@@ -1,0 +1,137 @@
+{
+  "footer": {
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "help": "Help Center",
+    "feedback": "Feedback",
+    "rights": "All rights reserved."
+  },
+  "notfound": {
+    "title": "Page Not Found",
+    "description": "Oops! The page you are looking for does not exist.",
+    "home_button": "Go Back Home"
+  },
+  "auth": {
+    "enter_email": "Please enter your email address",
+    "enter_email_desc": "Enter your email to continue",
+    "email_placeholder": "Email Address",
+    "continue": "Continue",
+    "welcome": "Welcome",
+    "email_exists": "Email exists. Please enter your password.",
+    "email_not_exists": "Email not found. Please verify your email to continue.",
+    "server_error": "Something went wrong. Please try again.",
+    "login_title": "Login to your account",
+    "signup_title": "Create a new account",
+    "password_placeholder": "Enter your password",
+    "enter_password": "Please enter your password",
+    "forgot_password": "Forgot password?",
+    "login": "Login",
+    "create_account": "Create Account",
+    "loading": "Processing..."
+  },
+  "verifyEmail": {
+    "code_required": "Verification code is required",
+    "invalid_or_expired_code": "The code is invalid or has expired",
+    "server_error": "Something went wrong. Please try again.",
+    "enter_code_desc": "Please enter the code sent to your email",
+    "code_placeholder": "Verification Code",
+    "loading": "Verifying...",
+    "verify": "Verify",
+    "not_received": "Didn't get the email?",
+    "resend_code": "Resend code",
+    "resend_in": "Resend available in {{seconds}}s",
+    "resend_failed": "Failed to resend verification code. Please try again.",
+    "tips": "Make sure to check your Spam or Junk folder. It may take a few minutes for the email to arrive."
+  },
+  "userInfo": {
+    "enter_details_desc": "Set a strong password for your account",
+    "password_placeholder": "Password",
+    "confirm_password_placeholder": "Confirm Password",
+    "continue": "Continue",
+    "loading": "Saving...",
+    "disclaimer_before": "By signing up or creating an account you agree to our",
+    "terms": "Terms & Conditions",
+    "and": "and",
+    "privacy": "Privacy Policy",
+    "server_error": "Something went wrong. Please try again.",
+    "password_required": "Password is required",
+    "password_length": "Password must be between 8-24 characters",
+    "password_uppercase": "Password must include an uppercase letter",
+    "password_lowercase": "Password must include a lowercase letter",
+    "password_number": "Password must include a number",
+    "password_special": "Password must include a special character",
+    "passwords_mismatch": "Passwords do not match"
+  },
+  "preferences": {
+    "language": "Language",
+    "lang_rw": "Kinyarwanda",
+    "lang_en": "English",
+    "lang_fr": "French",
+    "lang_sw": "Swahili",
+    "notifications": "Allow Notifications",
+    "subtitles": "Enable Auto Subtitles",
+    "genres": "Preferred Genres",
+    "save": "Save Preferences",
+    "saving": "Saving...",
+    "update_success": "Preferences updated successfully!",
+    "update_error": "Failed to update preferences."
+  },
+  "genres": {
+    "comedy": "Comedy",
+    "drama": "Drama",
+    "action": "Action",
+    "romance": "Romance",
+    "horror": "Horror",
+    "documentary": "Documentary",
+    "animation": "Animation"
+  },
+  "settings": {
+    "title": "Account Settings",
+    "back": "Go Back",
+    "loading": "Loading...",
+    "more": "More",
+    "tabs": {
+      "account": "Account Info",
+      "security": "Security",
+      "preferences": "Preferences",
+      "sessions": "Active Sessions",
+      "subscription": "Subscription",
+      "profiles": "Family / Profiles",
+      "parental": "Parental Controls"
+    }
+  },
+  "accountInfo": {
+    "avatarAlt": "Avatar",
+    "changeAvatar": "Change Profile Picture",
+    "close": "Close",
+    "categories": {
+      "People": "People",
+      "Animals": "Animals",
+      "Fantasy": "Fantasy",
+      "Abstract": "Abstract"
+    },
+    "email": "Email",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "success": "Account info updated successfully!",
+    "error": "Failed to update account info."
+  },
+  "sessions": {
+    "logoutSuccess": "Session logged out successfully.",
+    "logoutFail": "Failed to log out this session.",
+    "logoutAllSuccess": "All other sessions logged out successfully.",
+    "logoutAllFail": "Failed to log out other sessions.",
+    "noActive": "No active sessions.",
+    "logoutAll": "Logout All Other Sessions",
+    "loggingOut": "Logging out...",
+    "current": "Current Session",
+    "ip": "IP",
+    "location": "Location",
+    "login": "Login",
+    "logout": "Logout",
+    "status": "Status",
+    "active": "Active",
+    "loggedOut": "Logged out",
+    "unknown": "Unknown"
+  }
+}

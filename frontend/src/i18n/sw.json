@@ -1,0 +1,130 @@
+{
+  "footer": {
+    "terms": "Masharti ya Huduma",
+    "privacy": "Sera ya Faragha",
+    "help": "Kituo cha Msaada",
+    "feedback": "Maoni",
+    "rights": "Haki zote zimehifadhiwa."
+  },
+    "notfound": {
+    "title": "Ukurasa Haupo",
+    "description": "Oops! Ukurasa unaotafuta haupo.",
+    "home_button": "Rudi Nyumbani"
+  },
+  "auth": {
+    "enter_email": "Tafadhali weka anuani yako ya barua pepe",
+    "enter_email_desc": "Weka barua pepe yako ili kuendelea",
+    "email_placeholder": "Anuani ya Barua Pepe",
+    "continue": "Endelea",
+    "welcome": "Karibu",
+    "email_exists": "Barua pepe ipo. Tafadhali weka nenosiri lako.",
+    "email_not_exists": "Barua pepe haipo. Tafadhali thibitisha barua pepe yako ili kuendelea.",
+    "server_error": "Kuna tatizo. Tafadhali jaribu tena.",
+    "loading": "Inapakia..."
+  },
+    "verifyEmail": {
+    "code_required": "Nambari ya uthibitisho inahitajika",
+    "invalid_or_expired_code": "Nambari si sahihi au imekwisha muda wake",
+    "server_error": "Hitilafu imetokea kwenye seva. Tafadhali jaribu tena.",
+    "enter_code_desc": "Tafadhali ingiza nambari iliyotumwa kwenye barua pepe yako",
+    "code_placeholder": "Nambari ya Uthibitisho",
+    "loading": "Inathibitisha...",
+    "verify": "Thibitisha",
+    "not_received": "Hujapokea barua pepe?",
+    "resend_code": "Tuma tena msimbo",
+    "resend_in": "Tuma tena utapatikana baada ya sekunde {{seconds}}",
+    "resend_failed": "Imeshindikana kutuma msimbo wa uthibitisho tena. Tafadhali jaribu tena.",
+    "tips": "Hakikisha umeangalia folda ya Spam au Junk. Inaweza kuchukua dakika chache kufika."
+  },
+  "userInfo": {
+    "enter_details_desc": "Weka nenosiri thabiti kwa akaunti yako",
+    "password_placeholder": "Nenosiri",
+    "confirm_password_placeholder": "Thibitisha Nenosiri",
+    "continue": "Endelea",
+    "loading": "Inaendelea kuhifadhi...",
+    "disclaimer_before": "Kwa kujisajili au kuunda akaunti unakubaliana na",
+    "terms": "Masharti & Masharti",
+    "and": "na",
+    "privacy": "Sera ya Faragha",
+    "server_error": "Kosa la seva, tafadhali jaribu tena",
+    "password_required": "Nenosiri linahitajika",
+    "password_length": "Nenosiri lazima liwe kati ya herufi 8-24",
+    "password_uppercase": "Nenosiri lazima liwe na herufi kubwa",
+    "password_lowercase": "Nenosiri lazima liwe na herufi ndogo",
+    "password_number": "Nenosiri lazima liwe na namba",
+    "password_special": "Nenosiri lazima liwe na alama maalum",
+    "passwords_mismatch": "Manenosiri hayalingani"
+  },
+  "preferences": {
+    "language": "Lugha",
+    "lang_rw": "Kinyarwanda",
+    "lang_en": "Kiingereza(English)",
+    "lang_fr": "Kifaransa(French)",
+    "lang_sw": "Kiswahili",
+    "notifications": "Ruhusu Arifa",
+    "subtitles": "Wezesha Manukuu Kiotomatiki",
+    "genres": "Aina unazopendelea",
+    "save": "Hifadhi Mapendeleo",
+    "saving": "Inahifadhiwa...",
+    "update_success": "Mapendeleo yamehifadhiwa kwa mafanikio!",
+    "update_error": "Imeshindikana kuhifadhi mapendeleo."
+  },
+  "genres": {
+    "comedy": "Vichekesho",
+    "drama": "Tamthilia",
+    "action": "Mapigano",
+    "romance": "Mapenzi",
+    "horror": "Ya Kutisha",
+    "documentary": "Hati",
+    "animation": "Uchoraji"
+  },
+  "settings": {
+    "title": "Mipangilio ya Akaunti",
+    "back": "Rudi Nyuma",
+    "loading": "Inapakia...",
+    "more": "Zaidi",
+    "tabs": {
+      "account": "Taarifa za Akaunti",
+      "security": "Usalama",
+      "preferences": "Mapendeleo",
+      "sessions": "Vipindi Vinavyoendelea",
+      "subscription": "Usajili",
+      "profiles": "Familia / Profaili",
+      "parental": "Udhibiti wa Wazazi"
+    }
+  },
+  "accountInfo": {
+    "avatarAlt": "Picha ya mtumiaji",
+    "changeAvatar": "Badilisha Picha ya Profaili",
+    "close": "Funga",
+    "categories": {
+      "People": "Watu",
+      "Animals": "Wanyama",
+      "Fantasy": "Hadithi za Kubuni",
+      "Abstract": "Sanaa ya Kufikirika"
+    },
+    "email": "Barua pepe",
+    "save": "Hifadhi Mabadiliko",
+    "saving": "Inahifadhiwa...",
+    "success": "Taarifa za akaunti zimehifadhiwa kwa mafanikio!",
+    "error": "Imeshindikana kuhifadhi taarifa za akaunti."
+  },
+  "sessions": {
+    "logoutSuccess": "Kikao kimetolewa kwa mafanikio.",
+    "logoutFail": "Imeshindikana kutoa kikao hiki.",
+    "logoutAllSuccess": "Vikao vingine vyote vimetolewa kwa mafanikio.",
+    "logoutAllFail": "Imeshindikana kutoa vikao vingine.",
+    "noActive": "Hakuna vikao vinavyoendelea.",
+    "logoutAll": "Toa vikao vingine vyote",
+    "loggingOut": "Inatoka...",
+    "current": "Kikao cha sasa",
+    "ip": "IP",
+    "location": "Mahali",
+    "login": "Kuingia",
+    "logout": "Kutoka",
+    "status": "Hali",
+    "active": "Hai",
+    "loggedOut": "Imetolewa",
+    "unknown": "Haijulikani"
+  }
+}

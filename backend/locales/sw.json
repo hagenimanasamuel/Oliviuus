@@ -1,0 +1,22 @@
+{
+  "emailVerification": {
+    "verification_subject": "Thibitisha Barua Pepe Yako",
+    "verification_body": "Tafadhali tumia nambari hii kuthibitisha akaunti yako: {{code}}",
+    "code_expires": "Nambari hii itakuwa hai baada ya dakika 10.",
+    "security_notice_title": "Tahadhari ya Usalama:",
+    "security_notice_li1": "Usishirikishe nambari hii na mtu",
+    "security_notice_li2": "Hatutaikuhitaji kamwe",
+    "security_notice_li3": "Puuza ikiwa huikuomba"
+  },
+  "welcomeEmail": {
+    "subject": "Karibu Oliviuus 🎉",
+    "title": "Habari na Karibu!",
+    "body": "Akaunti yako imeundwa kikamilifu. Sasa unaweza kuanza kutazama filamu, tamthilia na mengine mengi kwenye Oliviuus.",
+    "tip_title": "Vidokezo vya Kuanza:",
+    "tips": [
+      "Binafsisha mapendeleo yako muda wowote kupitia profaili yako",
+      "Angalia barua pepe mara kwa mara kupata taarifa mpya"
+    ],
+    "closing": "Furahia safari yako na Oliviuus!"
+  }
+}

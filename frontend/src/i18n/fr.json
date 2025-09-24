@@ -1,0 +1,130 @@
+{
+  "footer": {
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "help": "Centre d'aide",
+    "feedback": "Retour d'information",
+    "rights": "Tous droits réservés."
+  },
+    "notfound": {
+    "title": "Page Introuvable",
+    "description": "Oups! La page que vous recherchez n'existe pas.",
+    "home_button": "Retour à l'accueil"
+  },
+  "auth": {
+    "enter_email": "Veuillez entrer votre adresse e-mail",
+    "enter_email_desc": "Entrez votre e-mail pour continuer",
+    "email_placeholder": "Adresse e-mail",
+    "continue": "Continuer",
+    "welcome": "Bienvenue",
+    "email_exists": "L'email existe. Veuillez saisir votre mot de passe.",
+    "email_not_exists": "Email introuvable. Veuillez vérifier votre e-mail pour continuer.",
+    "server_error": "Une erreur est survenue. Veuillez réessayer.",
+    "loading": "Chargement..."
+  },
+    "verifyEmail": {
+    "code_required": "Le code de vérification est requis",
+    "invalid_or_expired_code": "Le code est invalide ou a expiré",
+    "server_error": "Une erreur s'est produite sur le serveur. Veuillez réessayer.",
+    "enter_code_desc": "Veuillez entrer le code envoyé à votre adresse e-mail",
+    "code_placeholder": "Code de vérification",
+    "loading": "Vérification...",
+    "verify": "Vérifier",
+    "not_received": "Vous n'avez pas reçu l'e-mail ?",
+    "resend_code": "Renvoyer le code",
+    "resend_in": "Nouveau renvoi disponible dans {{seconds}}s",
+    "resend_failed": "Échec du renvoi du code de vérification. Veuillez réessayer.",
+    "tips": "Vérifiez votre dossier Spam ou Courriers indésirables. L'e-mail peut prendre quelques minutes à arriver."
+  },
+  "userInfo": {
+    "enter_details_desc": "Définissez un mot de passe fort pour votre compte",
+    "password_placeholder": "Mot de passe",
+    "confirm_password_placeholder": "Confirmez le mot de passe",
+    "continue": "Continuer",
+    "loading": "Enregistrement...",
+    "disclaimer_before": "En vous inscrivant ou en créant un compte, vous acceptez nos",
+    "terms": "Termes & Conditions",
+    "and": "et",
+    "privacy": "Politique de confidentialité",
+    "server_error": "Erreur serveur, veuillez réessayer",
+    "password_required": "Le mot de passe est requis",
+    "password_length": "Le mot de passe doit contenir entre 8 et 24 caractères",
+    "password_uppercase": "Le mot de passe doit inclure une lettre majuscule",
+    "password_lowercase": "Le mot de passe doit inclure une lettre minuscule",
+    "password_number": "Le mot de passe doit inclure un chiffre",
+    "password_special": "Le mot de passe doit inclure un caractère spécial",
+    "passwords_mismatch": "Les mots de passe ne correspondent pas"
+  },
+  "preferences": {
+    "language": "Langue",
+    "lang_rw": "Kinyarwanda",
+    "lang_en": "Anglais(English)",
+    "lang_fr": "Français",
+    "lang_sw": "Swahili",
+    "notifications": "Autoriser les notifications",
+    "subtitles": "Activer les sous-titres automatiques",
+    "genres": "Genres préférés",
+    "save": "Enregistrer les préférences",
+    "saving": "Enregistrement...",
+    "update_success": "Préférences mises à jour avec succès !",
+    "update_error": "Échec de la mise à jour des préférences."
+  },
+  "genres": {
+    "comedy": "Comédie",
+    "drama": "Drame",
+    "action": "Action",
+    "romance": "Romance",
+    "horror": "Horreur",
+    "documentary": "Documentaire",
+    "animation": "Animation"
+  },
+  "settings": {
+    "title": "Paramètres du Compte",
+    "back": "Retour",
+    "loading": "Chargement...",
+    "more": "Plus",
+    "tabs": {
+      "account": "Infos du Compte",
+      "security": "Sécurité",
+      "preferences": "Préférences",
+      "sessions": "Sessions Actives",
+      "subscription": "Abonnement",
+      "profiles": "Famille / Profils",
+      "parental": "Contrôle Parental"
+    }
+  },
+  "accountInfo": {
+    "avatarAlt": "Avatar",
+    "changeAvatar": "Changer la photo de profil",
+    "close": "Fermer",
+    "categories": {
+      "People": "Personnes",
+      "Animals": "Animaux",
+      "Fantasy": "Fantaisie",
+      "Abstract": "Abstrait"
+    },
+    "email": "Email",
+    "save": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "success": "Informations du compte mises à jour avec succès !",
+    "error": "Échec de la mise à jour des informations du compte."
+  },
+  "sessions": {
+    "logoutSuccess": "Session déconnectée avec succès.",
+    "logoutFail": "Échec de la déconnexion de cette session.",
+    "logoutAllSuccess": "Toutes les autres sessions ont été déconnectées.",
+    "logoutAllFail": "Échec de la déconnexion des autres sessions.",
+    "noActive": "Aucune session active.",
+    "logoutAll": "Déconnecter toutes les autres sessions",
+    "loggingOut": "Déconnexion...",
+    "current": "Session actuelle",
+    "ip": "IP",
+    "location": "Localisation",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "status": "Statut",
+    "active": "Active",
+    "loggedOut": "Déconnectée",
+    "unknown": "Inconnu"
+  }
+}

@@ -1,13 +1,45 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="rw"> <!-- Set language to Kinyarwanda -->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/oliviuus_logo_transparent.png" />
+
+  <!-- SEO Meta Tags (Localized for Kinyarwanda) -->
+  <meta name="description" content="Shakisha no kureba filimi nyarwanda kuri Oliviuus" />
+  <meta name="keywords" content="filimi nyarwanda, gukina filimi, sinema, Rwanda, filimi zo muri Africa" />
+  <meta name="author" content="Oliviuus" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content="Oliviuus - Urubuga rw'amafilimi Nyarwanda" />
+  <meta property="og:description" content="Shakisha no kureba filimi nyarwanda kuri Oliviuus." />
+  <meta property="og:image" content="/oliviuus_logo_transparent.png" />
+  <meta property="og:url" content="https://www.oliviuus.com" />
+  <meta name="twitter:title" content="Oliviuus - Urubuga rw'amafilimi Nyarwanda" />
+  <meta name="twitter:description" content="Shakisha no kureba filimi nyarwanda kuri Oliviuus." />
+  <meta name="twitter:image" content="/oliviuus_logo_transparent.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Dynamic Title (Default will be updated by React app) -->
+  <title>Oliviuus</title>
+
+  <!-- Fonts (Google Fonts or System fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" />
+
+  <!-- Preload key assets -->
+  <link rel="preload" href="/oliviuus_logo_transparent.png" as="image" />
+
+
+  <!-- Minimal FOUC (Flash of Unstyled Content) -->
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <!-- Preload and defer JS for better performance -->
+  <script type="module" src="/src/main.jsx" defer></script>
+</body>
+
 </html>

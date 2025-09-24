@@ -1,0 +1,22 @@
+{
+  "emailVerification": {
+    "verification_subject": "Verify Your Email Address",
+    "verification_body": "Please use this code to verify your account: {{code}}",
+    "code_expires": "This code expires in 10 minutes.",
+    "security_notice_title": "Security Notice:",
+    "security_notice_li1": "Never share this code",
+    "security_notice_li2": "We will never ask for it",
+    "security_notice_li3": "Ignore if you didn’t request it"
+  },
+  "welcomeEmail": {
+    "subject": "Welcome to Oliviuus 🎉",
+    "title": "Hello and Welcome!",
+    "body": "Your account has been successfully created. You can now explore movies, series, and more on Oliviuus.",
+    "tip_title": "Pro Tips to Get Started:",
+    "tips": [
+      "Personalize your preferences anytime in your profile",
+      "Check your email regularly for new updates"
+    ],
+    "closing": "Enjoy your journey with Oliviuus!"
+  }
+}

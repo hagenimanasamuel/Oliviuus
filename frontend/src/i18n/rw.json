@@ -1,0 +1,130 @@
+{
+  "footer": {
+    "terms": "Amategeko",
+    "privacy": "Politiki y’Ubuzima bwite",
+    "help": "Komeza gufashwa",
+    "feedback": "Icyifuzo",
+    "rights": "Uburenganzira bwose burabitswe."
+  },
+  "notfound": {
+    "title": "Urupapuro Ntabwo Rwabonetse",
+    "description": "Oya! Urupapuro urigushaka ntirubaho.",
+    "home_button": "Subira Ahabanza"
+  },
+  "auth": {
+    "enter_email": "Nyamuneka shyiramo aderesi email yawe",
+    "enter_email_desc": "Shyiramo email yawe kugirango ukomeze",
+    "email_placeholder": "Aderesi Email",
+    "continue": "Komeza",
+    "welcome": "Murakaza neza",
+    "email_exists": "Email irabaho. Nyamuneka shyiramo ijambo ry’ibanga.",
+    "email_not_exists": "Email ntiyabonetse. Nyamuneka wemeze email yawe kugirango ukomeze.",
+    "server_error": "Habayeho ikosa. Ongera ugerageze.",
+    "loading": "Birimo gutunganywa..."
+  },
+    "verifyEmail": {
+    "code_required": "Kode yo kugenzura irakenewe",
+    "invalid_or_expired_code": "Kode siyo cyangwa yarengeje igihe",
+    "server_error": "Habaye ikosa. Ongera ugerageze.",
+    "enter_code_desc": "Shyiramo kode woherejwe kuri imeri yawe",
+    "code_placeholder": "Kode yo Kugenzura",
+    "loading": "Irimo kugenzura...",
+    "verify": "Emeza",
+    "not_received": "Ntabwo wabonye email?",
+    "resend_code": "Ohereza kode kongera",
+    "resend_in": "Uzashobora kongera kohereza mu masegonda {{seconds}}",
+    "resend_failed": "Kohereza kode byanze. Ongera ugerageze.",
+    "tips": "Reba muri Spam cyangwa Junk. Email ishobora gufata iminota mike kugira ngo igere."
+  },
+  "userInfo": {
+    "enter_details_desc": "Shyiraho ijambo ry'ibanga rikomeye kuri konti yawe",
+    "password_placeholder": "Ijambo ry'ibanga",
+    "confirm_password_placeholder": "Emeza ijambo ry'ibanga",
+    "continue": "Komeza",
+    "loading": "Birimo kubikwa...",
+    "disclaimer_before": "Ukwiyandikisha cyangwa gukora konti wemera",
+    "terms": "Amategeko & Amabwiriza",
+    "and": "na",
+    "privacy": "Politiki y'Ibanga",
+    "server_error": "Ikosa rya server, gerageza kongera",
+    "password_required": "Ijambo ry'ibanga rirakenewe",
+    "password_length": "Ijambo ry'ibanga rigomba kuba hagati ya 8-24 inyuguti",
+    "password_uppercase": "Ijambo ry'ibanga rigomba kugira inyuguti nkuru",
+    "password_lowercase": "Ijambo ry'ibanga rigomba kugira inyuguti ntoya",
+    "password_number": "Ijambo ry'ibanga rigomba kugira nimero",
+    "password_special": "Ijambo ry'ibanga rigomba kugira ikimenyetso cyihariye",
+    "passwords_mismatch": "Amagambo y'ibanga ntahura"
+  },
+  "preferences": {
+    "language": "Ururimi",
+    "lang_rw": "Ikinyarwanda",
+    "lang_en": "Icyongereza(English)",
+    "lang_fr": "Igifaransa(Français)",
+    "lang_sw": "Igiswahili(Swahili)",
+    "notifications": "Emera kumenyeshwa",
+    "subtitles": "Hindura subtitles ku buryo bwikora",
+    "genres": "Ubwoko ukunda",
+    "save": "Bika Ibyifuzo",
+    "saving": "Ibikomeje kubikwa...",
+    "update_success": "Ibyifuzo byabitswe neza!",
+    "update_error": "Ntibyashobotse kubika ibyifuzo."
+  },
+  "genres": {
+    "comedy": "Ibyo gusetsa",
+    "drama": "Drama",
+    "action": "Ibikorwa",
+    "romance": "Urukundo",
+    "horror": "Gutera ubwoba",
+    "documentary": "Documentaire",
+    "animation": "Animation"
+  },
+  "settings": {
+    "title": "Amagenamiterere ya Konti",
+    "back": "Subira Inyuma",
+    "loading": "Birimo Gupakururwa...",
+    "more": "Ibindi",
+    "tabs": {
+      "account": "Amakuru ya Konti",
+      "security": "Umutekano",
+      "preferences": "Ibyihariye",
+      "sessions": "Ibihe biriho",
+      "subscription": "Ukwiyandikisha",
+      "profiles": "Imiryango / Profayiri",
+      "parental": "Igenzura ry’Ababyeyi"
+    }
+  },
+  "accountInfo": {
+    "avatarAlt": "Ifoto y’umukoresha",
+    "changeAvatar": "Hindura Ifoto",
+    "close": "Funga",
+    "categories": {
+      "People": "Abantu",
+      "Animals": "Inyamaswa",
+      "Fantasy": "Imigani",
+      "Abstract": "Ibishushanyo"
+    },
+    "email": "Imeyili",
+    "save": "Bika Impinduka",
+    "saving": "Birimo Kubikwa...",
+    "success": "Amakuru ya konti abitswe neza!",
+    "error": "Byanze kubika amakuru ya konti."
+  },
+  "sessions": {
+    "logoutSuccess": "Icyiciro cyasohowe neza.",
+    "logoutFail": "Ntibyashobotse gusohora iki cyiciro.",
+    "logoutAllSuccess": "Ibindi byiciro byose byasohowe neza.",
+    "logoutAllFail": "Ntibyashobotse gusohora ibindi byiciro.",
+    "noActive": "Nta byiciro biri gukora.",
+    "logoutAll": "Sohora ibindi byose",
+    "loggingOut": "Birimo gusohoka...",
+    "current": "Icyiciro uri gukoresha",
+    "ip": "IP",
+    "location": "Aho uri",
+    "login": "Kwinjira",
+    "logout": "Gusohoka",
+    "status": "Imiterere",
+    "active": "Bikora",
+    "loggedOut": "Byasohotse",
+    "unknown": "Ntibizwi"
+  }
+}
