@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import EditableEmail from "../../components/ui/EditableEmail";
+import ForgotPasswordModal from "./ForgotPasswordModal";
 import Alert from "../../components/ui/Alert.jsx";
 import api from "../../api/axios"; // pre-configured Axios
 import { useAuth } from "../../context/AuthContext";
@@ -10,10 +11,11 @@ import { useAuth } from "../../context/AuthContext";
 const PasswordStep = ({ email }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { loginUser, user: currentUser } = useAuth(); 
+  const { loginUser, user: currentUser } = useAuth();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isForgotOpen, setIsForgotOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -31,8 +33,8 @@ const PasswordStep = ({ email }) => {
     const deviceType = /Mobi|Android/i.test(navigator.userAgent)
       ? "mobile"
       : /Tablet|iPad/i.test(navigator.userAgent)
-      ? "tablet"
-      : "desktop";
+        ? "tablet"
+        : "desktop";
 
     return {
       device_name: deviceName,
@@ -82,8 +84,7 @@ const PasswordStep = ({ email }) => {
     "w-full px-4 py-4 text-lg bg-transparent text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#BC8BBC] peer border border-gray-600";
 
   const labelClass = (fieldValue) =>
-    `absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none transition-all duration-200 peer-focus:text-[#BC8BBC] ${
-      fieldValue || isFocused ? "text-xs -translate-y-6 text-[#BC8BBC]" : "text-lg"
+    `absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none transition-all duration-200 peer-focus:text-[#BC8BBC] ${fieldValue || isFocused ? "text-xs -translate-y-6 text-[#BC8BBC]" : "text-lg"
     }`;
 
   return (
@@ -123,17 +124,24 @@ const PasswordStep = ({ email }) => {
       </div>
 
       <div className="flex justify-between text-sm">
-        <Link to="/forgot-password" className="text-[#BC8BBC] hover:underline">
+        <span
+          onClick={() => setIsForgotOpen(true)}
+          className="text-[#BC8BBC] hover:underline cursor-pointer"
+        >
           {t("auth.forgot_password")}
-        </Link>
+        </span>
+        <ForgotPasswordModal
+          isOpen={isForgotOpen}
+          onClose={() => setIsForgotOpen(false)}
+          email={email}
+        />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className={`w-full ${
-          loading ? "bg-gray-500" : "bg-[#BC8BBC] hover:bg-[#9b69b2]"
-        } text-white font-medium py-3 rounded-lg transition`}
+        className={`w-full ${loading ? "bg-gray-500" : "bg-[#BC8BBC] hover:bg-[#9b69b2]"
+          } text-white font-medium py-3 rounded-lg transition`}
       >
         {loading ? t("auth.loading") : t("auth.login")}
       </button>

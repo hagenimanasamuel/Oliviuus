@@ -29,6 +29,23 @@ const UserInfoStep = () => {
     if (decoded?.email) setEmail(decoded.email);
   }, [location.search]);
 
+  // ✅ Detect device and session info 
+  const getSessionInfo = () => {
+    const deviceName = navigator.platform || "Unknown Device";
+    const userAgent = navigator.userAgent || "Unknown UA";
+    const deviceType = /Mobi|Android/i.test(navigator.userAgent)
+      ? "mobile"
+      : /Tablet|iPad/i.test(navigator.userAgent)
+        ? "tablet"
+        : "desktop";
+
+    return {
+      device_name: deviceName,
+      device_type: deviceType,
+      user_agent: userAgent,
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -45,15 +62,20 @@ const UserInfoStep = () => {
       // Get language from localStorage (fallback to "rw")
       const language = localStorage.getItem("lang") || "rw";
 
+      // ✅ Get device/session info
+      const sessionInfo = getSessionInfo();
+
+      // ✅ Send all data to backend
       const res = await api.post("/auth/user-info", { 
         email, 
         password, 
-        language
-      });
+        language,
+        ...sessionInfo,
+      }, { withCredentials: true }); // set cookies
 
       if (res.status === 200) {
         // ✅ Redirect to subscription page after successful signup
-        navigate("/subscription", { replace: true });
+        navigate("/dashboard", { replace: true });
       } else {
         setError(t("userInfo.server_error"));
       }

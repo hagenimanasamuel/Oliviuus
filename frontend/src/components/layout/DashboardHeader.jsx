@@ -1,18 +1,31 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell, ChevronDown, LogOut, Settings } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Settings, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../Logo";
 
-export default function DashboardHeader({ user, onLogout }) {
+export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1024);
 
   const [avatarUrl, setAvatarUrl] = useState(user?.profile_avatar_url || "");
   const [tempAvatar, setTempAvatar] = useState(user?.profile_avatar_url || "");
 
   const profileRef = useRef(null);
   const notifRef = useRef(null);
+
+  // Track window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isMobileView = windowWidth < 768;
 
   useEffect(() => {
     setTempAvatar(user?.profile_avatar_url || "");
@@ -48,12 +61,26 @@ export default function DashboardHeader({ user, onLogout }) {
   return (
     <>
       <header className="w-full bg-gray-900 text-white shadow-md px-4 sm:px-6 py-3 flex justify-between items-center fixed top-0 left-0 z-50">
-        {/* Logo / Branding */}
-        <div
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => navigate("/")}
-        >
-          <Logo className="h-8 w-auto" />
+        {/* Left side: Menu button + Logo */}
+        <div className="flex items-center gap-4">
+          {/* Menu button - only shown on mobile */}
+          {isMobileView && (
+            <button
+              onClick={onMenuToggle}
+              className="flex items-center justify-center w-10 h-10 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Toggle menu"
+            >
+              <Menu size={24} />
+            </button>
+          )}
+          
+          {/* Logo */}
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            <Logo className="h-8 w-auto" />
+          </div>
         </div>
 
         {/* Right side actions */}

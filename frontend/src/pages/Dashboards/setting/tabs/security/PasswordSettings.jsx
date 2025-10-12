@@ -3,8 +3,12 @@ import { Eye, EyeOff } from "lucide-react";
 import api from "../../../../../api/axios";
 import Alert from "../../../../../components/ui/Alert.jsx";
 import Toast from "../../../../../components/ui/Toast";
+import { useAuth } from "../../../../../context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 export default function PasswordSettings() {
+  const { t } = useTranslation();
+  const { user: currentUser } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,65 +29,75 @@ export default function PasswordSettings() {
     return lengthValid && hasUpper && hasLower && hasNumber && hasSymbol;
   };
 
-const handleChangePassword = async () => {
-  setAlertMessage("");
-  
-  if (newPassword !== confirmPassword) {
-    setAlertType("error");
-    setAlertMessage("Passwords do not match");
-    return;
-  }
+  const handleChangePassword = async () => {
+    setAlertMessage("");
 
-  if (!validatePassword(newPassword)) {
-    setAlertType("error");
-    setAlertMessage(
-      "Password must be 8+ chars and include uppercase, lowercase, number & symbol."
-    );
-    return;
-  }
+    if (newPassword !== confirmPassword) {
+      setAlertType("error");
+      setAlertMessage(t("passwordSettings.errorPasswordsMismatch"));
+      return;
+    }
 
-  if (!currentPassword) {
-    setAlertType("error");
-    setAlertMessage("Current password is required.");
-    return;
-  }
+    if (!validatePassword(newPassword)) {
+      setAlertType("error");
+      setAlertMessage(t("passwordSettings.errorPasswordCriteria"));
+      return;
+    }
 
-  setLoading(true);
+    if (!currentPassword) {
+      setAlertType("error");
+      setAlertMessage(t("passwordSettings.errorCurrentRequired"));
+      return;
+    }
 
-  try {
-    const res = await api.put(
-      "/user/update-password",
-      { currentPassword, newPassword },
-      { withCredentials: true }
-    );
+    setLoading(true);
 
-    setAlertType("success");
-    setAlertMessage(res.data.message || "Password updated successfully!");
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-  } catch (err) {
-    console.error(err);
-
-    // ✅ Extract message from server response, fallback if missing
-    const serverMessage = err.response?.data?.message || "Failed to update password.";
-
-    setAlertType("error");
-    setAlertMessage(serverMessage);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
-  const handleRequestReset = async () => {
     try {
-      await api.post("/user/request-password-reset", {}, { withCredentials: true });
-      setToast({ message: "Password reset link sent to your email.", type: "success" });
+      const res = await api.put(
+        "/user/update-password",
+        { currentPassword, newPassword },
+        { withCredentials: true }
+      );
+
+      setAlertType("success");
+      setAlertMessage(res.data.message || t("passwordSettings.successUpdate"));
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err) {
       console.error(err);
-      setToast({ message: err.response?.data?.message || "Failed to send reset link.", type: "error" });
+      const serverMessage =
+        err.response?.data?.message || t("passwordSettings.errorUpdate");
+      setAlertType("error");
+      setAlertMessage(serverMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRequestReset = async () => {
+    if (!currentUser?.email) return;
+
+    try {
+      setToast({ message: t("passwordSettings.sendingReset"), type: "info" });
+
+      await api.post(
+        "/auth/request-password-reset",
+        { email: currentUser.email, language: currentUser.language || "en" },
+        { withCredentials: true }
+      );
+
+      setToast({
+        message: t("passwordSettings.resetSent"),
+        type: "success",
+      });
+    } catch (err) {
+      console.error(err);
+      setToast({
+        message:
+          err.response?.data?.error || t("passwordSettings.resetFailed"),
+        type: "error",
+      });
     }
   };
 
@@ -98,13 +112,15 @@ const handleChangePassword = async () => {
       )}
 
       <div>
-        <label className="block text-gray-400 mb-1">Current Password</label>
+        <label className="block text-gray-400 mb-1">
+          {t("passwordSettings.currentPassword")}
+        </label>
         <div className="relative">
           <input
             type={showCurrent ? "text" : "password"}
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="Enter current password"
+            placeholder={t("passwordSettings.currentPasswordPlaceholder")}
             className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#BC8BBC]"
           />
           <span
@@ -115,23 +131,26 @@ const handleChangePassword = async () => {
           </span>
         </div>
         <p className="text-gray-500 text-sm mt-1">
-          Forgot your current password? <span
+          {t("passwordSettings.forgotCurrent")}{" "}
+          <span
             onClick={handleRequestReset}
             className="text-[#BC8BBC] hover:underline cursor-pointer"
           >
-            Request a reset link
+            {t("passwordSettings.requestReset")}
           </span>
         </p>
       </div>
 
       <div>
-        <label className="block text-gray-400 mb-1">New Password</label>
+        <label className="block text-gray-400 mb-1">
+          {t("passwordSettings.newPassword")}
+        </label>
         <div className="relative">
           <input
             type={showNew ? "text" : "password"}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Enter new password"
+            placeholder={t("passwordSettings.newPasswordPlaceholder")}
             className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#BC8BBC]"
           />
           <span
@@ -142,18 +161,20 @@ const handleChangePassword = async () => {
           </span>
         </div>
         <p className="text-gray-500 text-sm mt-1">
-          Must be 8+ chars, include uppercase, lowercase, number & symbol
+          {t("passwordSettings.newPasswordHelp")}
         </p>
       </div>
 
       <div>
-        <label className="block text-gray-400 mb-1">Confirm New Password</label>
+        <label className="block text-gray-400 mb-1">
+          {t("passwordSettings.confirmPassword")}
+        </label>
         <div className="relative">
           <input
             type={showConfirm ? "text" : "password"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm new password"
+            placeholder={t("passwordSettings.confirmPasswordPlaceholder")}
             className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#BC8BBC]"
           />
           <span
@@ -172,7 +193,7 @@ const handleChangePassword = async () => {
           loading ? "opacity-50 cursor-not-allowed" : ""
         }`}
       >
-        {loading ? "Saving..." : "Update Password"}
+        {loading ? t("passwordSettings.saving") : t("passwordSettings.update")}
       </button>
 
       {toast.message && (

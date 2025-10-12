@@ -6,7 +6,7 @@
     "feedback": "Retour d'information",
     "rights": "Tous droits réservés."
   },
-    "notfound": {
+  "notfound": {
     "title": "Page Introuvable",
     "description": "Oups! La page que vous recherchez n'existe pas.",
     "home_button": "Retour à l'accueil"
@@ -20,9 +20,28 @@
     "email_exists": "L'email existe. Veuillez saisir votre mot de passe.",
     "email_not_exists": "Email introuvable. Veuillez vérifier votre e-mail pour continuer.",
     "server_error": "Une erreur est survenue. Veuillez réessayer.",
-    "loading": "Chargement..."
+    "login_title": "Connectez-vous à votre compte",
+    "signup_title": "Créer un nouveau compte",
+    "password_placeholder": "Entrez votre mot de passe",
+    "enter_password": "Veuillez entrer votre mot de passe",
+    "forgot_password": "Mot de passe oublié ?",
+    "login": "Connexion",
+    "loading": "Chargement...",
+    "reset_password": "Réinitialiser le mot de passe",
+    "reset_link_confirm": "Voulez-vous envoyer un lien de réinitialisation à",
+    "cancel": "Annuler",
+    "send_reset_link": "Envoyer le lien",
+    "sending": "Envoi...",
+    "reset_link_sent": "Le lien de réinitialisation du mot de passe a été envoyé à {{email}}",
+    "reset_link_error": "Échec de l’envoi du lien. Veuillez réessayer.",
+    "invalid_reset_link": "Lien de réinitialisation du mot de passe invalide.",
+    "password_mismatch": "Les mots de passe ne correspondent pas.",
+    "password_reset_success": "Votre mot de passe a été réinitialisé avec succès !",
+    "new_password": "Nouveau mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "reset_password_button": "Réinitialiser le mot de passe"
   },
-    "verifyEmail": {
+  "verifyEmail": {
     "code_required": "Le code de vérification est requis",
     "invalid_or_expired_code": "Le code est invalide ou a expiré",
     "server_error": "Une erreur s'est produite sur le serveur. Veuillez réessayer.",
@@ -126,5 +145,708 @@
     "active": "Active",
     "loggedOut": "Déconnectée",
     "unknown": "Inconnu"
+  },
+  "sidebar": {
+    "overview": "Aperçu",
+    "users": "Utilisateurs",
+    "library": "Bibliothèque",
+    "subscriptions": "Abonnements",
+    "analytics": "Analytique",
+    "globalManagement": "Gestion Globale",
+    "support": "Support"
+  },
+  "usersHeader": {
+    "allUsers": "Tous les Utilisateurs",
+    "filtered": "filtrés",
+    "searchPlaceholder": "Rechercher des utilisateurs par email ou rôle...",
+    "refresh": "Rafraîchir les utilisateurs",
+    "bulkActions": "Actions Groupées ({{count}})",
+    "activateSelected": "Activer la Sélection",
+    "deactivateSelected": "Désactiver la Sélection",
+    "deleteSelected": "Supprimer la Sélection",
+    "export": "Exporter",
+    "addUser": "Ajouter un Utilisateur",
+    "filters": "Filtres",
+    "allRoles": "Tous les Rôles",
+    "roles": {
+      "admin": "Administrateur",
+      "viewer": "Spectateur",
+      "moderator": "Modérateur",
+      "editor": "Éditeur"
+    },
+    "allStatus": "Tous les Statuts",
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "suspended": "Suspendu",
+      "pending": "En attente"
+    },
+    "lastLogin": "Dernière Connexion",
+    "lastLoginOptions": {
+      "today": "Aujourd'hui",
+      "week": "Cette Semaine",
+      "month": "Ce Mois-ci",
+      "quarter": "Ce Trimestre",
+      "year": "Cette Année",
+      "never": "Jamais Connecté"
+    },
+    "advanced": "Avancé",
+    "clearAll": "Tout Effacer",
+    "sortBy": "Trier par :",
+    "sort": {
+      "newest": "Plus Récent",
+      "oldest": "Plus Ancien",
+      "emailAsc": "Email (A → Z)",
+      "emailDesc": "Email (Z → A)",
+      "role": "Rôle",
+      "lastLogin": "Dernière Connexion"
+    },
+    "registrationDate": "Date d'Inscription",
+    "clearAdvanced": "Effacer Avancé"
+  },
+  "usersTabs": {
+    "allUsers": "Tous les Utilisateurs",
+    "rolesPermissions": "Rôles et Permissions",
+    "specials": "Spéciaux",
+    "familyPlan": "Forfait Famille",
+    "more": "Plus"
+  },
+  "passwordSettings": {
+    "currentPassword": "Mot de passe actuel",
+    "currentPasswordPlaceholder": "Entrez le mot de passe actuel",
+    "forgotCurrent": "Mot de passe oublié ?",
+    "requestReset": "Demander un lien de réinitialisation",
+    "newPassword": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Entrez le nouveau mot de passe",
+    "newPasswordHelp": "Doit contenir 8+ caractères, majuscule, minuscule, chiffre & symbole",
+    "confirmPassword": "Confirmez le nouveau mot de passe",
+    "confirmPasswordPlaceholder": "Confirmez le nouveau mot de passe",
+    "update": "Mettre à jour le mot de passe",
+    "saving": "Enregistrement...",
+    "errorPasswordsMismatch": "Les mots de passe ne correspondent pas",
+    "errorPasswordCriteria": "Le mot de passe doit comporter 8+ caractères, majuscule, minuscule, chiffre & symbole.",
+    "errorCurrentRequired": "Le mot de passe actuel est requis.",
+    "successUpdate": "Mot de passe mis à jour avec succès !",
+    "errorUpdate": "Échec de la mise à jour du mot de passe.",
+    "sendingReset": "Envoi du lien de réinitialisation...",
+    "resetSent": "Lien de réinitialisation envoyé à votre email.",
+    "resetFailed": "Échec de l'envoi du lien de réinitialisation."
+  },
+  "criticalActions": {
+    "warning": "Attention : Actions critiques du compte",
+    "deactivate": "Désactiver le compte",
+    "delete": "Supprimer le compte",
+    "processing": "Traitement...",
+    "info": "La désactivation désactivera temporairement votre compte. La suppression supprimera définitivement toutes les données.",
+    "confirm": "Êtes-vous sûr de vouloir {{action}} votre compte ? Cette action est irréversible.",
+    "deleteSuccess": "Compte supprimé avec succès.",
+    "deactivateSuccess": "Compte désactivé avec succès.",
+    "actionFailed": "Échec de l'action."
+  },
+  "securitySettings": {
+    "title": "Paramètres de sécurité",
+    "tabs": {
+      "password": "Mot de passe",
+      "critical": "Actions critiques"
+    },
+    "more": "Plus"
+  },
+  "userForm": {
+    "title": "Inviter un utilisateur",
+    "subtitle": "Envoyer une invitation pour rejoindre la plateforme",
+    "fields": {
+      "email": "Adresse e-mail",
+      "role": "Rôle",
+      "language": "Langue",
+      "sendInvitation": "Envoyer un e-mail d'invitation"
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "viewer": "Spectateur"
+    },
+    "languages": {
+      "en": "Anglais",
+      "rw": "Kinyarwanda",
+      "fr": "Français",
+      "sw": "Kiswahili"
+    },
+    "buttons": {
+      "cancel": "Annuler",
+      "sendInvitation": "Envoyer l'invitation",
+      "createUser": "Créer un utilisateur"
+    },
+    "alerts": {
+      "emailRequired": "L'adresse e-mail est requise",
+      "emailInvalid": "Veuillez entrer une adresse e-mail valide",
+      "roleRequired": "Veuillez sélectionner un rôle pour l'utilisateur",
+      "languageRequired": "Veuillez sélectionner une langue pour l'utilisateur",
+      "successInvitation": "Utilisateur créé avec succès ! Un e-mail a été envoyé pour définir son mot de passe.",
+      "successManual": "Utilisateur créé avec succès ! Vous pouvez envoyer l'invitation plus tard.",
+      "failed": "Échec de la création de l'utilisateur. Veuillez réessayer."
+    }
+  },
+  "users": {
+    "pageTitle": "Gestion des utilisateurs"
+  },
+  "userModal": {
+    "tabs": {
+      "overview": "Aperçu",
+      "activity": "Activité",
+      "subscription": "Abonnement",
+      "security": "Sécurité"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "suspended": "Suspendu",
+      "banned": "Banni"
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "moderator": "Modérateur",
+      "viewer": "Observateur",
+      "user": "Utilisateur"
+    },
+    "actions": {
+      "editEmail": "Modifier l'email",
+      "save": "Sauvegarder",
+      "cancel": "Annuler",
+      "makeAdmin": "Rendre Admin",
+      "makeViewer": "Rendre Observateur",
+      "activate": "Activer",
+      "deactivate": "Désactiver",
+      "loginHistory": "Historique",
+      "delete": "Supprimer",
+      "more": "Plus"
+    },
+    "confirmation": {
+      "changeRole": "Changer le rôle de {{email}} en {{role}}?",
+      "deleteAccount": "Êtes-vous sûr de vouloir supprimer le compte de {{email}}?",
+      "processing": "Traitement en cours..."
+    },
+    "errors": {
+      "updateRole": "Échec de la mise à jour du rôle utilisateur",
+      "updateStatus": "Échec de la mise à jour du statut utilisateur",
+      "deleteUser": "Échec de la suppression du compte utilisateur",
+      "updateEmail": "Échec de la mise à jour de l'email",
+      "networkError": "Erreur réseau. Veuillez vérifier le serveur.",
+      "sameEmail": "Le nouvel email est identique à l'email actuel.",
+      "invalidEmail": "Veuillez saisir une adresse email valide."
+    },
+    "prompts": {
+      "enterNewEmail": "Entrez le nouvel email :"
+    },
+    "success": {
+      "emailUpdated": "Email mis à jour avec succès !"
+    }
+  },
+  "overviewTab": {
+    "title": "Informations Utilisateur",
+    "activitySummary": "Résumé d'Activité",
+    "status": "Statut",
+    "plan": "Plan",
+    "memberSince": "Membre Depuis",
+    "lastLogin": "Dernière Connexion",
+    "language": "Langue",
+    "emailVerified": "Email Vérifié",
+    "lastIp": "Dernière IP",
+    "verified": "Vérifié",
+    "pending": "En Attente",
+    "stats": {
+      "totalLogins": "Connexions Totales",
+      "currentStreak": "Série Actuelle",
+      "failedLogins": "Échecs Connexion",
+      "avgSession": "Session Moyenne",
+      "todayLogins": "Connexions Aujourd'hui",
+      "thisWeek": "Cette Semaine",
+      "lastDevice": "Dernier Appareil",
+      "subscription": "Abonnement",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "avgSessionTime": "Temps Session Moyen",
+      "activeSessions": "Sessions Actives",
+      "totalSessions": "Sessions Totales"
+    },
+    "recentActivity": "Activité Récente",
+    "subscriptionPlans": {
+      "premium": "Premium",
+      "enterprise": "Entreprise",
+      "standard": "Standard",
+      "basic": "Basique",
+      "free": "Gratuit"
+    },
+    "time": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "daysAgo": "Il y a {{count}} jours",
+      "weeksAgo": "Il y a {{count}} semaines",
+      "monthsAgo": "Il y a {{count}} mois",
+      "yearsAgo": "Il y a {{count}} ans",
+      "never": "Jamais",
+      "unknown": "Inconnu"
+    }
+  },
+  "activityTab": {
+    "title": "Historique de Connexion & Sessions",
+    "stats": {
+      "totalSessions": "Sessions Totales",
+      "activeNow": "Actives Maintenant",
+      "completed": "Terminées",
+      "lastLogin": "Dernière Connexion"
+    },
+    "filters": {
+      "all": "Toutes les Sessions",
+      "active": "Actives Seulement",
+      "completed": "Terminées"
+    },
+    "actions": {
+      "refresh": "Actualiser",
+      "logoutAll": "Déconnecter Tout",
+      "terminate": "Terminer",
+      "terminateAllConfirm": "Êtes-vous sûr de vouloir terminer toutes les sessions actives de cet utilisateur ?"
+    },
+    "session": {
+      "status": {
+        "active": "Active",
+        "completed": "Terminée"
+      },
+      "deviceTypes": {
+        "mobile": "📱 Mobile",
+        "tablet": "📟 Tablette",
+        "desktop": "🖥️ Bureau",
+        "default": "💻 Appareil"
+      },
+      "login": "Connexion",
+      "duration": "Durée",
+      "active": "Active",
+      "justNow": "À l'instant",
+      "unknownLocation": "Localisation inconnue"
+    },
+    "messages": {
+      "loading": "Chargement des sessions...",
+      "noSessions": "Aucune session de connexion trouvée",
+      "noFilteredSessions": "Aucune session {{filter}} trouvée",
+      "noSessionsYet": "Cet utilisateur n'a pas encore de sessions de connexion",
+      "terminateSuccess": "Session terminée avec succès",
+      "terminateAllSuccess": "Toutes les sessions terminées avec succès",
+      "terminateError": "Échec de la terminaison de la session",
+      "terminateAllError": "Échec de la terminaison de toutes les sessions",
+      "permissionDenied": "Permission refusée : Vous n'avez pas accès aux sessions utilisateur"
+    },
+    "debug": {
+      "userId": "ID Utilisateur",
+      "sessionsLoaded": "Sessions chargées",
+      "activeSessions": "actives",
+      "filter": "Filtre",
+      "loading": "Chargement"
+    }
+  },
+  "securityTab": {
+    "title": "Sécurité",
+    "passwordManagement": "Gestion des Mots de Passe",
+    "sessionManagement": "Gestion des Sessions",
+    "stats": {
+      "emailStatus": "Statut Email",
+      "lastLogin": "Dernière Connexion",
+      "pendingResets": "Réinitialisations en Attente",
+      "failedLogins": "Échecs Connexion",
+      "verified": "Vérifié",
+      "unverified": "Non Vérifié"
+    },
+    "passwordReset": {
+      "sendResetEmail": "Envoyer un Email de Réinitialisation",
+      "sendResetEmailShort": "Envoyer Email Réinitialisation",
+      "description": "L'utilisateur recevra un lien de réinitialisation dans sa langue préférée",
+      "sending": "Envoi en cours...",
+      "sendResetLink": "Envoyer le Lien de Réinitialisation",
+      "forceReset": "Forcer la Réinitialisation",
+      "forceDescription": "Définir immédiatement un nouveau mot de passe (déconnectera toutes les sessions)",
+      "newPassword": "Nouveau Mot de Passe",
+      "confirmPassword": "Confirmer le Mot de Passe",
+      "enterNewPassword": "Entrez le nouveau mot de passe",
+      "confirmNewPassword": "Confirmez le nouveau mot de passe",
+      "resetting": "Réinitialisation...",
+      "resetPassword": "Réinitialiser le Mot de Passe",
+      "confirmSendReset": "Envoyer un email de réinitialisation à {{email}} ?",
+      "confirmForceReset": "Réinitialiser le mot de passe pour {{email}} ? Cela les déconnectera de toutes les sessions.",
+      "successResetSent": "Email de réinitialisation envoyé avec succès !",
+      "successResetDone": "Mot de passe réinitialisé avec succès ! L'utilisateur devra utiliser ce nouveau mot de passe."
+    },
+    "sessions": {
+      "terminateAll": "Terminer Toutes les Sessions Actives",
+      "terminateAllShort": "Terminer les Sessions",
+      "description": "Déconnecter l'utilisateur de tous les appareils et navigateurs",
+      "terminating": "Terminaison...",
+      "logoutAll": "Déconnecter Tout",
+      "confirmTerminate": "Terminer toutes les sessions actives de {{email}} ? Cela les déconnectera de tous les appareils.",
+      "successTerminate": "Toutes les sessions terminées avec succès !",
+      "activeSessions": "{{count}} session active",
+      "activeSessions_plural": "{{count}} sessions actives"
+    },
+    "messages": {
+      "processing": "Traitement en cours...",
+      "enterPassword": "Veuillez entrer un nouveau mot de passe",
+      "passwordsMatch": "Les mots de passe ne correspondent pas",
+      "passwordLength": "Le mot de passe doit contenir au moins 8 caractères",
+      "failedAction": "Échec de {{action}}",
+      "failedSendReset": "Échec de l'envoi de la réinitialisation",
+      "failedForceReset": "Échec de la réinitialisation du mot de passe",
+      "failedTerminate": "Échec de la terminaison des sessions"
+    },
+    "time": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "daysAgo": "Il y a {{count}} jours",
+      "weeksAgo": "Il y a {{count}} semaines",
+      "monthsAgo": "Il y a {{count}} mois",
+      "never": "Jamais",
+      "unknown": "Inconnu"
+    }
+  },
+  "usersList": {
+    "loading": "Chargement...",
+    "emptyState": {
+      "title": "Aucun utilisateur trouvé",
+      "description": "Aucun utilisateur ne correspond à vos critères."
+    },
+    "loadMore": "Charger Plus d'Utilisateurs"
+  },
+  "subscriptionPage": {
+    "title": "Choisissez votre forfait",
+    "subtitle": "Streaming illimité. Aucun engagement. Annulez à tout moment.",
+    "pricesIn": "Prix en",
+    "convertedFromRWF": "converti depuis le RWF",
+    "fetchError": "Échec du chargement des forfaits",
+    "noPlans": "Aucun forfait disponible",
+    "checkBackLater": "Veuillez revenir plus tard pour voir les forfaits disponibles",
+    "selectPlan": "Sélectionner un forfait",
+    "processing": "Traitement...",
+    "mostPopular": "LE PLUS POPULAIRE",
+    "serverError": "Erreur du serveur. Veuillez réessayer.",
+    "selectError": "Échec de la sélection du forfait. Veuillez réessayer.",
+    "loading": "Chargement des forfaits...",
+    "comparePlans": "Comparer les forfaits",
+    "compareSubtitle": "Trouvez le forfait idéal pour vos besoins de divertissement",
+    "perMonth": "/mois",
+    "device": "Appareil",
+    "devices": "Appareils",
+    "perfectFor": "Idéal pour",
+    "moreFeatures": "plus de fonctionnalités",
+    "getPlan": "Obtenir {{plan}}",
+    "watchOn": "Regarder sur {count} {devices} simultanément",
+    "videoQuality": "Qualité vidéo",
+    "unlimitedDownloads": "Téléchargements illimités pour visionnage hors ligne",
+    "downloadLimit": "Télécharger {count} éléments pour visionnage hors ligne",
+    "simultaneousDownloads": "{count} téléchargements simultanés",
+    "downloadExpiry": "Les téléchargements expirent après {days} jours",
+    "noDownloads": "Aucun téléchargement disponible",
+    "hdrSupport": "Prise en charge HDR pour des images améliorées",
+    "adFree": "Streaming sans publicité",
+    "fullLibrary": "Accès à l'ensemble de la bibliothèque de contenu",
+    "prioritySupport": "Support client prioritaire",
+    "parentalControls": "Contrôles parentaux pour la sécurité familiale",
+    "quality": {
+      "SD": "SD (480p)",
+      "HD": "HD (720p)",
+      "FHD": "Full HD (1080p)",
+      "UHD": "4K Ultra HD"
+    },
+    "plans": {
+      "mobile": {
+        "title": "Forfait Mobile",
+        "tagline": "Divertissement en déplacement",
+        "description": "Idéal pour les utilisateurs mobiles qui veulent un accès abordable à Oliviuus sur un seul appareil.",
+        "idealFor": "Personnes recherchant un accès mobile uniquement"
+      },
+      "basic": {
+        "title": "Forfait de Base",
+        "tagline": "Votre dose quotidienne de films et séries",
+        "description": "Le forfait de base offre une meilleure qualité et flexibilité pour les utilisateurs réguliers.",
+        "idealFor": "Couples ou colocataires partageant des écrans"
+      },
+      "standard": {
+        "title": "Forfait Standard",
+        "tagline": "Améliorez votre expérience de visionnage",
+        "description": "Passez au forfait standard pour une meilleure qualité et flexibilité sur plusieurs appareils.",
+        "idealFor": "Petites familles ou utilisateurs attentifs à la qualité"
+      },
+      "family": {
+        "title": "Forfait Famille",
+        "tagline": "L'expérience de divertissement complète pour la famille",
+        "description": "Notre forfait famille premium offre tout ce qu'Oliviuus a à offrir avec la meilleure qualité.",
+        "idealFor": "Familles avec plusieurs spectateurs et appareils"
+      }
+    },
+    "comparison": {
+      "features": "Fonctionnalités",
+      "simultaneousStreams": "Flux simultanés",
+      "videoQuality": "Qualité vidéo",
+      "offlineDownloads": "Téléchargements hors ligne",
+      "downloadLimit": "Limite de téléchargement",
+      "downloadQuality": "Qualité de téléchargement",
+      "hdrSupport": "Support HDR",
+      "parentalControls": "Contrôles parentaux",
+      "supportedPlatforms": "Plateformes prises en charge",
+      "maxRegisteredDevices": "Appareils enregistrés max",
+      "simultaneousDownloads": "Téléchargements simultanés",
+      "downloadExpiry": "Expiration des téléchargements",
+      "videoBitrate": "Débit vidéo",
+      "devices": "{count} appareils",
+      "unlimited": "Illimité",
+      "notAvailable": "Indisponible",
+      "downloadItems": "{count} éléments",
+      "platformsCount": "{count} plateformes",
+      "allPlatforms": "Toutes les plateformes",
+      "registeredDevices": "{count} appareils",
+      "downloadsAtOnce": "{count} en même temps",
+      "expiryDays": "{days} jours",
+      "neverExpires": "N’expire jamais",
+      "mbps": "{value} Mbps",
+      "kbps": "{value} kbps"
+    }
+  },
+  "profileMenu": {
+    "profileMenu": "Menu profil",
+    "profilePicture": "Photo de profil",
+    "user": "Utilisateur",
+    "activeAccount": "Compte actif",
+    "signOut": "Se déconnecter"
+  },
+  "faq": {
+    "title": "Questions Fréquemment Posées",
+    "subtitle": "Obtenez des réponses aux questions courantes sur nos forfaits d'abonnement",
+    "needMoreHelp": "Besoin de plus d'aide?",
+    "contactSupport": "Notre équipe de support est là pour vous aider avec toutes questions supplémentaires",
+    "contactUs": "Contacter le Support",
+    "canChangePlan": "Puis-je changer mon forfait plus tard?",
+    "changePlanAnswer": "Oui, vous pouvez améliorer ou réduire votre forfait à tout moment. Les changements prennent effet au début de votre prochain cycle de facturation. Les améliorations sont calculées au prorata, tandis que les réductions prennent effet après la fin de votre période de facturation actuelle.",
+    "commitmentPeriod": "Y a-t-il une période d'engagement?",
+    "commitmentAnswer": "Non, tous les forfaits sont mensuels sans engagement à long terme. Annulez à tout moment sans frais. Votre abonnement restera actif jusqu'à la fin de votre période de facturation actuelle.",
+    "devicesSimultaneously": "Combien d'appareils puis-je utiliser simultanément?",
+    "devicesAnswer": "Le nombre de flux simultanés varie selon le forfait. Veuillez consulter les limites d'appareils spécifiques pour chaque forfait dans notre tableau comparatif pour trouver celui qui correspond le mieux aux besoins de votre foyer.",
+    "discountsAvailable": "Offrez-vous des réductions pour étudiants, militaires ou de fidélité?",
+    "discountsAnswer": "Bien que nous ne prenions actuellement pas en charge les réductions de fidélité ou spéciales, nous travaillons activement à la mise en œuvre d'un programme de fidélité complet. Restez à l'écoute pour les mises à jour futures alors que nous continuons à améliorer nos offres d'abonnement.",
+    "paymentMethods": "Quels modes de paiement acceptez-vous?",
+    "paymentAnswer": "Nous acceptons le mobile money (MTN, Airtel), les cartes de crédit/débit (Visa, MasterCard) et les virements bancaires. Tous les paiements sont sécurisés et cryptés pour votre protection.",
+    "offlineViewing": "Puis-je télécharger du contenu pour une visualisation hors ligne?",
+    "offlineAnswer": "La disponibilité du téléchargement hors ligne dépend de votre forfait sélectionné. Veuillez consulter la comparaison des fonctionnalités entre les forfaits pour voir lesquels incluent les capacités de téléchargement et leurs limites respectives.",
+    "regionalAvailability": "Le contenu est-il disponible dans toutes les régions?",
+    "regionalAnswer": "En raison des accords de licence, certains contenus peuvent ne pas être disponibles dans toutes les régions. Notre catalogue est optimisé pour les publics d'Afrique de l'Est avec un riche mélange de contenu local et international.",
+    "cancelSubscription": "Comment annuler mon abonnement?",
+    "cancelAnswer": "Vous pouvez annuler à tout moment depuis vos paramètres de compte. Accédez à 'Abonnement' → 'Gérer le forfait' → 'Annuler l'abonnement'. Votre accès continuera jusqu'à la fin de votre période de facturation actuelle.",
+    "videoQuality": "Quelle qualité vidéo puis-je attendre?",
+    "qualityAnswer": "La qualité vidéo varie selon le forfait d'abonnement, allant de la définition standard à l'Ultra HD 4K. Veuillez vous référer à la comparaison des forfaits pour les offres de qualité spécifiques correspondant à chaque niveau.",
+    "billingCycle": "Quand mon cycle de facturation commence-t-il?",
+    "billingAnswer": "Votre cycle de facturation commence immédiatement lors de l'abonnement et se renouvelle automatiquement tous les 30 jours. Vous recevrez une notification avant chaque renouvellement, et vous pouvez annuler à tout moment sans pénalité."
+  },
+  "contact": {
+    "contactUs": "Nous Contacter",
+    "helpSubtitle": "Nous sommes là pour vous aider avec toutes vos questions ou préoccupations",
+    "needHelp": "Besoin d'Aide?",
+    "ctaDescription": "Notre équipe est là pour vous aider avec toutes vos questions, commentaires ou préoccupations. Nous sommes toujours heureux de vous aider!",
+    "getInTouch": "Nous Contacter",
+    "emailSupport": "Support Email",
+    "responseTime": "Réponse sous 2 heures",
+    "phoneSupport": "Support Téléphonique",
+    "phoneHours": "Lun-Dim, 8H-22H",
+    "liveChat": "Chat en Direct",
+    "available247": "Disponible 24h/24",
+    "instantSupport": "Support instantané",
+    "messageSent": "Message Envoyé avec Succès!",
+    "thankYou": "Merci de nous avoir contactés. Nous vous répondrons bientôt.",
+    "sendAnother": "Envoyer un autre message",
+    "fullName": "Nom Complet",
+    "namePlaceholder": "Entrez votre nom complet",
+    "emailAddress": "Adresse Email",
+    "emailPlaceholder": "Entrez votre email",
+    "category": "Catégorie",
+    "selectCategory": "Sélectionnez une catégorie",
+    "subject": "Sujet",
+    "subjectPlaceholder": "Brève ligne de sujet",
+    "message": "Message",
+    "messagePlaceholder": "Dites-nous comment nous pouvons vous aider...",
+    "sending": "Envoi du Message...",
+    "sendMessage": "Envoyer le Message",
+    "generalInquiry": "Demande Générale",
+    "technicalSupport": "Support Technique",
+    "billingQuestion": "Question de Facturation",
+    "featureRequest": "Demande de Fonctionnalité",
+    "bugReport": "Rapport de Bug",
+    "partnership": "Partenariat",
+    "feedback": "Retours & Suggestions",
+    "other": "Autre",
+    "title": "Gestion des Contacts",
+    "allContacts": "Tous les Contacts",
+    "submissionError": "Échec de l'envoi du message. Veuillez réessayer.",
+    "exportError": "Échec de l'exportation des contacts.",
+    "filters": {
+      "search": "Rechercher des contacts...",
+      "allStatus": "Tous les Statuts",
+      "allPriority": "Toutes les Priorités",
+      "allCategories": "Toutes les Catégories",
+      "filters": "Filtres",
+      "sortBy": "Trier par",
+      "newestFirst": "Plus récent d'abord",
+      "lastUpdated": "Dernière mise à jour",
+      "priority": "Priorité",
+      "status": "Statut",
+      "advanced": "Avancé",
+      "clearAll": "Tout Effacer",
+      "dateRange": "Plage de Dates",
+      "responseCount": "Nombre de Réponses",
+      "source": "Source",
+      "clearAdvanced": "Effacer Avancé",
+      "any": "Tous",
+      "noResponses": "Aucune Réponse",
+      "responses1to3": "1-3 Réponses",
+      "responses4plus": "4+ Réponses",
+      "allSources": "Toutes les Sources",
+      "filtered": "filtré",
+      "from": "De",
+      "to": "À",
+      "responses": "Réponses"
+    },
+    "status": {
+      "new": "Nouveau",
+      "open": "Ouvert",
+      "in_progress": "En Cours",
+      "awaiting_reply": "En Attente de Réponse",
+      "resolved": "Résolu",
+      "closed": "Fermé"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "high": "Élevé",
+      "medium": "Moyen",
+      "low": "Faible"
+    },
+    "category": {
+      "general": "Demande Générale",
+      "technical": "Support Technique",
+      "billing": "Question de Facturation",
+      "feature": "Demande de Fonctionnalité",
+      "bug_report": "Rapport de Bug",
+      "partnership": "Partenariat",
+      "feedback": "Retours & Suggestions",
+      "other": "Autre"
+    },
+    "stats": {
+      "totalContacts": "Total des Contacts",
+      "newContacts": "Nouveaux Contacts",
+      "inProgress": "En Cours",
+      "resolved": "Résolus",
+      "responseRate": "Taux de Réponse",
+      "resolutionRate": "Taux de Résolution",
+      "avgResponseTime": "Temps de Réponse Moyen",
+      "statusDistribution": "Répartition par Statut",
+      "priorityOverview": "Aperçu des Priorités",
+      "categoryBreakdown": "Répartition par Catégorie",
+      "performanceMetrics": "Métriques de Performance"
+    },
+    "settings": {
+      "refresh": "Actualiser",
+      "export": "Exporter",
+      "title": "Paramètres de Contact",
+      "subtitle": "Gérez vos informations de contact affichées aux utilisateurs sur le formulaire de contact",
+      "supportEmail": "Email de Support",
+      "emailPlaceholder": "support@oliviuus.com",
+      "emailDescription": "Cet email sera affiché aux utilisateurs pour les demandes de support",
+      "supportPhone": "Téléphone de Support",
+      "phonePlaceholder": "+250 788 123 456",
+      "phoneDescription": "Ce numéro de téléphone sera affiché aux utilisateurs pour les appels de support",
+      "saveChanges": "Enregistrer les Modifications",
+      "saving": "Enregistrement...",
+      "preview": "Aperçu",
+      "defaultEmail": "support@oliviuus.com",
+      "defaultPhone": "+250 788 123 456",
+      "loadError": "Échec du chargement des informations de contact",
+      "updateSuccess": "Informations de contact mises à jour avec succès",
+      "updateError": "Échec de la mise à jour des informations de contact"
+    },
+    "list": {
+      "noContacts": "Aucun contact trouvé",
+      "adjustFilters": "Essayez d'ajuster vos filtres ou vos termes de recherche",
+      "loadMore": "Charger plus"
+    },
+    "time": {
+      "justNow": "À l'instant",
+      "hoursAgo": "il y a {{hours}}h",
+      "daysAgo": "il y a {{days}}j"
+    },
+    "modal": {
+      "changeStatus": "Changer le statut",
+      "details": "Détails",
+      "conversation": "Conversation",
+      "reply": "Répondre",
+      "contactInfo": "Informations de contact",
+      "technicalDetails": "Détails techniques",
+      "submitted": "Soumis",
+      "lastResponse": "Dernière réponse",
+      "source": "Source",
+      "notAvailable": "N/A",
+      "ipAddress": "Adresse IP",
+      "responses": "Réponses",
+      "firstRead": "Première lecture",
+      "message": "Message",
+      "refresh": "Actualiser",
+      "supportTeam": "Équipe de support",
+      "noResponses": "Aucune réponse pour le moment",
+      "sendFirstResponse": "Envoyez la première réponse pour démarrer la conversation",
+      "sendReply": "Envoyer la réponse",
+      "originalMessage": "Message original",
+      "replyPlaceholder": "Tapez votre réponse ici...",
+      "cancel": "Annuler",
+      "sending": "Envoi en cours...",
+      "statusUpdateError": "Échec de la mise à jour du statut du contact",
+      "replySuccess": "Réponse envoyée avec succès !",
+      "replyError": "Échec de l'envoi de la réponse",
+      "never": "Jamais"
+    },
+    "categoryLabel": "Catégorie",
+    "priorityLabel": "Priorité",
+    "statusLabel": "Statut",
+    "stats": {
+      "title": "Analytique des Contacts",
+      "subtitle": "Aperçu complet de la performance de votre gestion des contacts",
+      "loading": "Chargement des statistiques...",
+      "failedToLoad": "Échec du chargement des statistiques",
+      "tryAgain": "Réessayer",
+      "refresh": "Actualiser",
+      "fromLastPeriod": "par rapport à la période précédente",
+      "totalContacts": "Total des Contacts",
+      "allTimeContacts": "Tous les contacts",
+      "responseRate": "Taux de Réponse",
+      "respondedOfTotal": "{{responded}} sur {{total}} ont reçu une réponse",
+      "avgResponseTime": "Temps de Réponse Moyen",
+      "acrossAllContacts": "Sur tous les contacts",
+      "resolutionRate": "Taux de Résolution",
+      "resolvedContacts": "{{resolved}} résolus",
+      "statusDistribution": "Répartition par Statut",
+      "priorityOverview": "Aperçu des Priorités",
+      "categoryBreakdown": "Répartition par Catégorie",
+      "performanceMetrics": "Métriques de Performance",
+      "emailResponses": "Réponses par Email",
+      "totalSentReplies": "Total des réponses envoyées",
+      "satisfactionRate": "Taux de Satisfaction",
+      "estimatedFromResolutions": "Estimé à partir des résolutions",
+      "activeConversations": "Conversations Actives",
+      "currentlyInProgress": "Actuellement en cours",
+      "newToday": "Nouveaux Aujourd'hui",
+      "timeRanges": {
+        "all": "Tout le Temps",
+        "today": "Aujourd'hui",
+        "week": "Cette Semaine",
+        "month": "Ce Mois"
+      }
+    }
+  },
+  "contactAdmin": {
+    "tabs": {
+      "allContacts": "Tous les Contacts",
+      "statistics": "Statistiques",
+      "contactSettings": "Paramètres de Contact"
+    },
+    "more": "Plus",
+    "loading": "Chargement..."
   }
 }

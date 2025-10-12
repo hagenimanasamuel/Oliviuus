@@ -101,10 +101,108 @@ const sendWelcomeEmail = async (to, lang = "en") => {
   await transporter.sendMail(mailOptions);
 };
 
+// RESET PASSWORD EMAIL
+const sendPasswordResetEmail = async (to, resetLink, lang = "en") => {
+  const locale = locales[lang] || locales["en"];
+  const pr = locale.passwordReset || locales["en"].passwordReset;
+
+  const mailOptions = {
+    from: `"Oliviuus" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: pr.subject,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;
+                  border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center;
+                    border-bottom: 1px solid #e0e0e0;">
+          <h1 style="color: #2c3e50; margin: 0;">Oliviuus Team</h1>
+        </div>
+        <div style="padding: 30px;">
+          <h2 style="color: #2c3e50;">${pr.title}</h2>
+          <p style="font-size: 16px;">${pr.body}</p>
+          <a href="${resetLink}" style="display: inline-block; margin: 20px 0; 
+             padding: 12px 24px; background-color: #BC8BBC; color: #fff;
+             text-decoration: none; border-radius: 4px; font-weight: bold;">
+            ${pr.button_text}
+          </a>
+          <p style="font-size: 14px; color: #555;">${pr.expiry_notice}</p>
+        </div>
+        <div style="background-color: #f8f9fa; padding: 15px; text-align: center;
+                    border-top: 1px solid #e0e0e0; font-size: 12px;">
+          &copy; ${new Date().getFullYear()} Oliviuus. All rights reserved.
+        </div>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+// ACCOUNT CREATED EMAIL (for admin-created users)
+const sendAccountCreatedEmail = async (to, resetLink, lang = "en") => {
+  const locale = locales[lang] || locales["en"];
+  const ac = locale.accountCreated || locales["en"].accountCreated;
+
+  const mailOptions = {
+    from: `"Oliviuus" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: ac.subject,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom: 1px solid #e0e0e0;">
+          <h1 style="color: #2c3e50; margin: 0;">Oliviuus Team</h1>
+        </div>
+        <div style="padding: 30px;">
+          <h2 style="color: #2c3e50;">${ac.title}</h2>
+          <p style="font-size: 16px;">${ac.body}</p>
+          <a href="${resetLink}" style="display: inline-block; margin: 20px 0; padding: 12px 24px; background-color: #BC8BBC; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold;">
+            ${ac.button_text}
+          </a>
+          <p style="font-size: 14px; color: #555;">${ac.note}</p>
+        </div>
+        <div style="background-color: #f8f9fa; padding: 15px; text-align: center; border-top: 1px solid #e0e0e0; font-size: 12px;">
+          &copy; ${new Date().getFullYear()} Oliviuus. All rights reserved.
+        </div>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+// REPLY TO CONTACT EMAIL
+const sendContactReplyEmail = async (to, replyMessage, originalSubject) => {
+  const mailOptions = {
+    from: `"Oliviuus Support" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: `Re: ${originalSubject}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom: 1px solid #e0e0e0;">
+          <h1 style="color: #2c3e50; margin: 0;">Oliviuus Team</h1>
+        </div>
+        <div style="padding: 30px;">
+          <p style="font-size: 16px; color: #333; white-space: pre-wrap;">${replyMessage}</p>
+        </div>
+        <div style="background-color: #f8f9fa; padding: 15px; text-align: center; border-top: 1px solid #e0e0e0; font-size: 12px;">
+          &copy; ${new Date().getFullYear()} Oliviuus. All rights reserved.
+        </div>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+
+
 
 
 // ✅ EXPORT
 module.exports = {
   sendVerificationEmail,
   sendWelcomeEmail,
+  sendPasswordResetEmail,
+  sendAccountCreatedEmail,
+  sendContactReplyEmail,
 };

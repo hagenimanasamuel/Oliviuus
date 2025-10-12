@@ -17,15 +17,30 @@ export const AuthProvider = ({ children }) => {
     i18n.changeLanguage(lang);
     setCurrentLanguage(lang);
 
-    if (!userData) localStorage.setItem("lang", lang);
+    if (!userData) {
+      localStorage.setItem("lang", lang);
+    }
   };
 
-  // Fetch user from backend
+  // Fetch user only if logged in (cookies/session exists)
   const fetchUser = async () => {
     try {
       const res = await axios.get("/auth/me", { withCredentials: true });
-      setUser(res.data); // backend returns full user object including sessions
-      applyLanguage(res.data); // apply language from backend
+      const newUser = res.data;
+
+      if (newUser && newUser.id) {
+        setUser((prev) => {
+          if (JSON.stringify(prev) !== JSON.stringify(newUser)) {
+            applyLanguage(newUser);
+            return newUser;
+          }
+          return prev;
+        });
+      } else {
+        // no user → fallback to localStorage language
+        setUser(null);
+        applyLanguage(null);
+      }
     } catch (err) {
       setUser(null);
       applyLanguage(null); // fallback to localStorage/default
@@ -34,16 +49,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Call once on mount and set interval to refresh user
   useEffect(() => {
-    fetchUser(); // initial load
-
+    fetchUser(); // initial check
     const interval = setInterval(() => {
-      fetchUser(); // refresh every 10 seconds
+      if (user) {
+        // ✅ only refresh if logged in
+        fetchUser();
+      }
     }, 10000);
 
-    return () => clearInterval(interval); // cleanup on unmount
-  }, []);
+    return () => clearInterval(interval);
+  }, [user]);
 
   // After login, update user immediately
   const loginUser = (userData) => {
@@ -57,12 +73,14 @@ export const AuthProvider = ({ children }) => {
     applyLanguage(null);
   };
 
-  // Manual language change (e.g., from dropdown)
+  // Manual language change
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
     setCurrentLanguage(lang);
 
-    if (!user) localStorage.setItem("lang", lang);
+    if (!user) {
+      localStorage.setItem("lang", lang);
+    }
   };
 
   return (
@@ -74,7 +92,7 @@ export const AuthProvider = ({ children }) => {
         logoutUser,
         currentLanguage,
         changeLanguage,
-        refreshUser: fetchUser, // expose for manual refresh if needed
+        refreshUser: fetchUser,
       }}
     >
       {children}

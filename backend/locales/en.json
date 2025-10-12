@@ -18,5 +18,19 @@
       "Check your email regularly for new updates"
     ],
     "closing": "Enjoy your journey with Oliviuus!"
+  },
+  "passwordReset": {
+    "subject": "Reset your Oliviuus password",
+    "title": "Password Reset Request",
+    "body": "We received a request to reset your password. Click the button below to reset it.",
+    "button_text": "Reset Password",
+    "expiry_notice": "This link will expire in 1 hour. If you didn’t request this, please ignore this email."
+  },
+  "accountCreated": {
+    "subject": "Your Oliviuus Account is Ready",
+    "title": "Welcome to Oliviuus!",
+    "body": "Your account has been successfully created. Click the button below to set your password and get started.",
+    "button_text": "Set Your Password",
+    "note": "This link is valid for 1 hour. If it expires, request a new password setup."
   }
 }

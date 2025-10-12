@@ -1,5 +1,5 @@
 const { query } = require("../config/dbConfig");
-const { sendVerificationEmail, sendWelcomeEmail } = require("../services/emailService");
+const { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendAccountCreatedEmail } = require("../services/emailService");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -67,7 +67,7 @@ const checkEmail = async (req, res) => {
 
 // Save user info after email verification (UserInfoStep)
 const saveUserInfo = async (req, res) => {
-  const { email, password, language } = req.body;
+  const { email, password, language, device_name, device_type, user_agent } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required" });
@@ -114,7 +114,7 @@ const saveUserInfo = async (req, res) => {
       console.error("⚠️ Failed to send welcome email:", emailErr);
     }
 
-    // 6. Generate JWT token
+    // 6. Generate JWT token (same as login)
     const token = jwt.sign(
       { id: userId, role: "viewer" },
       process.env.JWT_SECRET,
@@ -129,8 +129,27 @@ const saveUserInfo = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
     });
 
+    // 8. Record session in user_session table (same logic as login)
+    const ip_address =
+      req.headers["x-forwarded-for"] || req.connection.remoteAddress || "Unknown";
+
+    await query(
+      `INSERT INTO user_session 
+       (user_id, session_token, device_name, device_type, ip_address, user_agent, token_expires)
+       VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))`,
+      [
+        userId,
+        token, // 🔑 use the same JWT as cookie
+        device_name || "Unknown",
+        device_type || "desktop",
+        ip_address,
+        user_agent || "Unknown",
+      ]
+    );
+
+    // 9. Return created user info
     return res.status(200).json({
-      message: "User created successfully",
+      message: "User created and logged in successfully",
       user: {
         id: userId,
         email,
@@ -144,6 +163,7 @@ const saveUserInfo = async (req, res) => {
     res.status(500).json({ error: "Something went wrong, please try again." });
   }
 };
+
 
 
 // ✅ GET logged in user 
@@ -380,6 +400,153 @@ const updatePassword = async (req, res) => {
   }
 };
 
+// ✅ REQUEST PASSWORD RESET
+const requestPasswordReset = async (req, res) => {
+  const { email, language } = req.body;
+
+  if (!email) return res.status(400).json({ error: "Email is required" });
+
+  try {
+    // 1️⃣ Check if user exists
+    const users = await query("SELECT id FROM users WHERE email = ?", [email]);
+    if (users.length === 0) {
+      return res.status(404).json({ error: "No account found with this email" });
+    }
+
+    const userId = users[0].id;
+
+    // 2️⃣ Get user preferred language from DB (fallback to request or default 'en')
+    let userLang = "en";
+    if (language) {
+      userLang = language;
+    } else {
+      const prefs = await query(
+        "SELECT language FROM user_preferences WHERE user_id = ?",
+        [userId]
+      );
+      if (prefs.length > 0 && prefs[0].language) {
+        userLang = prefs[0].language;
+      }
+    }
+
+    // 3️⃣ Generate reset token (JWT)
+    const resetToken = jwt.sign(
+      { id: userId, email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" } // valid for 1 hour
+    );
+
+    // 4️⃣ Build reset link
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+    const resetLink = `${clientUrl}/reset-password?token=${resetToken}`;
+
+    // 5️⃣ Save token in DB (optional for tracking)
+    await query(
+      `INSERT INTO password_resets (user_id, token, expires_at) 
+       VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))
+       ON DUPLICATE KEY UPDATE token = VALUES(token), expires_at = VALUES(expires_at)`,
+      [userId, resetToken]
+    );
+
+    // 6️⃣ Send reset email in correct language
+    await sendPasswordResetEmail(email, resetLink, userLang);
+
+    return res.json({ message: "Password reset link sent to your email" });
+  } catch (err) {
+    console.error("❌ Error in requestPasswordReset:", err);
+    res.status(500).json({ error: "Something went wrong, please try again." });
+  }
+};
+
+// Reset Password
+const resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token || !password) {
+    return res.status(400).json({ error: "Token and password are required" });
+  }
+
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update password in DB
+    await query("UPDATE users SET password = ? WHERE id = ?", [
+      hashedPassword,
+      userId,
+    ]);
+
+    // Optional: delete any existing password reset tokens
+    await query("DELETE FROM password_resets WHERE user_id = ?", [userId]);
+
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    console.error("❌ Reset password error:", err);
+    res.status(400).json({ error: "Invalid or expired reset link" });
+  }
+};
+
+// create user via admin
+const createUser = async (req, res) => {
+  const { email, role = "viewer", language } = req.body;
+  const lang = language || "rw"; // default to Kinyarwanda
+
+  if (!email) return res.status(400).json({ error: "Email is required" });
+  if (!role) return res.status(400).json({ error: "Role is required" });
+
+  try {
+    // 1️⃣ Check if user exists
+    const existingUser = await query("SELECT id FROM users WHERE email = ?", [email]);
+    if (existingUser.length > 0) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    // 2️⃣ Set default profile picture (avatar)
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=BC8BBC&color=fff&size=128`;
+
+    // 3️⃣ Create user with placeholder password and profile picture
+    const result = await query(
+      `INSERT INTO users (email, password, email_verified, is_active, role, subscription_plan, profile_avatar_url)
+       VALUES (?, '', true, true, ?, 'none', ?)`,
+      [email, role, defaultAvatar]
+    );
+    const userId = result.insertId;
+
+    // 4️⃣ Save language in user_preferences
+    await query(
+      `INSERT INTO user_preferences (user_id, language) VALUES (?, ?)`,
+      [userId, lang]
+    );
+
+    // 5️⃣ Generate JWT for password setup
+    const resetToken = jwt.sign(
+      { id: userId, email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+    const resetLink = `${clientUrl}/reset-password?token=${resetToken}`;
+
+    // 6️⃣ Send account created email in the selected language
+    await sendAccountCreatedEmail(email, resetLink, lang);
+
+    // 7️⃣ Return created user info including profile picture
+    res.status(201).json({
+      message: "User created successfully. Account email sent.",
+      user: { id: userId, email, role, language: lang, profile_avatar_url: defaultAvatar },
+    });
+  } catch (err) {
+    console.error("❌ Error in createUser:", err);
+    res.status(500).json({ error: "Something went wrong, please try again." });
+  }
+};
+
+
 
 
 
@@ -393,4 +560,7 @@ module.exports = {
   loginUser,
   updateProfileAvatar,
   updatePassword,
+  requestPasswordReset,
+  resetPassword,
+  createUser,
 };

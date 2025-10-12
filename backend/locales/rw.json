@@ -18,5 +18,19 @@
       "Muge mureba ubutumwa bwo kuri email kugira ngo mubone amakuru mashya"
     ],
     "closing": "Twishimiye urugendo rwanyu kuri Oliviuus!"
+  },
+  "passwordReset": {
+    "subject": "Hindura ijambo ry’ibanga ryawe kuri Oliviuus",
+    "title": "Gusaba guhindura ijambo ry’ibanga",
+    "body": "Twakiriye ubusabe bwo guhindura ijambo ry’ibanga ryawe. Kanda kuri buto iri hasi kugirango uhindure.",
+    "button_text": "Hindura Ijambo ry’ibanga",
+    "expiry_notice": "Ubu busabe buzarangira mu isaha 1. Niba utabisabye, wirengagize iyi imeli."
+  },
+  "accountCreated": {
+    "subject": "Konti yawe ya Oliviuus Yakozwe",
+    "title": "Murakaza neza kuri Oliviuus!",
+    "body": "Konti yawe yakozwe neza. Kanda ku buto hasi kugirango ushyire ijambo ry'ibanga maze utangire gukoresha.",
+    "button_text": "Shyiramo Ijambo ry'Ibanga",
+    "note": "Uru rukurikirane ruzamara isaha 1. Niba rurangiye, saba gushyiraho ijambo ry'ibanga nshya."
   }
 }

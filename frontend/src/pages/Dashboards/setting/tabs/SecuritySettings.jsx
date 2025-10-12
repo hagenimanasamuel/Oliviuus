@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import PasswordSettings from "./security/PasswordSettings";
 import CriticalActions from "./security/CriticalActions";
 import { MoreHorizontal } from "lucide-react";
-
-const securitySubTabs = ["Password", "Critical Actions"];
+import { useTranslation } from "react-i18next";
 
 export default function SecuritySettings() {
-  const [activeSubTab, setActiveSubTab] = useState("Password");
+  const { t } = useTranslation();
+  const securitySubTabs = [t("securitySettings.tabs.password"), t("securitySettings.tabs.critical")];
+
+  const [activeSubTab, setActiveSubTab] = useState(securitySubTabs[0]);
   const [visibleTabs, setVisibleTabs] = useState([]);
   const [overflowTabs, setOverflowTabs] = useState([]);
   const [showMore, setShowMore] = useState(false);
@@ -79,13 +81,13 @@ export default function SecuritySettings() {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [securitySubTabs]);
 
   const renderSubTabContent = () => {
     switch (activeSubTab) {
-      case "Password":
+      case t("securitySettings.tabs.password"):
         return <PasswordSettings />;
-      case "Critical Actions":
+      case t("securitySettings.tabs.critical"):
         return <CriticalActions />;
       default:
         return null;
@@ -94,7 +96,9 @@ export default function SecuritySettings() {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4 bg-gray-900 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold text-white mb-4">Security Settings</h2>
+      <h2 className="text-xl font-semibold text-white mb-4">
+        {t("securitySettings.title")}
+      </h2>
 
       {/* Tabs */}
       <div className="flex items-center relative border-b border-gray-700 mb-4" ref={containerRef}>
@@ -121,7 +125,7 @@ export default function SecuritySettings() {
               className="p-2 rounded-full hover:bg-gray-800 transition flex items-center gap-1"
             >
               <MoreHorizontal size={20} />
-              More
+              {t("securitySettings.more")}
             </button>
             {showMore && (
               <div

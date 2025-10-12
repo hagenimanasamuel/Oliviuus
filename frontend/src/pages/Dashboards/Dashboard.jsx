@@ -3,7 +3,8 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import ViewerDashboard from "./ViewerDashboard";
-import AdminDashboard from "./AdminDashboard";
+import AdminDashboard from "./Admins/AdminDashboard.jsx";
+import Overview from "./Admins/overview/Overview.jsx"; // 
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -19,7 +20,7 @@ const Dashboard = () => {
     case "viewer":
       return <ViewerDashboard />;
     case "admin":
-      return <AdminDashboard />;
+      return <AdminDashboard bodyContent={<Overview />} />;
     default:
       return <Navigate to="/" replace />; // fallback for undefined roles
   }

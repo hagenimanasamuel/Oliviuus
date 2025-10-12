@@ -3,8 +3,10 @@ import { AlertTriangle } from "lucide-react";
 import api from "../../../../../api/axios";
 import Popup from "../../../../../components/ui/Popup";
 import Toast from "../../../../../components/ui/Toast";
+import { useTranslation } from "react-i18next";
 
 export default function CriticalActions() {
+  const { t } = useTranslation();
   const [popupOpen, setPopupOpen] = useState(false);
   const [criticalAction, setCriticalAction] = useState(""); // "delete" or "deactivate"
   const [criticalLoading, setCriticalLoading] = useState(false);
@@ -15,15 +17,15 @@ export default function CriticalActions() {
     try {
       if (criticalAction === "delete") {
         await api.delete("/user/delete-account", { withCredentials: true });
-        setToast({ message: "Account deleted successfully.", type: "success" });
+        setToast({ message: t("criticalActions.deleteSuccess"), type: "success" });
       } else if (criticalAction === "deactivate") {
         await api.put("/user/deactivate-account", {}, { withCredentials: true });
-        setToast({ message: "Account deactivated successfully.", type: "success" });
+        setToast({ message: t("criticalActions.deactivateSuccess"), type: "success" });
       }
     } catch (err) {
       console.error(err);
       setToast({
-        message: err.response?.data?.message || "Failed to perform action.",
+        message: err.response?.data?.message || t("criticalActions.actionFailed"),
         type: "error",
       });
     } finally {
@@ -35,8 +37,9 @@ export default function CriticalActions() {
   return (
     <div className="space-y-6 max-w-md">
       <p className="text-red-400 flex items-center gap-2">
-        <AlertTriangle size={18} /> Warning: Critical account actions
+        <AlertTriangle size={18} /> {t("criticalActions.warning")}
       </p>
+
       <button
         onClick={() => {
           setCriticalAction("deactivate");
@@ -47,8 +50,9 @@ export default function CriticalActions() {
           criticalLoading ? "opacity-50 cursor-not-allowed" : ""
         }`}
       >
-        {criticalLoading ? "Processing..." : "Deactivate Account"}
+        {criticalLoading ? t("criticalActions.processing") : t("criticalActions.deactivate")}
       </button>
+
       <button
         onClick={() => {
           setCriticalAction("delete");
@@ -59,16 +63,16 @@ export default function CriticalActions() {
           criticalLoading ? "opacity-50 cursor-not-allowed" : ""
         }`}
       >
-        {criticalLoading ? "Processing..." : "Delete Account"}
+        {criticalLoading ? t("criticalActions.processing") : t("criticalActions.delete")}
       </button>
 
       <p className="text-gray-400 text-sm mt-2">
-        Deactivating will temporarily disable your account. Deleting will permanently remove all data.
+        {t("criticalActions.info")}
       </p>
 
       <Popup
         isOpen={popupOpen}
-        message={`Are you sure you want to ${criticalAction} your account? This action cannot be undone.`}
+        message={t("criticalActions.confirm", { action: t(`criticalActions.${criticalAction}`) })}
         onConfirm={handleCriticalAction}
         onCancel={() => setPopupOpen(false)}
       />

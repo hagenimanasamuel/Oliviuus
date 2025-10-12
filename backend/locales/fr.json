@@ -18,5 +18,19 @@
       "Vérifiez régulièrement vos emails pour les nouveautés"
     ],
     "closing": "Profitez de votre aventure avec Oliviuus !"
+  },
+  "passwordReset": {
+    "subject": "Réinitialisez votre mot de passe Oliviuus",
+    "title": "Demande de réinitialisation du mot de passe",
+    "body": "Nous avons reçu une demande de réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour continuer.",
+    "button_text": "Réinitialiser le mot de passe",
+    "expiry_notice": "Ce lien expirera dans 1 heure. Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail."
+  },
+    "accountCreated": {
+    "subject": "Votre compte Oliviuus est prêt",
+    "title": "Bienvenue sur Oliviuus!",
+    "body": "Votre compte a été créé avec succès. Cliquez sur le bouton ci-dessous pour définir votre mot de passe et commencer.",
+    "button_text": "Définir votre mot de passe",
+    "note": "Ce lien est valide pendant 1 heure. S'il expire, demandez un nouveau mot de passe."
   }
 }
