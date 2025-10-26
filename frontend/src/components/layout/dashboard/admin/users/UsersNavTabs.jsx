@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback, useMemo } from "react";
-import { Users, Shield, Star, Users2, MoreHorizontal } from "lucide-react";
+import { Users, Shield, Star, Users2, MoreHorizontal, Settings, Zap } from "lucide-react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 
@@ -8,6 +8,7 @@ const AllUsers = React.lazy(() => import("../../../../../pages/dashboards/admins
 const RolesPermissions = React.lazy(() => import("../../../../../pages/dashboards/admins/users/RolesPermissions"));
 const Specials = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/Specials"));
 const FamilyPlan = React.lazy(() => import("../../../../../pages/dashboards/admins/users/FamilyPlan"));
+const BulkOperations = React.lazy(() => import("../../../../../pages/dashboards/admins/users/BulkOperations"));
 
 export default function UsersNavTabs() {
   const { t } = useTranslation();
@@ -23,7 +24,8 @@ export default function UsersNavTabs() {
       { id: "all", label: t("usersTabs.allUsers"), icon: Users, component: <AllUsers /> },
       { id: "roles", label: t("usersTabs.rolesPermissions"), icon: Shield, component: <RolesPermissions /> },
       { id: "specials", label: t("usersTabs.specials"), icon: Star, component: <Specials /> },
-      { id: "family", label: t("usersTabs.familyPlan"), icon: Users2, component: <FamilyPlan /> }
+      { id: "family", label: t("usersTabs.familyPlan"), icon: Users2, component: <FamilyPlan /> },
+      { id: "bulk", label: t("usersTabs.bulkOperations"), icon: Zap, component: <BulkOperations /> }
     ],
     [t]
   );
@@ -184,12 +186,13 @@ export default function UsersNavTabs() {
                       setShowMore(false);
                     }}
                     className={clsx(
-                      "block w-full text-left px-4 py-2 text-sm transition",
+                      "flex items-center gap-2 w-full text-left px-4 py-2 text-sm transition",
                       selectedTab === tab.id
                         ? "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
                         : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                     )}
                   >
+                    <tab.icon size={16} />
                     {tab.label}
                   </button>
                 ))}

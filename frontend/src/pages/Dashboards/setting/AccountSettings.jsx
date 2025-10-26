@@ -1,6 +1,7 @@
 // src/pages/account/AccountSettings.jsx
 import React, { useState, useEffect, Suspense } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { useSubscription } from "../../../context/SubscriptionContext";
 import api from "../../../api/axios";
 import { ArrowLeft, MoreHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +17,7 @@ const ParentalControls = React.lazy(() => import("./tabs/ParentalControls"));
 
 export default function AccountSettings() {
   const { user } = useAuth();
+  const { currentSubscription } = useSubscription(); // Add subscription context
   const { t } = useTranslation();
 
   // === FIX: Initialize selectedTab from URL hash synchronously ===
@@ -59,7 +61,7 @@ export default function AccountSettings() {
     };
   }, [showMore]);
 
-  // Build tabs list
+  // Build tabs list - UPDATED with family plan check
   useEffect(() => {
     const baseTabs = [
       { id: "account", label: t("settings.tabs.account") },
@@ -67,13 +69,26 @@ export default function AccountSettings() {
       { id: "preferences", label: t("settings.tabs.preferences") },
       { id: "sessions", label: t("settings.tabs.sessions") },
     ];
+    
     const viewerTabs = [
       { id: "subscription", label: t("settings.tabs.subscription") },
+    ];
+
+    // Check if user has family plan subscription
+    const hasFamilyPlan = currentSubscription && 
+      currentSubscription.plan_type === 'family';
+
+    // Only add family-specific tabs if user has family plan
+    const familyTabs = hasFamilyPlan ? [
       { id: "profiles", label: t("settings.tabs.profiles") },
       { id: "parental", label: t("settings.tabs.parental") },
-    ];
-    setTabs(user.role === "viewer" ? [...baseTabs, ...viewerTabs] : baseTabs);
-  }, [user, t]);
+    ] : [];
+
+    setTabs(user.role === "viewer" 
+      ? [...baseTabs, ...viewerTabs, ...familyTabs] 
+      : baseTabs
+    );
+  }, [user, currentSubscription, t]); // Added currentSubscription dependency
 
   // Measure overflow on resize
   useEffect(() => {

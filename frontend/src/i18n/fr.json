@@ -293,7 +293,9 @@
       "overview": "Aperçu",
       "activity": "Activité",
       "subscription": "Abonnement",
-      "security": "Sécurité"
+      "security": "Sécurité",
+      "securityLogs": "Journaux de Sécurité",
+      "notifications": "Notifications & Emails"
     },
     "status": {
       "active": "Actif",

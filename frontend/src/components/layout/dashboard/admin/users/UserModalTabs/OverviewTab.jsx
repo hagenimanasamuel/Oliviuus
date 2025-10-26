@@ -1,6 +1,6 @@
 // src/components/dashboard/admin/Users/UserModalTabs/OverviewTab.jsx
 import React, { useEffect, useState } from "react";
-import { User, Activity, CheckCircle, Ban, Clock4, CreditCard, Calendar, Globe, Shield, Wifi, TrendingUp, AlertTriangle, Clock, Users } from "lucide-react";
+import { User, Activity, CheckCircle, Ban, Clock4, CreditCard, Calendar, Globe, Shield, Wifi, TrendingUp, AlertTriangle, Clock, Users, Crown, Zap, Building, Smartphone } from "lucide-react";
 import clsx from "clsx";
 import api from "../../../../../../api/axios";
 import { useTranslation } from "react-i18next";
@@ -8,7 +8,9 @@ import { useTranslation } from "react-i18next";
 const OverviewTab = ({ userDetails, user, statusConfig }) => {
   const { t } = useTranslation();
   const [overviewData, setOverviewData] = useState(null);
+  const [subscriptionData, setSubscriptionData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
 
   useEffect(() => {
     const fetchOverviewData = async () => {
@@ -16,6 +18,7 @@ const OverviewTab = ({ userDetails, user, statusConfig }) => {
         setLoading(true);
         const response = await api.get(`/user/${user.id}/overview`);
         setOverviewData(response.data);
+        console.log("📊 Overview subscription data:", response.data.subscription);
       } catch (error) {
         console.error("Failed to fetch overview data:", error);
       } finally {
@@ -23,41 +26,96 @@ const OverviewTab = ({ userDetails, user, statusConfig }) => {
       }
     };
 
+    const fetchSubscriptionData = async () => {
+      try {
+        setSubscriptionLoading(true);
+        const response = await api.get(`/user/${user.id}/subscription`);
+        setSubscriptionData(response.data.subscription);
+        console.log("💰 Subscription API data:", response.data.subscription);
+      } catch (error) {
+        console.error("Failed to fetch subscription data:", error);
+      } finally {
+        setSubscriptionLoading(false);
+      }
+    };
+
     if (user?.id) {
       fetchOverviewData();
+      fetchSubscriptionData();
     }
   }, [user?.id]);
 
   // Use real data from overviewData or fallback to props
   const userData = overviewData?.user || user;
   const preferences = overviewData?.preferences || {};
-  const subscription = overviewData?.subscription || {};
   const activity = overviewData?.activity || {};
+  
+  // Use subscription data from subscription API first, then overview data
+  const subscription = subscriptionData || overviewData?.subscription || {};
 
   const getSubscriptionConfig = (subscription) => {
+    console.log("🔍 Processing subscription for config:", subscription);
+    
     // Handle both object and string subscription data
     let planName = 'free';
     
     if (typeof subscription === 'string') {
       planName = subscription.toLowerCase();
     } else if (subscription && typeof subscription === 'object') {
-      planName = (subscription.name || subscription.type || 'free').toLowerCase();
+      // FIXED: Check both name and type fields, and handle all possible values
+      // Use type first, then name, then fallback to free
+      planName = (subscription.type || subscription.name || 'free').toLowerCase().trim();
     }
     
+    console.log("📋 Plan name determined:", planName);
+    
+    // FIXED: Match the exact same mapping as SubscriptionTab
     switch (planName) {
-      case "premium": 
-        return { label: t("overviewTab.subscriptionPlans.premium"), color: "text-purple-400", bg: "bg-purple-400/10", icon: "✨" };
-      case "enterprise": 
-        return { label: t("overviewTab.subscriptionPlans.enterprise"), color: "text-green-400", bg: "bg-green-400/10", icon: "🏢" };
-      case "standard": 
-        return { label: t("overviewTab.subscriptionPlans.standard"), color: "text-teal-400", bg: "bg-teal-400/10", icon: "📊" };
+      case "mobile": 
+      case "custom":
+        return { 
+          label: "Custom", 
+          color: "text-purple-400", 
+          bg: "bg-purple-400/10",
+          icon: "✨"
+        };
       case "basic": 
-        return { label: t("overviewTab.subscriptionPlans.basic"), color: "text-indigo-400", bg: "bg-indigo-400/10", icon: "🔰" };
-      case "none":
+        return { 
+          label: "Basic", 
+          color: "text-blue-400", 
+          bg: "bg-blue-400/10",
+          icon: "⚡"
+        };
+      case "standard": 
+        return { 
+          label: "Standard", 
+          color: "text-green-400", 
+          bg: "bg-green-400/10",
+          icon: "🚀"
+        };
+      case "family":
+        return { 
+          label: "Family", 
+          color: "text-orange-400", 
+          bg: "bg-orange-400/10",
+          icon: "👨‍👩‍👧‍👦"
+        };
       case "free_trial":
+        return { 
+          label: "Free Trial", 
+          color: "text-yellow-400", 
+          bg: "bg-yellow-400/10",
+          icon: "🆓"
+        };
+      case "none":
       case "free": 
       default: 
-        return { label: t("overviewTab.subscriptionPlans.free"), color: "text-gray-400", bg: "bg-gray-400/10", icon: "🔓" };
+        return { 
+          label: "Free", 
+          color: "text-gray-400", 
+          bg: "bg-gray-400/10",
+          icon: "🔓"
+        };
     }
   };
 
@@ -94,6 +152,10 @@ const OverviewTab = ({ userDetails, user, statusConfig }) => {
   };
 
   const subscriptionConfig = getSubscriptionConfig(subscription);
+
+  // Debug: Log the current subscription data
+  console.log("🎯 Current subscription object for OverviewTab:", subscription);
+  console.log("🎯 Subscription config result:", subscriptionConfig);
 
   if (loading) {
     return (
@@ -143,8 +205,18 @@ const OverviewTab = ({ userDetails, user, statusConfig }) => {
             <label className="text-xs text-gray-500 uppercase tracking-wide">{t("overviewTab.plan")}</label>
             <div className={clsx("flex items-center space-x-2 px-3 py-2 rounded-lg", subscriptionConfig.bg)}>
               <span className={clsx("text-sm font-medium", subscriptionConfig.color)}>
-                <span className="hidden sm:inline">{subscriptionConfig.icon} {subscriptionConfig.label}</span>
-                <span className="sm:hidden">{subscriptionConfig.label}</span>
+                {subscriptionLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+                    <span className="hidden sm:inline">Loading...</span>
+                    <span className="sm:hidden">...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span className="hidden sm:inline">{subscriptionConfig.icon} {subscriptionConfig.label}</span>
+                    <span className="sm:hidden">{subscriptionConfig.label}</span>
+                  </>
+                )}
               </span>
             </div>
           </div>
@@ -306,7 +378,7 @@ const OverviewTab = ({ userDetails, user, statusConfig }) => {
                 {activity.last_device || t("overviewTab.time.unknown")}
               </span>
             </div>
-            {subscription.status && (
+            {!subscriptionLoading && subscription.status && (
               <div className="flex justify-between items-center">
                 <span className="flex items-center space-x-2">
                   <span>{t("overviewTab.stats.subscription")}:</span>
@@ -316,6 +388,16 @@ const OverviewTab = ({ userDetails, user, statusConfig }) => {
                   subscription.status === 'active' ? "text-green-400" : "text-yellow-400"
                 )}>
                   {subscription.status === 'active' ? t("overviewTab.stats.active") : t("overviewTab.stats.inactive")}
+                </span>
+              </div>
+            )}
+            {subscription.price > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="flex items-center space-x-2">
+                  <span>{t("overviewTab.stats.subscriptionPrice")}:</span>
+                </span>
+                <span className="text-gray-300 font-medium">
+                  {subscription.currency || 'RWF'} {subscription.price}
                 </span>
               </div>
             )}

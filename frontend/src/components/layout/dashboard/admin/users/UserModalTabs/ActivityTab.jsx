@@ -1,4 +1,3 @@
-// src/components/dashboard/admin/Users/UserModalTabs/ActivityTab.jsx
 import React, { useState, useEffect } from "react";
 import { CheckCircle, LogOut, MoreVertical, RefreshCw } from "lucide-react";
 import clsx from "clsx";

@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import EditableEmail from "../../components/ui/EditableEmail";
 import ForgotPasswordModal from "./ForgotPasswordModal";
 import Alert from "../../components/ui/Alert.jsx";
-import api from "../../api/axios"; // pre-configured Axios
+import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 
 const PasswordStep = ({ email }) => {

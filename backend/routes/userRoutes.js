@@ -23,6 +23,18 @@ const {
   forcePasswordReset,
   getUserSecurityInfo,
   updateUserRole,
+  getUserSubscription,
+  updateUserSubscription,
+  cancelUserSubscription,
+  getSubscriptionPlans,
+  createUserSubscription,
+  getUserSecurityLogs,
+  exportSecurityLogs,
+  sendUserNotification,
+  getUserNotifications,
+  markNotificationAsRead,
+  archiveNotification,
+  bulkUserOperations,
 } = require("../controllers/userController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require('../middlewares/adminMiddleware');
@@ -98,5 +110,35 @@ router.get("/:userId/security-info", authMiddleware, adminMiddleware, getUserSec
 
 // change user's role route
 router.put("/:userId/role", authMiddleware, adminMiddleware, updateUserRole);
+
+// ✅ Get user subscription details
+router.get("/:userId/subscription", authMiddleware, adminMiddleware, getUserSubscription);
+
+// ✅ Update user subscription
+router.put("/:userId/subscription", authMiddleware, adminMiddleware, updateUserSubscription);
+
+// ✅ Create new subscription for user
+router.post("/:userId/subscription", authMiddleware, adminMiddleware, createUserSubscription);
+
+// ✅ Cancel user subscription
+router.delete("/:userId/subscription", authMiddleware, adminMiddleware, cancelUserSubscription);
+
+// ✅ Get available subscription plans
+router.get("/subscription/plans", authMiddleware, adminMiddleware, getSubscriptionPlans);
+
+// Get user security logs
+router.get('/:userId/security-logs', getUserSecurityLogs);
+
+// Export user security logs
+router.get('/:userId/security-logs/export', exportSecurityLogs);
+
+// ✅ User Notifications Routes
+router.get('/:userId/notifications', getUserNotifications);
+router.post('/:userId/send-notification', sendUserNotification);
+router.put('/:userId/notifications/:notificationId/read', markNotificationAsRead);
+router.put('/:userId/notifications/:notificationId/archive', archiveNotification);
+
+// ✅ Bulk user operations
+router.post('/bulk-operations', bulkUserOperations);
 
 module.exports = router;

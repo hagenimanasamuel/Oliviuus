@@ -293,7 +293,9 @@
       "overview": "Muhtasari",
       "activity": "Shughuli",
       "subscription": "Usajili",
-      "security": "Usalama"
+      "security": "Usalama",
+      "securityLogs": "Funguo za Usalama",
+      "notifications": "Arifa & Barua pepe"
     },
     "status": {
       "active": "Inatumika",

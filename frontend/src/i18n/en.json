@@ -210,6 +210,7 @@
     "rolesPermissions": "Roles & Permissions",
     "specials": "Specials",
     "familyPlan": "Family Plan",
+    "bulkOperations": "Bulk Operations",
     "more": "More"
   },
   "passwordSettings": {
@@ -294,7 +295,9 @@
       "overview": "Overview",
       "activity": "Activity",
       "subscription": "Subscription",
-      "security": "Security"
+      "security": "Security",
+      "securityLogs": "Security Logs",
+      "notifications": "Notifications & Emails"
     },
     "status": {
       "active": "Active",

@@ -1,15 +1,17 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { 
   User, Mail, Calendar, Shield, Eye, Edit, Ban, Trash2, X, 
   Clock, LogOut, Monitor, CreditCard, Activity, ChevronRight,
   Download, Filter, Search, CheckCircle, AlertCircle, Clock4,
-  MoreHorizontal, RefreshCw, Ellipsis
+  MoreHorizontal, RefreshCw, Ellipsis, Bell, Lock
 } from "lucide-react";
 import clsx from "clsx";
 import OverviewTab from "./UserModalTabs/OverviewTab";
 import ActivityTab from "./UserModalTabs/ActivityTab";
 import SubscriptionTab from "./UserModalTabs/SubscriptionTab";
 import SecurityTab from "./UserModalTabs/SecurityTab";
+import SecurityLogsTab from "./UserModalTabs/SecurityLogsTab";
+import NotificationsTab from "./UserModalTabs/NotificationsTab";
 import api from "../../../../../api/axios";
 import { useTranslation } from "react-i18next";
 
@@ -34,12 +36,16 @@ export default function UserModal({ user, onClose, onUserUpdated }) {
   const tabContainerRef = useRef(null);
   const tabMoreButtonRef = useRef(null);
   const tabDropdownRef = useRef(null);
+  const resizeTimeoutRef = useRef(null);
+  const isCalculatingRef = useRef(false);
 
   const tabs = [
-    { id: "overview", label: t("userModal.tabs.overview") },
-    { id: "activity", label: t("userModal.tabs.activity") },
-    { id: "subscription", label: t("userModal.tabs.subscription") },
-    { id: "security", label: t("userModal.tabs.security") }
+    { id: "overview", label: t("userModal.tabs.overview"), icon: User },
+    { id: "activity", label: t("userModal.tabs.activity"), icon: Activity },
+    { id: "subscription", label: t("userModal.tabs.subscription"), icon: CreditCard },
+    { id: "security", label: t("userModal.tabs.security"), icon: Shield },
+    { id: "security-logs", label: t("userModal.tabs.securityLogs"), icon: Lock },
+    { id: "notifications", label: t("userModal.tabs.notifications"), icon: Bell }
   ];
 
   useEffect(() => {
@@ -96,34 +102,48 @@ export default function UserModal({ user, onClose, onUserUpdated }) {
     };
   }, [showMoreActions, showTabDropdown]);
 
-  // Handle responsive tabs
-  useEffect(() => {
-    const handleResize = () => {
-      if (!tabContainerRef.current) return;
-      
+  // Fixed handleResize function with debouncing
+  const handleResize = useCallback(() => {
+    if (!tabContainerRef.current || isCalculatingRef.current) return;
+    
+    isCalculatingRef.current = true;
+    
+    // Clear any existing timeout
+    if (resizeTimeoutRef.current) {
+      clearTimeout(resizeTimeoutRef.current);
+    }
+    
+    // Use debouncing to prevent excessive calculations
+    resizeTimeoutRef.current = setTimeout(() => {
       const container = tabContainerRef.current;
       const containerWidth = container.offsetWidth;
       let usedWidth = 0;
       const newVisible = [];
       const newOverflow = [];
 
+      // First, make all tabs visible to measure their actual width
       tabs.forEach(tab => {
         const tabElement = container.querySelector(`[data-tab="${tab.id}"]`);
         if (tabElement) {
           tabElement.style.display = 'flex';
+          tabElement.style.visibility = 'hidden'; // Hide but keep layout
         }
       });
 
-      const moreButtonWidth = 60;
+      // Force a reflow to ensure accurate measurements
+      container.offsetHeight;
+
+      const moreButtonWidth = 80; // Increased buffer for safety
       
       tabs.forEach(tab => {
         const tabElement = container.querySelector(`[data-tab="${tab.id}"]`);
         if (!tabElement) return;
 
-        const tabWidth = tabElement.offsetWidth + 8;
+        const tabWidth = tabElement.offsetWidth + 8; // Include margin
         if (usedWidth + tabWidth <= containerWidth - moreButtonWidth) {
           newVisible.push(tab);
           usedWidth += tabWidth;
+          tabElement.style.visibility = 'visible';
         } else {
           newOverflow.push(tab);
           tabElement.style.display = 'none';
@@ -132,12 +152,43 @@ export default function UserModal({ user, onClose, onUserUpdated }) {
 
       setVisibleTabs(newVisible);
       setOverflowTabs(newOverflow);
-    };
+      
+      isCalculatingRef.current = false;
+    }, 100); // 100ms debounce delay
+  }, [tabs]);
 
+  // Handle responsive tabs - FIXED VERSION
+  useEffect(() => {
+    // Initial calculation
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [tabs, t]);
+    
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        if (entry.target === tabContainerRef.current) {
+          handleResize();
+        }
+      }
+    });
+
+    if (tabContainerRef.current) {
+      resizeObserver.observe(tabContainerRef.current);
+    }
+
+    // Fallback for older browsers
+    const handleWindowResize = () => {
+      handleResize();
+    };
+    
+    window.addEventListener('resize', handleWindowResize);
+    
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleWindowResize);
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
+  }, [handleResize]);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -507,14 +558,15 @@ export default function UserModal({ user, onClose, onUserUpdated }) {
                 onClick={() => setActiveTab(tab.id)} 
                 disabled={isLoading} 
                 className={clsx(
-                  "flex items-center px-3 sm:px-4 py-3 text-sm font-medium transition-all duration-200 capitalize flex-shrink-0",
+                  "flex items-center space-x-2 px-3 sm:px-4 py-3 text-sm font-medium transition-all duration-200 capitalize flex-shrink-0",
                   activeTab === tab.id 
                     ? "text-white border-b-2 border-purple-500" 
                     : "text-gray-400 hover:text-gray-300", 
                   isLoading && "opacity-50 cursor-not-allowed"
                 )}
               >
-                {tab.label}
+                <tab.icon className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">{tab.label}</span>
               </button>
             ))}
 
@@ -539,13 +591,14 @@ export default function UserModal({ user, onClose, onUserUpdated }) {
                           setShowTabDropdown(false);
                         }}
                         className={clsx(
-                          "block w-full text-left px-4 py-3 text-sm transition first:rounded-t-lg last:rounded-b-lg",
+                          "flex items-center space-x-2 w-full text-left px-4 py-3 text-sm transition first:rounded-t-lg last:rounded-b-lg",
                           activeTab === tab.id
                             ? "bg-gray-800 text-white"
                             : "text-gray-300 hover:bg-gray-800 hover:text-white"
                         )}
                       >
-                        {tab.label}
+                        <tab.icon className="w-4 h-4 flex-shrink-0" />
+                        <span>{tab.label}</span>
                       </button>
                     ))}
                   </div>
@@ -573,11 +626,24 @@ export default function UserModal({ user, onClose, onUserUpdated }) {
             )}
             {activeTab === "subscription" && (
               <SubscriptionTab 
-                userDetails={userDetails} 
+                userDetails={userDetails}
+                userId={currentUser.id} 
               />
             )}
             {activeTab === "security" && (
               <SecurityTab 
+                userDetails={userDetails} 
+                userId={currentUser.id}
+              />
+            )}
+            {activeTab === "security-logs" && (
+              <SecurityLogsTab 
+                userDetails={userDetails} 
+                userId={currentUser.id}
+              />
+            )}
+            {activeTab === "notifications" && (
+              <NotificationsTab 
                 userDetails={userDetails} 
                 userId={currentUser.id}
               />

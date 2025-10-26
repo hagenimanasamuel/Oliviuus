@@ -11,6 +11,7 @@
     "oliviuus": "npx nodemon server.js"
   },
   "dependencies": {
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -20,6 +21,8 @@
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.3",
+    "ngrok": "^5.0.0-beta.2",
+    "node-cache": "^5.1.2",
     "nodemailer": "^7.0.5",
     "sequelize": "^6.37.7"
   },

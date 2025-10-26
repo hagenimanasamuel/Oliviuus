@@ -85,7 +85,7 @@ export default function Sidebar({ isCollapsed, toggleCollapse, isMobile, toggleM
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-700 text-xs text-gray-500 flex-shrink-0">
-          &copy; {new Date().getFullYear()} Oliviuus
+          &copy; {new Date().getFullYear()} Oliviuus Ltd
         </div>
 
         {/* Collapse button (desktop only) */}

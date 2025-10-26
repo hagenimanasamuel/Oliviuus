@@ -113,7 +113,7 @@ export default function AllContacts() {
         }
       });
 
-      const response = await api.get(`/api/contact/admin/contacts/export?${params}`, {
+      const response = await api.get(`/contact/admin/contacts/export?${params}`, {
         responseType: "blob",
       });
 
@@ -170,7 +170,7 @@ export default function AllContacts() {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const response = await api.get('/api/contact/admin/contacts/stats');
+        const response = await api.get('/contact/admin/contacts/stats');
         if (response.data.success) {
           setTotalContacts(response.data.data.overview?.total || response.data.data.total || totalContacts);
         }

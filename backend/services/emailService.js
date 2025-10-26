@@ -194,6 +194,36 @@ const sendContactReplyEmail = async (to, replyMessage, originalSubject) => {
   await transporter.sendMail(mailOptions);
 };
 
+// ADMIN MESSAGE EMAIL
+const sendAdminMessageEmail = async (to, subject, message, userName) => {
+  const mailOptions = {
+    from: `"Oliviuus Support" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: subject,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom: 1px solid #e0e0e0;">
+          <h1 style="color: #2c3e50; margin: 0;">Oliviuus Team</h1>
+        </div>
+        <div style="padding: 30px;">
+          <h2 style="color: #2c3e50;">${subject}</h2>
+          <p style="font-size: 16px; color: #333; white-space: pre-wrap; line-height: 1.6;">${message}</p>
+          <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 4px;">
+            <p style="margin: 0; font-size: 14px; color: #666;">
+              This is an important message from the Oliviuus administration team.
+            </p>
+          </div>
+        </div>
+        <div style="background-color: #f8f9fa; padding: 15px; text-align: center; border-top: 1px solid #e0e0e0; font-size: 12px;">
+          &copy; ${new Date().getFullYear()} Oliviuus. All rights reserved.
+        </div>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
 
 
 
@@ -205,4 +235,5 @@ module.exports = {
   sendPasswordResetEmail,
   sendAccountCreatedEmail,
   sendContactReplyEmail,
+  sendAdminMessageEmail,
 };

@@ -69,12 +69,55 @@ const submitContact = async (req, res) => {
       userAgent
     ]);
 
+    const contactId = result.insertId;
+
+    // Create notification for all admins if priority is high
+    if (priority === 'high') {
+      try {
+        // Get all admin users
+        const adminUsers = await query(
+          'SELECT id FROM users WHERE role = ? AND is_active = TRUE',
+          ['admin']
+        );
+
+        if (adminUsers.length > 0) {
+          // Prepare notification values for all admins
+          const notificationValues = adminUsers.map(admin => [
+            admin.id,
+            'contact',
+            'New High Priority Support Request',
+            `User ${name} (${email}) submitted a high priority support request: "${subject}"`,
+            'support',
+            'high',
+            contactId,
+            'contact',
+            `/admin/support#all`
+          ]);
+
+          // Insert notifications for all admins
+          const insertNotificationSql = `
+            INSERT INTO notifications 
+            (user_id, type, title, message, icon, priority, reference_id, reference_type, action_url) 
+            VALUES ?
+          `;
+
+          await query(insertNotificationSql, [notificationValues]);
+          
+          console.log(`✅ Created high-priority notifications for ${adminUsers.length} admins for contact #${contactId}`);
+        }
+      } catch (notificationError) {
+        // Don't fail the contact submission if notification creation fails
+        console.error('❌ Error creating admin notifications:', notificationError);
+        // Continue with contact submission success
+      }
+    }
+
     // Send success response
     res.status(201).json({
       success: true,
       message: 'Your message has been sent successfully! We will get back to you soon.',
       data: {
-        contactId: result.insertId,
+        contactId: contactId,
         priority: priority,
         estimatedResponseTime: getEstimatedResponseTime(priority)
       }

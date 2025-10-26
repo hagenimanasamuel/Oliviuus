@@ -4,7 +4,14 @@ const {
   resetSubscriptionPlans,
   getSubscriptionPlans,
   getSubscriptionPlanById,
-  updateSubscriptionPlan
+  updateSubscriptionPlan,
+  getCurrentSubscription,
+  getSubscriptionHistory,
+  createSubscription,
+  cancelSubscription,
+  getAvailablePlans,
+  checkSubscriptionStatus,
+  quickSessionLimitCheck,
 } = require("../controllers/subscriptionController");
 const { getPublicSubscriptionPlans } = require("../controllers/publicSubscriptionController");
 const authMiddleware = require("../middlewares/authMiddleware");
@@ -15,19 +22,20 @@ const router = express.Router();
 // ✅ Public route - Get subscription plans (No auth required)
 router.get("/public", getPublicSubscriptionPlans);
 
-// ✅ Seed default subscription plans (Admin only)
+// ✅ User subscription routes (Authenticated users)
+router.get("/user/current", authMiddleware, getCurrentSubscription);
+router.get("/user/history", authMiddleware, getSubscriptionHistory);
+router.get("/user/status", authMiddleware, checkSubscriptionStatus);
+router.get("/user/available-plans", authMiddleware, getAvailablePlans);
+router.post("/user/subscribe", authMiddleware, createSubscription);
+router.post("/user/cancel", authMiddleware, cancelSubscription);
+router.get("/user/sessions/quick-check", authMiddleware, quickSessionLimitCheck);
+
+// ✅ Admin routes (Admin only)
 router.post("/seed", authMiddleware, adminMiddleware, seedSubscriptionPlans);
-
-// ✅ Reset subscription plans (delete all and reseed - Admin only)
 router.post("/reset", authMiddleware, adminMiddleware, resetSubscriptionPlans);
-
-// ✅ Get all subscription plans (Admin only - for management)
 router.get("/", authMiddleware, adminMiddleware, getSubscriptionPlans);
-
-// ✅ Get subscription plan by ID (Admin only)
 router.get("/:planId", authMiddleware, adminMiddleware, getSubscriptionPlanById);
-
-// ✅ Update subscription plan (Admin only)
 router.put("/:planId", authMiddleware, adminMiddleware, updateSubscriptionPlan);
 
 module.exports = router;

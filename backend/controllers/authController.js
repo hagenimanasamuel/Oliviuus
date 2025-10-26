@@ -107,12 +107,19 @@ const saveUserInfo = async (req, res) => {
       [userId, chosenLang]
     );
 
-    // 5. Send welcome email (non-blocking)
-    try {
-      await sendWelcomeEmail(email, chosenLang);
-    } catch (emailErr) {
-      console.error("⚠️ Failed to send welcome email:", emailErr);
-    }
+    // 5. Send welcome email in background (non-blocking)
+    const sendWelcomeEmailBackground = async (email, language) => {
+      try {
+        await sendWelcomeEmail(email, language);
+        // console.log(`✅ Welcome email sent to ${email}`);
+      } catch (emailErr) {
+        // console.error("⚠️ Failed to send welcome email:", emailErr);
+        // Don't throw error - just log it
+      }
+    };
+
+    // Trigger email sending in background without waiting
+    sendWelcomeEmailBackground(email, chosenLang);
 
     // 6. Generate JWT token (same as login)
     const token = jwt.sign(
@@ -147,7 +154,10 @@ const saveUserInfo = async (req, res) => {
       ]
     );
 
-    // 9. Return created user info
+    // 9. Send welcome notifications to the user
+    await sendWelcomeNotifications(userId, chosenLang);
+
+    // 10. Return created user info immediately (don't wait for email)
     return res.status(200).json({
       message: "User created and logged in successfully",
       user: {
@@ -161,6 +171,109 @@ const saveUserInfo = async (req, res) => {
   } catch (err) {
     console.error("❌ Error in saveUserInfo:", err);
     res.status(500).json({ error: "Something went wrong, please try again." });
+  }
+};
+
+// Helper function to send welcome notifications
+const sendWelcomeNotifications = async (userId, language) => {
+  try {
+    const currentTime = new Date();
+    
+    // Welcome notification
+    await query(
+      `INSERT INTO notifications 
+       (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+       VALUES (?, 'welcome', '🎉 Welcome to Oliviuus!', ?, 'party', 'user', ?, 'normal', ?, ?)`,
+      [
+        userId,
+        `Welcome to Oliviuus! We're excited to have you on board. Start exploring thousands of movies and series tailored just for you.`,
+        userId,
+        JSON.stringify({
+          timestamp: currentTime.toISOString(),
+          language: language,
+          is_welcome: true
+        }),
+        "/browse"
+      ]
+    );
+
+    // Profile customization tip
+    await query(
+      `INSERT INTO notifications 
+       (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+       VALUES (?, 'tip', '👤 Personalize Your Experience', ?, 'user', 'user', ?, 'low', ?, ?)`,
+      [
+        userId,
+        `Make Oliviuus truly yours! Customize your profile, set up multiple viewing profiles for family members, and adjust your preferences in account settings.`,
+        userId,
+        JSON.stringify({
+          timestamp: currentTime.toISOString(),
+          language: language,
+          tip_type: 'profile_customization'
+        }),
+        "/account/settings#profiles"
+      ]
+    );
+
+    // Content discovery tip
+    await query(
+      `INSERT INTO notifications 
+       (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+       VALUES (?, 'tip', '🎬 Discover Amazing Content', ?, 'film', 'user', ?, 'low', ?, ?)`,
+      [
+        userId,
+        `Explore our vast library of movies and series. Use our smart recommendations to find content you'll love based on your preferences.`,
+        userId,
+        JSON.stringify({
+          timestamp: currentTime.toISOString(),
+          language: language,
+          tip_type: 'content_discovery'
+        }),
+        "/browse"
+      ]
+    );
+
+    // Mobile app tip (if applicable)
+    await query(
+      `INSERT INTO notifications 
+       (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+       VALUES (?, 'tip', '📱 Watch Anywhere', ?, 'smartphone', 'user', ?, 'low', ?, ?)`,
+      [
+        userId,
+        `Take Oliviuus with you! Download our mobile app to watch your favorite content on the go, download for offline viewing, and continue watching across all your devices.`,
+        userId,
+        JSON.stringify({
+          timestamp: currentTime.toISOString(),
+          language: language,
+          tip_type: 'mobile_app'
+        }),
+        "/download"
+      ]
+    );
+
+    // Subscription info tip
+    await query(
+      `INSERT INTO notifications 
+       (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+       VALUES (?, 'tip', '💎 Upgrade Your Experience', ?, 'diamond', 'user', ?, 'low', ?, ?)`,
+      [
+        userId,
+        `Enjoying Oliviuus? Upgrade to a premium plan for HD streaming, multiple screens, offline downloads, and exclusive content. Explore our subscription plans to get the most out of your experience.`,
+        userId,
+        JSON.stringify({
+          timestamp: currentTime.toISOString(),
+          language: language,
+          tip_type: 'subscription_info'
+        }),
+        "/subscriptions"
+      ]
+    );
+
+    // console.log(`✅ Sent welcome notifications to user ${userId}`);
+
+  } catch (error) {
+    // console.error('Error sending welcome notifications:', error);
+    // Don't throw error to avoid breaking user registration flow
   }
 };
 
@@ -261,26 +374,34 @@ const loginUser = async (req, res) => {
   }
 
   try {
+    const ip_address = req.headers["x-forwarded-for"] || req.connection.remoteAddress || "Unknown";
+
     // 1️⃣ Check user
     const rows = await query(
-      "SELECT id, password, role, is_active FROM users WHERE email = ?",
+      "SELECT id, password, role, is_active, email FROM users WHERE email = ?",
       [email]
     );
 
     if (!rows || rows.length === 0) {
+      // Send notification for failed login attempt (invalid email)
+      await handleFailedLoginAttempt(null, email, ip_address, device_name, device_type, 'invalid_email');
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
     const user = rows[0];
 
     if (!user.is_active) {
+      // Send notification for disabled account attempt
+      await handleFailedLoginAttempt(user.id, email, ip_address, device_name, device_type, 'account_disabled');
       return res.status(403).json({ error: "Account is disabled" });
     }
 
     // 2️⃣ Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Invalid password" });
+      // Send notification for failed password attempt
+      await handleFailedLoginAttempt(user.id, email, ip_address, device_name, device_type, 'invalid_password');
+      return res.status(400).json({ error: "Invalid email or password" });
     }
 
     // 3️⃣ Generate JWT token (used for both cookie + DB session)
@@ -299,16 +420,13 @@ const loginUser = async (req, res) => {
     });
 
     // 5️⃣ Record session in user_session table
-    const ip_address =
-      req.headers["x-forwarded-for"] || req.connection.remoteAddress || "Unknown";
-
     await query(
       `INSERT INTO user_session 
        (user_id, session_token, device_name, device_type, ip_address, user_agent, token_expires)
        VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))`,
       [
         user.id,
-        token, // 🔑 use the same JWT as cookie + middleware
+        token,
         device_name || "Unknown",
         device_type || "desktop",
         ip_address,
@@ -316,7 +434,10 @@ const loginUser = async (req, res) => {
       ]
     );
 
-    // 6️⃣ Return response
+    // 6️⃣ Send success notification for new device/login
+    await handleSuccessfulLogin(user.id, email, ip_address, device_name, device_type, user_agent);
+
+    // 7️⃣ Return response
     return res.status(200).json({
       message: "Login successful",
       user: { id: user.id, email, role: user.role },
@@ -324,6 +445,178 @@ const loginUser = async (req, res) => {
   } catch (err) {
     console.error("❌ Error in loginUser:", err);
     res.status(500).json({ error: "Something went wrong, please try again." });
+  }
+};
+
+// Helper function to handle failed login attempts with rate limiting
+const handleFailedLoginAttempt = async (userId, email, ip_address, device_name, device_type, reason) => {
+  try {
+    const currentTime = new Date();
+    const fiveMinutesAgo = new Date(currentTime.getTime() - 5 * 60 * 1000);
+
+    // MariaDB compatible rate limiting - check by created_at timestamp only
+    const existingNotification = await query(
+      `SELECT id FROM notifications 
+       WHERE user_id = ? 
+       AND reference_type = 'user' 
+       AND type = 'security_alert' 
+       AND created_at > ? 
+       LIMIT 1`,
+      [userId, fiveMinutesAgo]
+    );
+
+    // If no recent notification exists, send one
+    if (!existingNotification || existingNotification.length === 0) {
+      let title, message, action_url;
+
+      switch (reason) {
+        case 'invalid_email':
+          title = '🔒 Suspicious Login Attempt Blocked';
+          message = `We detected a failed login attempt for your email (${email}) from ${device_name || 'an unknown device'} (${ip_address}). The attempt was blocked by Oliviuus security due to incorrect credentials. If this wasn't you, we recommend securing your account.`;
+          action_url = "/account/settings#security";
+          break;
+        case 'invalid_password':
+          title = '🔒 Failed Login Attempt Detected';
+          message = `A login attempt to your account from ${device_name || 'an unknown device'} (${ip_address}) was blocked due to incorrect password. If this wasn't you, we strongly recommend changing your password immediately.`;
+          action_url = "/account/settings#security";
+          break;
+        case 'account_disabled':
+          title = '🚫 Login Attempt on Disabled Account';
+          message = `Someone tried to access your disabled account from ${device_name || 'an unknown device'} (${ip_address}). No action is required as your account remains secure.`;
+          action_url = "/account/settings#security";
+          break;
+        default:
+          title = '⚠️ Security Alert';
+          message = `Unusual login activity detected on your account from ${ip_address}. Please review your account security.`;
+          action_url = "/account/settings#security";
+      }
+
+      // Create notification with action URL
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+         VALUES (?, 'security_alert', ?, ?, 'shield-alert', 'user', ?, 'high', ?, ?)`,
+        [
+          userId,
+          title,
+          message,
+          userId,
+          JSON.stringify({
+            ip_address: ip_address,
+            device_name: device_name || 'Unknown',
+            device_type: device_type || 'desktop',
+            reason: reason,
+            timestamp: currentTime.toISOString()
+          }),
+          action_url
+        ]
+      );
+    }
+
+    // Always log the failed attempt in security_logs table
+    await query(
+      `INSERT INTO security_logs 
+       (user_id, action, ip_address, device_info, status, details) 
+       VALUES (?, 'login_attempt', ?, ?, 'failed', ?)`,
+      [
+        userId,
+        ip_address,
+        JSON.stringify({
+          device_name: device_name,
+          device_type: device_type
+        }),
+        JSON.stringify({ reason: reason, email_attempted: email })
+      ]
+    );
+
+  } catch (error) {
+    console.error('Error handling failed login attempt:', error);
+    // Don't throw error to avoid breaking login flow
+  }
+};
+
+// Helper function to handle successful logins
+const handleSuccessfulLogin = async (userId, email, ip_address, device_name, device_type, user_agent) => {
+  try {
+    const currentTime = new Date();
+
+    // Check if this device has logged in before (within last 30 days)
+    const existingSession = await query(
+      `SELECT id FROM user_session 
+       WHERE user_id = ? 
+       AND ip_address = ? 
+       AND device_type = ?
+       AND is_active = true
+       AND created_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
+       LIMIT 1`,
+      [userId, ip_address, device_type]
+    );
+
+    const isNewDevice = !existingSession || existingSession.length === 0;
+
+    if (isNewDevice) {
+      // Send notification for login from new device
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+         VALUES (?, 'new_device_login', '📱 New Login Location', ?, 'devices', 'user', ?, 'high', ?, ?)`,
+        [
+          userId,
+          `Your Account was just accessed from a new ${device_type || 'device'} (${device_name || 'Unknown Device'}) at ${ip_address}. If this wasn't you, please secure your account immediately by changing your password.`,
+          userId,
+          JSON.stringify({
+            ip_address: ip_address,
+            device_name: device_name || 'Unknown',
+            device_type: device_type || 'desktop',
+            location: 'Unknown',
+            timestamp: currentTime.toISOString(),
+            is_new_device: true
+          }),
+          "/account/settings#sessions"
+        ]
+      );
+    } else {
+      // Send notification for successful login from recognized device
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+         VALUES (?, 'login_success', '✅ Login Successful', ?, 'shield-check', 'user', ?, 'low', ?, ?)`,
+        [
+          userId,
+          `You've successfully logged in to your Oliviuus account from your ${device_name || 'device'} (${device_type || 'desktop'}). Welcome back!`,
+          userId,
+          JSON.stringify({
+            ip_address: ip_address,
+            device_name: device_name || 'Unknown',
+            device_type: device_type || 'desktop',
+            timestamp: currentTime.toISOString(),
+            is_new_device: false
+          }),
+          "/account/settings#sessions"
+        ]
+      );
+    }
+
+    // Log successful login in security_logs table
+    await query(
+      `INSERT INTO security_logs 
+       (user_id, action, ip_address, device_info, status, details) 
+       VALUES (?, 'login_attempt', ?, ?, 'success', ?)`,
+      [
+        userId,
+        ip_address,
+        JSON.stringify({
+          device_name: device_name,
+          device_type: device_type,
+          is_new_device: isNewDevice
+        }),
+        JSON.stringify({ email: email, new_device: isNewDevice })
+      ]
+    );
+
+  } catch (error) {
+    console.error('Error handling successful login:', error);
+    // Don't throw error to avoid breaking login flow
   }
 };
 
@@ -532,17 +825,153 @@ const createUser = async (req, res) => {
     const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
     const resetLink = `${clientUrl}/reset-password?token=${resetToken}`;
 
-    // 6️⃣ Send account created email in the selected language
-    await sendAccountCreatedEmail(email, resetLink, lang);
+    // 6️⃣ Send account created email in background
+    const sendAccountCreatedEmailBackground = async (email, resetLink, language) => {
+      try {
+        await sendAccountCreatedEmail(email, resetLink, language);
+        console.log(`✅ Account creation email sent to ${email}`);
+      } catch (emailErr) {
+        console.error("⚠️ Failed to send account creation email:", emailErr);
+        // Don't throw error - just log it
+      }
+    };
 
-    // 7️⃣ Return created user info including profile picture
+    // Trigger email sending in background without waiting
+    sendAccountCreatedEmailBackground(email, resetLink, lang);
+
+    // 7️⃣ Send role-based notifications
+    await sendRoleBasedNotifications(userId, role, lang);
+
+    // 8️⃣ Return created user info including profile picture
     res.status(201).json({
-      message: "User created successfully. Account email sent.",
+      message: "User created successfully. Account setup email sent.",
       user: { id: userId, email, role, language: lang, profile_avatar_url: defaultAvatar },
     });
   } catch (err) {
     console.error("❌ Error in createUser:", err);
     res.status(500).json({ error: "Something went wrong, please try again." });
+  }
+};
+
+// Helper function to send role-based notifications
+const sendRoleBasedNotifications = async (userId, role, language) => {
+  try {
+    const currentTime = new Date();
+
+    if (role === "admin") {
+      // Admin-specific notifications
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+         VALUES (?, 'admin_welcome', '⚡ Admin Account Created', ?, 'shield', 'user', ?, 'high', ?, ?)`,
+        [
+          userId,
+          `Your Oliviuus admin account has been created. You now have access to the admin dashboard with full system management capabilities. Please set your password to get started.`,
+          userId,
+          JSON.stringify({
+            timestamp: currentTime.toISOString(),
+            language: language,
+            role: 'admin',
+            is_admin: true
+          }),
+          "/admin/dashboard"
+        ]
+      );
+
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+         VALUES (?, 'admin_tip', '🔧 Admin Responsibilities', ?, 'settings', 'user', ?, 'high', ?, ?)`,
+        [
+          userId,
+          `As an admin, you can manage users, content, subscriptions, and system settings. Review the admin guide to understand your responsibilities and capabilities.`,
+          userId,
+          JSON.stringify({
+            timestamp: currentTime.toISOString(),
+            language: language,
+            tip_type: 'admin_responsibilities'
+          }),
+          "/admin/guide"
+        ]
+      );
+
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+         VALUES (?, 'security', '🔒 Secure Your Admin Account', ?, 'lock', 'user', ?, 'high', ?, ?)`,
+        [
+          userId,
+          `Admin accounts require enhanced security. Please set a strong password immediately and enable two-factor authentication for maximum security.`,
+          userId,
+          JSON.stringify({
+            timestamp: currentTime.toISOString(),
+            language: language,
+            security_level: 'high'
+          }),
+          "/account/settings#security"
+        ]
+      );
+
+    } else {
+      // Viewer-specific notifications (same as registration flow)
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+         VALUES (?, 'welcome', '🎉 Welcome to Oliviuus!', ?, 'party', 'user', ?, 'normal', ?, ?)`,
+        [
+          userId,
+          `Welcome to Oliviuus! Your account has been created. We're excited to have you on board. Start exploring thousands of movies and series tailored just for you.`,
+          userId,
+          JSON.stringify({
+            timestamp: currentTime.toISOString(),
+            language: language,
+            is_welcome: true,
+            created_by_admin: true
+          }),
+          "/browse"
+        ]
+      );
+
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+         VALUES (?, 'tip', '👤 Complete Your Setup', ?, 'user', 'user', ?, 'normal', ?, ?)`,
+        [
+          userId,
+          `Your Oliviuus account is ready! Please set your password to start watching. You can then customize your profile and preferences.`,
+          userId,
+          JSON.stringify({
+            timestamp: currentTime.toISOString(),
+            language: language,
+            tip_type: 'setup_required'
+          }),
+          "/reset-password"
+        ]
+      );
+
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, reference_type, reference_id, priority, metadata, action_url) 
+         VALUES (?, 'tip', '🎬 Discover Amazing Content', ?, 'film', 'user', ?, 'low', ?, ?)`,
+        [
+          userId,
+          `Once you set your password, explore our vast library of movies and series. Use our smart recommendations to find content you'll love.`,
+          userId,
+          JSON.stringify({
+            timestamp: currentTime.toISOString(),
+            language: language,
+            tip_type: 'content_discovery'
+          }),
+          "/browse"
+        ]
+      );
+    }
+
+    // console.log(`✅ Sent ${role}-specific notifications to user ${userId}`);
+
+  } catch (error) {
+    // console.error('Error sending role-based notifications:', error);
+    // Don't throw error to avoid breaking user creation flow
   }
 };
 

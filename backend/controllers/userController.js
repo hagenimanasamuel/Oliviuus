@@ -2,20 +2,18 @@ const { query } = require("../config/dbConfig");
 const bcrypt = require("bcrypt");
 const { Parser } = require("json2csv");
 const jwt = require("jsonwebtoken");
-const { sendPasswordResetEmail } = require("../services/emailService");
+const { sendPasswordResetEmail, sendAdminMessageEmail } = require("../services/emailService");
 
 // ✅ Deactivate account (soft delete)
 const deactivateAccount = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Mark account as inactive
     await query(
       "UPDATE users SET is_active = FALSE, updated_at = NOW() WHERE id = ?",
       [userId]
     );
 
-    // Optionally, invalidate all active sessions
     await query(
       "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
       [userId]
@@ -23,7 +21,6 @@ const deactivateAccount = async (req, res) => {
 
     res.status(200).json({ message: "Account deactivated successfully." });
   } catch (err) {
-    console.error("❌ Error in deactivateAccount:", err);
     res.status(500).json({ message: "Failed to deactivate account." });
   }
 };
@@ -33,14 +30,10 @@ const deleteAccount = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // 1️⃣ Delete user-related data (sessions, preferences, etc.)
     await query("DELETE FROM user_session WHERE user_id = ?", [userId]);
     await query("DELETE FROM user_preferences WHERE user_id = ?", [userId]);
-
-    // 2️⃣ Delete the user
     await query("DELETE FROM users WHERE id = ?", [userId]);
 
-    // 3️⃣ Clear auth cookie
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -49,7 +42,6 @@ const deleteAccount = async (req, res) => {
 
     res.status(200).json({ message: "Account deleted successfully." });
   } catch (err) {
-    console.error("❌ Error in deleteAccount:", err);
     res.status(500).json({ message: "Failed to delete account." });
   }
 };
@@ -67,7 +59,6 @@ const getUsers = async (req, res) => {
     const date_end = req.query.date_end || "";
     const last_login = req.query.last_login || "";
 
-    // Base query with LEFT JOIN on sessions table
     let sql = `
       SELECT u.*, 
         MAX(s.logout_time) AS last_login_time
@@ -77,25 +68,21 @@ const getUsers = async (req, res) => {
     `;
     const params = [];
 
-    // Search
     if (search) {
       sql += " AND u.email LIKE ?";
       params.push(`%${search}%`);
     }
 
-    // Role filter
     if (role) {
       sql += " AND u.role = ?";
       params.push(role);
     }
 
-    // Status filter
     if (status) {
       sql += " AND u.is_active = ?";
       params.push(status === "active" ? 1 : 0);
     }
 
-    // Registration date filter
     if (date_start && date_end) {
       sql += " AND DATE(u.created_at) BETWEEN ? AND ?";
       params.push(date_start, date_end);
@@ -107,7 +94,6 @@ const getUsers = async (req, res) => {
       params.push(date_end);
     }
 
-    // Last login filter using sessions
     if (last_login) {
       const now = new Date();
       let startDate;
@@ -147,7 +133,6 @@ const getUsers = async (req, res) => {
 
     sql += " GROUP BY u.id";
 
-    // Sorting
     switch (sort) {
       case "newest":
         sql += " ORDER BY u.created_at DESC";
@@ -172,13 +157,11 @@ const getUsers = async (req, res) => {
         break;
     }
 
-    // Pagination
     sql += " LIMIT ? OFFSET ?";
     params.push(limit, offset);
 
     const users = await query(sql, params);
 
-    // Total count
     let countSql = "SELECT COUNT(*) as total FROM users u WHERE 1=1";
     const countParams = [];
     if (search) {
@@ -209,7 +192,6 @@ const getUsers = async (req, res) => {
 
     res.status(200).json({ users, total });
   } catch (err) {
-    console.error("❌ Error in getUsers:", err);
     res.status(500).json({ message: "Failed to fetch users." });
   }
 };
@@ -220,7 +202,6 @@ const getTotalUsers = async (req, res) => {
     const result = await query("SELECT COUNT(*) AS total FROM users");
     res.status(200).json({ total: result[0].total });
   } catch (err) {
-    console.error("❌ Error in getTotalUsers:", err);
     res.status(500).json({ message: "Failed to fetch total users." });
   }
 };
@@ -260,7 +241,6 @@ const exportUsers = async (req, res) => {
     res.attachment("users_export.csv");
     return res.send(csv);
   } catch (err) {
-    console.error("❌ Error in exportUsers:", err);
     res.status(500).json({ message: "Failed to export users." });
   }
 };
@@ -271,18 +251,15 @@ const updateUserStatus = async (req, res) => {
     const { userId } = req.params;
     const { is_active } = req.body;
 
-    // Validate input
     if (typeof is_active !== 'boolean') {
       return res.status(400).json({ message: "is_active must be a boolean" });
     }
 
-    // Update user status
     await query(
       "UPDATE users SET is_active = ?, updated_at = NOW() WHERE id = ?",
       [is_active, userId]
     );
 
-    // If deactivating, also invalidate active sessions
     if (!is_active) {
       await query(
         "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
@@ -295,7 +272,6 @@ const updateUserStatus = async (req, res) => {
       is_active
     });
   } catch (err) {
-    console.error("❌ Error in updateUserStatus:", err);
     res.status(500).json({ message: "Failed to update user status." });
   }
 };
@@ -306,12 +282,10 @@ const updateUserEmail = async (req, res) => {
     const { userId } = req.params;
     const { email } = req.body;
 
-    // Validate email
     if (!email || !email.includes('@')) {
       return res.status(400).json({ message: "Valid email is required" });
     }
 
-    // Check if email already exists
     const existingUser = await query(
       "SELECT id FROM users WHERE email = ? AND id != ?",
       [email, userId]
@@ -321,7 +295,6 @@ const updateUserEmail = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    // Update user email
     await query(
       "UPDATE users SET email = ?, updated_at = NOW() WHERE id = ?",
       [email, userId]
@@ -332,7 +305,6 @@ const updateUserEmail = async (req, res) => {
       email
     });
   } catch (err) {
-    console.error("❌ Error in updateUserEmail:", err);
     res.status(500).json({ message: "Failed to update email." });
   }
 };
@@ -342,16 +314,12 @@ const adminDeleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // 1️⃣ Delete user-related data
     await query("DELETE FROM user_session WHERE user_id = ?", [userId]);
     await query("DELETE FROM user_preferences WHERE user_id = ?", [userId]);
-
-    // 2️⃣ Delete the user
     await query("DELETE FROM users WHERE id = ?", [userId]);
 
     res.status(200).json({ message: "User account deleted successfully." });
   } catch (err) {
-    console.error("❌ Error in adminDeleteUser:", err);
     res.status(500).json({ message: "Failed to delete user account." });
   }
 };
@@ -379,7 +347,6 @@ const getUserById = async (req, res) => {
 
     res.status(200).json({ user: user[0] });
   } catch (err) {
-    console.error("❌ Error in getUserById:", err);
     res.status(500).json({ message: "Failed to fetch user details." });
   }
 };
@@ -395,9 +362,6 @@ const getUserLoginSessions = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    console.log("🔍 Fetching sessions for user:", userId);
-
-    // First, verify the user exists
     const userExists = await query("SELECT id FROM users WHERE id = ?", [userId]);
     if (userExists.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -421,14 +385,11 @@ const getUserLoginSessions = async (req, res) => {
       LIMIT ? OFFSET ?
     `, [userId, limit, offset]);
 
-    console.log("📊 Found sessions:", sessions.length);
-
     const totalResult = await query(
       "SELECT COUNT(*) as total FROM user_session WHERE user_id = ?",
       [userId]
     );
 
-    // Get session statistics
     const statsResult = await query(`
       SELECT 
         COUNT(*) as total_sessions,
@@ -439,7 +400,6 @@ const getUserLoginSessions = async (req, res) => {
       WHERE user_id = ?
     `, [userId]);
 
-    // Map the data to match frontend expectations
     const formattedSessions = sessions.map(session => ({
       id: session.id,
       device_name: session.device_name || 'Unknown Device',
@@ -465,7 +425,6 @@ const getUserLoginSessions = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error("❌ Error in getUserLoginSessions:", err);
     res.status(500).json({ message: "Failed to fetch login sessions." });
   }
 };
@@ -479,7 +438,7 @@ const getUserOverview = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    // Get comprehensive user data with activity stats
+    // Get basic user data
     const userData = await query(`
       SELECT 
         u.*,
@@ -499,33 +458,12 @@ const getUserOverview = async (req, res) => {
           FROM user_session us3 
           WHERE us3.user_id = u.id 
           AND us3.login_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-        ) as week_logins,
-        (
-          SELECT AVG(TIMESTAMPDIFF(MINUTE, login_time, COALESCE(last_activity, login_time)))
-          FROM user_session 
-          WHERE user_id = u.id 
-          AND last_activity IS NOT NULL
-        ) as avg_session_minutes,
-        (
-          SELECT COUNT(*) 
-          FROM user_subscriptions 
-          WHERE user_id = u.id 
-          AND status = 'active'
-          AND (end_date IS NULL OR end_date > NOW())
-        ) as active_subscription_count,
-        us_current.ip_address as last_ip,
-        us_current.device_name as last_device
+        ) as week_logins
       FROM users u
       LEFT JOIN user_preferences up ON u.id = up.user_id
       LEFT JOIN user_session us ON u.id = us.user_id
-      LEFT JOIN user_session us_current ON u.id = us_current.user_id 
-        AND us_current.login_time = (
-          SELECT MAX(login_time) 
-          FROM user_session 
-          WHERE user_id = u.id
-        )
       WHERE u.id = ?
-      GROUP BY u.id, up.language, up.notifications, up.subtitles, us_current.ip_address, us_current.device_name
+      GROUP BY u.id, up.language, up.notifications, up.subtitles
     `, [userId]);
 
     if (userData.length === 0) {
@@ -534,7 +472,18 @@ const getUserOverview = async (req, res) => {
 
     const user = userData[0];
 
-    // Calculate current streak (consecutive days with login)
+    // Get session statistics
+    const sessionStats = await query(`
+      SELECT 
+        COUNT(*) as total_sessions,
+        COUNT(CASE WHEN is_active = TRUE THEN 1 END) as active_sessions,
+        COUNT(CASE WHEN is_active = FALSE THEN 1 END) as completed_sessions,
+        AVG(TIMESTAMPDIFF(MINUTE, login_time, COALESCE(logout_time, NOW()))) as avg_session_minutes
+      FROM user_session 
+      WHERE user_id = ?
+    `, [userId]);
+
+    // Get current streak
     const streakResult = await query(`
       WITH login_dates AS (
         SELECT DISTINCT DATE(login_time) as login_date
@@ -559,14 +508,14 @@ const getUserOverview = async (req, res) => {
       )
     `, [userId]);
 
-    // Get subscription details
+    // Get subscription details - FIXED: Get actual subscription data
     const subscriptionData = await query(`
       SELECT 
         us.*,
         s.name as subscription_name,
         s.type as subscription_type,
         s.price,
-        s.features as subscription_features
+        s.currency
       FROM user_subscriptions us
       LEFT JOIN subscriptions s ON us.subscription_id = s.id
       WHERE us.user_id = ? 
@@ -575,6 +524,81 @@ const getUserOverview = async (req, res) => {
       ORDER BY us.start_date DESC
       LIMIT 1
     `, [userId]);
+
+    // Get last session details
+    const lastSession = await query(`
+      SELECT ip_address, device_name 
+      FROM user_session 
+      WHERE user_id = ? 
+      ORDER BY login_time DESC 
+      LIMIT 1
+    `, [userId]);
+
+    // FIXED: Determine actual subscription data with proper mapping
+    let actualSubscription = {};
+    if (subscriptionData.length > 0) {
+      // User has an active subscription in user_subscriptions table
+      const sub = subscriptionData[0];
+      actualSubscription = {
+        name: sub.subscription_name || sub.name,
+        type: sub.subscription_type || sub.type,
+        price: sub.price || 0,
+        currency: sub.currency || 'RWF',
+        start_date: sub.start_date,
+        end_date: sub.end_date,
+        status: sub.status || 'active'
+      };
+    } else {
+      // Fallback to user's subscription_plan field with proper mapping
+      // FIXED: Use consistent mapping that matches SubscriptionTab
+      const userSubscriptionPlan = user.subscription_plan;
+
+      let subscriptionName = 'Free';
+      let subscriptionType = 'free';
+      let price = 0;
+
+      switch (userSubscriptionPlan) {
+        case 'free_trial':
+          subscriptionName = 'Free Trial';
+          subscriptionType = 'free_trial';
+          break;
+        case 'basic':
+          subscriptionName = 'Basic';
+          subscriptionType = 'basic';
+          price = 4900;
+          break;
+        case 'standard':
+          subscriptionName = 'Standard';
+          subscriptionType = 'standard';
+          price = 8900;
+          break;
+        case 'premium':
+          subscriptionName = 'Premium';
+          subscriptionType = 'mobile'; // Map premium to mobile to match SubscriptionTab
+          price = 12900;
+          break;
+        case 'custom':
+          subscriptionName = 'Custom';
+          subscriptionType = 'custom';
+          price = 0;
+          break;
+        case 'none':
+        default:
+          subscriptionName = 'Free';
+          subscriptionType = 'free';
+          price = 0;
+      }
+
+      actualSubscription = {
+        name: subscriptionName,
+        type: subscriptionType,
+        price: price,
+        currency: 'RWF',
+        start_date: user.created_at,
+        end_date: null,
+        status: 'active'
+      };
+    }
 
     // Format the response data
     const overviewData = {
@@ -594,44 +618,32 @@ const getUserOverview = async (req, res) => {
         notifications: user.notifications,
         subtitles: user.subtitles
       },
-      subscription: subscriptionData.length > 0 ? {
-        name: subscriptionData[0].subscription_name,
-        type: subscriptionData[0].subscription_type,
-        price: subscriptionData[0].price,
-        features: subscriptionData[0].subscription_features ? JSON.parse(subscriptionData[0].subscription_features) : null,
-        start_date: subscriptionData[0].start_date,
-        end_date: subscriptionData[0].end_date,
-        status: subscriptionData[0].status
-      } : {
-        name: user.subscription_plan !== 'none' ? user.subscription_plan : 'Free',
-        type: 'free',
-        price: 0,
-        features: null,
-        status: 'active'
-      },
+      subscription: actualSubscription, // Use the actual subscription data
       activity: {
         total_logins: user.total_logins || 0,
-        failed_attempts: 0, // Your table doesn't track failed logins
         today_logins: user.today_logins || 0,
         week_logins: user.week_logins || 0,
         current_streak: streakResult[0]?.current_streak || 0,
-        avg_session_minutes: Math.round(user.avg_session_minutes) || 0,
-        avg_session: user.avg_session_minutes ? 
-          `${Math.floor(user.avg_session_minutes)}m ${Math.round((user.avg_session_minutes % 1) * 60)}s` : "0m 00s",
+        avg_session_minutes: Math.round(sessionStats[0]?.avg_session_minutes) || 0,
+        avg_session: sessionStats[0]?.avg_session_minutes ?
+          `${Math.floor(sessionStats[0].avg_session_minutes)}m ${Math.round((sessionStats[0].avg_session_minutes % 1) * 60)}s` : "0m 00s",
         last_login: user.last_login,
-        last_ip: user.last_ip,
-        last_device: user.last_device
+        last_ip: lastSession[0]?.ip_address || 'Unknown',
+        last_device: lastSession[0]?.device_name || 'Unknown device'
       },
       stats: {
-        active_subscription: user.active_subscription_count > 0,
-        total_subscriptions: user.active_subscription_count
+        active_subscription: subscriptionData.length > 0,
+        total_subscriptions: subscriptionData.length,
+        active_sessions: sessionStats[0]?.active_sessions || 0,
+        total_sessions: sessionStats[0]?.total_sessions || 0
       }
     };
 
     res.status(200).json(overviewData);
   } catch (err) {
-    console.error("❌ Error in getUserOverview:", err);
-    res.status(500).json({ message: "Failed to fetch user overview data." });
+    res.status(500).json({
+      message: "Failed to fetch user overview data."
+    });
   }
 };
 
@@ -684,7 +696,6 @@ const getUserActivityTimeline = async (req, res) => {
       total: totalResult[0]?.total || 0
     });
   } catch (err) {
-    console.error("❌ Error in getUserActivityTimeline:", err);
     res.status(500).json({ message: "Failed to fetch user activity timeline." });
   }
 };
@@ -695,33 +706,29 @@ const updateUserPreferences = async (req, res) => {
     const { userId } = req.params;
     const { language, notifications, subtitles, genres } = req.body;
 
-    // Check if preferences exist
     const existingPrefs = await query(
       "SELECT id FROM user_preferences WHERE user_id = ?",
       [userId]
     );
 
     if (existingPrefs.length > 0) {
-      // Update existing preferences
       await query(`
         UPDATE user_preferences 
         SET language = ?, notifications = ?, subtitles = ?, genres = ?, updated_at = NOW()
         WHERE user_id = ?
       `, [language, notifications, subtitles, JSON.stringify(genres), userId]);
     } else {
-      // Insert new preferences
       await query(`
         INSERT INTO user_preferences (user_id, language, notifications, subtitles, genres)
         VALUES (?, ?, ?, ?, ?)
       `, [userId, language, notifications, subtitles, JSON.stringify(genres)]);
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "User preferences updated successfully.",
       preferences: { language, notifications, subtitles, genres }
     });
   } catch (err) {
-    console.error("❌ Error in updateUserPreferences:", err);
     res.status(500).json({ message: "Failed to update user preferences." });
   }
 };
@@ -731,37 +738,83 @@ const getUserSubscriptionHistory = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    const userExists = await query("SELECT id, subscription_plan, created_at FROM users WHERE id = ?", [userId]);
+    if (userExists.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = userExists[0];
+
     const subscriptions = await query(`
       SELECT 
         us.*,
         s.name as subscription_name,
         s.type as subscription_type,
         s.price,
-        s.features as subscription_features,
-        s.devices_allowed
+        s.currency,
+        s.description,
+        s.devices_allowed,
+        s.max_sessions,
+        s.video_quality,
+        s.offline_downloads,
+        s.max_profiles
       FROM user_subscriptions us
       LEFT JOIN subscriptions s ON us.subscription_id = s.id
       WHERE us.user_id = ?
       ORDER BY us.start_date DESC
     `, [userId]);
 
-    const formattedSubscriptions = subscriptions.map(sub => ({
-      id: sub.id,
-      name: sub.subscription_name,
-      type: sub.subscription_type,
-      price: sub.price,
-      features: sub.subscription_features ? JSON.parse(sub.subscription_features) : null,
-      devices_allowed: sub.devices_allowed ? JSON.parse(sub.devices_allowed) : null,
-      start_date: sub.start_date,
-      end_date: sub.end_date,
-      status: sub.status,
-      created_at: sub.created_at
-    }));
+    let formattedSubscriptions = [];
 
-    res.status(200).json({ subscriptions: formattedSubscriptions });
+    if (subscriptions.length > 0) {
+      formattedSubscriptions = subscriptions.map(sub => ({
+        id: sub.id,
+        name: sub.subscription_name || sub.subscription_name || 'Unknown Plan',
+        type: sub.subscription_type || sub.type || 'free',
+        price: sub.subscription_price || sub.price || 0,
+        currency: sub.subscription_currency || sub.currency || 'RWF',
+        status: sub.status || 'unknown',
+        start_date: sub.start_date,
+        end_date: sub.end_date,
+        cancelled_at: sub.cancelled_at,
+        auto_renew: Boolean(sub.auto_renew),
+        devices_allowed: sub.devices_allowed ? JSON.parse(sub.devices_allowed) : null,
+        max_sessions: sub.max_sessions || 1,
+        video_quality: sub.video_quality || 'SD',
+        offline_downloads: Boolean(sub.offline_downloads),
+        max_profiles: sub.max_profiles || 1,
+        created_at: sub.created_at
+      }));
+    } else {
+      const fallbackSubscription = {
+        id: 0,
+        name: user.subscription_plan !== 'none' ? user.subscription_plan : 'Free',
+        type: user.subscription_plan !== 'none' ? user.subscription_plan.toLowerCase() : 'free',
+        price: 0,
+        currency: 'RWF',
+        status: 'active',
+        start_date: user.created_at,
+        end_date: null,
+        cancelled_at: null,
+        auto_renew: false,
+        devices_allowed: null,
+        max_sessions: 1,
+        video_quality: 'SD',
+        offline_downloads: false,
+        max_profiles: 1,
+        created_at: user.created_at
+      };
+      formattedSubscriptions = [fallbackSubscription];
+    }
+
+    res.status(200).json({
+      subscriptions: formattedSubscriptions,
+      total: formattedSubscriptions.length
+    });
   } catch (err) {
-    console.error("❌ Error in getUserSubscriptionHistory:", err);
-    res.status(500).json({ message: "Failed to fetch subscription history." });
+    res.status(500).json({
+      message: "Failed to fetch subscription history."
+    });
   }
 };
 
@@ -809,7 +862,6 @@ const getUserSecuritySettings = async (req, res) => {
       password_resets_last_30_days: securityInfo.password_resets_last_30_days || 0
     });
   } catch (err) {
-    console.error("❌ Error in getUserSecuritySettings:", err);
     res.status(500).json({ message: "Failed to fetch security settings." });
   }
 };
@@ -818,8 +870,7 @@ const getUserSecuritySettings = async (req, res) => {
 const terminateUserSession = async (req, res) => {
   try {
     const { userId, sessionId } = req.params;
-    
-    // Verify the session belongs to the user
+
     const sessionCheck = await query(
       "SELECT id FROM user_session WHERE id = ? AND user_id = ?",
       [sessionId, userId]
@@ -836,7 +887,6 @@ const terminateUserSession = async (req, res) => {
 
     res.status(200).json({ message: "Session terminated successfully" });
   } catch (err) {
-    console.error("❌ Error in terminateUserSession:", err);
     res.status(500).json({ message: "Failed to terminate session" });
   }
 };
@@ -845,18 +895,17 @@ const terminateUserSession = async (req, res) => {
 const terminateAllUserSessions = async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     await query(
       "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
       [userId]
     );
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "All sessions terminated successfully",
       terminated: true
     });
   } catch (err) {
-    console.error("❌ Error in terminateAllUserSessions:", err);
     res.status(500).json({ message: "Failed to terminate sessions" });
   }
 };
@@ -876,7 +925,6 @@ const getEnhancedUserLoginSessions = async (req, res) => {
     let whereClause = "WHERE user_id = ?";
     const params = [userId];
 
-    // Apply filters based on your table structure
     if (filter === "active") {
       whereClause += " AND is_active = TRUE";
     } else if (filter === "completed") {
@@ -903,13 +951,11 @@ const getEnhancedUserLoginSessions = async (req, res) => {
       LIMIT ? OFFSET ?
     `, [...params, limit, offset]);
 
-    // Get total count for pagination
     const totalResult = await query(
       `SELECT COUNT(*) as total FROM user_session ${whereClause}`,
       params
     );
 
-    // Get session statistics
     const statsResult = await query(`
       SELECT 
         COUNT(*) as total_sessions,
@@ -920,7 +966,6 @@ const getEnhancedUserLoginSessions = async (req, res) => {
       WHERE user_id = ?
     `, [userId]);
 
-    // Format sessions for frontend
     const formattedSessions = sessions.map(session => ({
       id: session.id,
       device_name: session.device_name,
@@ -932,7 +977,7 @@ const getEnhancedUserLoginSessions = async (req, res) => {
       logout_time: session.logout_time,
       last_activity: session.last_activity,
       is_active: session.is_active,
-      success: true, // All recorded sessions are considered successful
+      success: true,
       user_agent: session.user_agent,
       device_id: session.device_id,
       created_at: session.created_at
@@ -944,7 +989,6 @@ const getEnhancedUserLoginSessions = async (req, res) => {
       stats: statsResult[0]
     });
   } catch (err) {
-    console.error("❌ Error in getEnhancedUserLoginSessions:", err);
     res.status(500).json({ message: "Failed to fetch login sessions" });
   }
 };
@@ -954,7 +998,6 @@ const sendPasswordReset = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // 1️⃣ Check if user exists
     const users = await query("SELECT id, email FROM users WHERE id = ?", [userId]);
     if (users.length === 0) {
       return res.status(404).json({ message: "User not found" });
@@ -962,8 +1005,7 @@ const sendPasswordReset = async (req, res) => {
 
     const user = users[0];
 
-    // 2️⃣ Get user preferred language from DB
-    let userLang = "en"; // default to English
+    let userLang = "en";
     const prefs = await query(
       "SELECT language FROM user_preferences WHERE user_id = ?",
       [userId]
@@ -972,36 +1014,31 @@ const sendPasswordReset = async (req, res) => {
       userLang = prefs[0].language;
     }
 
-    // 3️⃣ Generate reset token (JWT)
     const resetToken = jwt.sign(
       { id: userId, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" } // valid for 1 hour
+      { expiresIn: "1h" }
     );
 
-    // 4️⃣ Build reset link
     const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
     const resetLink = `${clientUrl}/reset-password?token=${resetToken}`;
 
-    // 5️⃣ Save token in DB for tracking (delete existing first since no used column)
     await query("DELETE FROM password_resets WHERE user_id = ?", [userId]);
-    
+
     await query(
       `INSERT INTO password_resets (user_id, token, expires_at) 
        VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))`,
       [userId, resetToken]
     );
 
-    // 6️⃣ Send reset email in user's preferred language
     await sendPasswordResetEmail(user.email, resetLink, userLang);
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "Password reset email sent successfully",
       language: userLang,
       email: user.email
     });
   } catch (err) {
-    console.error("❌ Error in sendPasswordReset:", err);
     res.status(500).json({ message: "Failed to send password reset email." });
   }
 };
@@ -1020,36 +1057,30 @@ const forcePasswordReset = async (req, res) => {
       return res.status(400).json({ message: "Password must be at least 8 characters" });
     }
 
-    // 1️⃣ Check if user exists
     const users = await query("SELECT id, email FROM users WHERE id = ?", [userId]);
     if (users.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 2️⃣ Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-    // 3️⃣ Update password (using 'password' column, not 'password_hash')
     await query(
       "UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?",
       [hashedPassword, userId]
     );
 
-    // 4️⃣ Terminate all active sessions
     await query(
       "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
       [userId]
     );
 
-    // 5️⃣ Delete any existing reset tokens (since no 'used' column)
     await query("DELETE FROM password_resets WHERE user_id = ?", [userId]);
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "Password reset successfully. All active sessions have been terminated.",
       email: users[0].email
     });
   } catch (err) {
-    console.error("❌ Error in forcePasswordReset:", err);
     res.status(500).json({ message: "Failed to reset password." });
   }
 };
@@ -1119,7 +1150,6 @@ const getUserSecurityInfo = async (req, res) => {
       last_updated: securityInfo.updated_at
     });
   } catch (err) {
-    console.error("❌ Error in getUserSecurityInfo:", err);
     res.status(500).json({ message: "Failed to fetch security information." });
   }
 };
@@ -1130,33 +1160,1311 @@ const updateUserRole = async (req, res) => {
     const { userId } = req.params;
     const { role } = req.body;
 
-    // Validate role
     if (!['admin', 'viewer'].includes(role)) {
       return res.status(400).json({ message: "Role must be either 'admin' or 'viewer'" });
     }
 
-    // Check if user exists
     const users = await query("SELECT id, email FROM users WHERE id = ?", [userId]);
     if (users.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update user role
     await query(
       "UPDATE users SET role = ?, updated_at = NOW() WHERE id = ?",
       [role, userId]
     );
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: `User role updated to ${role} successfully.`,
       role,
       email: users[0].email
     });
   } catch (err) {
-    console.error("❌ Error in updateUserRole:", err);
     res.status(500).json({ message: "Failed to update user role." });
   }
 };
+
+// ✅ ADMIN: Get user subscription details
+const getUserSubscription = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Get user's active subscription with details
+    const subscriptionData = await query(`
+      SELECT 
+        us.*,
+        s.name,
+        s.type,
+        s.price,
+        s.currency,
+        s.description,
+        s.devices_allowed,
+        s.max_sessions,
+        s.video_quality,
+        s.offline_downloads,
+        s.max_profiles
+      FROM user_subscriptions us
+      LEFT JOIN subscriptions s ON us.subscription_id = s.id
+      WHERE us.user_id = ? 
+      AND us.status = 'active'
+      AND (us.end_date IS NULL OR us.end_date > NOW())
+      ORDER BY us.start_date DESC
+      LIMIT 1
+    `, [userId]);
+
+    // If no active subscription, check user's subscription_plan field
+    if (subscriptionData.length === 0) {
+      const userData = await query(
+        "SELECT id, subscription_plan, created_at FROM users WHERE id = ?",
+        [userId]
+      );
+
+      if (userData.length === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const user = userData[0];
+
+      // FIXED: Map subscription_plan enum to proper subscription data with correct types
+      let subscriptionType = 'free';
+      let subscriptionName = 'Free';
+      let price = 0;
+
+      switch (user.subscription_plan) {
+        case 'free_trial':
+          subscriptionType = 'free_trial';
+          subscriptionName = 'Free Trial';
+          break;
+        case 'basic':
+          subscriptionType = 'basic';
+          subscriptionName = 'Basic';
+          price = 4900;
+          break;
+        case 'standard':
+          subscriptionType = 'standard';
+          subscriptionName = 'Standard';
+          price = 8900;
+          break;
+        case 'premium':
+          subscriptionType = 'mobile'; // Map premium to mobile
+          subscriptionName = 'Premium';
+          price = 12900;
+          break;
+        case 'custom':
+          subscriptionType = 'custom';
+          subscriptionName = 'Custom';
+          price = 0;
+          break;
+        case 'none':
+        default:
+          subscriptionType = 'free';
+          subscriptionName = 'Free';
+          price = 0;
+      }
+
+      return res.status(200).json({
+        subscription: {
+          name: subscriptionName,
+          type: subscriptionType, // Use the mapped type
+          status: 'active',
+          price: price,
+          currency: 'RWF',
+          billing_cycle: 'monthly',
+          start_date: user.created_at,
+          end_date: null,
+          auto_renew: false,
+          is_active: true
+        }
+      });
+    }
+
+    const sub = subscriptionData[0];
+    const subscription = {
+      id: sub.id,
+      name: sub.name,
+      type: sub.type, // Use the actual type from subscriptions table
+      status: sub.status,
+      price: sub.price,
+      currency: sub.currency || 'RWF',
+      billing_cycle: 'monthly',
+      start_date: sub.start_date,
+      end_date: sub.end_date,
+      trial_end_date: sub.trial_end_date,
+      auto_renew: sub.auto_renew || false,
+      is_active: sub.status === 'active',
+      description: sub.description,
+      devices_allowed: sub.devices_allowed ? JSON.parse(sub.devices_allowed) : null,
+      max_sessions: sub.max_sessions || 1,
+      video_quality: sub.video_quality || 'SD',
+      offline_downloads: sub.offline_downloads || false,
+      max_profiles: sub.max_profiles || 1
+    };
+
+    res.status(200).json({ subscription });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch subscription details." });
+  }
+};
+
+// ✅ ADMIN: Update user subscription
+const updateUserSubscription = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      subscription_type,
+      price = 0,
+      billing_cycle = 'monthly',
+      start_date,
+      end_date,
+      auto_renew = false,
+      status = 'active'
+    } = req.body;
+
+    const validTypes = ['mobile', 'basic', 'standard', 'family', 'free', 'custom'];
+    if (!validTypes.includes(subscription_type)) {
+      return res.status(400).json({
+        message: "Invalid subscription type. Must be: mobile, basic, standard, family, free, or custom"
+      });
+    }
+
+    const userExists = await query("SELECT id FROM users WHERE id = ?", [userId]);
+    if (userExists.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const subscriptionPlan = await query(
+      "SELECT id, name, price FROM subscriptions WHERE type = ? AND is_active = TRUE",
+      [subscription_type]
+    );
+
+    let subscriptionId;
+    let subscriptionName;
+    let subscriptionPrice = price;
+
+    if (subscriptionPlan.length > 0) {
+      subscriptionId = subscriptionPlan[0].id;
+      subscriptionName = subscriptionPlan[0].name;
+      if (!price) {
+        subscriptionPrice = subscriptionPlan[0].price;
+      }
+    } else {
+      subscriptionId = null;
+      subscriptionName = subscription_type.charAt(0).toUpperCase() + subscription_type.slice(1) + ' Plan';
+    }
+
+    let userSubscriptionPlan = 'none';
+    switch (subscription_type) {
+      case 'free':
+        userSubscriptionPlan = 'free_trial';
+        break;
+      case 'basic':
+        userSubscriptionPlan = 'basic';
+        break;
+      case 'standard':
+        userSubscriptionPlan = 'standard';
+        break;
+      case 'mobile':
+        userSubscriptionPlan = 'premium';
+        break;
+      case 'family':
+        userSubscriptionPlan = 'custom';
+        break;
+      case 'custom':
+        userSubscriptionPlan = 'custom';
+        break;
+    }
+
+    const now = new Date();
+    const startDate = start_date ? new Date(start_date) : now;
+
+    let endDate = end_date ? new Date(end_date) : new Date();
+    if (!end_date) {
+      endDate.setMonth(endDate.getMonth() + 1);
+    }
+
+    const existingSubscription = await query(`
+      SELECT id FROM user_subscriptions 
+      WHERE user_id = ? AND status = 'active' AND (end_date IS NULL OR end_date > NOW())
+    `, [userId]);
+
+    if (existingSubscription.length > 0) {
+      await query(`
+        UPDATE user_subscriptions 
+        SET 
+          subscription_id = ?,
+          subscription_name = ?,
+          subscription_price = ?,
+          subscription_currency = 'RWF',
+          start_date = ?,
+          end_date = ?,
+          auto_renew = ?,
+          status = ?,
+          updated_at = NOW()
+        WHERE user_id = ? AND status = 'active'
+      `, [
+        subscriptionId,
+        subscriptionName,
+        subscriptionPrice,
+        startDate,
+        endDate,
+        auto_renew,
+        status,
+        userId
+      ]);
+    } else {
+      await query(`
+        INSERT INTO user_subscriptions (
+          user_id, subscription_id, subscription_name, subscription_price, 
+          subscription_currency, start_date, end_date, auto_renew, status
+        ) VALUES (?, ?, ?, ?, 'RWF', ?, ?, ?, ?)
+      `, [
+        userId,
+        subscriptionId,
+        subscriptionName,
+        subscriptionPrice,
+        startDate,
+        endDate,
+        auto_renew,
+        status
+      ]);
+    }
+
+    await query(
+      "UPDATE users SET subscription_plan = ?, updated_at = NOW() WHERE id = ?",
+      [userSubscriptionPlan, userId]
+    );
+
+    res.status(200).json({
+      message: "Subscription updated successfully.",
+      subscription: {
+        type: subscription_type,
+        name: subscriptionName,
+        price: subscriptionPrice,
+        currency: 'RWF',
+        billing_cycle: billing_cycle,
+        start_date: startDate,
+        end_date: endDate,
+        auto_renew: auto_renew,
+        status: status
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update subscription." });
+  }
+};
+
+// ✅ ADMIN: Cancel user subscription
+const cancelUserSubscription = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { reason = 'admin_cancelled' } = req.body;
+
+    const activeSubscription = await query(`
+      SELECT id FROM user_subscriptions 
+      WHERE user_id = ? AND status = 'active' AND (end_date IS NULL OR end_date > NOW())
+    `, [userId]);
+
+    if (activeSubscription.length === 0) {
+      return res.status(404).json({ message: "No active subscription found for this user." });
+    }
+
+    await query(`
+      UPDATE user_subscriptions 
+      SET 
+        status = 'cancelled', 
+        cancelled_at = NOW(), 
+        cancellation_reason = ?,
+        auto_renew = FALSE,
+        updated_at = NOW()
+      WHERE user_id = ? AND status = 'active'
+    `, [reason, userId]);
+
+    await query(
+      "UPDATE users SET subscription_plan = 'none', updated_at = NOW() WHERE id = ?",
+      [userId]
+    );
+
+    res.status(200).json({
+      message: "Subscription cancelled successfully.",
+      cancelled: true,
+      timestamp: new Date()
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to cancel subscription." });
+  }
+};
+
+// ✅ ADMIN: Get available subscription plans
+const getSubscriptionPlans = async (req, res) => {
+  try {
+    const plans = await query(`
+      SELECT 
+        id,
+        name,
+        type,
+        price,
+        currency,
+        description,
+        devices_allowed,
+        max_sessions,
+        video_quality,
+        offline_downloads,
+        max_profiles,
+        display_order,
+        is_popular,
+        is_featured,
+        is_active
+      FROM subscriptions 
+      WHERE is_active = TRUE AND is_visible = TRUE
+      ORDER BY display_order ASC, price ASC
+    `);
+
+    const formattedPlans = plans.map(plan => ({
+      id: plan.id,
+      name: plan.name,
+      type: plan.type,
+      price: plan.price,
+      currency: plan.currency,
+      description: plan.description,
+      devices_allowed: plan.devices_allowed ? JSON.parse(plan.devices_allowed) : [],
+      max_sessions: plan.max_sessions,
+      video_quality: plan.video_quality,
+      offline_downloads: plan.offline_downloads,
+      max_profiles: plan.max_profiles,
+      display_order: plan.display_order,
+      is_popular: plan.is_popular,
+      is_featured: plan.is_featured,
+      is_active: plan.is_active
+    }));
+
+    res.status(200).json({ plans: formattedPlans });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch subscription plans." });
+  }
+};
+
+// ✅ ADMIN: Create a new subscription for user
+const createUserSubscription = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      subscription_type,
+      price = 0,
+      duration_months = 1,
+      auto_renew = false
+    } = req.body;
+
+    const validTypes = ['mobile', 'basic', 'standard', 'family', 'free', 'custom'];
+    if (!validTypes.includes(subscription_type)) {
+      return res.status(400).json({
+        message: "Invalid subscription type"
+      });
+    }
+
+    const userExists = await query("SELECT id, created_at FROM users WHERE id = ?", [userId]);
+    if (userExists.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const subscriptionPlan = await query(
+      "SELECT id, name, price FROM subscriptions WHERE type = ? AND is_active = TRUE",
+      [subscription_type]
+    );
+
+    let subscriptionId = null;
+    let subscriptionName = subscription_type.charAt(0).toUpperCase() + subscription_type.slice(1) + ' Plan';
+    let subscriptionPrice = price;
+
+    if (subscriptionPlan.length > 0) {
+      subscriptionId = subscriptionPlan[0].id;
+      subscriptionName = subscriptionPlan[0].name;
+      if (!price) {
+        subscriptionPrice = subscriptionPlan[0].price;
+      }
+    }
+
+    let userSubscriptionPlan = 'none';
+    switch (subscription_type) {
+      case 'free':
+        userSubscriptionPlan = 'free_trial';
+        break;
+      case 'basic':
+        userSubscriptionPlan = 'basic';
+        break;
+      case 'standard':
+        userSubscriptionPlan = 'standard';
+        break;
+      case 'mobile':
+        userSubscriptionPlan = 'premium';
+        break;
+      case 'family':
+      case 'custom':
+        userSubscriptionPlan = 'custom';
+        break;
+    }
+
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + duration_months);
+
+    const result = await query(`
+      INSERT INTO user_subscriptions (
+        user_id, subscription_id, subscription_name, subscription_price,
+        subscription_currency, start_date, end_date, auto_renew, status
+      ) VALUES (?, ?, ?, ?, 'RWF', ?, ?, ?, 'active')
+    `, [
+      userId,
+      subscriptionId,
+      subscriptionName,
+      subscriptionPrice,
+      startDate,
+      endDate,
+      auto_renew
+    ]);
+
+    await query(
+      "UPDATE users SET subscription_plan = ?, updated_at = NOW() WHERE id = ?",
+      [userSubscriptionPlan, userId]
+    );
+
+    res.status(201).json({
+      message: "Subscription created successfully.",
+      subscription: {
+        id: result.insertId,
+        type: subscription_type,
+        name: subscriptionName,
+        price: subscriptionPrice,
+        start_date: startDate,
+        end_date: endDate,
+        auto_renew: auto_renew,
+        status: 'active'
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to create subscription." });
+  }
+};
+
+// ✅ Get user security logs 
+const getUserSecurityLogs = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      page = 1,
+      limit = 20,
+      search = "",
+      type = "",
+      severity = "",
+      date_start = "",
+      date_end = ""
+    } = req.query;
+
+    if (!userId || userId === 'undefined') {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    // Verify user exists
+    const userExists = await query("SELECT id FROM users WHERE id = ?", [userId]);
+    if (userExists.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let sql = `
+      SELECT 
+        sl.*,
+        u.email as user_email
+      FROM security_logs sl
+      LEFT JOIN users u ON sl.user_id = u.id
+      WHERE sl.user_id = ?
+    `;
+    const params = [userId];
+
+    // Apply filters with safe column names
+    if (search) {
+      sql += " AND (sl.action LIKE ? OR sl.details LIKE ?)";
+      params.push(`%${search}%`, `%${search}%`);
+    }
+
+    if (type) {
+      // Map frontend event types to your action column values
+      const actionMap = {
+        'login': 'user_login',
+        'password_change': 'password_change',
+        'email_change': 'email_update',
+        'suspicious_activity': 'suspicious_activity',
+        'account_lockout': 'account_blocked'
+      };
+      const actionValue = actionMap[type] || type;
+      sql += " AND sl.action = ?";
+      params.push(actionValue);
+    }
+
+    if (severity) {
+      // Map severity to status
+      const statusMap = {
+        'low': 'success',
+        'medium': 'success',
+        'high': 'failed',
+        'critical': 'blocked'
+      };
+      const statusValue = statusMap[severity];
+      if (statusValue) {
+        sql += " AND sl.status = ?";
+        params.push(statusValue);
+      }
+    }
+
+    if (date_start && date_end) {
+      sql += " AND DATE(sl.created_at) BETWEEN ? AND ?";
+      params.push(date_start, date_end);
+    } else if (date_start) {
+      sql += " AND DATE(sl.created_at) >= ?";
+      params.push(date_start);
+    } else if (date_end) {
+      sql += " AND DATE(sl.created_at) <= ?";
+      params.push(date_end);
+    }
+
+    // Count total records
+    const countSql = sql.replace('SELECT sl.*, u.email as user_email', 'SELECT COUNT(*) as total');
+    const countResult = await query(countSql, params);
+    const total = countResult[0]?.total || 0;
+
+    // Add ordering and pagination
+    sql += " ORDER BY sl.created_at DESC LIMIT ? OFFSET ?";
+    const offset = (page - 1) * limit;
+    params.push(parseInt(limit), offset);
+
+    const logs = await query(sql, params);
+
+    // Format response with safe field access
+    const formattedLogs = logs.map(log => {
+      // Safely extract details from JSON field
+      let details = {};
+      let detailsText = '';
+      try {
+        if (log.details) {
+          details = typeof log.details === 'string' ? JSON.parse(log.details) : log.details;
+          detailsText = typeof details === 'object' ? JSON.stringify(details) : String(details);
+        }
+      } catch (e) {
+        details = { raw: log.details };
+        detailsText = String(log.details || '');
+      }
+
+      // Safely map action to event_type for frontend
+      const action = log.action || 'unknown';
+      const eventTypeMap = {
+        'user_login': 'login',
+        'password_change': 'password_change',
+        'email_update': 'email_change',
+        'suspicious_activity': 'suspicious_activity',
+        'account_blocked': 'account_lockout'
+      };
+
+      // Safely map status to severity for frontend
+      const status = log.status || 'success';
+      const severityMap = {
+        'success': action === 'suspicious_activity' ? 'medium' : 'low',
+        'failed': 'high',
+        'blocked': 'critical'
+      };
+
+      return {
+        id: log.id || 0,
+        user_id: log.user_id || 0,
+        user_email: log.user_email || 'Unknown',
+        event_type: eventTypeMap[action] || action,
+        description: action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        details: detailsText,
+        severity: severityMap[status] || 'low',
+        status: status,
+        ip_address: log.ip_address || 'Unknown',
+        user_agent: details.user_agent || details.device_info || 'Unknown',
+        metadata: details,
+        created_at: log.created_at
+      };
+    });
+
+    res.status(200).json({
+      logs: formattedLogs,
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(total / limit)
+    });
+  } catch (err) {
+    console.error("❌ Error in getUserSecurityLogs:", err);
+    res.status(500).json({ message: "Failed to fetch security logs." });
+  }
+};
+
+// ✅ Export security logs (CSV)
+const exportSecurityLogs = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      search = "",
+      type = "",
+      severity = "",
+      date_start = "",
+      date_end = ""
+    } = req.query;
+
+    if (!userId || userId === 'undefined') {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    let sql = `
+      SELECT 
+        sl.id,
+        sl.action,
+        sl.ip_address,
+        sl.status,
+        sl.details,
+        sl.created_at,
+        u.email as user_email
+      FROM security_logs sl
+      LEFT JOIN users u ON sl.user_id = u.id
+      WHERE sl.user_id = ?
+    `;
+    const params = [userId];
+
+    // Apply filters
+    if (search) {
+      sql += " AND (sl.action LIKE ? OR JSON_EXTRACT(sl.details, '$') LIKE ?)";
+      params.push(`%${search}%`, `%${search}%`);
+    }
+
+    if (type) {
+      const actionMap = {
+        'login': 'user_login',
+        'password_change': 'password_change',
+        'email_change': 'email_update',
+        'suspicious_activity': 'suspicious_activity',
+        'account_lockout': 'account_blocked'
+      };
+      const actionValue = actionMap[type] || type;
+      sql += " AND sl.action = ?";
+      params.push(actionValue);
+    }
+
+    if (severity) {
+      const statusMap = {
+        'low': 'success',
+        'medium': 'success',
+        'high': 'failed',
+        'critical': 'blocked'
+      };
+      const statusValue = statusMap[severity];
+      if (statusValue) {
+        sql += " AND sl.status = ?";
+        params.push(statusValue);
+      }
+    }
+
+    if (date_start && date_end) {
+      sql += " AND DATE(sl.created_at) BETWEEN ? AND ?";
+      params.push(date_start, date_end);
+    } else if (date_start) {
+      sql += " AND DATE(sl.created_at) >= ?";
+      params.push(date_start);
+    } else if (date_end) {
+      sql += " AND DATE(sl.created_at) <= ?";
+      params.push(date_end);
+    }
+
+    sql += " ORDER BY sl.created_at DESC";
+
+    const logs = await query(sql, params);
+
+    // Convert to CSV with proper field mapping and error handling
+    const fields = [
+      'id',
+      'event_type',
+      'description',
+      'status',
+      'severity',
+      'ip_address',
+      'user_email',
+      'details',
+      'created_at'
+    ];
+
+    const csvRows = logs.map(log => {
+      // Safely format description from action
+      const action = log.action || 'unknown_action';
+      const description = action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+      // Map status to severity
+      const severityMap = {
+        'success': log.action === 'suspicious_activity' ? 'medium' : 'low',
+        'failed': 'high',
+        'blocked': 'critical'
+      };
+      const severity = severityMap[log.status] || 'low';
+
+      // Safely handle details
+      let detailsText = '';
+      try {
+        if (log.details) {
+          const details = typeof log.details === 'string' ? JSON.parse(log.details) : log.details;
+          detailsText = typeof details === 'object' ? JSON.stringify(details) : String(details);
+        }
+      } catch (e) {
+        detailsText = String(log.details || '');
+      }
+
+      const row = [
+        log.id || '',
+        action, // event_type
+        description, // description
+        log.status || '', // status
+        severity, // severity
+        log.ip_address || '', // ip_address
+        log.user_email || '', // user_email
+        detailsText, // details
+        log.created_at ? new Date(log.created_at).toISOString() : '' // created_at
+      ];
+
+      // Escape quotes for CSV
+      return row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',');
+    });
+
+    const csv = [
+      fields.join(','), // header
+      ...csvRows
+    ].join('\n');
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment(`security-logs-${userId}-${new Date().toISOString().split('T')[0]}.csv`);
+    return res.send(csv);
+  } catch (err) {
+    console.error("❌ Error in exportSecurityLogs:", err);
+    res.status(500).json({ message: "Failed to export security logs." });
+  }
+};
+
+// ✅ Get user notifications
+const getUserNotifications = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      page = 1,
+      limit = 10,
+      status = "",
+      type = "",
+      search = ""
+    } = req.query;
+
+    if (!userId || userId === 'undefined') {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    // Verify user exists
+    const userExists = await query("SELECT id, email FROM users WHERE id = ?", [userId]);
+    if (userExists.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let sql = `
+      SELECT 
+        n.*
+      FROM notifications n
+      WHERE n.user_id = ?
+    `;
+    const params = [userId];
+
+    // Apply filters
+    if (status) {
+      sql += " AND n.status = ?";
+      params.push(status);
+    }
+
+    if (type) {
+      sql += " AND n.type = ?";
+      params.push(type);
+    }
+
+    if (search) {
+      sql += " AND (n.title LIKE ? OR n.message LIKE ?)";
+      params.push(`%${search}%`, `%${search}%`);
+    }
+
+    // Count total records
+    const countSql = sql.replace('SELECT n.*', 'SELECT COUNT(*) as total');
+    const countResult = await query(countSql, params);
+    const total = countResult[0]?.total || 0;
+
+    // Add ordering and pagination
+    sql += " ORDER BY n.created_at DESC LIMIT ? OFFSET ?";
+    const offset = (page - 1) * limit;
+    params.push(parseInt(limit), offset);
+
+    const notifications = await query(sql, params);
+
+    res.status(200).json({
+      notifications,
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(total / limit)
+    });
+  } catch (err) {
+    console.error("❌ Error in getUserNotifications:", err);
+    res.status(500).json({ message: "Failed to fetch notifications." });
+  }
+};
+
+// ✅ Send notification/email to user
+const sendUserNotification = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      title,
+      message,
+      sendType = "both", // "notification", "email", "both"
+      priority = "normal",
+      type = "admin_message"
+    } = req.body;
+
+    if (!userId || userId === 'undefined') {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    if (!title || !message) {
+      return res.status(400).json({ message: "Title and message are required" });
+    }
+
+    // Verify user exists and get email
+    const userData = await query("SELECT id, email, is_active FROM users WHERE id = ?", [userId]);
+    if (userData.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = userData[0];
+
+    if (!user.is_active) {
+      return res.status(400).json({ message: "Cannot send to inactive user" });
+    }
+
+    const results = [];
+
+    // Send notification if requested
+    if (sendType === "notification" || sendType === "both") {
+      const notificationResult = await query(`
+        INSERT INTO notifications (
+          user_id, type, title, message, priority, status, 
+          icon, metadata, created_at
+        ) VALUES (?, ?, ?, ?, ?, 'unread', ?, ?, NOW())
+      `, [
+        userId,
+        type,
+        title,
+        message,
+        priority,
+        type === 'admin_message' ? 'bell' : 'info',
+        JSON.stringify({ sent_via: 'admin_dashboard', send_type: sendType })
+      ]);
+
+      results.push({
+        type: 'notification',
+        success: true,
+        id: notificationResult.insertId
+      });
+    }
+
+    // Send email if requested
+    if (sendType === "email" || sendType === "both") {
+      try {
+        await sendAdminMessageEmail(user.email, title, message, user.email);
+        results.push({
+          type: 'email',
+          success: true,
+          email: user.email
+        });
+      } catch (emailError) {
+        console.error("❌ Failed to send email:", emailError);
+        results.push({
+          type: 'email',
+          success: false,
+          error: emailError.message
+        });
+      }
+    }
+
+    res.status(200).json({
+      message: "Message sent successfully",
+      results,
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    });
+  } catch (err) {
+    console.error("❌ Error in sendUserNotification:", err);
+    res.status(500).json({ message: "Failed to send message." });
+  }
+};
+
+// ✅ Mark notification as read
+const markNotificationAsRead = async (req, res) => {
+  try {
+    const { userId, notificationId } = req.params;
+
+    const result = await query(`
+      UPDATE notifications 
+      SET status = 'read', read_at = NOW() 
+      WHERE id = ? AND user_id = ? AND status = 'unread'
+    `, [notificationId, userId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Notification not found or already read" });
+    }
+
+    res.status(200).json({ message: "Notification marked as read" });
+  } catch (err) {
+    console.error("❌ Error in markNotificationAsRead:", err);
+    res.status(500).json({ message: "Failed to mark notification as read." });
+  }
+};
+
+// ✅ Archive notification
+const archiveNotification = async (req, res) => {
+  try {
+    const { userId, notificationId } = req.params;
+
+    const result = await query(`
+      UPDATE notifications 
+      SET status = 'archived'
+      WHERE id = ? AND user_id = ?
+    `, [notificationId, userId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Notification not found" });
+    }
+
+    res.status(200).json({ message: "Notification archived" });
+  } catch (err) {
+    console.error("❌ Error in archiveNotification:", err);
+    res.status(500).json({ message: "Failed to archive notification." });
+  }
+};
+
+// ✅ Bulk operations for multiple users - COMPREHENSIVE VERSION
+const bulkUserOperations = async (req, res) => {
+  try {
+    const {
+      userIds,
+      operation,
+      title,
+      message,
+      subscriptionType,
+      customSubscription,
+      role,
+      sendType = "both",
+      userStatus,
+      sessionAction
+    } = req.body;
+
+    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({ message: "User IDs are required" });
+    }
+
+    if (userIds.length > 1000) {
+      return res.status(400).json({ message: "Cannot process more than 1000 users at once" });
+    }
+
+    const results = {
+      processed: 0,
+      successful: 0,
+      failed: 0,
+      errors: []
+    };
+
+    // Get user details for the operation
+    const placeholders = userIds.map(() => '?').join(',');
+    const users = await query(
+      `SELECT id, email, is_active FROM users WHERE id IN (${placeholders})`,
+      userIds
+    );
+
+    const validUserIds = users.map(user => user.id);
+    results.processed = validUserIds.length;
+
+    // Perform the requested operation
+    switch (operation) {
+      case "notification":
+      case "email":
+        await handleBulkNotifications(validUserIds, title, message, sendType, results);
+        break;
+
+      case "subscription":
+        await handleBulkSubscription(validUserIds, subscriptionType, customSubscription, results);
+        break;
+
+      case "role":
+        await handleBulkRoleChange(validUserIds, role, results);
+        break;
+
+      case "status":
+        await handleBulkStatusChange(validUserIds, userStatus, results);
+        break;
+
+      case "session":
+        await handleBulkSessionManagement(validUserIds, sessionAction, results);
+        break;
+
+      case "delete":
+        await handleBulkDelete(validUserIds, results);
+        break;
+
+      default:
+        return res.status(400).json({ message: "Invalid operation type" });
+    }
+
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("❌ Error in bulkUserOperations:", err);
+    res.status(500).json({ message: "Bulk operation failed." });
+  }
+};
+
+// Helper function for bulk notifications/emails
+const handleBulkNotifications = async (userIds, title, message, sendType, results) => {
+  for (const userId of userIds) {
+    try {
+      // Send notification if requested
+      if (sendType === "notification" || sendType === "both") {
+        await query(`
+          INSERT INTO notifications (
+            user_id, type, title, message, priority, status, 
+            icon, metadata, created_at
+          ) VALUES (?, 'admin_message', ?, ?, 'high', 'unread', 'bell', ?, NOW())
+        `, [userId, title, message, JSON.stringify({ bulk_operation: true })]);
+      }
+
+      // Send email if requested
+      if (sendType === "email" || sendType === "both") {
+        const user = await query("SELECT email FROM users WHERE id = ?", [userId]);
+        if (user.length > 0) {
+          await sendAdminMessageEmail(user[0].email, title, message, user[0].email);
+        }
+      }
+
+      results.successful++;
+    } catch (error) {
+      results.failed++;
+      results.errors.push(`User ${userId}: ${error.message}`);
+    }
+  }
+};
+
+// Helper function for bulk subscription changes - UPDATED with custom subscriptions
+const handleBulkSubscription = async (userIds, subscriptionType, customSubscription, results) => {
+  let plan;
+
+  // Handle custom subscription
+  if (customSubscription && customSubscription.name) {
+    plan = {
+      id: null, // No ID for custom plans
+      name: customSubscription.name,
+      type: customSubscription.type || 'custom',
+      price: customSubscription.price || 0,
+      currency: customSubscription.currency || 'RWF',
+      duration_months: customSubscription.duration_months || 1
+    };
+  } else {
+    // Get the subscription plan details from subscriptions table
+    const subscriptionPlan = await query(
+      "SELECT id, name, type, price, currency FROM subscriptions WHERE type = ? AND is_active = TRUE LIMIT 1",
+      [subscriptionType]
+    );
+
+    if (subscriptionPlan.length === 0) {
+      results.failed = userIds.length;
+      results.errors.push(`Subscription plan '${subscriptionType}' not found`);
+      return;
+    }
+
+    plan = subscriptionPlan[0];
+    plan.duration_months = 1; // Default duration for existing plans
+  }
+
+  // Map subscription type to user subscription_plan enum
+  const userSubscriptionPlanMap = {
+    'free': 'none',
+    'mobile': 'premium',
+    'basic': 'basic',
+    'standard': 'standard',
+    'family': 'custom',
+    'custom': 'custom'
+  };
+
+  const userSubscriptionPlan = userSubscriptionPlanMap[plan.type] || 'none';
+
+  // Update users table subscription_plan
+  const placeholders = userIds.map(() => '?').join(',');
+
+  try {
+    const result = await query(
+      `UPDATE users SET subscription_plan = ?, updated_at = NOW() WHERE id IN (${placeholders})`,
+      [userSubscriptionPlan, ...userIds]
+    );
+
+    // Also create user_subscriptions records for tracking
+    for (const userId of userIds) {
+      try {
+        const endDate = new Date();
+        endDate.setMonth(endDate.getMonth() + plan.duration_months);
+
+        await query(`
+          INSERT INTO user_subscriptions (
+            user_id, subscription_id, subscription_name, subscription_price, 
+            subscription_currency, start_date, end_date, status, auto_renew
+          ) VALUES (?, ?, ?, ?, ?, NOW(), ?, 'active', FALSE)
+        `, [
+          userId,
+          plan.id,
+          plan.name,
+          plan.price,
+          plan.currency,
+          endDate
+        ]);
+      } catch (subError) {
+        // Continue even if subscription record creation fails
+        console.warn(`Failed to create subscription record for user ${userId}:`, subError.message);
+      }
+    }
+
+    results.successful = result.affectedRows;
+    results.failed = userIds.length - result.affectedRows;
+  } catch (error) {
+    results.failed = userIds.length;
+    results.errors.push(`Subscription update failed: ${error.message}`);
+  }
+};
+
+// Helper function for bulk role changes
+const handleBulkRoleChange = async (userIds, role, results) => {
+  const placeholders = userIds.map(() => '?').join(',');
+
+  try {
+    const result = await query(
+      `UPDATE users SET role = ?, updated_at = NOW() WHERE id IN (${placeholders})`,
+      [role, ...userIds]
+    );
+
+    results.successful = result.affectedRows;
+    results.failed = userIds.length - result.affectedRows;
+  } catch (error) {
+    results.failed = userIds.length;
+    results.errors.push(`Role update failed: ${error.message}`);
+  }
+};
+
+// Helper function for bulk status changes (activate/deactivate)
+const handleBulkStatusChange = async (userIds, userStatus, results) => {
+  const isActive = userStatus === 'active';
+  const placeholders = userIds.map(() => '?').join(',');
+
+  try {
+    const result = await query(
+      `UPDATE users SET is_active = ?, updated_at = NOW() WHERE id IN (${placeholders})`,
+      [isActive, ...userIds]
+    );
+
+    // If deactivating, also logout all sessions
+    if (!isActive) {
+      await query(
+        `UPDATE user_session SET is_active = FALSE, logout_time = NOW() 
+         WHERE user_id IN (${placeholders}) AND is_active = TRUE`,
+        [...userIds]
+      );
+    }
+
+    results.successful = result.affectedRows;
+    results.failed = userIds.length - result.affectedRows;
+  } catch (error) {
+    results.failed = userIds.length;
+    results.errors.push(`Status update failed: ${error.message}`);
+  }
+};
+
+// Helper function for bulk session management
+const handleBulkSessionManagement = async (userIds, sessionAction, results) => {
+  const placeholders = userIds.map(() => '?').join(',');
+
+  try {
+    let result;
+
+    switch (sessionAction) {
+      case "logout_all":
+        // Logout from all active sessions
+        result = await query(
+          `UPDATE user_session SET is_active = FALSE, logout_time = NOW() 
+           WHERE user_id IN (${placeholders}) AND is_active = TRUE`,
+          [...userIds]
+        );
+        results.successful = result.affectedRows;
+        break;
+
+      case "logout_specific":
+        // Logout from specific session types (mobile/desktop)
+        // You can extend this based on device_type or other criteria
+        result = await query(
+          `UPDATE user_session SET is_active = FALSE, logout_time = NOW() 
+           WHERE user_id IN (${placeholders}) AND is_active = TRUE AND device_type IN ('mobile', 'tablet')`,
+          [...userIds]
+        );
+        results.successful = result.affectedRows;
+        break;
+
+      case "clear_old":
+        // Remove sessions older than 30 days
+        result = await query(
+          `DELETE FROM user_session 
+           WHERE user_id IN (${placeholders}) AND created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)`,
+          [...userIds]
+        );
+        results.successful = result.affectedRows;
+        break;
+
+      default:
+        results.failed = userIds.length;
+        results.errors.push(`Invalid session action: ${sessionAction}`);
+        return;
+    }
+
+    results.failed = userIds.length - results.successful;
+  } catch (error) {
+    results.failed = userIds.length;
+    results.errors.push(`Session management failed: ${error.message}`);
+  }
+};
+
+// Helper function for bulk deletions
+const handleBulkDelete = async (userIds, results) => {
+  for (const userId of userIds) {
+    try {
+      // Delete user data in correct order to respect foreign key constraints
+      await query("DELETE FROM user_session WHERE user_id = ?", [userId]);
+      await query("DELETE FROM user_preferences WHERE user_id = ?", [userId]);
+      await query("DELETE FROM notifications WHERE user_id = ?", [userId]);
+      await query("DELETE FROM security_logs WHERE user_id = ?", [userId]);
+      await query("DELETE FROM user_subscriptions WHERE user_id = ?", [userId]);
+      await query("DELETE FROM email_verifications WHERE email = (SELECT email FROM users WHERE id = ?)", [userId]);
+      await query("DELETE FROM password_resets WHERE user_id = ?", [userId]);
+      await query("DELETE FROM users WHERE id = ?", [userId]);
+
+      results.successful++;
+    } catch (error) {
+      results.failed++;
+      results.errors.push(`User ${userId}: ${error.message}`);
+    }
+  }
+};
+
 
 module.exports = {
   deactivateAccount,
@@ -1181,4 +2489,16 @@ module.exports = {
   forcePasswordReset,
   getUserSecurityInfo,
   updateUserRole,
+  getUserSubscription,
+  updateUserSubscription,
+  cancelUserSubscription,
+  getSubscriptionPlans,
+  createUserSubscription,
+  getUserSecurityLogs,
+  exportSecurityLogs,
+  getUserNotifications,
+  sendUserNotification,
+  markNotificationAsRead,
+  archiveNotification,
+  bulkUserOperations,
 };

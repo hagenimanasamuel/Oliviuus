@@ -1,5 +1,5 @@
 import React from "react";
-import { Mail, Clock, AlertCircle, CheckCircle, MessageSquare, Eye } from "lucide-react";
+import { Mail, Clock, AlertCircle, CheckCircle, MessageSquare, Eye, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function ContactsList({ contacts, loading, hasMore, loadMore, onContactClick }) {
@@ -57,6 +57,21 @@ export default function ContactsList({ contacts, loading, hasMore, loadMore, onC
     return formatDate(dateString);
   };
 
+  // Function to check if contact should be highlighted
+  const shouldHighlightContact = (contact) => {
+    return !['open', 'resolved', 'closed'].includes(contact.status);
+  };
+
+  // Sort contacts: highlighted ones first, then others
+  const sortedContacts = [...contacts].sort((a, b) => {
+    const aHighlighted = shouldHighlightContact(a);
+    const bHighlighted = shouldHighlightContact(b);
+    
+    if (aHighlighted && !bHighlighted) return -1;
+    if (!aHighlighted && bHighlighted) return 1;
+    return 0;
+  });
+
   if (contacts.length === 0 && !loading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
@@ -73,61 +88,94 @@ export default function ContactsList({ contacts, loading, hasMore, loadMore, onC
     <div className="space-y-4">
       {/* Contacts Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-        {contacts.map((contact) => (
-          <div
-            key={contact.id}
-            onClick={() => onContactClick(contact)}
-            className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-200 cursor-pointer group"
-          >
-            {/* Header */}
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 dark:text-primary-400" />
+        {sortedContacts.map((contact) => {
+          const isHighlighted = shouldHighlightContact(contact);
+          
+          return (
+            <div
+              key={contact.id}
+              onClick={() => onContactClick(contact)}
+              className={`relative bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-sm border transition-all duration-200 cursor-pointer group ${
+                isHighlighted 
+                  ? 'border-[#BC8BBC] dark:border-[#BC8BBC] bg-[#BC8BBC]/5 dark:bg-[#BC8BBC]/10 shadow-md hover:shadow-lg' 
+                  : 'border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-primary-300 dark:hover:border-primary-600'
+              }`}
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between mb-2 sm:mb-3">
+                <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    isHighlighted 
+                      ? 'bg-[#BC8BBC]/20' 
+                      : 'bg-primary-100 dark:bg-primary-900'
+                  }`}>
+                    {isHighlighted ? (
+                      <Star className="w-4 h-4 sm:w-5 sm:h-5 text-[#BC8BBC] dark:text-[#BC8BBC]" fill="#BC8BBC" />
+                    ) : (
+                      <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 dark:text-primary-400" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className={`font-semibold truncate text-sm sm:text-base ${
+                      isHighlighted ? 'text-[#7A5B7A] dark:text-[#D4B1D4]' : 'text-gray-900 dark:text-white'
+                    }`}>
+                      {contact.name}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
+                      {contact.email}
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white truncate text-sm sm:text-base">
-                    {contact.name}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
-                    {contact.email}
-                  </p>
+                <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0 ml-2">
+                  <span className={`inline-flex items-center px-1.5 sm:px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(contact.priority)}`}>
+                    {getPriorityIcon(contact.priority)}
+                  </span>
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 </div>
               </div>
-              <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0 ml-2">
-                <span className={`inline-flex items-center px-1.5 sm:px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(contact.priority)}`}>
-                  {getPriorityIcon(contact.priority)}
-                </span>
-                <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+
+              {/* Subject */}
+              <h4 className={`font-medium mb-2 line-clamp-2 text-sm sm:text-base ${
+                isHighlighted ? 'text-[#7A5B7A] dark:text-[#D4B1D4]' : 'text-gray-900 dark:text-white'
+              }`}>
+                {contact.subject}
+              </h4>
+
+              {/* Message Preview */}
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-2 sm:mb-3 line-clamp-2">
+                {contact.message}
+              </p>
+
+              {/* Footer */}
+              <div className={`flex items-center justify-between pt-2 sm:pt-3 ${
+                isHighlighted 
+                  ? 'border-t border-[#BC8BBC]/20' 
+                  : 'border-t border-gray-200 dark:border-gray-700'
+              }`}>
+                <div className="flex items-center space-x-1 sm:space-x-2 min-w-0 flex-1">
+                  <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium ${getStatusColor(contact.status)} whitespace-nowrap overflow-hidden ${
+                    isHighlighted ? 'ring-1 ring-[#BC8BBC]/50' : ''
+                  }`}>
+                    <span className="truncate">{t(`contact.status.${contact.status}`)}</span>
+                  </span>
+                  <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 whitespace-nowrap overflow-hidden">
+                    <span className="truncate">{t(`contact.category.${contact.category}`)}</span>
+                  </span>
+                </div>
+                <div className={`text-xs flex-shrink-0 ml-2 whitespace-nowrap ${
+                  isHighlighted ? 'text-[#7A5B7A] dark:text-[#D4B1D4]' : 'text-gray-500 dark:text-gray-400'
+                }`}>
+                  {formatTimeAgo(contact.created_at)}
+                </div>
               </div>
+
+              {/* Subtle corner accent for highlighted contacts */}
+              {isHighlighted && (
+                <div className="absolute top-0 right-0 w-3 h-3 bg-[#BC8BBC] rounded-bl-lg rounded-tr-lg"></div>
+              )}
             </div>
-
-            {/* Subject */}
-            <h4 className="font-medium text-gray-900 dark:text-white mb-2 line-clamp-2 text-sm sm:text-base">
-              {contact.subject}
-            </h4>
-
-            {/* Message Preview */}
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-2 sm:mb-3 line-clamp-2">
-              {contact.message}
-            </p>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between pt-2 sm:pt-3 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-1 sm:space-x-2 min-w-0 flex-1">
-                <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium ${getStatusColor(contact.status)} whitespace-nowrap overflow-hidden`}>
-                  <span className="truncate">{t(`contact.status.${contact.status}`)}</span>
-                </span>
-                <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 whitespace-nowrap overflow-hidden">
-                  <span className="truncate">{t(`contact.category.${contact.category}`)}</span>
-                </span>
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2 whitespace-nowrap">
-                {formatTimeAgo(contact.created_at)}
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Loading State */}

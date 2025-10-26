@@ -293,7 +293,9 @@
       "overview": "Incamake",
       "activity": "Ibikorwa",
       "subscription": "Kwiyandikisha",
-      "security": "Umutekano"
+      "security": "Umutekano",
+      "securityLogs": "Amakuru y'Umutekano",
+      "notifications": "Amatangazo & Imeri"
     },
     "status": {
       "active": "Gikora",
