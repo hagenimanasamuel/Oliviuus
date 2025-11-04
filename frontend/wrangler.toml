@@ -2,9 +2,10 @@ name = "oliviuus"
 compatibility_date = "2025-11-04"
 pages_build_output_dir = "./dist"
 
-# For Pages deployment
-[env.production] 
+[env.production]
 pages_build_output_dir = "./dist"
 
-[env.preview]
-pages_build_output_dir = "./dist"
+# GitHub deployment configuration
+[deployment]
+environment = "production"
+trigger_branch = "main"
