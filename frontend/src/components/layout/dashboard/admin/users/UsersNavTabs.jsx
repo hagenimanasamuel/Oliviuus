@@ -5,10 +5,10 @@ import { useTranslation } from "react-i18next";
 
 // Lazy-loaded external pages
 const AllUsers = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/AllUsers.jsx"));
-const RolesPermissions = React.lazy(() => import("../../../../../pages/dashboards/admins/users/RolesPermissions"));
-const Specials = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/Specials"));
-const FamilyPlan = React.lazy(() => import("../../../../../pages/dashboards/admins/users/FamilyPlan"));
-const BulkOperations = React.lazy(() => import("../../../../../pages/dashboards/admins/users/BulkOperations"));
+const RolesPermissions = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/RolesPermissions.jsx"));
+const Specials = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/Specials.jsx"));
+const FamilyPlan = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/FamilyPlan.jsx"));
+const BulkOperations = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/BulkOperations.jsx"));
 
 export default function UsersNavTabs() {
   const { t } = useTranslation();
