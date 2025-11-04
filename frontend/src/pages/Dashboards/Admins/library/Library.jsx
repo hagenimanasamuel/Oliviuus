@@ -13,12 +13,12 @@ export default function Library() {
   const [selectedTab, setSelectedTab] = useState(initialTab);
   const [showMore, setShowMore] = useState(false);
 
-  // ✅ Memoize tabs (removed "Add New" tab)
+  // ✅ Only metadata in the tabs array (no JSX components!)
   const tabs = useMemo(
     () => [
-      { id: "all", label: "All Content", icon: Film, component: <AllContent /> },
-      { id: "genres", label: "Genres & Categories", icon: Tag, component: <GenresCategories /> },
-      { id: "people", label: "People Management", icon: Users, component: <PeopleManagement /> }
+      { id: "all", label: "All Content", icon: Film },
+      { id: "genres", label: "Genres & Categories", icon: Tag },
+      { id: "people", label: "People Management", icon: Users }
     ],
     []
   );
@@ -202,7 +202,12 @@ export default function Library() {
           {/* Tab Content */}
           <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg min-h-[400px]">
             <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-              {tabs.find((tab) => tab.id === selectedTab)?.component}
+
+              {/* ✅ Only load the selected component */}
+              {selectedTab === "all" && <AllContent />}
+              {selectedTab === "genres" && <GenresCategories />}
+              {selectedTab === "people" && <PeopleManagement />}
+
             </Suspense>
           </div>
         </div>
