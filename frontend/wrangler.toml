@@ -1,11 +1,8 @@
-name = "oliviuus"
-compatibility_date = "2025-11-04"
-pages_build_output_dir = "./dist"
+Project name: oliviuus
+Production branch: main
 
-[env.production]
-pages_build_output_dir = "./dist"
+Build settings:
+Build command: npm run build
+Build output directory: dist
 
-# GitHub deployment configuration
-[deployment]
-environment = "production"
-trigger_branch = "main"
+Root directory: /frontend 
