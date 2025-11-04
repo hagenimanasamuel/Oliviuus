@@ -37,6 +37,7 @@ const genreRoutes = require('./routes/genreRoutes');
 const imageProxyRoutes = require('./routes/imageProxyRoutes');
 const peopleRoutes = require('./routes/peopleRoutes');
 const overviewRoutes = require('./routes/overviewRoutes');
+const viewerRoutes = require('./routes/viewerRoutes');
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -74,6 +75,7 @@ app.use('/api/genres', genreRoutes);
 app.use('/api/images', imageProxyRoutes);
 app.use('/api/people', peopleRoutes);
 app.use('/api/overview', overviewRoutes);
+app.use('/api/viewer', viewerRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

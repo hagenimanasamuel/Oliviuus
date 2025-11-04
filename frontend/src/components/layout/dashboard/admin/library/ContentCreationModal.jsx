@@ -24,12 +24,10 @@ const STEPS = [
   { id: 'review', label: 'Review & Publish', icon: Eye }
 ];
 
-// Enhanced Upload Progress Component
 const EnhancedUploadProgress = ({ uploadProgress, isSubmitting }) => {
   const [timeRemaining, setTimeRemaining] = useState(null);
   const [startTime, setStartTime] = useState(null);
 
-  // Calculate time remaining
   useEffect(() => {
     if (isSubmitting && uploadProgress.overall > 0 && uploadProgress.overall < 100) {
       if (!startTime) {
@@ -37,7 +35,7 @@ const EnhancedUploadProgress = ({ uploadProgress, isSubmitting }) => {
       } else {
         const elapsed = Date.now() - startTime;
         const remaining = (elapsed / uploadProgress.overall) * (100 - uploadProgress.overall);
-        setTimeRemaining(Math.max(0, Math.round(remaining / 1000))); // Convert to seconds
+        setTimeRemaining(Math.max(0, Math.round(remaining / 1000)));
       }
     } else if (uploadProgress.overall >= 100) {
       setTimeRemaining(0);
@@ -71,7 +69,6 @@ const EnhancedUploadProgress = ({ uploadProgress, isSubmitting }) => {
     return categories[fileType] || { label: fileType, category: 'Other', color: 'bg-gray-500' };
   };
 
-  // Group files by category
   const groupedFiles = uploadProgress.files.reduce((acc, file) => {
     const category = getFileCategory(file.type).category;
     if (!acc[category]) acc[category] = [];
@@ -85,7 +82,6 @@ const EnhancedUploadProgress = ({ uploadProgress, isSubmitting }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header with Celebration */}
       {uploadProgress.overall === 100 ? (
         <div className="text-center bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-8 border-2 border-green-200 dark:border-green-800">
           <div className="relative">
@@ -127,7 +123,6 @@ const EnhancedUploadProgress = ({ uploadProgress, isSubmitting }) => {
         </div>
       )}
 
-      {/* Main Progress */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -148,7 +143,6 @@ const EnhancedUploadProgress = ({ uploadProgress, isSubmitting }) => {
           </div>
         </div>
 
-        {/* Progress Bar */}
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-2">
           <div
             className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out shadow-lg"
@@ -156,7 +150,6 @@ const EnhancedUploadProgress = ({ uploadProgress, isSubmitting }) => {
           />
         </div>
 
-        {/* Progress Stats */}
         <div className="grid grid-cols-3 gap-4 text-center mt-4">
           <div>
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">{completedFiles}</div>
@@ -175,7 +168,6 @@ const EnhancedUploadProgress = ({ uploadProgress, isSubmitting }) => {
         </div>
       </div>
 
-      {/* Current File Progress */}
       {uploadProgress.currentFile && uploadProgress.overall < 100 && (
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-700">
           <div className="flex items-center justify-between mb-2">
@@ -198,7 +190,6 @@ const EnhancedUploadProgress = ({ uploadProgress, isSubmitting }) => {
         </div>
       )}
 
-      {/* Grouped File Progress */}
       {Object.entries(groupedFiles).map(([category, files]) => (
         <div key={category} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
           <h5 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
@@ -288,7 +279,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
   const dropdownRef = useRef(null);
   const resizeTimeoutRef = useRef(null);
 
-  // Form data
   const [formData, setFormData] = useState({
     contentType: '',
     title: '',
@@ -321,7 +311,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
     primaryLanguage: 'en'
   });
 
-  // Validation rules for each step
   const validationRules = {
     type: () => {
       const errors = [];
@@ -341,22 +330,17 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
     },
     media: () => {
       const errors = [];
-
-      // Check if required files exist and have file objects
       if (!formData.thumbnail || !formData.thumbnail.file) {
         errors.push('Thumbnail is required');
       }
       if (!formData.poster || !formData.poster.file) {
         errors.push('Poster is required');
       }
-      // Only require mainVideo for non-series content types
       if (formData.contentType !== 'series') {
         if (!formData.mainVideo || !formData.mainVideo.file) {
           errors.push('Main video is required');
         }
       }
-
-      // Validate file types and sizes only if files exist
       if (formData.thumbnail && formData.thumbnail.file) {
         if (!validateFile('thumbnail', formData.thumbnail.file)) {
           errors.push('Thumbnail must be an image (JPEG, PNG, WebP) under 5MB');
@@ -377,7 +361,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
           errors.push('Trailer must be a video file (MP4, MOV) under 500MB');
         }
       }
-
       return errors;
     },
     classification: () => {
@@ -398,21 +381,19 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
       return errors;
     },
     review: () => {
-      // Review step doesn't have specific validations
       return [];
     }
   };
 
-  // File validation helper
   const validateFile = (fileType, file) => {
     if (!file || !(file instanceof File)) return false;
 
     const maxSizes = {
-      thumbnail: 5 * 1024 * 1024, // 5MB
-      poster: 10 * 1024 * 1024, // 10MB
-      mainVideo: 4 * 1024 * 1024 * 1024, // 4GB
-      trailer: 500 * 1024 * 1024, // 500MB
-      screenshot: 5 * 1024 * 1024 // 5MB
+      thumbnail: 5 * 1024 * 1024,
+      poster: 10 * 1024 * 1024,
+      mainVideo: 4 * 1024 * 1024 * 1024,
+      trailer: 500 * 1024 * 1024,
+      screenshot: 5 * 1024 * 1024
     };
 
     const allowedTypes = {
@@ -423,22 +404,17 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
       screenshot: ['image/jpeg', 'image/png', 'image/webp']
     };
 
-    // Check file size
     if (file.size > (maxSizes[fileType] || 0)) {
-      console.log(`File ${fileType} too large: ${file.size} > ${maxSizes[fileType]}`);
       return false;
     }
 
-    // Check file type
     if (!allowedTypes[fileType]?.includes(file.type)) {
-      console.log(`Invalid file type for ${fileType}: ${file.type}, allowed: ${allowedTypes[fileType]}`);
       return false;
     }
 
     return true;
   };
 
-  // Calculate visible steps based on container width
   const calculateVisibleSteps = useCallback(() => {
     if (!stepsContainerRef.current) return;
 
@@ -478,7 +454,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
     setOverflowSteps(newOverflow);
   }, []);
 
-  // Handle resize with debounce
   useEffect(() => {
     const handleResize = () => {
       if (resizeTimeoutRef.current) {
@@ -505,7 +480,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
     };
   }, [calculateVisibleSteps]);
 
-  // Validate current step whenever form data changes
   useEffect(() => {
     const currentStepId = STEPS[currentStep].id;
     const errors = validationRules[currentStepId]();
@@ -515,7 +489,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
     }));
   }, [formData, currentStep]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -542,7 +515,7 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
   }, []);
 
   const handleClose = () => {
-    if (isSubmitting) return; // Prevent closing during submission
+    if (isSubmitting) return;
     setIsClosing(true);
     setTimeout(() => {
       setIsVisible(false);
@@ -574,7 +547,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
     if (validateCurrentStep()) {
       setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
     } else {
-      // Scroll to top to show errors
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -584,20 +556,53 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
   };
 
   const handleStepSelect = (stepIndex) => {
-    // Only allow going to completed steps or next step
     if (stepIndex <= currentStep || stepIndex === currentStep + 1) {
       setCurrentStep(stepIndex);
       setShowStepsDropdown(false);
     }
   };
 
+  const createContentRights = async (contentId) => {
+    if (!formData.licenseType) return;
+    
+    try {
+      await axios.post(`/contents/${contentId}/rights`, {
+        license_type: formData.licenseType,
+        regions: formData.regions || [],
+        start_date: formData.startDate || null,
+        end_date: formData.endDate || null,
+        exclusive: formData.exclusive || false,
+        downloadable: formData.downloadable || false,
+        shareable: formData.shareable || false,
+        commercial_use: false,
+        georestricted: formData.regions?.length > 0
+      });
+    } catch (error) {
+      console.warn('Content rights creation failed:', error);
+    }
+  };
+
+  const createContentWarnings = async (contentId) => {
+    if (!formData.contentWarnings || formData.contentWarnings.length === 0) return;
+    
+    try {
+      await axios.post(`/contents/${contentId}/warnings`, {
+        warnings: formData.contentWarnings.map(warning => ({
+          warning_type: warning,
+          severity: 'moderate'
+        }))
+      });
+    } catch (error) {
+      console.warn('Content warnings creation failed:', error);
+    }
+  };
+
   const handleSubmit = async () => {
-    // Validate all steps before submission
     const allErrors = {};
     let hasErrors = false;
 
     STEPS.forEach((step, index) => {
-      if (index < STEPS.length - 1) { // Don't validate review step
+      if (index < STEPS.length - 1) {
         const errors = validationRules[step.id]();
         allErrors[step.id] = errors;
         if (errors.length > 0) {
@@ -610,7 +615,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
 
     if (hasErrors) {
       alert('Please fix all validation errors before submitting.');
-      // Go to first step with errors
       const firstErrorStep = STEPS.findIndex(step => allErrors[step.id]?.length > 0);
       if (firstErrorStep !== -1) {
         setCurrentStep(firstErrorStep);
@@ -627,116 +631,69 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
     });
 
     try {
-      // Prepare COMPLETE data for backend - INCLUDING ALL FIELDS
       const contentData = {
-        // === BASIC INFO ===
         title: formData.title,
         description: formData.description,
         short_description: formData.description?.substring(0, 150) || '',
         content_type: formData.contentType,
-
-        // === CLASSIFICATION ===
         age_rating: formData.ageRating,
         primary_language: formData.primaryLanguage || 'en',
         genre: formData.genre,
         categories: formData.categories || [],
-
-        // === METADATA ===
         duration: formData.duration ? parseInt(formData.duration) : null,
         release_date: formData.releaseDate || null,
         director: formData.director || null,
-
-        // === PRODUCTION DETAILS (Previously Missing) ===
         production_company: formData.productionCompany || null,
         budget: formData.budget ? parseFloat(formData.budget) : null,
-        subject: formData.subject || null, // Documentary subject
-        location: formData.location || null, // Documentary location
-        festival: formData.festival || null, // Film festival
-
-        // === CAST & CREW (Previously Missing) ===
+        subject: formData.subject || null,
+        location: formData.location || null,
+        festival: formData.festival || null,
         cast: formData.cast || [],
         tags: formData.tags || [],
-
-        // === SERIES-SPECIFIC DATA ===
         total_seasons: formData.contentType === 'series' ? parseInt(formData.totalSeasons) : null,
         episodes_per_season: formData.contentType === 'series' ? parseInt(formData.episodesPerSeason) : null,
         episode_duration: formData.contentType === 'series' ? parseInt(formData.episodeDuration) : null,
-
-        // === LIVE EVENT DATA ===
         event_date: formData.contentType === 'live_event' ? formData.eventDate : null,
         event_location: formData.contentType === 'live_event' ? formData.eventLocation : null,
         expected_audience: formData.contentType === 'live_event' ? parseInt(formData.expectedAudience) : null,
-
-        // === RIGHTS AND DISTRIBUTION ===
-        license_type: formData.licenseType,
-        regions: formData.regions || [],
-        start_date: formData.startDate || null,
-        end_date: formData.endDate || null,
-        exclusive: formData.exclusive || false,
-        downloadable: formData.downloadable || false,
-        shareable: formData.shareable || false,
-
-        // === CONTENT WARNINGS AND LANGUAGES ===
-        content_warnings: formData.contentWarnings || [],
         languages: formData.languages || [],
         subtitles: formData.subtitles || [],
-
-        // === MEDIA METADATA (Previously Missing) ===
         media_metadata: {
-          // Thumbnail metadata
           thumbnail_title: formData.thumbnail?.title || null,
           thumbnail_description: formData.thumbnail?.description || null,
-
-          // Poster metadata  
           poster_title: formData.poster?.title || null,
           poster_description: formData.poster?.description || null,
-
-          // Main video metadata
           main_video_title: formData.mainVideo?.title || null,
           main_video_description: formData.mainVideo?.description || null,
-
-          // Trailer metadata
           trailer_title: formData.trailer?.title || null,
           trailer_description: formData.trailer?.description || null,
-
-          // Screenshots metadata - FIXED: Handle non-array cases
           screenshots: Array.isArray(formData.screenshots) ? formData.screenshots?.map((screenshot, index) => ({
             title: screenshot.title || null,
             description: screenshot.description || null,
             order: index
           })) : [],
-
-          // Behind the scenes metadata - FIXED: Handle non-array cases
           behind_scenes: Array.isArray(formData.behindScenes) ? formData.behindScenes?.map((item, index) => ({
             title: item.title || null,
             description: item.description || null,
             order: index
           })) : [],
-
-          // Key art metadata - FIXED: Handle non-array cases
           key_art: Array.isArray(formData.keyArt) ? formData.keyArt?.map((art, index) => ({
             title: art.title || null,
             description: art.description || null,
             order: index
           })) : [],
-
-          // Season posters metadata (for series) - FIXED: Handle non-array cases
           season_posters: Array.isArray(formData.seasonPosters) ? formData.seasonPosters?.map((poster, index) => ({
             title: poster.title || null,
             description: poster.description || null,
             season_number: index + 1,
             order: index
           })) : [],
-
-          // Bloopers & extras metadata - FIXED: Handle non-array cases
           bloopers: Array.isArray(formData.bloopers) ? formData.bloopers?.map((blooper, index) => ({
             title: blooper.title || null,
             description: blooper.description || null,
             order: index
           })) : []
         },
-
-        // === EPISODE DATA (for series - Previously Missing) ===
         episodes_data: formData.contentType === 'series' ? {
           seasons: Array.isArray(formData.seasons) ? formData.seasons.map(season => ({
             id: season.id,
@@ -753,15 +710,10 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
               duration: episode.duration || null,
               release_date: episode.releaseDate || null,
               media_assets: {
-                // Episode video metadata
                 episode_video_title: episode.episodeVideo?.title || null,
                 episode_video_description: episode.episodeVideo?.description || null,
-
-                // Episode thumbnail metadata
                 episode_thumbnail_title: episode.episodeThumbnail?.title || null,
                 episode_thumbnail_description: episode.episodeThumbnail?.description || null,
-
-                // Episode trailer metadata
                 episode_trailer_title: episode.episodeTrailer?.title || null,
                 episode_trailer_description: episode.episodeTrailer?.description || null
               },
@@ -771,21 +723,20 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
         } : null
       };
 
-      console.log('📤 Sending COMPLETE content data:', contentData);
-
-      // 1. Create content in database with ALL data
       setUploadProgress(prev => ({ ...prev, currentStep: 'Creating content record...' }));
       const response = await axios.post('/contents', contentData);
       const newContent = response.data.content;
 
       setUploadProgress(prev => ({ ...prev, overall: 20 }));
 
-      // 2. Upload ALL media files with progress tracking (including metadata)
+      await createContentRights(newContent.id);
+      await createContentWarnings(newContent.id);
+
+      setUploadProgress(prev => ({ ...prev, currentStep: 'Uploading media files...' }));
       await uploadMediaFiles(newContent.id);
 
       setUploadProgress(prev => ({ ...prev, overall: 100, currentStep: 'Finalizing...' }));
       
-      // Show celebration effect
       setShowCelebration(true);
       
       setTimeout(() => {
@@ -796,7 +747,7 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
       }, 3000);
 
     } catch (error) {
-      console.error('❌ Failed to create content:', error);
+      console.error('Failed to create content:', error);
       setUploadProgress(prev => ({ ...prev, currentStep: 'Error occurred!' }));
 
       if (error.response?.data?.error) {
@@ -812,63 +763,50 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
   };
 
   const uploadMediaFiles = async (contentId) => {
-    // Collect ALL media files including those with metadata - FIXED: Handle non-array cases
     const mediaFiles = [
-      // Main promotional assets
       { type: 'thumbnail', file: formData.thumbnail?.file, metadata: formData.thumbnail },
       { type: 'poster', file: formData.poster?.file, metadata: formData.poster },
       { type: 'mainVideo', file: formData.mainVideo?.file, metadata: formData.mainVideo },
       { type: 'trailer', file: formData.trailer?.file, metadata: formData.trailer },
-
-      // Multiple file assets - FIXED: Handle non-array cases
       ...(Array.isArray(formData.screenshots) ? formData.screenshots.map((screenshot, index) => ({
         type: 'screenshot',
         file: screenshot.file,
         metadata: screenshot,
         options: { index }
       })) : []),
-
       ...(Array.isArray(formData.behindScenes) ? formData.behindScenes.map((video, index) => ({
         type: 'behindScenes',
         file: video.file,
         metadata: video,
         options: { index }
       })) : []),
-
       ...(Array.isArray(formData.keyArt) ? formData.keyArt.map((art, index) => ({
         type: 'keyArt',
         file: art.file,
         metadata: art,
         options: { index }
       })) : []),
-
       ...(Array.isArray(formData.seasonPosters) ? formData.seasonPosters.map((poster, index) => ({
         type: 'seasonPosters',
         file: poster.file,
         metadata: poster,
         options: { index, seasonNumber: index + 1 }
       })) : []),
-
       ...(Array.isArray(formData.bloopers) ? formData.bloopers.map((blooper, index) => ({
         type: 'bloopers',
         file: blooper.file,
         metadata: blooper,
         options: { index }
       })) : []),
-
-      // Subtitles for main video
       ...(formData.mainVideo?.subtitles ? Object.entries(formData.mainVideo.subtitles).map(([language, file]) => ({
         type: 'subtitle',
         file: file,
         options: { language, forAsset: 'mainVideo' }
       })) : []),
-
-      // Episode media files (for series) - FIXED: Handle non-array/object cases
       ...(formData.contentType === 'series' && formData.episodes && typeof formData.episodes === 'object' ?
         Object.entries(formData.episodes).flatMap(([seasonId, seasonEpisodes]) =>
           seasonEpisodes && typeof seasonEpisodes === 'object' ?
             Object.entries(seasonEpisodes).flatMap(([episodeId, episode]) => [
-              // Episode video
               ...(episode.episodeVideo ? [{
                 type: 'episodeVideo',
                 file: episode.episodeVideo.file,
@@ -879,8 +817,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
                   episodeTitle: episode.title
                 }
               }] : []),
-
-              // Episode thumbnail
               ...(episode.episodeThumbnail ? [{
                 type: 'episodeThumbnail',
                 file: episode.episodeThumbnail.file,
@@ -891,8 +827,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
                   episodeTitle: episode.title
                 }
               }] : []),
-
-              // Episode trailer
               ...(episode.episodeTrailer ? [{
                 type: 'episodeTrailer',
                 file: episode.episodeTrailer.file,
@@ -903,8 +837,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
                   episodeTitle: episode.title
                 }
               }] : []),
-
-              // Episode subtitles
               ...(episode.subtitles ? Object.entries(episode.subtitles).map(([language, file]) => ({
                 type: 'subtitle',
                 file: file,
@@ -935,7 +867,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
       }))
     }));
 
-    // Upload ALL files
     for (let i = 0; i < mediaFiles.length; i++) {
       const { type, file, metadata = {}, options = {} } = mediaFiles[i];
       const fileIndex = i;
@@ -959,7 +890,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
         )
       }));
 
-      // 1. Get pre-signed URL with ALL metadata
       const urlResponse = await axios.post('/upload/generate-url', {
         contentType: formData.contentType,
         contentId: contentId,
@@ -969,7 +899,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
         seasonNumber: options.seasonNumber,
         episodeNumber: options.episodeNumber,
         language: options.language,
-        // Include metadata for database storage
         metadata: {
           title: metadata?.title || null,
           description: metadata?.description || null,
@@ -984,7 +913,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
 
       const { uploadUrl, key } = urlResponse.data;
 
-      // 2. Upload file with progress tracking
       const xhr = new XMLHttpRequest();
 
       xhr.upload.addEventListener('progress', (e) => {
@@ -1014,7 +942,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
         xhr.open('PUT', uploadUrl);
         xhr.setRequestHeader('Content-Type', file.type);
 
-        // Add additional headers for better tracking
         if (metadata?.title) {
           xhr.setRequestHeader('X-Asset-Title', encodeURIComponent(metadata.title));
         }
@@ -1025,31 +952,21 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
         xhr.send(file);
       });
 
-      // 3. Confirm upload completion with COMPLETE metadata
       await axios.post('/upload/confirm', {
         key,
         contentId: contentId,
         assetType: assetType,
         metadata: {
-          // Asset metadata
           asset_title: metadata?.title || null,
           asset_description: metadata?.description || null,
-          alt_text: metadata?.title || null, // For SEO
+          alt_text: metadata?.title || null,
           caption: metadata?.description || null,
-
-          // Episode/season metadata
           episode_title: options?.episodeTitle || null,
           season_number: options?.seasonNumber || null,
           episode_number: options?.episodeNumber || null,
-
-          // Subtitle information
           subtitle_languages: options?.language ? [options.language] : [],
           has_subtitles: !!options?.language,
-
-          // Order and indexing
           sort_order: options?.index || 0,
-
-          // Additional tracking
           original_file_name: file.name,
           file_size: file.size,
           mime_type: file.type
@@ -1063,36 +980,14 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
         )
       }));
 
-      console.log(`✅ Successfully uploaded ${assetType}: ${file.name}`);
-      console.log(`📝 Metadata stored:`, {
-        title: metadata?.title,
-        description: metadata?.description,
-        episodeTitle: options?.episodeTitle,
-        season: options?.seasonNumber,
-        episode: options?.episodeNumber,
-        language: options?.language
-      });
-
     } catch (error) {
-      console.error(`❌ Failed to upload ${assetType}:`, error);
+      console.error(`Failed to upload ${assetType}:`, error);
       setUploadProgress(prev => ({
         ...prev,
         files: prev.files.map((f, i) =>
           i === fileIndex ? { ...f, status: 'failed', progress: 0 } : f
         )
       }));
-
-      // Log detailed error information
-      console.error(`📄 File details:`, {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        assetType: assetType,
-        metadata: metadata,
-        options: options
-      });
-
-      // Continue with other uploads even if one fails
     }
   };
 
@@ -1110,14 +1005,12 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
       validateCurrentStep: () => validationRules[currentStepId]()
     };
 
-    // Show only upload progress during submission on review step
     if (currentStep === 5 && isSubmitting) {
       return <EnhancedUploadProgress uploadProgress={uploadProgress} isSubmitting={isSubmitting} />;
     }
 
     return (
       <div>
-        {/* Validation Errors */}
         {errors.length > 0 && (
           <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-xs">
             <h3 className="text-red-800 dark:text-red-200 font-semibold mb-1 text-xs">
@@ -1131,7 +1024,6 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
           </div>
         )}
 
-        {/* Step Content */}
         <div className={isSubmitting ? "opacity-50 pointer-events-none" : ""}>
           {currentStep === 0 && <ContentTypeStep {...stepProps} />}
           {currentStep === 1 && <BasicInfoStep {...stepProps} />}
@@ -1149,7 +1041,7 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
   return (
     <div
       className={clsx(
-        "fixed inset-0 z-50 flex items-center justify-center p-1 sm:p-2 transition-all duration-300",
+        "fixed inset-0 z-50 flex items-center justify-center transition-all duration-300",
         isVisible ? "bg-black/60" : "bg-transparent",
         isClosing ? "bg-black/0" : ""
       )}
@@ -1157,22 +1049,21 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
     >
       <div
         className={clsx(
-          "bg-white dark:bg-gray-900 rounded-xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] shadow-2xl transform transition-all duration-300 overflow-hidden flex flex-col",
+          "bg-white dark:bg-gray-900 rounded-none w-full h-full shadow-2xl transform transition-all duration-300 overflow-hidden flex flex-col",
           isClosing ? "scale-95 opacity-0 translate-y-4" : "scale-100 opacity-100 translate-y-0"
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
-          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-            <div className="bg-gradient-to-br from-[#BC8BBC] to-purple-600 p-1.5 sm:p-2 rounded-lg flex-shrink-0">
-              <Film className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+          <div className="flex items-center space-x-3 min-w-0 flex-1">
+            <div className="bg-gradient-to-br from-[#BC8BBC] to-purple-600 p-2 rounded-lg flex-shrink-0">
+              <Film className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white truncate">
                 Add New Content
               </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                 Step {currentStep + 1} of {STEPS.length}: {STEPS[currentStep].label}
               </p>
             </div>
@@ -1180,19 +1071,17 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
           <button
             onClick={handleClose}
             disabled={isSubmitting}
-            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors text-gray-500 dark:text-gray-400 flex-shrink-0 ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors text-gray-500 dark:text-gray-400 flex-shrink-0 ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Progress Steps - Responsive */}
         <div className="border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
           <div
             ref={stepsContainerRef}
-            className="flex items-center justify-between px-3 sm:px-4 py-2 relative min-h-[50px]"
+            className="flex items-center justify-between px-6 py-4 relative min-h-[60px]"
           >
-            {/* Visible Steps */}
             <div className="flex items-center flex-1 min-w-0">
               {STEPS.map((step, index) => {
                 const stepErrors = validationRules[step.id]?.() || [];
@@ -1204,14 +1093,14 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
                     data-step={step.id}
                     className={clsx(
                       "flex items-center transition-all duration-200 flex-shrink-0",
-                      index < STEPS.length - 1 && "mr-3"
+                      index < STEPS.length - 1 && "mr-4"
                     )}
                   >
                     <button
                       onClick={() => handleStepSelect(index)}
                       disabled={isSubmitting || index > currentStep + 1}
                       className={clsx(
-                        "flex items-center space-x-1.5 px-2 py-1.5 rounded transition-all duration-200 min-w-0 relative text-xs",
+                        "flex items-center space-x-2 px-3 py-2 rounded transition-all duration-200 min-w-0 relative text-sm",
                         index === currentStep
                           ? "bg-[#BC8BBC] text-white shadow transform scale-105"
                           : index < currentStep
@@ -1223,31 +1112,30 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
                       )}
                     >
                       {hasErrors && index < currentStep && (
-                        <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
                       )}
                       <div className={clsx(
-                        "flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold flex-shrink-0",
+                        "flex items-center justify-center w-6 h-6 rounded-full text-sm font-bold flex-shrink-0",
                         index === currentStep ? "bg-white/20" : ""
                       )}>
                         {index < currentStep ? (
                           hasErrors ? (
                             <span className="text-xs">!</span>
                           ) : (
-                            <CheckCircle className="w-2.5 h-2.5" />
+                            <CheckCircle className="w-3 h-3" />
                           )
                         ) : (
                           index + 1
                         )}
                       </div>
-                      <span className="hidden xs:inline text-xs font-medium whitespace-nowrap">
+                      <span className="hidden sm:inline text-sm font-medium whitespace-nowrap">
                         {step.label}
                       </span>
                     </button>
 
-                    {/* Connector Line */}
                     {index < STEPS.length - 1 && (
                       <div className={clsx(
-                        "w-3 h-0.5 mx-1.5 flex-shrink-0",
+                        "w-4 h-1 mx-2 flex-shrink-0",
                         index < currentStep ?
                           (validationRules[step.id]?.().length > 0 ? "bg-red-500" : "bg-green-500")
                           : "bg-gray-300 dark:bg-gray-600"
@@ -1258,27 +1146,26 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
               })}
             </div>
 
-            {/* Steps Dropdown for Overflow */}
             {overflowSteps.length > 0 && (
-              <div className="relative ml-1.5 flex-shrink-0" ref={dropdownRef}>
+              <div className="relative ml-2 flex-shrink-0" ref={dropdownRef}>
                 <button
                   onClick={() => setShowStepsDropdown(!showStepsDropdown)}
                   className={clsx(
-                    "flex items-center space-x-1 px-2 py-1.5 rounded border transition-all duration-200 text-xs",
+                    "flex items-center space-x-2 px-3 py-2 rounded border transition-all duration-200 text-sm",
                     "border-[#BC8BBC] bg-[#BC8BBC]/10 text-[#BC8BBC] hover:bg-[#BC8BBC]/20",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                   disabled={isSubmitting}
                 >
-                  <MoreHorizontal className="w-3.5 h-3.5" />
+                  <MoreHorizontal className="w-4 h-4" />
                   <ChevronDown className={clsx(
-                    "w-2.5 h-2.5 transition-transform duration-200",
+                    "w-3 h-3 transition-transform duration-200",
                     showStepsDropdown ? "rotate-180" : ""
                   )} />
                 </button>
 
                 {showStepsDropdown && (
-                  <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-gray-800 rounded shadow border border-gray-200 dark:border-gray-700 z-50 py-1">
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 py-2">
                     {overflowSteps.map((step, index) => {
                       const stepIndex = STEPS.findIndex(s => s.id === step.id);
                       const stepErrors = validationRules[step.id]?.() || [];
@@ -1290,14 +1177,14 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
                           onClick={() => handleStepSelect(stepIndex)}
                           disabled={isSubmitting || stepIndex > currentStep + 1}
                           className={clsx(
-                            "flex items-center space-x-2 w-full text-left px-3 py-2 text-xs transition-colors relative",
-                            "hover:bg-gray-50 dark:hover:bg-gray-700 first:rounded-t last:rounded-b",
+                            "flex items-center space-x-3 w-full text-left px-4 py-2 text-sm transition-colors relative",
+                            "hover:bg-gray-50 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg",
                             stepIndex === currentStep && "bg-[#BC8BBC]/10 text-[#BC8BBC]",
                             "disabled:opacity-50 disabled:cursor-not-allowed"
                           )}
                         >
                           {hasErrors && stepIndex < currentStep && (
-                            <div className="absolute top-1.5 right-2 w-1.5 h-1.5 bg-red-500 rounded-full" />
+                            <div className="absolute top-2 right-3 w-2 h-2 bg-red-500 rounded-full" />
                           )}
                           <div className={clsx(
                             "flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold flex-shrink-0",
@@ -1319,7 +1206,7 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
                               stepIndex + 1
                             )}
                           </div>
-                          <span className="flex-1 text-xs">{step.label}</span>
+                          <span className="flex-1 text-sm">{step.label}</span>
                         </button>
                       );
                     })}
@@ -1328,49 +1215,33 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
               </div>
             )}
           </div>
-
-          {/* Mobile Step Indicator */}
-          <div className="px-3 sm:px-4 pb-2 sm:hidden">
-            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>Step {currentStep + 1} of {STEPS.length}</span>
-              <span className="font-medium text-[#BC8BBC] text-xs">{STEPS[currentStep].label}</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1 mt-1.5">
-              <div
-                className="bg-gradient-to-r from-[#BC8BBC] to-purple-600 h-1 rounded-full transition-all duration-300"
-                style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
-              />
-            </div>
-          </div>
         </div>
 
-        {/* Step Content */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4">
-          <div className="max-w-4xl mx-auto">
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-6xl mx-auto">
             {renderStepContent()}
           </div>
         </div>
 
-        {/* Footer Actions - Responsive */}
-        <div className="flex flex-col xs:flex-row justify-between items-stretch xs:items-center p-3 sm:p-4 border-t border-gray-200 dark:border-gray-800 flex-shrink-0 gap-2">
-          <div className="flex justify-center xs:justify-start">
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center p-6 border-t border-gray-200 dark:border-gray-800 flex-shrink-0 gap-4">
+          <div className="flex justify-center sm:justify-start">
             {currentStep > 0 && (
               <button
                 onClick={handlePrevious}
                 disabled={isSubmitting}
-                className="flex items-center space-x-1.5 px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs"
+                className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
-                <span className="whitespace-nowrap text-xs">Previous</span>
+                <ChevronLeft className="w-4 h-4" />
+                <span className="whitespace-nowrap text-sm">Previous</span>
               </button>
             )}
           </div>
 
-          <div className="flex items-center justify-center xs:justify-end space-x-1.5 flex-wrap gap-1.5">
+          <div className="flex items-center justify-center sm:justify-end space-x-3 flex-wrap gap-3">
             <button
               onClick={handleClose}
               disabled={isSubmitting}
-              className="px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap text-xs"
+              className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap text-sm"
             >
               Cancel
             </button>
@@ -1379,26 +1250,26 @@ export default function ContentCreationModal({ onClose, onContentCreated, catego
               <button
                 onClick={handleNext}
                 disabled={isSubmitting}
-                className="flex items-center space-x-1.5 px-3 py-1.5 bg-gradient-to-r from-[#BC8BBC] to-purple-600 text-white rounded hover:from-[#9b69b2] hover:to-purple-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 whitespace-nowrap text-xs"
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#BC8BBC] to-purple-600 text-white rounded-lg hover:from-[#9b69b2] hover:to-purple-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 whitespace-nowrap text-sm"
               >
-                <span className="text-xs">Next Step</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <span className="text-sm">Next Step</span>
+                <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="flex items-center space-x-1.5 px-3 py-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 whitespace-nowrap text-xs"
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 whitespace-nowrap text-sm"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span className="text-xs">Publishing...</span>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="text-sm">Publishing...</span>
                   </>
                 ) : (
                   <>
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    <span className="text-xs">Publish Content</span>
+                    <CheckCircle className="w-4 h-4" />
+                    <span className="text-sm">Publish Content</span>
                   </>
                 )}
               </button>

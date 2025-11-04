@@ -1,0 +1,128 @@
+import React, { useState, useRef, useEffect } from "react";
+import { ChevronDown, Settings, LogOut, Download, Heart, Clock, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+const ProfileDropdown = ({ user, onLogout }) => {
+  const navigate = useNavigate();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+
+  const profileImage = user?.profile_avatar_url || (user?.id ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}` : "https://placehold.co/100x100/333333/FFFFFF?text=User");
+
+  const libraryItems = [
+    { icon: <Download size={18} />, label: "Downloads", path: "/downloads" },
+    { icon: <Heart size={18} />, label: "My List", path: "/my-list" },
+    { icon: <Clock size={18} />, label: "Continue Watching", path: "/continue" },
+    { icon: <Star size={18} />, label: "Top Picks", path: "/top-picks" },
+  ];
+
+  const getCurrentYear = () => new Date().getFullYear();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={profileRef} className="relative">
+      <button
+        onClick={() => setProfileOpen(!profileOpen)}
+        className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-800/50 transition-all duration-200 border border-transparent hover:border-gray-600 transform hover:scale-105"
+      >
+        <img 
+          src={profileImage} 
+          alt="Profile" 
+          className="w-8 h-8 rounded-lg object-cover"
+        />
+        <ChevronDown 
+          size={16} 
+          className={`text-gray-400 transition-transform duration-200 ${
+            profileOpen ? "rotate-180" : ""
+          }`} 
+        />
+      </button>
+
+      {/* Profile Dropdown */}
+      {profileOpen && (
+        <div className="absolute right-0 top-12 w-80 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-50">
+          <div className="p-4 border-b border-gray-700 bg-gradient-to-r from-gray-800 to-gray-900">
+            <div className="flex items-center gap-3">
+              <img 
+                src={profileImage} 
+                alt="Profile" 
+                className="w-14 h-14 rounded-lg border-2 border-[#BC8BBC] object-cover"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-white text-lg truncate">
+                  {user?.name || "Welcome"}
+                </p>
+                <p className="text-gray-400 text-sm truncate">
+                  {user?.email}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 border-b border-gray-700">
+            <h3 className="text-gray-400 text-sm font-medium mb-3 uppercase tracking-wide">Your Library</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {libraryItems.map((item, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    navigate(item.path);
+                    setProfileOpen(false);
+                  }}
+                  className="flex items-center gap-2 p-3 text-sm text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors border border-transparent hover:border-gray-600"
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="p-2">
+            <button 
+              onClick={() => {
+                navigate("/account-settings");
+                setProfileOpen(false);
+              }}
+              className="flex items-center w-full px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <Settings size={18} className="mr-3" />
+              Account & Settings
+            </button>
+            
+            <button 
+              onClick={onLogout}
+              className="flex items-center w-full px-4 py-3 text-sm text-[#BC8BBC] hover:bg-[#BC8BBC]/10 rounded-lg transition-colors"
+            >
+              <LogOut size={18} className="mr-3" />
+              Sign Out
+            </button>
+          </div>
+
+          <div className="p-3 bg-gray-900/50 border-t border-gray-700">
+            <div className="text-xs text-gray-500">
+              <p>© {getCurrentYear()} Oliviuus Ltd</p>
+              <div className="flex gap-4 mt-2">
+                <button className="hover:text-gray-300 transition-colors">Privacy</button>
+                <button className="hover:text-gray-300 transition-colors">Terms</button>
+                <button className="hover:text-gray-300 transition-colors">Help</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProfileDropdown;

@@ -28,9 +28,12 @@ import WatchPage from "../pages/Dashboards/viewer/WatchPage.jsx";
 import MyLibrary from "../pages/Dashboards/viewer/MyLibrary"; 
 import DownloadPage from "../pages/Dashboards/viewer/DownloadPage"; 
 import ProfilePage from "../pages/Dashboards/viewer/ProfilePage"; 
+import ContentDetailPage from "../pages/Dashboards/viewer/ContentDetailPage.jsx";
 
 // Sample subscription
 import SampleSubscription from "../pages/subscription/SampleSubscriptionPage";
+import SecurityGridSystem from "../pages/subscription/SecurityGridSystem.jsx";
+import SecurityGridPresentation from "../pages/subscription/SecurityGridSystem.jsx";
 
 export default function AppRoutes() {
   const { user, loading } = useAuth();
@@ -116,9 +119,11 @@ export default function AppRoutes() {
       <Route path="/library" element={<ViewerRoute element={<MyLibrary />} />} />
       <Route path="/downloads" element={<ViewerRoute element={<DownloadPage />} />} />
       <Route path="/profile" element={<ViewerRoute element={<ProfilePage />} requireSubscription={false} />} />
+      <Route path="/title/:id" element={<ContentDetailPage />} />
 
       {/* Sample routes */}
       <Route path="/sample" element={<SampleSubscription />} />
+      <Route path="/sample/security" element={<SecurityGridPresentation />} />
 
       {/* Catch-all */}
       <Route path="*" element={<NotFound />} />

@@ -51,6 +51,16 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
     }
   }, []);
 
+  // Sort notifications: unread first, then by creation date (newest first)
+  const sortedNotifications = [...notifications].sort((a, b) => {
+    // First sort by status (unread first)
+    if (a.status === 'unread' && b.status !== 'unread') return -1;
+    if (a.status !== 'unread' && b.status === 'unread') return 1;
+    
+    // Then sort by creation date (newest first)
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
   // Smart sound notification player
   const playNotificationSound = useCallback(() => {
     const now = Date.now();

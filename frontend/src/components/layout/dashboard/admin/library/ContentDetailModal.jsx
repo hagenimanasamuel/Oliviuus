@@ -6,7 +6,8 @@ import {
   MoreHorizontal, RefreshCw, Ellipsis, BarChart3,
   Users, Globe, Lock, FileText, Tag, FolderOpen,
   ChevronRight, Settings, Archive, Send, Copy,
-  UserCheck, UserCog, Award, Camera, Edit3, Plus
+  UserCheck, UserCog, Award, Camera, Edit3, Plus,
+  Star, TrendingUp, Heart, Share2, Users as UsersIcon
 } from "lucide-react";
 import clsx from "clsx";
 import OverviewTab from "./ContentModalTabs/OverviewTab";
@@ -14,7 +15,7 @@ import MediaTab from "./ContentModalTabs/MediaTab";
 import AnalyticsTab from "./ContentModalTabs/AnalyticsTab";
 import RightsTab from "./ContentModalTabs/RightsTab";
 import SettingsTab from "./ContentModalTabs/SettingsTab";
-import CastingTab from "./ContentModalTabs/CastingTab"; // New import
+import CastingTab from "./ContentModalTabs/CastingTab";
 import api from "../../../../../api/axios";
 
 export default function ContentDetailModal({
@@ -36,6 +37,10 @@ export default function ContentDetailModal({
   const [showTabDropdown, setShowTabDropdown] = useState(false);
   const [visibleTabs, setVisibleTabs] = useState([]);
   const [overflowTabs, setOverflowTabs] = useState([]);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedDescription, setEditedDescription] = useState("");
 
   const containerRef = useRef(null);
   const moreButtonRef = useRef(null);
@@ -48,29 +53,38 @@ export default function ContentDetailModal({
 
   const tabs = [
     { id: "overview", label: "Overview", icon: FileText },
-    { id: "casting", label: "Casting", icon: Users }, // New tab
+    { id: "casting", label: "Casting", icon: Users },
     { id: "media", label: "Media", icon: FolderOpen },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "rights", label: "Rights & Distribution", icon: Globe },
     { id: "settings", label: "Settings", icon: Settings }
   ];
+
   useEffect(() => {
     if (content) {
       setIsVisible(true);
       setIsClosing(false);
       setCurrentContent(content);
+      setEditedTitle(content.title);
+      setEditedDescription(content.description);
     }
   }, [content]);
 
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") {
-        handleClose();
+        if (isEditingTitle) {
+          handleCancelTitle();
+        } else if (isEditingDescription) {
+          handleCancelDescription();
+        } else {
+          handleClose();
+        }
       }
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, []);
+  }, [isEditingTitle, isEditingDescription, currentContent.title, currentContent.description]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -101,6 +115,64 @@ export default function ContentDetailModal({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showMoreActions, showTabDropdown]);
+
+  const handleSaveTitle = async () => {
+    if (editedTitle && editedTitle !== currentContent.title) {
+      setIsLoading(true);
+      try {
+        // PATCH instead of PUT and send only title
+        await api.patch(`/contents/${currentContent.id}`, {
+          title: editedTitle
+        });
+
+        const updatedContent = { ...currentContent, title: editedTitle };
+        setCurrentContent(updatedContent);
+        setIsEditingTitle(false);
+
+      } catch (error) {
+        console.error("Failed to update title:", error);
+        alert("Failed to update title");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setIsEditingTitle(false);
+    }
+  };
+
+  const handleSaveDescription = async () => {
+    if (editedDescription !== currentContent.description) {
+      setIsLoading(true);
+      try {
+        // PATCH instead of PUT and send only description
+        await api.patch(`/contents/${currentContent.id}`, {
+          description: editedDescription
+        });
+
+        const updatedContent = { ...currentContent, description: editedDescription };
+        setCurrentContent(updatedContent);
+        setIsEditingDescription(false);
+
+      } catch (error) {
+        console.error("Failed to update description:", error);
+        alert("Failed to update description");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setIsEditingDescription(false);
+    }
+  };
+
+  const handleCancelTitle = () => {
+    setIsEditingTitle(false);
+    setEditedTitle(currentContent.title);
+  };
+
+  const handleCancelDescription = () => {
+    setIsEditingDescription(false);
+    setEditedDescription(currentContent.description);
+  };
 
   // Responsive tabs handling
   const handleResize = useCallback(() => {
@@ -193,7 +265,13 @@ export default function ContentDetailModal({
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
-      handleClose();
+      if (isEditingTitle) {
+        handleCancelTitle();
+      } else if (isEditingDescription) {
+        handleCancelDescription();
+      } else {
+        handleClose();
+      }
     }
   };
 
@@ -252,9 +330,7 @@ export default function ContentDetailModal({
   const handleDownloadAssets = async () => {
     setIsLoading(true);
     try {
-      // Implementation for downloading assets
       console.log("Download assets for content:", currentContent.id);
-      // This would typically trigger a zip download of all media assets
       alert("Download functionality will be implemented soon");
     } catch (error) {
       console.error("Failed to download assets:", error);
@@ -264,19 +340,14 @@ export default function ContentDetailModal({
     }
   };
 
-  const handleSettingsUpdate = async (settings) => {
-    setIsLoading(true);
-    try {
-      await api.put(`/contents/${currentContent.id}/settings`, settings);
-      const updatedContent = await api.get(`/contents/${currentContent.id}`);
-      setCurrentContent(updatedContent.data);
-      onSettingsUpdate?.(currentContent.id, settings);
-    } catch (error) {
-      console.error("Failed to update settings:", error);
-      alert("Failed to update settings");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRightsUpdate = (updatedContent) => {
+    setCurrentContent(updatedContent);
+    onSettingsUpdate?.(updatedContent);
+  };
+
+  const handleSettingsUpdate = (updatedContent) => {
+    setCurrentContent(updatedContent);
+    onSettingsUpdate?.(updatedContent);
   };
 
   const getStatusIcon = (status) => {
@@ -336,6 +407,11 @@ export default function ContentDetailModal({
     return new Date(dateString).toLocaleDateString();
   };
 
+  const formatNumber = (num) => {
+    if (!num) return '0';
+    return new Intl.NumberFormat().format(num);
+  };
+
   const getPrimaryImage = () => {
     if (!currentContent.media_assets || currentContent.media_assets.length === 0) {
       return null;
@@ -363,29 +439,38 @@ export default function ContentDetailModal({
     return null;
   };
 
+  // Enhanced function to get all available data for display
+  const getContentStats = () => {
+    return {
+      // Engagement metrics from backend
+      views: currentContent.view_count || 0,
+      likes: currentContent.like_count || 0,
+      shares: currentContent.share_count || 0,
+      rating: currentContent.average_rating || 0,
+      ratingCount: currentContent.rating_count || 0,
+
+      // Content metrics
+      castCount: currentContent.cast_crew?.length || 0,
+      mediaAssets: currentContent.media_assets?.length || 0,
+      awards: currentContent.awards?.length || 0,
+      seasons: currentContent.seasons?.length || 0,
+      episodes: currentContent.seasons?.reduce((total, season) => total + (season.episodes?.length || 0), 0) || 0,
+
+      // Content quality
+      quality: currentContent.content_quality || 'HD',
+      hasSubtitles: currentContent.has_subtitles || false,
+      hasDubbing: currentContent.has_dubbing || false
+    };
+  };
+
   if (!currentContent || !isVisible) return null;
 
   const statusConfig = getStatusConfig(currentContent.status);
   const typeConfig = getContentTypeConfig(currentContent.content_type);
   const imageUrl = getPrimaryImage();
+  const stats = getContentStats();
 
   const actionButtons = [
-    {
-      id: "play",
-      icon: Play,
-      label: "Play Content",
-      onClick: () => handleAction(onPlay),
-      disabled: isLoading,
-      priority: "high"
-    },
-    {
-      id: "edit",
-      icon: Edit,
-      label: "Edit Content",
-      onClick: () => handleAction(onEdit),
-      disabled: isLoading,
-      priority: "high"
-    },
     {
       id: "publish",
       icon: Send,
@@ -399,14 +484,6 @@ export default function ContentDetailModal({
       icon: Copy,
       label: "Duplicate",
       onClick: handleDuplicate,
-      disabled: isLoading,
-      priority: "medium"
-    },
-    {
-      id: "download",
-      icon: Download,
-      label: "Download Assets",
-      onClick: handleDownloadAssets,
       disabled: isLoading,
       priority: "medium"
     },
@@ -432,7 +509,6 @@ export default function ContentDetailModal({
   const highPriorityButtons = actionButtons.filter(btn => btn.priority === "high");
   const mediumPriorityButtons = actionButtons.filter(btn => btn.priority === "medium");
   const lowPriorityButtons = actionButtons.filter(btn => btn.priority === "low");
-
 
   return (
     <div
@@ -469,10 +545,48 @@ export default function ContentDetailModal({
             </div>
 
             <div className="min-w-0 flex-1">
+              {/* Title with Edit Icon */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
-                <h2 className="text-white text-base sm:text-lg font-bold truncate">
-                  {currentContent.title}
-                </h2>
+                {isEditingTitle ? (
+                  <div className="flex items-center space-x-2 flex-1">
+                    <input
+                      type="text"
+                      value={editedTitle}
+                      onChange={(e) => setEditedTitle(e.target.value)}
+                      className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1 text-white text-base sm:text-lg font-bold focus:outline-none focus:border-purple-500 flex-1 min-w-0"
+                      placeholder="Enter title"
+                      autoFocus
+                      disabled={isLoading}
+                    />
+                    <button
+                      onClick={handleSaveTitle}
+                      className="p-1 hover:bg-gray-800 rounded text-green-400 hover:text-green-300 flex-shrink-0"
+                      disabled={isLoading}
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={handleCancelTitle}
+                      className="p-1 hover:bg-gray-800 rounded text-red-400 hover:text-red-300 flex-shrink-0"
+                      disabled={isLoading}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2 group">
+                    <h2 className="text-white text-base sm:text-lg font-bold truncate">
+                      {currentContent.title}
+                    </h2>
+                    <button
+                      onClick={() => setIsEditingTitle(true)}
+                      className="p-1 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-white"
+                      disabled={isLoading}
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
                 <div className="flex items-center gap-1 flex-wrap">
                   <span className={clsx(
                     "inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-xs font-medium flex-shrink-0",
@@ -490,11 +604,107 @@ export default function ContentDetailModal({
                     {getStatusIcon(currentContent.status)}
                     <span className="text-xs">{statusConfig.label}</span>
                   </span>
+                  {currentContent.featured && (
+                    <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-xs font-medium bg-purple-500/20 text-purple-400 flex-shrink-0">
+                      <Star className="w-3 h-3" />
+                      <span className="text-xs">Featured</span>
+                    </span>
+                  )}
+                  {currentContent.trending && (
+                    <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-400 flex-shrink-0">
+                      <TrendingUp className="w-3 h-3" />
+                      <span className="text-xs">Trending</span>
+                    </span>
+                  )}
                 </div>
               </div>
-              <p className="text-gray-400 text-xs truncate mt-0.5">
-                {currentContent.short_description || currentContent.description}
-              </p>
+
+              {/* Description with Edit Icon */}
+              {isEditingDescription ? (
+                <div className="flex items-center space-x-2 mt-0.5">
+                  <textarea
+                    value={editedDescription}
+                    onChange={(e) => setEditedDescription(e.target.value)}
+                    className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1 text-gray-400 text-xs focus:outline-none focus:border-purple-500 flex-1 min-w-0 resize-none"
+                    placeholder="Enter description"
+                    rows="2"
+                    autoFocus
+                    disabled={isLoading}
+                  />
+                  <div className="flex flex-col space-y-1 flex-shrink-0">
+                    <button
+                      onClick={handleSaveDescription}
+                      className="p-1 hover:bg-gray-800 rounded text-green-400 hover:text-green-300"
+                      disabled={isLoading}
+                    >
+                      <CheckCircle className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={handleCancelDescription}
+                      className="p-1 hover:bg-gray-800 rounded text-red-400 hover:text-red-300"
+                      disabled={isLoading}
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start space-x-2 group mt-0.5">
+                  <p className="text-gray-400 text-xs truncate flex-1">
+                    {currentContent.short_description || currentContent.description}
+                  </p>
+                  <button
+                    onClick={() => setIsEditingDescription(true)}
+                    className="p-0.5 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-white flex-shrink-0 mt-0.5"
+                    disabled={isLoading}
+                  >
+                    <Edit3 className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+
+              {/* Additional metadata badges */}
+              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                {/* Engagement metrics */}
+                {stats.views > 0 && (
+                  <div className="flex items-center space-x-1 text-gray-400 text-xs">
+                    <Eye className="w-3 h-3" />
+                    <span>{formatNumber(stats.views)} views</span>
+                  </div>
+                )}
+                {stats.likes > 0 && (
+                  <div className="flex items-center space-x-1 text-gray-400 text-xs">
+                    <Heart className="w-3 h-3" />
+                    <span>{formatNumber(stats.likes)} likes</span>
+                  </div>
+                )}
+                {stats.rating > 0 && (
+                  <div className="flex items-center space-x-1 text-gray-400 text-xs">
+                    <Star className="w-3 h-3" />
+                    <span>{stats.rating.toFixed(1)} ({formatNumber(stats.ratingCount)})</span>
+                  </div>
+                )}
+
+                {/* Content metrics */}
+                {stats.castCount > 0 && (
+                  <div className="flex items-center space-x-1 text-gray-400 text-xs">
+                    <UsersIcon className="w-3 h-3" />
+                    <span>{stats.castCount} cast</span>
+                  </div>
+                )}
+                {stats.mediaAssets > 0 && (
+                  <div className="flex items-center space-x-1 text-gray-400 text-xs">
+                    <FolderOpen className="w-3 h-3" />
+                    <span>{stats.mediaAssets} media</span>
+                  </div>
+                )}
+                {stats.awards > 0 && (
+                  <div className="flex items-center space-x-1 text-gray-400 text-xs">
+                    <Award className="w-3 h-3" />
+                    <span>{stats.awards} awards</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <button
@@ -570,7 +780,7 @@ export default function ContentDetailModal({
         <div className="flex-1 overflow-y-auto min-h-0">
           <div className="p-3 sm:p-4">
             {activeTab === "overview" && (
-              <OverviewTab content={currentContent} />
+              <OverviewTab content={currentContent} stats={stats} />
             )}
             {activeTab === "casting" && (
               <CastingTab content={currentContent} />
@@ -579,10 +789,13 @@ export default function ContentDetailModal({
               <MediaTab content={currentContent} />
             )}
             {activeTab === "analytics" && (
-              <AnalyticsTab content={currentContent} />
+              <AnalyticsTab content={currentContent} stats={stats} />
             )}
             {activeTab === "rights" && (
-              <RightsTab content={currentContent} />
+              <RightsTab
+                content={currentContent}
+                onRightsUpdate={handleRightsUpdate}
+              />
             )}
             {activeTab === "settings" && (
               <SettingsTab

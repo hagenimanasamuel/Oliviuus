@@ -15,6 +15,8 @@ export default function ViewerDashboard({ bodyContent }) {
     }
   };
 
+  const content = bodyContent || <ViewerLandingPage />;
+
   return (
     <ViewerLayout user={user} onLogout={handleLogout}>
       {/* Render the dynamic body content */}

@@ -18,7 +18,10 @@ const uploadMediaAsset = async (req, res) => {
       format,
       season_number,
       episode_number,
-      is_primary
+      is_primary,
+      asset_title,
+      asset_description,
+      episode_title
     } = req.body;
 
     // Validate required fields
@@ -47,13 +50,14 @@ const uploadMediaAsset = async (req, res) => {
       );
     }
 
-    // Insert media asset
+    // Insert media asset with ALL fields
     const result = await query(
       `INSERT INTO media_assets (
         content_id, asset_type, file_name, file_path, file_size, mime_type,
         resolution, duration_seconds, bitrate, format, season_number,
-        episode_number, upload_status, is_primary
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?)`,
+        episode_number, asset_title, asset_description, episode_title,
+        upload_status, is_primary
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?)`,
       [
         contentId,
         asset_type,
@@ -67,6 +71,9 @@ const uploadMediaAsset = async (req, res) => {
         format || null,
         season_number || null,
         episode_number || null,
+        asset_title || file_name.replace(/\.[^/.]+$/, ""), // Use filename as default title
+        asset_description || null,
+        episode_title || null,
         is_primary || false
       ]
     );
@@ -86,6 +93,7 @@ const uploadMediaAsset = async (req, res) => {
   } catch (error) {
     // Rollback transaction on error
     await query('ROLLBACK');
+    console.error('Error uploading media asset:', error);
     
     res.status(500).json({
       error: 'Failed to upload media asset',
@@ -102,16 +110,27 @@ const getMediaAssets = async (req, res) => {
     const mediaAssets = await query(
       `SELECT * FROM media_assets 
        WHERE content_id = ? 
-       ORDER BY asset_type, created_at DESC`,
+       ORDER BY asset_type, season_number, episode_number, created_at DESC`,
       [contentId]
     );
 
-    // Generate URLs for completed uploads
+    // FIXED: Use consistent URL generation (same as uploadController)
     const assetsWithUrls = mediaAssets.map(asset => ({
       ...asset,
       url: asset.upload_status === 'completed' 
-        ? `https://pub-${process.env.R2_PUBLIC_URL_ID}.r2.dev/${asset.file_path}`
-        : null
+        ? `https://pub-${process.env.R2_ACCOUNT_ID}.r2.dev/${asset.file_path}`
+        : null,
+      // FIXED: Parse JSON fields safely
+      subtitle_languages: asset.subtitle_languages 
+        ? (() => {
+            try {
+              return JSON.parse(asset.subtitle_languages);
+            } catch (e) {
+              console.error('Error parsing subtitle_languages:', e);
+              return [];
+            }
+          })()
+        : []
     }));
 
     res.json({
@@ -120,6 +139,7 @@ const getMediaAssets = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error getting media assets:', error);
     res.status(500).json({
       error: 'Failed to fetch media assets',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -127,7 +147,7 @@ const getMediaAssets = async (req, res) => {
   }
 };
 
-// Update media asset
+// Update media asset - FIXED: Added all fields from frontend
 const updateMediaAsset = async (req, res) => {
   const { assetId } = req.params;
 
@@ -135,9 +155,22 @@ const updateMediaAsset = async (req, res) => {
     const {
       asset_type,
       file_name,
-      is_primary,
+      asset_title,
+      asset_description,
       alt_text,
-      caption
+      caption,
+      resolution,
+      duration_seconds,
+      bitrate,
+      format,
+      season_number,
+      episode_number,
+      episode_title,
+      episode_description,
+      is_primary,
+      is_optimized,
+      has_subtitles,
+      subtitle_languages
     } = req.body;
 
     // Start transaction
@@ -160,17 +193,49 @@ const updateMediaAsset = async (req, res) => {
       );
     }
 
-    // Update media asset
+    // FIXED: Update ALL fields from frontend
     await query(
       `UPDATE media_assets 
-       SET asset_type = ?, file_name = ?, is_primary = ?, alt_text = ?, caption = ?, updated_at = NOW()
+       SET 
+         asset_type = COALESCE(?, asset_type),
+         file_name = COALESCE(?, file_name),
+         asset_title = ?,
+         asset_description = ?,
+         alt_text = ?,
+         caption = ?,
+         resolution = ?,
+         duration_seconds = ?,
+         bitrate = ?,
+         format = ?,
+         season_number = ?,
+         episode_number = ?,
+         episode_title = ?,
+         episode_description = ?,
+         is_primary = ?,
+         is_optimized = ?,
+         has_subtitles = ?,
+         subtitle_languages = ?,
+         updated_at = NOW()
        WHERE id = ?`,
       [
         asset_type,
         file_name,
-        is_primary || false,
+        asset_title,
+        asset_description,
         alt_text,
         caption,
+        resolution,
+        duration_seconds ? parseInt(duration_seconds) : null,
+        bitrate ? parseInt(bitrate) : null,
+        format,
+        season_number ? parseInt(season_number) : null,
+        episode_number ? parseInt(episode_number) : null,
+        episode_title,
+        episode_description,
+        is_primary || false,
+        is_optimized || false,
+        has_subtitles || false,
+        subtitle_languages,
         assetId
       ]
     );
@@ -190,6 +255,7 @@ const updateMediaAsset = async (req, res) => {
   } catch (error) {
     // Rollback transaction on error
     await query('ROLLBACK');
+    console.error('Error updating media asset:', error);
     
     res.status(500).json({
       error: 'Failed to update media asset',
@@ -198,28 +264,65 @@ const updateMediaAsset = async (req, res) => {
   }
 };
 
-// Delete media asset
+// Delete media asset - Also delete from R2
 const deleteMediaAsset = async (req, res) => {
   const { assetId } = req.params;
 
   try {
-    // Check if asset exists
-    const assetExists = await query('SELECT id FROM media_assets WHERE id = ?', [assetId]);
+    // Check if asset exists and get file_path
+    const assetExists = await query('SELECT id, file_path FROM media_assets WHERE id = ?', [assetId]);
     if (assetExists.length === 0) {
       return res.status(404).json({
         error: "Media asset not found"
       });
     }
 
-    // Delete media asset
+    const asset = assetExists[0];
+
+    // Start transaction
+    await query('START TRANSACTION');
+
+    // Delete from database
     await query('DELETE FROM media_assets WHERE id = ?', [assetId]);
+
+    // Delete from R2 storage
+    try {
+      const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+      
+      const s3Client = new S3Client({
+        region: 'auto',
+        endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+        credentials: {
+          accessKeyId: process.env.R2_ACCESS_KEY_ID,
+          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+        },
+      });
+
+      const deleteCommand = new DeleteObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: asset.file_path
+      });
+
+      await s3Client.send(deleteCommand);
+      console.log(`✅ File deleted from R2: ${asset.file_path}`);
+    } catch (r2Error) {
+      console.error('❌ Failed to delete from R2, but DB record was removed:', r2Error);
+      // Continue anyway - we don't want to rollback if R2 delete fails
+    }
+
+    // Commit transaction
+    await query('COMMIT');
 
     res.json({
       success: true,
-      message: 'Media asset deleted successfully'
+      message: 'Media asset deleted successfully from both database and storage'
     });
 
   } catch (error) {
+    // Rollback transaction on error
+    await query('ROLLBACK');
+    console.error('Error deleting media asset:', error);
+    
     res.status(500).json({
       error: 'Failed to delete media asset',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -266,6 +369,7 @@ const setPrimaryMediaAsset = async (req, res) => {
   } catch (error) {
     // Rollback transaction on error
     await query('ROLLBACK');
+    console.error('Error setting primary media asset:', error);
     
     res.status(500).json({
       error: 'Failed to set primary media asset',

@@ -214,14 +214,25 @@ export default function AllContent() {
   };
 
   // Handle content settings update
-  const handleContentSettingsUpdate = async (contentId, settings) => {
+  const handleContentSettingsUpdate = async (updatedContent) => {
     try {
-      await axios.put(`/contents/${contentId}/settings`, settings);
-      await fetchContents();
-      alert('Content settings updated successfully!');
+
+      // Safety check
+      if (!updatedContent?.id || typeof updatedContent.id !== 'number') {
+        console.error('❌ Invalid content ID:', updatedContent?.id);
+        return;
+      }
+
+      // Update local state - NO API CALL NEEDED (SettingsTab already made it)
+      setContents(prevContents =>
+        prevContents.map(content =>
+          content.id === updatedContent.id ? updatedContent : content
+        )
+      );
+
     } catch (err) {
-      console.error('Error updating content settings:', err);
-      alert(`Failed to update content settings: ${err.response?.data?.error || err.message}`);
+      console.error('Error handling content settings update:', err);
+      alert(`Failed to update content: ${err.response?.data?.error || err.message}`);
     }
   };
 

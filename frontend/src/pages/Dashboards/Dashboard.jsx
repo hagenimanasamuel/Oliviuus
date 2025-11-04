@@ -6,6 +6,7 @@ import { useSubscription } from "../../context/SubscriptionContext";
 import AdminDashboard from "./Admins/AdminDashboard.jsx";
 import ViewerDashboard from "./ViewerDashboard.jsx";
 import Overview from "./Admins/overview/Overview";
+import ViewerLandingPage from "../../components/layout/dashboard/viewer/ViewerLandingPage";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -78,7 +79,7 @@ const Dashboard = () => {
 
   // Viewer users with active subscription go to viewer dashboard
   if (user.role === "viewer" && canAccessPremium()) {
-    return <ViewerDashboard />;
+    return <ViewerDashboard bodyContent={<ViewerLandingPage />} />;
   }
 
   // Viewer users without active subscription go to subscription page

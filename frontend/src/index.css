@@ -6,6 +6,12 @@ body {
   background-color: #121212; /* Dark background */
   color: #ffffff; /* Text color */
   font-family: 'Poppins', Arial, sans-serif; /* Use Poppins first */
+  height: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100%;
 }
 
 /* Links */
@@ -96,4 +102,33 @@ footer {
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+
+/* Add to your global CSS */
+.modal-backdrop {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Smooth transitions */
+.modal-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.modal-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
