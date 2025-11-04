@@ -1,5 +1,14 @@
 name = "oliviuus"
 compatibility_date = "2025-11-04"
+pages_build_output_dir = "./dist"
 
-[site]
-bucket = "./dist"
+# Environment configurations
+[env.production]
+pages_build_output_dir = "./dist"
+
+[env.preview]
+pages_build_output_dir = "./dist"
+
+# Optional: Add deployment configurations
+[deployment]
+environment = "production"

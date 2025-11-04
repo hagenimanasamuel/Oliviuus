@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="rw"> <!-- Set language to Kinyarwanda -->
+<html lang="en"> <!-- Changed to English since your content is in English -->
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,39 +7,46 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/oliviuus_logo_transparent.png" />
 
-  <!-- SEO Meta Tags (Localized for Kinyarwanda) -->
-  <meta name="description" content="Shakisha no kureba filimi nyarwanda kuri Oliviuus" />
-  <meta name="keywords" content="filimi nyarwanda, gukina filimi, sinema, Rwanda, filimi zo muri Africa" />
+  <!-- Basic SEO Meta Tags (React Helmet will override these) -->
+  <meta name="description" content="Oliviuus - Streaming Platform for Rwandan Cinema & Global Entertainment. Launching 2026." />
+  <meta name="keywords" content="streaming platform, Rwandan movies, African cinema, movies online, TV shows, entertainment" />
   <meta name="author" content="Oliviuus" />
   <meta name="robots" content="index, follow" />
-  <meta property="og:title" content="Oliviuus - Urubuga rw'amafilimi Nyarwanda" />
-  <meta property="og:description" content="Shakisha no kureba filimi nyarwanda kuri Oliviuus." />
+
+  <!-- Open Graph (React Helmet will override these) -->
+  <meta property="og:title" content="Oliviuus - Streaming Platform" />
+  <meta property="og:description" content="Experience streaming reimagined for the African continent and beyond." />
   <meta property="og:image" content="/oliviuus_logo_transparent.png" />
   <meta property="og:url" content="https://www.oliviuus.com" />
-  <meta name="twitter:title" content="Oliviuus - Urubuga rw'amafilimi Nyarwanda" />
-  <meta name="twitter:description" content="Shakisha no kureba filimi nyarwanda kuri Oliviuus." />
-  <meta name="twitter:image" content="/oliviuus_logo_transparent.png" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter (React Helmet will override these) -->
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Oliviuus - Streaming Platform" />
+  <meta name="twitter:description" content="Experience streaming reimagined for the African continent and beyond." />
+  <meta name="twitter:image" content="/oliviuus_logo_transparent.png" />
 
-  <!-- Dynamic Title (Default will be updated by React app) -->
-  <title>Oliviuus</title>
+  <!-- Dynamic Title (Will be updated by React Helmet) -->
+  <title>Oliviuus </title>
 
-  <!-- Fonts (Google Fonts or System fonts) -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" />
 
   <!-- Preload key assets -->
   <link rel="preload" href="/oliviuus_logo_transparent.png" as="image" />
 
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#BC8BBC" />
 
-  <!-- Minimal FOUC (Flash of Unstyled Content) -->
+  <!-- Additional Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 </head>
 
 <body>
   <div id="root"></div>
-
-  <!-- Preload and defer JS for better performance -->
-  <script type="module" src="/src/main.jsx" defer></script>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
-
 </html>

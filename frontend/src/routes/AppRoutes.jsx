@@ -23,11 +23,11 @@ import GlobalManagement from "../pages/Dashboards/Admins/GlobalManagement/Global
 import Support from "../pages/Dashboards/Admins/support/Support";
 
 // Viewer Dashboard modules (new routes)
-import ViewerDashboard from "../pages/Dashboards/ViewerDashboard"; 
-import WatchPage from "../pages/Dashboards/viewer/WatchPage.jsx"; 
-import MyLibrary from "../pages/Dashboards/viewer/MyLibrary"; 
-import DownloadPage from "../pages/Dashboards/viewer/DownloadPage"; 
-import ProfilePage from "../pages/Dashboards/viewer/ProfilePage"; 
+import ViewerDashboard from "../pages/Dashboards/ViewerDashboard";
+import WatchPage from "../pages/Dashboards/viewer/WatchPage.jsx";
+import MyLibrary from "../pages/Dashboards/viewer/MyLibrary";
+import DownloadPage from "../pages/Dashboards/viewer/DownloadPage";
+import ProfilePage from "../pages/Dashboards/viewer/ProfilePage";
 import ContentDetailPage from "../pages/Dashboards/viewer/ContentDetailPage.jsx";
 
 // Sample subscription
@@ -39,13 +39,47 @@ export default function AppRoutes() {
   const { user, loading } = useAuth();
   const { canAccessPremium } = useSubscription(); // Add this hook
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen text-lg">
-        Checking authentication...
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen text-lg">
+  //       Checking authentication...
+  //     </div>
+  //   );
+  // }
+
+if (loading) {
+  return (
+    <div className="flex items-center justify-center h-screen bg-black">
+      <div className="relative">
+        {/* TV Screen Container */}
+        <div className="relative w-32 h-24 bg-gray-900 rounded-lg border-4 border-gray-700 p-2">
+          {/* TV Screen */}
+          <div className="w-full h-full bg-black rounded-sm overflow-hidden relative">
+            {/* Scanning Lines Effect */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/20 to-transparent animate-scan"></div>
+            
+            {/* Pulsing Brand Color Dots */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex space-x-2">
+              <div className="w-3 h-3 bg-[#BC8BBC] rounded-full animate-pulse"></div>
+              <div className="w-3 h-3 bg-[#BC8BBC] rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-3 h-3 bg-[#BC8BBC] rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+            </div>
+          </div>
+          
+          {/* TV Stand */}
+          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-8 h-6 bg-gray-700 rounded-b-lg"></div>
+        </div>
+
+        {/* Outer Glow Ring */}
+        <div className="absolute inset-0 border-4 border-transparent border-t-[#BC8BBC] border-r-[#BC8BBC] rounded-full animate-spin -z-10"></div>
+        
+        {/* Signal Waves */}
+        <div className="absolute -inset-4 border-2 border-[#BC8BBC]/30 rounded-full animate-ping"></div>
+        <div className="absolute -inset-6 border-2 border-[#BC8BBC]/20 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   // Simple helper to protect admin routes
   const AdminRoute = ({ element }) => (

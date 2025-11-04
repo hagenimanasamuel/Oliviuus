@@ -3,6 +3,7 @@
     "@aws-sdk/client-s3": "^3.913.0",
     "@aws-sdk/s3-request-presigner": "^3.913.0",
     "express-validator": "^7.2.1",
-    "file-type": "^21.0.0"
+    "file-type": "^21.0.0",
+    "react-helmet": "^6.1.0"
   }
 }

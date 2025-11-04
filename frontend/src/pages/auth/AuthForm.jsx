@@ -5,7 +5,7 @@ import CryptoJS from "crypto-js";
 import EmailStep from "./EmailStep";
 import CodeStep from "./CodeStep";
 import PasswordStep from "./PasswordStep";
-import UserInfoStep from "./UserInfoStep"; // ✅ new import
+import UserInfoStep from "./UserInfoStep"; 
 import Logo from "../../components/Logo";
 import Footer from "../../components/Footer";
 
