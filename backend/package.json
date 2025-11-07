@@ -13,6 +13,7 @@
     "oliviuus": "node server.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.926.0",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
