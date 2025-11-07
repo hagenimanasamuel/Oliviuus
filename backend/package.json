@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "oliviuus_dev": "npx nodemon server.js",
     "start": "pm2-runtime server.js",
-    "oliviuus": "pm2-runtime server.js"
+    "oliviuus": "node server.js"
   },
   "dependencies": {
     "axios": "^1.12.2",

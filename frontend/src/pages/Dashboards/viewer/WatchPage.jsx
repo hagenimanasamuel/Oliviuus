@@ -94,6 +94,7 @@ const WatchPage = () => {
   const volumeHideTimerRef = useRef(null);
   const saveSettingsTimeoutRef = useRef(null);
   const bufferingTimeoutRef = useRef(null);
+  const waitingTimeoutRef = useRef(null);
 
   // Fetch content data
   useEffect(() => {
@@ -285,7 +286,7 @@ const WatchPage = () => {
     };
   }, []);
 
-  // Video event handlers
+  // Video event handlers - FIXED VERSION
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
@@ -332,19 +333,24 @@ const WatchPage = () => {
     setIsPlaying(true);
     // Clear any buffering state when play starts
     setIsBuffering(false);
+    setIsLoading(false);
     clearTimeout(bufferingTimeoutRef.current);
+    clearTimeout(waitingTimeoutRef.current);
   };
 
   const handlePause = () => {
     setIsPlaying(false);
     // Clear buffering state when paused
     setIsBuffering(false);
+    setIsLoading(false);
     clearTimeout(bufferingTimeoutRef.current);
+    clearTimeout(waitingTimeoutRef.current);
   };
 
   const handleEnded = () => {
     setIsPlaying(false);
     setIsBuffering(false);
+    setIsLoading(false);
     // Clear saved time when video ends
     localStorage.removeItem(`video-player-time-${id}`);
   };
@@ -354,35 +360,43 @@ const WatchPage = () => {
     setError('Video playback error. Please check your connection and try again.');
     setIsLoading(false);
     setIsBuffering(false);
+    clearTimeout(bufferingTimeoutRef.current);
+    clearTimeout(waitingTimeoutRef.current);
   };
 
   const handleCanPlay = () => {
     setIsLoading(false);
     setIsBuffering(false);
     clearTimeout(bufferingTimeoutRef.current);
+    clearTimeout(waitingTimeoutRef.current);
   };
 
   const handleWaiting = () => {
     // Only show buffering if we're actually playing and have been waiting for a bit
-    if (isPlaying) {
-      bufferingTimeoutRef.current = setTimeout(() => {
+    if (isPlaying && !isSeeking) {
+      clearTimeout(waitingTimeoutRef.current);
+      waitingTimeoutRef.current = setTimeout(() => {
         setIsBuffering(true);
-      }, 500); // Only show buffering after 500ms of waiting
+      }, 800); // Increased delay to prevent false buffering
     }
   };
 
   const handleSeeking = () => {
     setIsSeeking(true);
-    // Don't show loading immediately for seeking - only if it takes too long
+    // Don't show loading for seeking unless it takes too long
+    clearTimeout(bufferingTimeoutRef.current);
     bufferingTimeoutRef.current = setTimeout(() => {
-      setIsLoading(true);
-    }, 300);
+      if (isSeeking) {
+        setIsLoading(true);
+      }
+    }, 500); // Increased delay for seeking
   };
 
   const handleSeeked = () => {
     setIsSeeking(false);
     setIsLoading(false);
     clearTimeout(bufferingTimeoutRef.current);
+    clearTimeout(waitingTimeoutRef.current);
     updateBufferedProgress();
   };
 
@@ -395,6 +409,7 @@ const WatchPage = () => {
       clearTimeout(previewTimeoutRef.current);
       clearTimeout(volumeHideTimerRef.current);
       clearTimeout(skipTimerRef.current);
+      clearTimeout(waitingTimeoutRef.current);
     };
   }, []);
 
