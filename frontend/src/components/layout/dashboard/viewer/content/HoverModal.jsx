@@ -1,16 +1,49 @@
 // src/components/ContentCard/HoverModal.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { Play, Plus, Info, Heart, Clock, Star, Volume2, VolumeX } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Play, Plus, Info, Heart, Clock, Star, Volume2, VolumeX, Check, Loader2 } from "lucide-react";
+import { useContentDetail } from "../../../../../hooks/useContentDetail";
+import userPreferencesApi from "../../../../../api/userPreferencesApi";
 
 const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList, onMoreInfo }) => {
+  const navigate = useNavigate();
   const [isTrailerPlaying, setIsTrailerPlaying] = useState(false);
   const [isTrailerMuted, setIsTrailerMuted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [trailerLoaded, setTrailerLoaded] = useState(false);
   const [animationStage, setAnimationStage] = useState('entering');
+  const [isLiked, setIsLiked] = useState(false);
+  const [isInList, setIsInList] = useState(false);
+  const [loading, setLoading] = useState({
+    like: false,
+    watchlist: false
+  });
   const videoRef = useRef(null);
   const autoPlayTimerRef = useRef(null);
   const modalRef = useRef(null);
+
+  // Use your content detail hook
+  const { openDetailModal } = useContentDetail();
+
+  // Check if content is already liked or in list
+  useEffect(() => {
+    const checkUserPreferences = async () => {
+      if (!content?.id) return;
+
+      try {
+        const response = await userPreferencesApi.getUserContentPreferences(content.id);
+        if (response.success) {
+          setIsLiked(response.data?.isLiked || false);
+          setIsInList(response.data?.isInList || false);
+        }
+      } catch (error) {
+        console.error('Error fetching user preferences:', error);
+        // Don't show error to user for preference loading
+      }
+    };
+
+    checkUserPreferences();
+  }, [content?.id]);
 
   const getAgeRating = (content) => {
     const rating = content.age_rating || "13+";
@@ -116,21 +149,81 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
   const handlePlayClick = (e) => {
     e.stopPropagation();
     stopTrailerPlayback();
+    
+    // Close the hover modal first
+    onClose?.();
+    
+    // Navigate to WatchPage with the content ID
+    if (content?.id) {
+      navigate(`/watch/${content.id}`);
+    }
+    
+    // Also call the original onPlay if provided
     onPlay?.(content);
   };
 
-  const handleAddClick = (e) => {
+  const handleAddClick = async (e) => {
     e.stopPropagation();
-    onAddToList?.(content);
+    
+    if (!content?.id) return;
+    
+    setLoading(prev => ({ ...prev, watchlist: true }));
+
+    try {
+      const action = isInList ? 'remove' : 'add';
+      const response = await userPreferencesApi.toggleWatchlist(content.id, action);
+
+      if (response.success) {
+        const newInListState = !isInList;
+        setIsInList(newInListState);
+        onAddToList?.(content, newInListState);
+      }
+    } catch (error) {
+      console.error('Error updating watchlist:', error);
+    } finally {
+      setLoading(prev => ({ ...prev, watchlist: false }));
+    }
   };
 
-  const handleLikeClick = (e) => {
+  const handleLikeClick = async (e) => {
     e.stopPropagation();
-    console.log('Liked:', content.title);
+    
+    if (!content?.id) return;
+    
+    setLoading(prev => ({ ...prev, like: true }));
+
+    try {
+      const action = isLiked ? 'unlike' : 'like';
+      const response = await userPreferencesApi.toggleLike(content.id, action);
+
+      if (response.success) {
+        setIsLiked(!isLiked);
+      }
+    } catch (error) {
+      console.error('Error updating like:', error);
+    } finally {
+      setLoading(prev => ({ ...prev, like: false }));
+    }
   };
 
   const handleInfoClick = (e) => {
     e.stopPropagation();
+    
+    // Stop trailer before navigating
+    stopTrailerPlayback();
+    
+    // Close the hover modal first
+    onClose?.();
+    
+    // Use your hook to open the detail page with proper positioning
+    openDetailModal(content, {
+      left: cardRect?.left || 0,
+      top: cardRect?.top || 0,
+      width: cardRect?.width || 0,
+      height: cardRect?.height || 0
+    });
+    
+    // Also call the original onMoreInfo if provided
     onMoreInfo?.(content, cardRect);
   };
 
@@ -139,12 +232,21 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
+    // Calculate max height based on viewport (leave space for content area)
+    const maxHeight = viewportHeight * 0.7; // 70% of viewport height
+    
     if (viewportWidth < 640) { // Mobile
-      return { width: Math.min(280, viewportWidth - 40), height: 320 };
+      const width = Math.min(280, viewportWidth - 40);
+      const imageHeight = Math.min(width * 1.5, maxHeight * 0.7); // 70% for image, 30% for content
+      return { width, imageHeight, totalHeight: imageHeight + 140 }; // 140px for content area
     } else if (viewportWidth < 768) { // Tablet
-      return { width: Math.min(300, viewportWidth - 40), height: 330 };
+      const width = Math.min(300, viewportWidth - 40);
+      const imageHeight = Math.min(width * 1.5, maxHeight * 0.7);
+      return { width, imageHeight, totalHeight: imageHeight + 150 };
     } else { // Desktop
-      return { width: Math.min(320, viewportWidth - 40), height: 340 };
+      const width = Math.min(320, viewportWidth - 40);
+      const imageHeight = Math.min(width * 1.5, maxHeight * 0.7);
+      return { width, imageHeight, totalHeight: imageHeight + 160 };
     }
   };
 
@@ -174,7 +276,7 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
     const cardCenterX = cardRect.left + cardRect.width / 2;
     const cardCenterY = cardRect.top + cardRect.height / 2;
     
-    const { width: modalWidth, height: modalHeight } = getModalSize();
+    const { width: modalWidth, totalHeight: modalHeight } = getModalSize();
     
     // Calculate target position
     const targetLeft = cardCenterX - modalWidth / 2;
@@ -200,7 +302,7 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
       left: safePosition.left,
       top: safePosition.top,
       width: modalWidth,
-      height: 'auto',
+      height: modalHeight,
       transform: 'scale(1)',
       opacity: 1,
       borderRadius: '12px',
@@ -217,10 +319,13 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
       onMouseLeave={onClose}
     >
       {/* Only show content when fully entered */}
-      <div className={`w-full h-full ${animationStage === 'entering' ? 'opacity-0' : 'opacity-100 transition-opacity duration-200 delay-150'}`}>
+      <div className={`w-full h-full flex flex-col ${animationStage === 'entering' ? 'opacity-0' : 'opacity-100 transition-opacity duration-200 delay-150'}`}>
         
-        {/* Trailer Video or Image - Responsive height */}
-        <div className="relative h-32 sm:h-36 md:h-44 bg-gray-800 overflow-hidden">
+        {/* Trailer Video or Image - Dynamic height based on modal width */}
+        <div 
+          className="relative bg-gray-800 overflow-hidden flex-shrink-0"
+          style={{ height: getModalSize().imageHeight }}
+        >
           {content.trailer ? (
             <>
               {/* Trailer Video */}
@@ -251,6 +356,15 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
                     <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   )}
                 </button>
+
+                {/* Play Icon Overlay - Only show when video is playing */}
+                {isTrailerPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                    <div className="bg-black/50 rounded-full p-3 backdrop-blur-sm">
+                      <Play className="w-6 h-6 text-white fill-current" />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Fallback Image */}
@@ -258,7 +372,7 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
                 !isTrailerPlaying || !trailerLoaded ? 'opacity-100' : 'opacity-0'
               }`}>
                 <img
-                  src={content.media_assets?.[0]?.url || '/api/placeholder/320/176'}
+                  src={content.media_assets?.[0]?.url || '/api/placeholder/320/480'}
                   alt={content.title}
                   className="w-full h-full object-cover"
                   onLoad={() => setImageLoaded(true)}
@@ -266,16 +380,37 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
                 {!imageLoaded && (
                   <div className="absolute inset-0 bg-gray-700 animate-pulse" />
                 )}
+
+                {/* Play Icon Overlay - Show on image when trailer is available but not playing */}
+                {!isTrailerPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm transform hover:scale-110 transition-transform duration-200">
+                      <Play className="w-6 h-6 text-white fill-current" />
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           ) : (
             // Only Image if no trailer
-            <img
-              src={content.media_assets?.[0]?.url || '/api/placeholder/320/176'}
-              alt={content.title}
-              className="w-full h-full object-cover"
-              onLoad={() => setImageLoaded(true)}
-            />
+            <>
+              <img
+                src={content.media_assets?.[0]?.url || '/api/placeholder/320/480'}
+                alt={content.title}
+                className="w-full h-full object-cover"
+                onLoad={() => setImageLoaded(true)}
+              />
+              {!imageLoaded && (
+                <div className="absolute inset-0 bg-gray-700 animate-pulse" />
+              )}
+
+              {/* Play Icon Overlay - Always show on image when no trailer */}
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm transform hover:scale-110 transition-transform duration-200">
+                  <Play className="w-6 h-6 text-white fill-current" />
+                </div>
+              </div>
+            </>
           )}
           
           {/* Gradient Overlay */}
@@ -283,7 +418,7 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
         </div>
 
         {/* Content Info - Responsive padding and spacing */}
-        <div className="p-3 sm:p-4">
+        <div className="flex-1 p-3 sm:p-4 flex flex-col">
           {/* Primary Actions - Responsive layout */}
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-1.5 sm:gap-2">
@@ -296,17 +431,37 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
               </button>
               <button
                 onClick={handleAddClick}
-                className="flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded-full p-1.5 sm:p-2 transition-all duration-200 transform hover:scale-110 border border-gray-600"
-                title="Add to List"
+                disabled={loading.watchlist}
+                className={`flex items-center justify-center rounded-full p-1.5 sm:p-2 transition-all duration-200 transform hover:scale-110 border ${
+                  isInList 
+                    ? 'bg-[#BC8BBC] text-white border-[#BC8BBC]' 
+                    : 'bg-gray-700 hover:bg-gray-600 text-white border-gray-600'
+                } ${loading.watchlist ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title={isInList ? "Remove from List" : "Add to List"}
               >
-                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                {loading.watchlist ? (
+                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                ) : isInList ? (
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                ) : (
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                )}
               </button>
               <button
                 onClick={handleLikeClick}
-                className="flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded-full p-1.5 sm:p-2 transition-all duration-200 transform hover:scale-110 border border-gray-600"
-                title="Like"
+                disabled={loading.like}
+                className={`flex items-center justify-center rounded-full p-1.5 sm:p-2 transition-all duration-200 transform hover:scale-110 border ${
+                  isLiked 
+                    ? 'bg-red-500 text-white border-red-500' 
+                    : 'bg-gray-700 hover:bg-gray-600 text-white border-gray-600'
+                } ${loading.like ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title={isLiked ? "Unlike" : "Like"}
               >
-                <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
+                {loading.like ? (
+                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                ) : (
+                  <Heart className={`w-3 h-3 sm:w-4 sm:h-4 ${isLiked ? 'fill-current' : ''}`} />
+                )}
               </button>
             </div>
             
@@ -354,7 +509,7 @@ const HoverModal = ({ content, position, cardRect, onClose, onPlay, onAddToList,
 
           {/* Description - Responsive text and line clamp */}
           {content.short_description && (
-            <p className="text-gray-300 text-xs sm:text-sm line-clamp-2 sm:line-clamp-2 leading-relaxed">
+            <p className="text-gray-300 text-xs sm:text-sm line-clamp-2 sm:line-clamp-3 leading-relaxed flex-1">
               {typeof content.short_description === 'string' 
                 ? content.short_description 
                 : 'Description not available'

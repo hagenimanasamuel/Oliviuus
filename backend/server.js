@@ -18,6 +18,7 @@ const {
   createSecurityLogsTable,
   createContentTables,
   createPeopleTables,
+  createUserPreferencesTables,
 } = require('./config/dbConfig');
 const createAdminSeed = require('./seeds/seedAdmin');
 const authRoutes = require('./routes/authRoutes');
@@ -38,6 +39,8 @@ const imageProxyRoutes = require('./routes/imageProxyRoutes');
 const peopleRoutes = require('./routes/peopleRoutes');
 const overviewRoutes = require('./routes/overviewRoutes');
 const viewerRoutes = require('./routes/viewerRoutes');
+const userPreferencesRoutes = require('./routes/viewerRoutes');
+
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -62,6 +65,7 @@ app.use('/api/email-verification', emailVerificationRoutes);
 app.use('/api/user', preferencesRoutes);
 app.use("/api/user/sessions", sessionRoutes);
 app.use("/api/user/", userRoutes);
+app.use('/api/user', userPreferencesRoutes);
 app.use('/api/roles', rolesRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/admin/subscriptions', subscriptionRoutes);
@@ -97,7 +101,8 @@ createContactInfoTable(),
 createNotificationsTable(),
 createSecurityLogsTable(),
 createContentTables(),
-createPeopleTables()])
+createPeopleTables(),
+createUserPreferencesTables()])
   .then(async () => {
     console.log("✅ Tables checked/created");
     await createAdminSeed();

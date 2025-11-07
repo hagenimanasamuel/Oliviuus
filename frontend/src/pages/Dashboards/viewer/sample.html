@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dynamic Video Preview (YouTube Style)</title>
+<style>
+    body {
+        background: #111;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial;
+    }
+
+    #player-container {
+        position: relative;
+        width: 700px;
+    }
+
+    video {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    #progress {
+        width: 100%;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    /* Preview box */
+    #preview-box {
+        position: absolute;
+        bottom: 60px;
+        width: 180px;
+        height: 100px;
+        background: #000;
+        border-radius: 6px;
+        display: none;
+        overflow: hidden;
+        pointer-events: none;
+        border: 2px solid #333;
+    }
+
+    #preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+</head>
+<body>
+
+<div id="player-container">
+    <video id="video" 
+           src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" 
+           controls></video>
+
+    <!-- Hover Preview -->
+    <div id="preview-box">
+        <img id="preview-img" src="">
+    </div>
+
+    <!-- Progress Bar -->
+    <input type="range" id="progress" min="0" value="0" step="0.1">
+</div>
+
+<!-- Hidden canvas for frame capture -->
+<canvas id="canvas" width="320" height="180" style="display:none;"></canvas>
+
+<script>
+    const video = document.getElementById("video");
+    const progress = document.getElementById("progress");
+    const previewBox = document.getElementById("preview-box");
+    const previewImg = document.getElementById("preview-img");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    // Hidden clone video to avoid interrupting playback
+    const previewVideo = document.createElement("video");
+    previewVideo.src = video.src;
+    previewVideo.crossOrigin = "anonymous"; 
+    previewVideo.muted = true;  // must be muted for autoplay-seeking
+    previewVideo.preload = "auto";
+    previewVideo.style.display = "none";
+    document.body.appendChild(previewVideo);
+
+    video.addEventListener("loadedmetadata", () => {
+        progress.max = video.duration;
+    });
+
+    let timeout;
+
+    progress.addEventListener("mousemove", (e) => {
+        const rect = progress.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+
+        const hoverTime = (x / rect.width) * video.duration;
+
+        // Throttle seeking to avoid freezing
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            previewVideo.currentTime = hoverTime;
+        }, 30);
+
+        previewVideo.onseeked = () => {
+            // Draw current frame onto canvas
+            ctx.drawImage(previewVideo, 0, 0, canvas.width, canvas.height);
+            previewImg.src = canvas.toDataURL("image/jpeg");
+
+            // Show preview box
+            previewBox.style.display = "block";
+            previewBox.style.left = (x - 90) + "px";
+        };
+    });
+
+    progress.addEventListener("mouseleave", () => {
+        previewBox.style.display = "none";
+    });
+
+    // Update video currentTime on drag
+    progress.addEventListener("input", () => {
+        video.currentTime = progress.value;
+    });
+
+    // Keep slider synced
+    video.addEventListener("timeupdate", () => {
+        progress.value = video.currentTime;
+    });
+</script>
+
+</body>
+</html>

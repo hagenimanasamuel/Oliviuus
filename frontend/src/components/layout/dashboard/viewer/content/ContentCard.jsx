@@ -13,13 +13,13 @@ const ContentCard = memo(({ content, size = "medium", onMoreInfo }) => {
   const hoverTimerRef = useRef(null);
   const leaveTimerRef = useRef(null);
 
-  console.log('ContentCard rendering:', content?.id); // Debug log to check re-renders
+  console.log('ContentCard rendering:', content?.id);
 
-  // Responsive card sizes
+  // Updated card sizes with proper aspect ratio [2/3] like your custom cards
   const cardSizes = {
-    small: "w-32 h-24 sm:w-40 sm:h-28 md:w-48 md:h-32",
-    medium: "w-40 h-28 sm:w-48 sm:h-32 md:w-56 md:h-40", 
-    large: "w-48 h-36 sm:w-56 sm:h-40 md:w-64 md:h-48"
+    small: "w-32 aspect-[2/3]",
+    medium: "w-40 aspect-[2/3]", 
+    large: "w-48 aspect-[2/3]"
   };
 
   // Memoize image URL calculation
@@ -143,13 +143,11 @@ const ContentCard = memo(({ content, size = "medium", onMoreInfo }) => {
             <img
               src={imageUrl}
               alt={content.title}
-              className={`w-full h-full object-cover transition-all duration-300 ${
-                isHovered ? 'scale-105' : 'scale-100'
-              } ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              className="w-full h-full object-cover transition-all duration-300"
               onLoad={handleImageLoad}
               onError={handleImageError}
               loading="lazy"
-              key={imageUrl} // Key helps React identify when image actually changes
+              key={imageUrl}
             />
           </>
         ) : (
@@ -212,7 +210,7 @@ const ContentCard = memo(({ content, size = "medium", onMoreInfo }) => {
             onClose={handleCloseModal}
             onPlay={() => console.log('Play content:', content.title)}
             onAddToList={() => console.log('Add to list:', content.title)}
-            onMoreInfo={onMoreInfo }
+            onMoreInfo={onMoreInfo}
           />
         </div>
       )}

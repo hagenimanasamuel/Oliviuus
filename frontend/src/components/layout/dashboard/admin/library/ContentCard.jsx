@@ -152,8 +152,8 @@ const ContentCard = ({
         </div>
       )}
 
-      {/* Thumbnail Section - UPDATED FOR CENTERED IMAGES */}
-      <div className="relative aspect-video bg-gray-200 dark:bg-gray-700 overflow-hidden">
+      {/* Thumbnail Section - UPDATED FOR PROPER IMAGE FITTING */}
+      <div className="relative aspect-[2/3] bg-gray-200 dark:bg-gray-700 overflow-hidden">
         {!imageError && imageUrl ? (
           <>
             {imageLoading && (
@@ -168,11 +168,11 @@ const ContentCard = ({
                 </div>
               </div>
             )}
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="w-full h-full">
               <img
                 src={imageUrl}
                 alt={content.title}
-                className={`max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105 ${
+                className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
                   imageLoading ? 'opacity-0' : 'opacity-100'
                 }`}
                 onError={handleImageError}

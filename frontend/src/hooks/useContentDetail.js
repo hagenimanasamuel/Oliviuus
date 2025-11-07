@@ -1,4 +1,3 @@
-// src/hooks/useContentDetail.js
 import { useState, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 

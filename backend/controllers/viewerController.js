@@ -1,4 +1,5 @@
 const { query } = require("../config/dbConfig");
+const { get } = require("../routes/viewerRoutes");
 
 // Cache configuration
 const cacheConfig = {
@@ -853,59 +854,117 @@ const getViewerContentById = async (req, res) => {
     content.current_rating_count = ratingStats[0].current_rating_count || 0;
     content.review_count = ratingStats[0].review_count || 0;
 
-    // For series content, get detailed seasons and episodes
+    // FIXED: For series content, create seasons structure from media assets
     if (content.content_type === 'series') {
-      const seasons = await query(`
-        SELECT 
-          s.*,
-          (
-            SELECT COUNT(*) 
-            FROM episodes e 
-            WHERE e.season_id = s.id
-          ) as actual_episode_count,
-          (
-            SELECT CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path)
-            FROM media_assets ma 
-            WHERE ma.content_id = s.content_id 
-              AND ma.season_number = s.season_number
-              AND ma.asset_type = 'season_poster'
-              AND ma.upload_status = 'completed'
-            LIMIT 1
-          ) as season_poster_url
-        FROM seasons s 
-        WHERE s.content_id = ? 
-        ORDER BY s.season_number ASC
-      `, [process.env.R2_PUBLIC_URL_ID, contentId]);
+      console.log('🔍 Processing series content - creating seasons structure');
 
-      // Get episodes for each season with media assets
-      for (let season of seasons) {
-        season.episodes = await query(`
-          SELECT 
-            e.*,
-            (
-              SELECT COUNT(*)
-              FROM media_assets ma
-              WHERE ma.content_id = ? 
-                AND ma.season_number = e.season_number
-                AND ma.episode_number = e.episode_number
-                AND ma.upload_status = 'completed'
-            ) as media_assets_count,
-            (
-              SELECT CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path)
-              FROM media_assets ma 
-              WHERE ma.content_id = ? 
-                AND ma.season_number = e.season_number
-                AND ma.episode_number = e.episode_number
-                AND ma.asset_type = 'episodeThumbnail'
-                AND ma.upload_status = 'completed'
-              LIMIT 1
-            ) as episode_thumbnail_url
-          FROM episodes e 
-          WHERE e.season_id = ?
-          ORDER BY e.episode_number ASC
-        `, [contentId, process.env.R2_PUBLIC_URL_ID, contentId, season.id]);
+      // Get unique seasons from media assets
+      const seasonNumbers = [...new Set(mediaAssets
+        .filter(asset => asset.season_number !== null && asset.season_number !== undefined)
+        .map(asset => asset.season_number)
+      )].sort((a, b) => a - b);
+
+      console.log('🔍 Found season numbers:', seasonNumbers);
+
+      const seasons = [];
+
+      for (const seasonNumber of seasonNumbers) {
+        // Get season poster from media assets
+        const seasonPoster = mediaAssets.find(asset =>
+          asset.season_number === seasonNumber &&
+          asset.asset_type === 'season_poster'
+        );
+
+        // Get episodes for this season from media assets
+        const episodeNumbers = [...new Set(mediaAssets
+          .filter(asset =>
+            asset.season_number === seasonNumber &&
+            asset.episode_number !== null &&
+            asset.episode_number !== undefined
+          )
+          .map(asset => asset.episode_number)
+        )].sort((a, b) => a - b);
+
+        console.log(`🔍 Season ${seasonNumber} - episodes:`, episodeNumbers);
+
+        const episodes = [];
+
+        for (const episodeNumber of episodeNumbers) {
+          // Get episode thumbnail
+          const episodeThumbnail = mediaAssets.find(asset =>
+            asset.season_number === seasonNumber &&
+            asset.episode_number === episodeNumber &&
+            asset.asset_type === 'episodeThumbnail'
+          );
+
+          // Get episode video asset to extract episode title and description
+          const episodeVideoAsset = mediaAssets.find(asset =>
+            asset.season_number === seasonNumber &&
+            asset.episode_number === episodeNumber &&
+            asset.asset_type === 'episodeVideo'
+          );
+
+          // Get episode trailer
+          const episodeTrailer = mediaAssets.find(asset =>
+            asset.season_number === seasonNumber &&
+            asset.episode_number === episodeNumber &&
+            asset.asset_type === 'episodeTrailer'
+          );
+
+          // Get episode media assets count
+          const episodeMediaAssetsCount = mediaAssets.filter(asset =>
+            asset.season_number === seasonNumber &&
+            asset.episode_number === episodeNumber
+          ).length;
+
+          // Smart title selection with proper conditioning
+          let episodeTitle = null;
+          if (episodeVideoAsset?.episode_title) {
+            episodeTitle = episodeVideoAsset.episode_title;
+          } else if (episodeVideoAsset?.asset_title) {
+            episodeTitle = episodeVideoAsset.asset_title;
+          }
+
+          // Smart description selection with proper conditioning
+          let episodeDescription = null;
+          if (episodeVideoAsset?.episode_description) {
+            episodeDescription = episodeVideoAsset.episode_description;
+          } else if (episodeVideoAsset?.asset_description) {
+            episodeDescription = episodeVideoAsset.asset_description;
+          }
+
+          episodes.push({
+            id: `season-${seasonNumber}-episode-${episodeNumber}`,
+            episode_number: episodeNumber,
+            title: episodeTitle, // Will be null if no data found
+            description: episodeDescription, // Will be null if no data found
+            duration_minutes: episodeVideoAsset?.duration_seconds ? Math.floor(episodeVideoAsset.duration_seconds / 60) : null,
+            release_date: null,
+            media_assets_count: episodeMediaAssetsCount,
+            episode_thumbnail_url: episodeThumbnail?.url || null,
+            has_trailer: !!episodeTrailer
+          });
+        }
+
+        seasons.push({
+          id: `season-${seasonNumber}`,
+          season_number: seasonNumber,
+          title: `Season ${seasonNumber}`,
+          description: null,
+          release_date: null,
+          actual_episode_count: episodes.length,
+          episode_count: episodes.length,
+          season_poster_url: seasonPoster?.url || null,
+          episodes: episodes
+        });
       }
+
       content.seasons = seasons;
+      console.log('🔍 Created seasons structure:', seasons);
+    } else {
+      // For non-series content, ensure seasons is an empty array
+      content.seasons = [];
+      console.log('🔍 Non-series content - setting empty seasons array');
     }
 
     // Get similar content based on genres
@@ -981,7 +1040,8 @@ const getViewerContentById = async (req, res) => {
       categories: content.categories?.length || 0,
       seasons: content.seasons?.length || 0,
       similar_content: content.similar_content?.length || 0,
-      languages: content.available_languages?.length || 0
+      languages: content.available_languages?.length || 0,
+      content_type: content.content_type
     });
 
     res.json({
@@ -1194,11 +1254,328 @@ const getWatchHistory = async (req, res) => {
   }
 };
 
+// Add/Remove from watchlist
+const toggleWatchlist = async (req, res) => {
+  try {
+    const { contentId, action } = req.body;
+    const userId = req.user.id;
+
+    if (!contentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Content ID is required'
+      });
+    }
+
+    // Verify content exists
+    const content = await query(`
+      SELECT id FROM contents 
+      WHERE id = ? AND status = 'published' AND visibility = 'public'
+    `, [contentId]);
+
+    if (content.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Content not found'
+      });
+    }
+
+    if (action === 'add') {
+      // Add to watchlist
+      await query(`
+        INSERT IGNORE INTO user_watchlist (user_id, content_id, added_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+      `, [userId, contentId]);
+
+      res.json({
+        success: true,
+        message: 'Added to watchlist',
+        action: 'added',
+        data: { isInList: true }
+      });
+    } else if (action === 'remove') {
+      // Remove from watchlist
+      await query(`
+        DELETE FROM user_watchlist 
+        WHERE user_id = ? AND content_id = ?
+      `, [userId, contentId]);
+
+      res.json({
+        success: true,
+        message: 'Removed from watchlist',
+        action: 'removed',
+        data: { isInList: false }
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid action. Use "add" or "remove"'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error updating watchlist:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Unable to update watchlist'
+    });
+  }
+};
+
+// Like/Unlike content
+const toggleLike = async (req, res) => {
+  try {
+    const { contentId, action } = req.body;
+    const userId = req.user.id;
+
+    if (!contentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Content ID is required'
+      });
+    }
+
+    // Verify content exists
+    const content = await query(`
+      SELECT id FROM contents 
+      WHERE id = ? AND status = 'published' AND visibility = 'public'
+    `, [contentId]);
+
+    if (content.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Content not found'
+      });
+    }
+
+    if (action === 'like') {
+      // Add like
+      await query(`
+        INSERT INTO user_likes (user_id, content_id, liked_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON DUPLICATE KEY UPDATE liked_at = CURRENT_TIMESTAMP, is_active = TRUE
+      `, [userId, contentId]);
+
+      // Update content like count
+      await query(`
+        UPDATE contents 
+        SET like_count = like_count + 1 
+        WHERE id = ?
+      `, [contentId]);
+
+      res.json({
+        success: true,
+        message: 'Content liked',
+        action: 'liked',
+        data: { isLiked: true }
+      });
+    } else if (action === 'unlike') {
+      // Remove like
+      await query(`
+        UPDATE user_likes 
+        SET is_active = FALSE, unliked_at = CURRENT_TIMESTAMP
+        WHERE user_id = ? AND content_id = ? AND is_active = TRUE
+      `, [userId, contentId]);
+
+      // Update content like count
+      await query(`
+        UPDATE contents 
+        SET like_count = GREATEST(0, like_count - 1) 
+        WHERE id = ?
+      `, [contentId]);
+
+      res.json({
+        success: true,
+        message: 'Content unliked',
+        action: 'unliked',
+        data: { isLiked: false }
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid action. Use "like" or "unlike"'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error updating like:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Unable to update like status'
+    });
+  }
+};
+
+// Get user preferences for specific content
+const getUserContentPreferences = async (req, res) => {
+  try {
+    const { contentId } = req.params;
+    const userId = req.user.id;
+
+    const [watchlist] = await query(`
+      SELECT 1 as in_list 
+      FROM user_watchlist 
+      WHERE user_id = ? AND content_id = ?
+    `, [userId, contentId]);
+
+    const [like] = await query(`
+      SELECT 1 as is_liked 
+      FROM user_likes 
+      WHERE user_id = ? AND content_id = ? AND is_active = TRUE
+    `, [userId, contentId]);
+
+    res.json({
+      success: true,
+      data: {
+        isInList: !!watchlist,
+        isLiked: !!like
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching user preferences:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Unable to fetch user preferences'
+    });
+  }
+};
+
+// Batch get user preferences for multiple contents
+const getBatchUserPreferences = async (req, res) => {
+  try {
+    const { contentIds } = req.body;
+    const userId = req.user.id;
+
+    if (!Array.isArray(contentIds) || contentIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Content IDs array is required'
+      });
+    }
+
+    // Get watchlist status for all content IDs
+    const placeholders = contentIds.map(() => '?').join(',');
+    const watchlistResults = await query(`
+      SELECT content_id 
+      FROM user_watchlist 
+      WHERE user_id = ? AND content_id IN (${placeholders})
+    `, [userId, ...contentIds]);
+
+    const likeResults = await query(`
+      SELECT content_id 
+      FROM user_likes 
+      WHERE user_id = ? AND content_id IN (${placeholders}) AND is_active = TRUE
+    `, [userId, ...contentIds]);
+
+    const watchlistSet = new Set(watchlistResults.map(row => row.content_id));
+    const likeSet = new Set(likeResults.map(row => row.content_id));
+
+    const preferences = {};
+    contentIds.forEach(contentId => {
+      preferences[contentId] = {
+        isInList: watchlistSet.has(contentId),
+        isLiked: likeSet.has(contentId)
+      };
+    });
+
+    res.json({
+      success: true,
+      data: preferences
+    });
+
+  } catch (error) {
+    console.error('Error fetching batch preferences:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Unable to fetch batch preferences'
+    });
+  }
+};
+
+// get User watchlist
+const getUserWatchlist = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const watchlist = await query(`
+      SELECT 
+        uw.*,
+        c.id as content_id,
+        c.title,
+        c.content_type,
+        c.description,
+        c.short_description,
+        c.duration_minutes,
+        c.release_date,
+        c.age_rating,
+        c.average_rating,
+        c.view_count,
+        (
+          SELECT CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path)
+          FROM media_assets ma 
+          WHERE ma.content_id = c.id 
+            AND ma.asset_type IN ('thumbnail', 'poster')
+            AND (ma.is_primary = 1 OR ma.is_primary IS NULL)
+            AND ma.upload_status = 'completed'
+          ORDER BY ma.is_primary DESC, ma.created_at DESC
+          LIMIT 1
+        ) as primary_image_url
+      FROM user_watchlist uw
+      JOIN contents c ON uw.content_id = c.id
+      WHERE uw.user_id = ?
+      ORDER BY uw.added_at DESC
+    `, [process.env.R2_PUBLIC_URL_ID, userId]);
+
+    // Process the data to match your frontend structure
+    const processedWatchlist = watchlist.map(item => ({
+      id: item.id,
+      added_at: item.added_at,
+      content: {
+        id: item.content_id,
+        title: item.title,
+        content_type: item.content_type,
+        description: item.description,
+        short_description: item.short_description,
+        duration_minutes: item.duration_minutes,
+        release_date: item.release_date,
+        age_rating: item.age_rating,
+        average_rating: item.average_rating,
+        view_count: item.view_count,
+        media_assets: item.primary_image_url ? [{
+          asset_type: 'thumbnail',
+          url: item.primary_image_url,
+          is_primary: 1,
+          upload_status: 'completed'
+        }] : []
+      }
+    }));
+
+    res.json({
+      success: true,
+      data: processedWatchlist,
+      count: processedWatchlist.length
+    });
+
+  } catch (error) {
+    console.error('Error fetching user watchlist:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Unable to fetch watchlist'
+    });
+  }
+};
+
 module.exports = {
   getViewerLandingContent,
   getAllViewerContent,
   getViewerContentById,
   trackContentView,
   rateContent,
-  getWatchHistory
+  getWatchHistory,
+  toggleWatchlist,
+  toggleLike,
+  getUserContentPreferences,
+  getBatchUserPreferences,
+  getUserWatchlist
 };

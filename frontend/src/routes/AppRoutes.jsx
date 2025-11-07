@@ -34,6 +34,7 @@ import ContentDetailPage from "../pages/Dashboards/viewer/ContentDetailPage.jsx"
 import SampleSubscription from "../pages/subscription/SampleSubscriptionPage";
 import SecurityGridSystem from "../pages/subscription/SecurityGridSystem.jsx";
 import SecurityGridPresentation from "../pages/subscription/SecurityGridSystem.jsx";
+import WatchlistPage from "../pages/Dashboards/viewer/preferences/WatchlistPage.jsx";
 
 export default function AppRoutes() {
   const { user, loading } = useAuth();
@@ -149,10 +150,11 @@ if (loading) {
       <Route path="/admin/support" element={<AdminRoute element={<Support />} />} />
 
       {/* Viewer Dashboard Routes (require active subscription) */}
-      <Route path="/watch" element={<ViewerRoute element={<WatchPage />} />} />
       <Route path="/library" element={<ViewerRoute element={<MyLibrary />} />} />
       <Route path="/downloads" element={<ViewerRoute element={<DownloadPage />} />} />
+      <Route path="/my-list" element={<ViewerRoute element={<WatchlistPage />} />} />
       <Route path="/profile" element={<ViewerRoute element={<ProfilePage />} requireSubscription={false} />} />
+      <Route path="/watch/:id" element={<WatchPage />} />
       <Route path="/title/:id" element={<ContentDetailPage />} />
 
       {/* Sample routes */}

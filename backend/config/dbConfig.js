@@ -1255,6 +1255,53 @@ const createPeopleTables = async () => {
   }
 };
 
+const createUserPreferencesTables = async () => {
+  try {
+    // User watchlist table
+    const sqlWatchlist = `
+      CREATE TABLE IF NOT EXISTS user_watchlist (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        content_id INT NOT NULL,
+        added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_user_content (user_id, content_id),
+        INDEX idx_watchlist_user (user_id),
+        INDEX idx_watchlist_content (content_id),
+        INDEX idx_watchlist_added (added_at)
+      );
+    `;
+    await query(sqlWatchlist);
+
+    // User likes table
+    const sqlLikes = `
+      CREATE TABLE IF NOT EXISTS user_likes (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        content_id INT NOT NULL,
+        is_active BOOLEAN DEFAULT TRUE,
+        liked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        unliked_at TIMESTAMP NULL,
+        
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_user_content_like (user_id, content_id),
+        INDEX idx_likes_user (user_id),
+        INDEX idx_likes_content (content_id),
+        INDEX idx_likes_active (is_active),
+        INDEX idx_likes_liked_at (liked_at)
+      );
+    `;
+    await query(sqlLikes);
+
+    console.log("✅ User preferences tables created successfully!");
+  } catch (error) {
+    console.error("❌ Error creating user preferences tables:", error);
+  }
+};
+
 
 
 module.exports = {
@@ -1275,4 +1322,5 @@ module.exports = {
   createSecurityLogsTable,
   createContentTables,
   createPeopleTables,
+  createUserPreferencesTables,
 };

@@ -15,21 +15,25 @@ import {
   VolumeX,
   Sparkles,
   TrendingUp,
-  Clock as ClockIcon
+  Clock as ClockIcon,
+  Heart,
+  Check,
+  Loader2
 } from "lucide-react";
 import api from "../../../../api/axios";
+import userPreferencesApi from "../../../../api/userPreferencesApi";
 import ContentCard from "./content/ContentCard.jsx";
 import { useContentDetail } from '../../../../hooks/useContentDetail';
-import ContentDetailModal from './content/ContentDetailModal.jsx';
+import ContentDetailPage from './content/ContentDetailModal';
 
 export default function ViewerLandingPage() {
   const navigate = useNavigate();
-    const {
+  const {
     detailModal,
     openDetailModal,
-    closeDetailModal,
-    openDetailPage
+    closeDetailModal
   } = useContentDetail();
+  
   const [contents, setContents] = useState([]);
   const [heroContent, setHeroContent] = useState(null);
   const [featuredContent, setFeaturedContent] = useState([]);
@@ -41,6 +45,14 @@ export default function ViewerLandingPage() {
   const [isTrailerMuted, setIsTrailerMuted] = useState(false);
   const [isHeroInView, setIsHeroInView] = useState(true);
   const [isPageVisible, setIsPageVisible] = useState(true);
+  const [heroPreferences, setHeroPreferences] = useState({
+    isLiked: false,
+    isInList: false,
+    loading: {
+      like: false,
+      watchlist: false
+    }
+  });
 
   const videoRef = useRef(null);
   const heroSectionRef = useRef(null);
@@ -77,6 +89,28 @@ export default function ViewerLandingPage() {
       setLoading(false);
     }
   }, []);
+
+  // Fetch hero content preferences when hero content is loaded
+  useEffect(() => {
+    const fetchHeroPreferences = async () => {
+      if (!heroContent?.id) return;
+
+      try {
+        const response = await userPreferencesApi.getUserContentPreferences(heroContent.id);
+        if (response.success) {
+          setHeroPreferences(prev => ({
+            ...prev,
+            isLiked: response.data?.isLiked || false,
+            isInList: response.data?.isInList || false
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching hero preferences:', error);
+      }
+    };
+
+    fetchHeroPreferences();
+  }, [heroContent]);
 
   useEffect(() => {
     fetchContentData();
@@ -242,16 +276,67 @@ export default function ViewerLandingPage() {
 
   const handleAddToLibrary = useCallback(async (content, e) => {
     e?.stopPropagation();
-    console.log('Added to library:', content.title);
-  }, []);
+    
+    if (!content?.id) return;
+
+    try {
+      const action = heroPreferences.isInList ? 'remove' : 'add';
+      const response = await userPreferencesApi.toggleWatchlist(content.id, action);
+
+      if (response.success) {
+        const newInListState = !heroPreferences.isInList;
+        setHeroPreferences(prev => ({
+          ...prev,
+          isInList: newInListState
+        }));
+        console.log(`Successfully ${action === 'add' ? 'added to' : 'removed from'} watchlist`);
+      }
+    } catch (error) {
+      console.error('Error updating watchlist:', error);
+    }
+  }, [heroPreferences.isInList]);
+
+  const handleLikeContent = useCallback(async (content, e) => {
+    e?.stopPropagation();
+    
+    if (!content?.id) return;
+
+    try {
+      const action = heroPreferences.isLiked ? 'unlike' : 'like';
+      const response = await userPreferencesApi.toggleLike(content.id, action);
+
+      if (response.success) {
+        const newLikedState = !heroPreferences.isLiked;
+        setHeroPreferences(prev => ({
+          ...prev,
+          isLiked: newLikedState
+        }));
+        console.log(`Successfully ${action}d content`);
+      }
+    } catch (error) {
+      console.error('Error updating like:', error);
+    }
+  }, [heroPreferences.isLiked]);
 
   const handleMoreInfo = useCallback((content, cardRect) => {
+    // Use the hook to open detail page with positioning
     openDetailModal(content, cardRect);
   }, [openDetailModal]);
 
   const handleExploreMore = useCallback((section) => {
     console.log('Explore more:', section);
   }, []);
+
+  // If detail modal is open, show the ContentDetailPage instead of landing page
+  if (detailModal.isOpen) {
+    return (
+      <ContentDetailPage 
+        content={detailModal.content}
+        onPlay={handlePlayContent}
+        onAddToList={handleAddToLibrary}
+      />
+    );
+  }
 
   // Responsive Skeleton Loading Components
   const HeroSkeleton = () => (
@@ -612,10 +697,40 @@ export default function ViewerLandingPage() {
 
                   <button
                     onClick={(e) => handleAddToLibrary(heroContent, e)}
-                    className="flex items-center gap-2 bg-gray-600/90 hover:bg-gray-500/90 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 border border-gray-500 backdrop-blur-sm"
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 border backdrop-blur-sm ${
+                      heroPreferences.isInList
+                        ? 'bg-[#BC8BBC] hover:bg-[#a56ba5] text-white border-[#BC8BBC]'
+                        : 'bg-gray-600/90 hover:bg-gray-500/90 text-white border-gray-500'
+                    }`}
                   >
-                    <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="hidden sm:inline">My List</span>
+                    {heroPreferences.loading.watchlist ? (
+                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                    ) : heroPreferences.isInList ? (
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                    ) : (
+                      <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                    )}
+                    <span className="hidden sm:inline">
+                      {heroPreferences.isInList ? 'In List' : 'My List'}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={(e) => handleLikeContent(heroContent, e)}
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 border backdrop-blur-sm ${
+                      heroPreferences.isLiked
+                        ? 'bg-red-500 hover:bg-red-600 text-white border-red-500'
+                        : 'bg-gray-600/90 hover:bg-gray-500/90 text-white border-gray-500'
+                    }`}
+                  >
+                    {heroPreferences.loading.like ? (
+                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                    ) : (
+                      <Heart className={`w-3 h-3 sm:w-4 sm:h-4 ${heroPreferences.isLiked ? 'fill-current' : ''}`} />
+                    )}
+                    <span className="hidden sm:inline">
+                      {heroPreferences.isLiked ? 'Liked' : 'Like'}
+                    </span>
                   </button>
 
                   <button
@@ -681,14 +796,6 @@ export default function ViewerLandingPage() {
           )}
         </div>
       </div>
-      <ContentDetailModal
-        content={detailModal.content}
-        isOpen={detailModal.isOpen}
-        position={detailModal.position}
-        onClose={closeDetailModal}
-        onPlay={handlePlayContent}
-        onAddToList={handleAddToLibrary}
-      />
     </div>
   );
 }
