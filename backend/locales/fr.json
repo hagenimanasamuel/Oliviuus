@@ -1,0 +1,45 @@
+{
+  "emailVerification": {
+    "verification_subject": "Vérifiez Votre Adresse Email",
+    "verification_body": "Veuillez utiliser ce code pour vérifier votre compte: {{code}}",
+    "code_expires": "Ce code expire dans 10 minutes.",
+    "security_notice_title": "Avis de Sécurité :",
+    "security_notice_li1": "Ne partagez jamais ce code",
+    "security_notice_li2": "Nous ne le demanderons jamais",
+    "security_notice_li3": "Ignorez si vous ne l’avez pas demandé"
+  },
+  "welcomeEmail": {
+    "subject": "Bienvenue sur Oliviuus 🎉",
+    "title": "Bonjour et Bienvenue !",
+    "body": "Votre compte a été créé avec succès. Vous pouvez maintenant explorer des films, séries et plus encore sur Oliviuus.",
+    "tip_title": "Astuces pour bien commencer :",
+    "tips": [
+      "Personnalisez vos préférences à tout moment dans votre profil",
+      "Vérifiez régulièrement vos emails pour les nouveautés"
+    ],
+    "closing": "Profitez de votre aventure avec Oliviuus !"
+  },
+  "passwordReset": {
+    "subject": "Réinitialisez votre mot de passe Oliviuus",
+    "title": "Demande de réinitialisation du mot de passe",
+    "body": "Nous avons reçu une demande de réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour continuer.",
+    "button_text": "Réinitialiser le mot de passe",
+    "expiry_notice": "Ce lien expirera dans 1 heure. Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail."
+  },
+  "accountCreated": {
+    "subject": "Votre compte Oliviuus est prêt",
+    "title": "Bienvenue sur Oliviuus!",
+    "body": "Votre compte a été créé avec succès. Cliquez sur le bouton ci-dessous pour définir votre mot de passe et commencer.",
+    "button_text": "Définir votre mot de passe",
+    "note": "Ce lien est valide pendant 1 heure. S'il expire, demandez un nouveau mot de passe."
+  },
+  "familyInvitation": {
+    "subject": "👨‍👩‍👧‍👦 Invitation Familiale de {{owner}}",
+    "title": "Vous êtes invité(e) à rejoindre un forfait familial !",
+    "body": "{{owner}} vous a invité(e) à rejoindre son forfait familial Oliviuus en tant que {{role}}. En acceptant cette invitation, vous aurez accès à tous les avantages de son abonnement.",
+    "button_text": "Accepter l’invitation familiale",
+    "note_title": "Qu’est-ce que cela signifie ?",
+    "note_body": "Vous pourrez regarder du contenu en utilisant l’abonnement familial. Votre historique et vos préférences resteront privés.",
+    "expiry_notice": "Cette invitation expirera dans 7 jours."
+  }
+}

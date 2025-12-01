@@ -1,0 +1,2191 @@
+{
+  "footer": {
+    "terms": "Masharti ya Huduma",
+    "privacy": "Sera ya Faragha",
+    "help": "Kituo cha Msaada",
+    "feedback": "Maoni",
+    "rights": "Haki zote zimehifadhiwa."
+  },
+  "notfound": {
+    "title": "Ukurasa Haupo",
+    "description": "Oops! Ukurasa unaotafuta haupo.",
+    "home_button": "Rudi Nyumbani"
+  },
+  "auth": {
+    "enter_email": "Tafadhali weka anuani yako ya barua pepe",
+    "enter_email_desc": "Weka barua pepe yako ili kuendelea",
+    "email_placeholder": "Anuani ya Barua Pepe",
+    "continue": "Endelea",
+    "welcome": "Karibu",
+    "email_exists": "Barua pepe ipo. Tafadhali weka nenosiri lako.",
+    "email_not_exists": "Barua pepe haipo. Tafadhali thibitisha barua pepe yako ili kuendelea.",
+    "server_error": "Kuna tatizo. Tafadhali jaribu tena.",
+    "login_title": "Ingia kwenye akaunti yako",
+    "signup_title": "Unda akaunti mpya",
+    "password_placeholder": "Weka nenosiri lako",
+    "enter_password": "Tafadhali weka nenosiri lako",
+    "forgot_password": "Umesahau nenosiri?",
+    "login": "Ingia",
+    "loading": "Inapakia...",
+    "reset_password": "Weka upya nenosiri",
+    "reset_link_confirm": "Unataka kutuma kiungo cha kuweka upya kwa",
+    "cancel": "Ghairi",
+    "send_reset_link": "Tuma Kiungo",
+    "sending": "Inatuma...",
+    "reset_link_sent": "Kiungo cha kuweka upya nenosiri kimetumwa kwa {{email}}",
+    "reset_link_error": "Imeshindikana kutuma kiungo. Tafadhali jaribu tena.",
+    "invalid_reset_link": "Kiungo cha kuweka upya nywila si sahihi.",
+    "password_mismatch": "Nywila hazilingani.",
+    "password_reset_success": "Nywila yako imefanikiwa kuwekwa upya!",
+    "new_password": "Nywila Mpya",
+    "confirm_password": "Thibitisha Nywila",
+    "reset_password_button": "Weka upya Nywila"
+  },
+  "verifyEmail": {
+    "code_required": "Nambari ya uthibitisho inahitajika",
+    "invalid_or_expired_code": "Nambari si sahihi au imekwisha muda wake",
+    "server_error": "Hitilafu imetokea kwenye seva. Tafadhali jaribu tena.",
+    "enter_code_desc": "Tafadhali ingiza nambari iliyotumwa kwenye barua pepe yako",
+    "code_placeholder": "Nambari ya Uthibitisho",
+    "loading": "Inathibitisha...",
+    "verify": "Thibitisha",
+    "not_received": "Hujapokea barua pepe?",
+    "resend_code": "Tuma tena msimbo",
+    "resend_in": "Tuma tena utapatikana baada ya sekunde {{seconds}}",
+    "resend_failed": "Imeshindikana kutuma msimbo wa uthibitisho tena. Tafadhali jaribu tena.",
+    "tips": "Hakikisha umeangalia folda ya Spam au Junk. Inaweza kuchukua dakika chache kufika."
+  },
+  "userInfo": {
+    "enter_details_desc": "Weka nenosiri thabiti kwa akaunti yako",
+    "password_placeholder": "Nenosiri",
+    "confirm_password_placeholder": "Thibitisha Nenosiri",
+    "continue": "Endelea",
+    "loading": "Inaendelea kuhifadhi...",
+    "disclaimer_before": "Kwa kujisajili au kuunda akaunti unakubaliana na",
+    "terms": "Masharti & Masharti",
+    "and": "na",
+    "privacy": "Sera ya Faragha",
+    "server_error": "Kosa la seva, tafadhali jaribu tena",
+    "password_required": "Nenosiri linahitajika",
+    "password_length": "Nenosiri lazima liwe kati ya herufi 8-24",
+    "password_uppercase": "Nenosiri lazima liwe na herufi kubwa",
+    "password_lowercase": "Nenosiri lazima liwe na herufi ndogo",
+    "password_number": "Nenosiri lazima liwe na namba",
+    "password_special": "Nenosiri lazima liwe na alama maalum",
+    "passwords_mismatch": "Manenosiri hayalingani"
+  },
+  "preferences": {
+    "language": "Lugha",
+    "lang_rw": "Kinyarwanda",
+    "lang_en": "Kiingereza(English)",
+    "lang_fr": "Kifaransa(French)",
+    "lang_sw": "Kiswahili",
+    "notifications": "Ruhusu Arifa",
+    "subtitles": "Wezesha Manukuu Kiotomatiki",
+    "genres": "Aina unazopendelea",
+    "save": "Hifadhi Mapendeleo",
+    "saving": "Inahifadhiwa...",
+    "update_success": "Mapendeleo yamehifadhiwa kwa mafanikio!",
+    "update_error": "Imeshindikana kuhifadhi mapendeleo."
+  },
+  "genres": {
+    "comedy": "Vichekesho",
+    "drama": "Tamthilia",
+    "action": "Mapigano",
+    "romance": "Mapenzi",
+    "horror": "Ya Kutisha",
+    "documentary": "Hati",
+    "animation": "Uchoraji"
+  },
+  "settings": {
+    "title": "Mipangilio ya Akaunti",
+    "back": "Rudi Nyuma",
+    "loading": "Inapakia...",
+    "more": "Zaidi",
+    "tabs": {
+      "account": "Taarifa za Akaunti",
+      "security": "Usalama",
+      "preferences": "Mapendeleo",
+      "sessions": "Vipindi Vinavyoendelea",
+      "subscription": "Usajili",
+      "profiles": "Familia / Profaili",
+      "parental": "Udhibiti wa Wazazi",
+      "family_invitations": "Mialiko ya Familia"
+    }
+  },
+  "accountInfo": {
+    "avatarAlt": "Picha ya mtumiaji",
+    "changeAvatar": "Badilisha Picha ya Profaili",
+    "close": "Funga",
+    "categories": {
+      "People": "Watu",
+      "Animals": "Wanyama",
+      "Fantasy": "Hadithi za Kubuni",
+      "Abstract": "Sanaa ya Kufikirika"
+    },
+    "email": "Barua pepe",
+    "save": "Hifadhi Mabadiliko",
+    "saving": "Inahifadhiwa...",
+    "success": "Taarifa za akaunti zimehifadhiwa kwa mafanikio!",
+    "error": "Imeshindikana kuhifadhi taarifa za akaunti."
+  },
+  "sessions": {
+    "logoutSuccess": "Kikao kimetolewa kwa mafanikio.",
+    "logoutFail": "Imeshindikana kutoa kikao hiki.",
+    "logoutAllSuccess": "Vikao vingine vyote vimetolewa kwa mafanikio.",
+    "logoutAllFail": "Imeshindikana kutoa vikao vingine.",
+    "noActive": "Hakuna vikao vinavyoendelea.",
+    "logoutAll": "Toa vikao vingine vyote",
+    "loggingOut": "Inatoka...",
+    "current": "Kikao cha sasa",
+    "ip": "IP",
+    "location": "Mahali",
+    "login": "Kuingia",
+    "logout": "Kutoka",
+    "status": "Hali",
+    "active": "Hai",
+    "loggedOut": "Imetolewa",
+    "unknown": "Haijulikani"
+  },
+  "sidebar": {
+    "overview": "Muhtasari",
+    "users": "Watumiaji",
+    "library": "Maktaba",
+    "subscriptions": "Usajili",
+    "analytics": "Uchambuzi",
+    "globalManagement": "Usimamizi wa Dunia",
+    "support": "Msaada"
+  },
+  "usersHeader": {
+    "allUsers": "Watumiaji Wote",
+    "filtered": "wamechujwa",
+    "searchPlaceholder": "Tafuta watumiaji kwa barua pepe au jukumu...",
+    "refresh": "Onyesha upya watumiaji",
+    "bulkActions": "Vitendo vya Pamoja ({{count}})",
+    "activateSelected": "Washa Waliyochaguliwa",
+    "deactivateSelected": "Zima Waliyochaguliwa",
+    "deleteSelected": "Futa Waliyochaguliwa",
+    "export": "Hamisha",
+    "addUser": "Ongeza Mtumiaji",
+    "filters": "Vichujio",
+    "allRoles": "Majukumu Yote",
+    "roles": {
+      "admin": "Msimamizi",
+      "viewer": "Mtazamaji",
+      "moderator": "Msimamizi",
+      "editor": "Mhariri"
+    },
+    "allStatus": "Hali Zote",
+    "status": {
+      "active": "Hai",
+      "inactive": "Haifanyi kazi",
+      "suspended": "Imesimamishwa",
+      "pending": "Inasubiri"
+    },
+    "lastLogin": "Kuingia Mara ya Mwisho",
+    "lastLoginOptions": {
+      "today": "Leo",
+      "week": "Wiki Hii",
+      "month": "Mwezi Huu",
+      "quarter": "Robo Hii",
+      "year": "Mwaka Huu",
+      "never": "Hajawahi Kuingia"
+    },
+    "advanced": "Ya Juu",
+    "clearAll": "Futa Vyote",
+    "sortBy": "Panga kwa:",
+    "sort": {
+      "newest": "Mpya Zaidi",
+      "oldest": "Ya Kale Zaidi",
+      "emailAsc": "Barua Pepe (A → Z)",
+      "emailDesc": "Barua Pepe (Z → A)",
+      "role": "Jukumu",
+      "lastLogin": "Kuingia Mara ya Mwisho"
+    },
+    "registrationDate": "Tarehe ya Usajili",
+    "clearAdvanced": "Futa Ya Juu"
+  },
+  "usersTabs": {
+    "allUsers": "Watumiaji Wote",
+    "rolesPermissions": "Majukumu na Ruhusa",
+    "specials": "Maalum",
+    "familyPlan": "Mpango wa Familia",
+    "more": "Zaidi"
+  },
+  "passwordSettings": {
+    "currentPassword": "Nenosiri la sasa",
+    "currentPasswordPlaceholder": "Weka nenosiri lako la sasa",
+    "forgotCurrent": "Umesahau nenosiri lako la sasa?",
+    "requestReset": "Omba kiungo cha kuweka upya",
+    "newPassword": "Nenosiri jipya",
+    "newPasswordPlaceholder": "Weka nenosiri jipya",
+    "newPasswordHelp": "Lazima liwe na herufi 8+, herufi kubwa, herufi ndogo, namba & alama",
+    "confirmPassword": "Thibitisha nenosiri jipya",
+    "confirmPasswordPlaceholder": "Thibitisha nenosiri jipya",
+    "update": "Sasisha nenosiri",
+    "saving": "Inahifadhiwa...",
+    "errorPasswordsMismatch": "Manenosiri hayalingani",
+    "errorPasswordCriteria": "Nenosiri lazima liwe na herufi 8+, herufi kubwa, herufi ndogo, namba & alama.",
+    "errorCurrentRequired": "Nenosiri la sasa linahitajika.",
+    "successUpdate": "Nenosiri limesasishwa kwa mafanikio!",
+    "errorUpdate": "Haikuweza kusasisha nenosiri.",
+    "sendingReset": "Inatuma kiungo cha kuweka upya...",
+    "resetSent": "Kiungo cha kuweka upya nenosiri kimetumwa kwa barua pepe yako.",
+    "resetFailed": "Haikuweza kutuma kiungo cha kuweka upya."
+  },
+  "criticalActions": {
+    "warning": "Attention : Actions critiques du compte",
+    "deactivate": "Désactiver le compte",
+    "delete": "Supprimer le compte",
+    "processing": "Traitement...",
+    "info": "La désactivation désactivera temporairement votre compte. La suppression supprimera définitivement toutes les données.",
+    "confirm": "Êtes-vous sûr de vouloir {{action}} votre compte ? Cette action est irréversible.",
+    "deleteSuccess": "Compte supprimé avec succès.",
+    "deactivateSuccess": "Compte désactivé avec succès.",
+    "actionFailed": "Échec de l'action."
+  },
+  "securitySettings": {
+    "title": "Mipangilio ya Usalama",
+    "tabs": {
+      "password": "Neno la siri",
+      "critical": "Vitendo Hatari"
+    },
+    "more": "Zaidi"
+  },
+  "userForm": {
+    "title": "Tuma Mwombaji",
+    "subtitle": "Tuma mwaliko kujiunga na jukwaa",
+    "fields": {
+      "email": "Barua pepe",
+      "role": "Kazi",
+      "language": "Lugha",
+      "sendInvitation": "Tuma barua pepe ya mwaliko"
+    },
+    "roles": {
+      "admin": "Msimamizi",
+      "viewer": "Mchunguzi"
+    },
+    "languages": {
+      "en": "Kiingereza",
+      "rw": "Kinyarwanda",
+      "fr": "Kifaransa",
+      "sw": "Kiswahili"
+    },
+    "buttons": {
+      "cancel": "Ghairi",
+      "sendInvitation": "Tuma Mwaliko",
+      "createUser": "Unda Mtumiaji"
+    },
+    "alerts": {
+      "emailRequired": "Barua pepe inahitajika",
+      "emailInvalid": "Tafadhali ingiza barua pepe halali",
+      "roleRequired": "Chagua kazi ya mtumiaji",
+      "languageRequired": "Chagua lugha ya mtumiaji",
+      "successInvitation": "Mtumiaji ameundwa kwa mafanikio! Barua pepe ya kuweka nenosiri imekutumwa.",
+      "successManual": "Mtumiaji ameundwa kwa mafanikio! Unaweza kutuma mwaliko baadaye.",
+      "failed": "Imeshindikana kuunda mtumiaji. Tafadhali jaribu tena."
+    }
+  },
+  "users": {
+    "pageTitle": "Usimamizi wa Watumiaji"
+  },
+  "userModal": {
+    "tabs": {
+      "overview": "Muhtasari",
+      "activity": "Shughuli",
+      "subscription": "Usajili",
+      "security": "Usalama",
+      "securityLogs": "Funguo za Usalama",
+      "notifications": "Arifa & Barua pepe"
+    },
+    "status": {
+      "active": "Inatumika",
+      "inactive": "Haitumiki",
+      "suspended": "Imesitishwa",
+      "banned": "Imepigwa Marufuku"
+    },
+    "roles": {
+      "admin": "Msimamizi",
+      "moderator": "Mratibu",
+      "viewer": "Mtazamaji",
+      "user": "Mtumiaji"
+    },
+    "actions": {
+      "editEmail": "Hariri Barua Pepe",
+      "save": "Hifadhi",
+      "cancel": "Ghairi",
+      "makeAdmin": "Fanya Msimamizi",
+      "makeViewer": "Fanya Mtazamaji",
+      "activate": "Amilisha",
+      "deactivate": "Zima",
+      "loginHistory": "Historia",
+      "delete": "Futa",
+      "more": "Zaidi"
+    },
+    "confirmation": {
+      "changeRole": "Badilisha jukumu la {{email}} kuwa {{role}}?",
+      "deleteAccount": "Una hakika unataka kufuta akaunti ya {{email}}?",
+      "processing": "Inachakata..."
+    },
+    "errors": {
+      "updateRole": "Imeshindwa kusasisha jukumu la mtumiaji",
+      "updateStatus": "Imeshindwa kusasisha hali ya mtumiaji",
+      "deleteUser": "Imeshindwa kufuta akaunti ya mtumiaji",
+      "updateEmail": "Imeshindwa kusasisha barua pepe",
+      "networkError": "Hitilafu ya mtandao. Tafadhali angalia seva.",
+      "sameEmail": "Barua pepe mpya ni sawa na ile ya sasa.",
+      "invalidEmail": "Tafadhali ingiza anwani halali ya barua pepe."
+    },
+    "prompts": {
+      "enterNewEmail": "Ingiza barua pepe mpya:"
+    },
+    "success": {
+      "emailUpdated": "Barua pepe imesasishwa kwa mafanikio!"
+    }
+  },
+  "overviewTab": {
+    "title": "Taarifa za Mtumiaji",
+    "activitySummary": "Muhtasari wa Shughuli",
+    "status": "Hali",
+    "plan": "Mpango",
+    "memberSince": "Mwanachama Tangu",
+    "lastLogin": "Ingia Mwisho",
+    "language": "Lugha",
+    "emailVerified": "Barua Pepe Imethibitishwa",
+    "lastIp": "IP ya Mwisho",
+    "verified": "Imethibitishwa",
+    "pending": "Inasubiri",
+    "stats": {
+      "totalLogins": "Kuingia Kwa Jumla",
+      "currentStreak": "Mfululizo wa Sasa",
+      "failedLogins": "Kushindwa Kuingia",
+      "avgSession": "Kikao cha Wastani",
+      "todayLogins": "Kuingia Leo",
+      "thisWeek": "Wiki Hii",
+      "lastDevice": "Kifaa cha Mwisho",
+      "subscription": "Usajili",
+      "active": "Inatumika",
+      "inactive": "Haitumiki",
+      "avgSessionTime": "Muda wa Kikao cha Wastani",
+      "activeSessions": "Vikao Vinavyotumika",
+      "totalSessions": "Vikao Vyote"
+    },
+    "recentActivity": "Shughuli za Hivi Karibuni",
+    "subscriptionPlans": {
+      "premium": "Premium",
+      "enterprise": "Enterprise",
+      "standard": "Standard",
+      "basic": "Basic",
+      "free": "Bure"
+    },
+    "time": {
+      "today": "Leo",
+      "yesterday": "Jana",
+      "daysAgo": "Siku {{count}} zilizopita",
+      "weeksAgo": "Wiki {{count}} zilizopita",
+      "monthsAgo": "Miezi {{count}} iliyopita",
+      "yearsAgo": "Miaka {{count}} iliyopita",
+      "never": "Kamwe",
+      "unknown": "Haijulikani"
+    }
+  },
+  "activityTab": {
+    "title": "Historia ya Kuingia & Vikao",
+    "stats": {
+      "totalSessions": "Vikao Vyote",
+      "activeNow": "Vinatumika Sasa",
+      "completed": "Vimekamilika",
+      "lastLogin": "Ingia Mwisho"
+    },
+    "filters": {
+      "all": "Vikao Vyote",
+      "active": "Vinavyotumika Tu",
+      "completed": "Vimekamilika"
+    },
+    "actions": {
+      "refresh": "Onyesha Upya",
+      "logoutAll": "Toka Zote",
+      "terminate": "Maliza",
+      "terminateAllConfirm": "Una hakika unataka kumaliza vikao vyote vinavyotumika vya mtumiaji huyu?"
+    },
+    "session": {
+      "status": {
+        "active": "Inatumika",
+        "completed": "Imekamilika"
+      },
+      "deviceTypes": {
+        "mobile": "📱 Rununu",
+        "tablet": "📟 Tabuleti",
+        "desktop": "🖥️ Desktop",
+        "default": "💻 Kifaa"
+      },
+      "login": "Ingia",
+      "duration": "Muda",
+      "active": "Inatumika",
+      "justNow": "Sasa hivi",
+      "unknownLocation": "Eneo lisilojulikana"
+    },
+    "messages": {
+      "loading": "Inapakia vikao...",
+      "noSessions": "Hakuna historia ya kuingia iliyopatikana",
+      "noFilteredSessions": "Hakuna vikao {{filter}} vilivyopatikana",
+      "noSessionsYet": "Mtumiaji huyu hana vikao vya kuingia bado",
+      "terminateSuccess": "Kikao kimekomeshwa kikamilifu",
+      "terminateAllSuccess": "Vikao vyote vimekomeshwa kikamilifu",
+      "terminateError": "Imeshindwa kumaliza kikao",
+      "terminateAllError": "Imeshindwa kumaliza vikao vyote",
+      "permissionDenied": "Ruhusa imekataliwa: Huna ufikiaji wa kuona vikao vya mtumiaji"
+    },
+    "debug": {
+      "userId": "Kitambulisho cha Mtumiaji",
+      "sessionsLoaded": "Vikao vimepakuliwa",
+      "activeSessions": "vinavyotumika",
+      "filter": "Chujio",
+      "loading": "Inapakia"
+    }
+  },
+  "securityTab": {
+    "title": "Usalama",
+    "passwordManagement": "Usimamizi wa Nenosiri",
+    "sessionManagement": "Usimamizi wa Vikao",
+    "stats": {
+      "emailStatus": "Hali ya Barua Pepe",
+      "lastLogin": "Ingia Mwisho",
+      "pendingResets": "Kuweka Upya Kunasubiri",
+      "failedLogins": "Kushindwa Kuingia",
+      "verified": "Imethibitishwa",
+      "unverified": "Haijathibitishwa"
+    },
+    "passwordReset": {
+      "sendResetEmail": "Tuma Barua Pepe ya Kuweka Upya Nenosiri",
+      "sendResetEmailShort": "Tuma Barua Pepe ya Upya",
+      "description": "Mtumiaji atapokea kiungo cha kuweka upya katika lugha anayopendelea",
+      "sending": "Inatuma...",
+      "sendResetLink": "Tuma Kiungo cha Kuweka Upya",
+      "forceReset": "Lazimisha Kuweka Upya Nenosiri",
+      "forceDescription": "Weka nenosiri jipya mara moja (itamtoa katika vikao vyote)",
+      "newPassword": "Nenosiri Jipya",
+      "confirmPassword": "Thibitisha Nenosiri",
+      "enterNewPassword": "Weka nenosiri jipya",
+      "confirmNewPassword": "Thibitisha nenosiri jipya",
+      "resetting": "Inaweka upya...",
+      "resetPassword": "Weka Upya Nenosiri",
+      "confirmSendReset": "Tuma barua pepe ya kuweka upya nenosiri kwa {{email}}?",
+      "confirmForceReset": "Weka upya nenosiri kwa {{email}}? Hii itamtoa katika vikao vyote.",
+      "successResetSent": "Barua pepe ya kuweka upya nenosiri imetumwa kikamilifu!",
+      "successResetDone": "Nenosiri limewekwa upya kikamilifu! Mtumiaji atahitaji kutumia nenosiri hili jipya."
+    },
+    "sessions": {
+      "terminateAll": "Maliza Vikao Vyote Vinavyotumika",
+      "terminateAllShort": "Maliza Vikao",
+      "description": "Mtoe mtumiaji kwenye vifaa na vivinjari vyote",
+      "terminating": "Inamaliza...",
+      "logoutAll": "Toka Zote",
+      "confirmTerminate": "Maliza vikao vyote vinavyotumika vya {{email}}? Hii itamtoa kwenye vifaa vyote.",
+      "successTerminate": "Vikao vyote vimekomeshwa kikamilifu!",
+      "activeSessions": "Kikao {{count}} kinachotumika",
+      "activeSessions_plural": "Vikao {{count}} vinavyotumika"
+    },
+    "messages": {
+      "processing": "Inachakata...",
+      "enterPassword": "Tafadhali weka nenosiri jipya",
+      "passwordsMatch": "Nenosiri hazifanani",
+      "passwordLength": "Nenosiri lazima liwe na herufi 8 angalau",
+      "failedAction": "Imeshindwa {{action}}",
+      "failedSendReset": "Imeshindwa kutuma kuweka upya nenosiri",
+      "failedForceReset": "Imeshindwa kuweka upya nenosiri",
+      "failedTerminate": "Imeshindwa kumaliza vikao"
+    },
+    "time": {
+      "today": "Leo",
+      "yesterday": "Jana",
+      "daysAgo": "Siku {{count}} zilizopita",
+      "weeksAgo": "Wiki {{count}} zilizopita",
+      "monthsAgo": "Miezi {{count}} iliyopita",
+      "never": "Kamwe",
+      "unknown": "Haijulikani"
+    }
+  },
+  "usersList": {
+    "loading": "Inapakia...",
+    "emptyState": {
+      "title": "Hakuna watumiaji walipatikana",
+      "description": "Hakuna watumiaji wanaofanana na vigezo vyako."
+    },
+    "loadMore": "Pakia Watumiaji Zaidi"
+  },
+  "subscriptionPage": {
+    "title": "Chagua Mpango Wako",
+    "subtitle": "Ucheze video bila kikomo. Hakuna masharti. Futa wakati wowote.",
+    "pricesIn": "Bei katika",
+    "convertedFromRWF": "imebadilishwa kutoka RWF",
+    "fetchError": "Imeshindwa kupakia mipango",
+    "noPlans": "Hakuna mipango iliyopo",
+    "checkBackLater": "Tafadhali angalia tena baadaye kwa mipango iliyopo",
+    "selectPlan": "Chagua Mpango",
+    "processing": "Inafanyiwa usindikaji...",
+    "mostPopular": "INAPENDWA ZAIDI",
+    "serverError": "Hitilafu ya seva. Tafadhali jaribu tena.",
+    "selectError": "Imeshindwa kuchagua mpango. Tafadhali jaribu tena.",
+    "loading": "Inapakia mipango ya usajili...",
+    "comparePlans": "Linganisheni Mipango",
+    "compareSubtitle": "Pata mpango bora kwa mahitaji yako ya burudani",
+    "perMonth": "/kila mwezi",
+    "device": "Kifaa",
+    "devices": "Vifaa",
+    "perfectFor": "Bora kwa",
+    "moreFeatures": "vipengele zaidi",
+    "getPlan": "Pata {{plan}}",
+    "watchOn": "Angalia kwenye {count} {devices} kwa wakati mmoja",
+    "videoQuality": "ubora wa video",
+    "unlimitedDownloads": "Pakua bila kikomo kwa kutazama bila mtandao",
+    "downloadLimit": "Pakua vipengele {count} kwa kutazama bila mtandao",
+    "simultaneousDownloads": "{count} pakua kwa wakati mmoja",
+    "downloadExpiry": "Upakuaji unakwisha baada ya siku {days}",
+    "noDownloads": "Hakuna upakuaji uliopo",
+    "hdrSupport": "HDR inasaidia picha za juu",
+    "adFree": "Uchezaji bila matangazo",
+    "fullLibrary": "Pata maktaba yote ya maudhui",
+    "prioritySupport": "Usaidizi wa wateja wa kipaumbele",
+    "parentalControls": "Udhibiti wa wazazi kwa usalama wa familia",
+    "quality": {
+      "SD": "SD (480p)",
+      "HD": "HD (720p)",
+      "FHD": "Full HD (1080p)",
+      "UHD": "4K Ultra HD"
+    },
+    "plans": {
+      "mobile": {
+        "title": "Mpango wa Simu",
+        "tagline": "Burudani ukiwa safarini",
+        "description": "Bora kwa watumiaji wa simu wanaotaka ufikiaji wa Oliviuus kwa kifaa kimoja kwa gharama nafuu.",
+        "idealFor": "Watu wanaotaka kutumia simu pekee"
+      },
+      "basic": {
+        "title": "Mpango wa Msingi",
+        "tagline": "Dozi yako ya kila siku ya filamu na mfululizo",
+        "description": "Mpango wa Msingi unatoa ubora bora na urahisi kwa watazamaji wa kawaida.",
+        "idealFor": "Wapenzi au washirika wanaoshiriki skrini"
+      },
+      "standard": {
+        "title": "Mpango wa Kawaida",
+        "tagline": "Boresha uzoefu wako wa kutazama",
+        "description": "Sasisha hadi Mpango wa Kawaida kwa ubora bora na urahisi wa vifaa vingi.",
+        "idealFor": "Familia ndogo au watumiaji wanaojali ubora"
+      },
+      "family": {
+        "title": "Mpango wa Familia",
+        "tagline": "Uzoefu kamili wa burudani wa familia",
+        "description": "Mpango wa Familia Premium unatoa kila kitu Oliviuus inatoa kwa ubora wa juu.",
+        "idealFor": "Familia zenye watazamaji wengi na vifaa"
+      }
+    },
+    "comparison": {
+      "features": "Vipengele",
+      "simultaneousStreams": "Vituo vya kutazama kwa wakati mmoja",
+      "videoQuality": "Ubora wa video",
+      "offlineDownloads": "Upakuaji bila mtandao",
+      "downloadLimit": "Kikomo cha kupakua",
+      "downloadQuality": "Ubora wa kupakua",
+      "hdrSupport": "Msaada wa HDR",
+      "parentalControls": "Udhibiti wa wazazi",
+      "supportedPlatforms": "Majukwaa yanayoungwa mkono",
+      "maxRegisteredDevices": "Idadi ya vifaa vilivyorekodiwa",
+      "simultaneousDownloads": "Upakuaji kwa wakati mmoja",
+      "downloadExpiry": "Muda wa kuisha kwa upakuaji",
+      "videoBitrate": "Video Bitrate",
+      "devices": "{count} {devices}",
+      "unlimited": "Bila kikomo",
+      "notAvailable": "Haipatikani",
+      "downloadItems": "{count} vipengele",
+      "platformsCount": "{count} majukwaa",
+      "allPlatforms": "Majukwaa yote",
+      "registeredDevices": "{count} vifaa",
+      "downloadsAtOnce": "{count} kwa wakati mmoja",
+      "expiryDays": "{days} siku",
+      "neverExpires": "Haikomi",
+      "mbps": "{value} Mbps",
+      "kbps": "{value} kbps"
+    },
+    "helpSection": {
+      "title": "Una matatizo na usajili wako?",
+      "checkStatus": "Angalia Hali ya Usajili Wako",
+      "contactSupport": "Wasiliana na Timu ya Usaidizi"
+    }
+  },
+  "profileMenu": {
+    "profileMenu": "Menyu ya Wasifu",
+    "profilePicture": "Picha ya wasifu",
+    "user": "Mtumiaji",
+    "activeAccount": "Akaunti inayotumika",
+    "signOut": "Toka",
+    "account": "Akaunti"
+  },
+  "faq": {
+    "title": "Maswali Yanayoulizwa Mara Kwa Mara",
+    "subtitle": "Pata majibu ya maswali ya kawaida kuhusu mipango yetu ya usajili",
+    "needMoreHelp": "Unahitaji usaidizi zaidi?",
+    "contactSupport": "Timu yetu ya usaidizi iko hapa kukusaidia na maswali yoyote ya ziada",
+    "contactUs": "Wasiliana na Usaidizi",
+    "canChangePlan": "Naweza kubadilisha mpango wangu baadaye?",
+    "changePlanAnswer": "Ndio, unaweza kuboresha au kupunguza mpango wako wakati wowote. Mabadiliko huanza kutumika mwanzoni mwa mzunguko wako unaofuata wa bili. Uboreshaji huhesabiwa kwa uwiano, wakati kupunguzwa kunatumika baada ya kipindi chako cha sasa cha bili kumalizika.",
+    "commitmentPeriod": "Je, kuna kipindi cha kujitolea?",
+    "commitmentAnswer": "Hapana, mipango yote ni ya mwezi hadi mwezi bila kujitolea kwa muda mrefu. Ghairi wakati wowote bila malipo. Usajili wako utabaki aktifu hadi mwisho wa kipindi chako cha sasa cha bili.",
+    "devicesSimultaneously": "Vifaa vingapi naweza kutumia wakati huo huo?",
+    "devicesAnswer": "Idadi ya mitiririko inayofanana inatofautiana kulingana na mpango. Tafadhali angalia viwango maalum vya kifaa kwa kila mpango kwenye jedwali letu la kulinganisha ili upate ule unaofaa zaidi mahitaji ya kaya yako.",
+    "discountsAvailable": "Je, unatoa punguzo kwa wanafunzi, jeshi, au upendwa?",
+    "discountsAnswer": "Ingawa hatuungi mkono punguzo la upendwa au maalum kwa sasa, tunafanya kazi kikamilifu kutekeleza programu kamili ya upendwa. Subiri taarifa za baadaye tunapoendelea kuboresha ofa zetu za usajili.",
+    "paymentMethods": "Je, unakubali njia gani za malipo?",
+    "paymentAnswer": "Tunakubali pesa za rununu (MTN, Airtel), kadi za mkopo/debit (Visa, MasterCard), na hamisha benki. Malipo yote ni salama na yamefichwa kwa ulinzi wako.",
+    "offlineViewing": "Je, naweza pakua maudhui kwa ajili ya kutazama nje ya mtandao?",
+    "offlineAnswer": "Upataji wa kupakua nje ya mtandao unategemea mpango uliochaguliwa. Tafadhali hakikisha kulinganisha kati ya mipango ili uone ni ipi inajumuisha uwezo wa kupakua na viwango vyake.",
+    "regionalAvailability": "Je, maudhui yanapatikana katika maeneo yote?",
+    "regionalAnswer": "Kutokana na makubaliano ya leseni, baadhi ya maudhui huenda yasipatikane katika maeneo yote. Katalogi yetu imeboreshwa kwa watu wa Afrika Mashariki mchanganyiko tajiri wa maudhui ya ndani na kimataifa.",
+    "cancelSubscription": "Je, ni jinsi gani ya kughairi usajili wangu?",
+    "cancelAnswer": "Unaweza kughairi wakati wowote kutoka kwenye mipangilio yako ya akaunti. Nenda kwenye 'Usajili' → 'Dhibiti Mpango' → 'Ghairi Usajili'. Ufikiaji wako utaendelea hadi mwisho wa kipindi chako cha sasa cha bili.",
+    "videoQuality": "Je, ni ubora gani wa video ninaweza kutarajia?",
+    "qualityAnswer": "Ubora wa video hutofautiana kulingana na mpango wa usajili, kuanzia ufafanuzi wa kawaida hadi 4K Ultra HD. Tafadhali rejea kulinganisha kwa mpango kwa ofa maalum za ubora zinazolingana na kila kiwango.",
+    "billingCycle": "Je, mzunguko wangu wa bili unaanza lini?",
+    "billingAnswer": "Mzunguko wako wa bili unaanza mara moja unaposajili na unarekebisha yenyewe kila siku 30. Utapokea arifa kabla ya kila marekebisho, na unaweza kughairi wakati wowote bila adhabu."
+  },
+  "contact": {
+    "contactUs": "Wasiliana Nasi",
+    "helpSubtitle": "Tuko hapa kukusaidia na maswali yoyote au wasiwasi",
+    "needHelp": "Unahitaji Usaidizi?",
+    "ctaDescription": "Timu yetu iko hapa kukusaidia na maswali yoyote, maoni, au wasiwasi. Tunafurahi kukusaidia!",
+    "getInTouch": "Wasiliana Nasi",
+    "emailSupport": "Usaidizi wa Barua Pepe",
+    "responseTime": "Jibu ndani ya masaa 2",
+    "phoneSupport": "Usaidizi wa Simu",
+    "phoneHours": "Jumapili-Jumamosi, saa 8 asubuhi-10 jioni",
+    "liveChat": "Mazungumzo ya Moja kwa Moja",
+    "available247": "Inapatikana masaa 24",
+    "instantSupport": "Usaidizi wa haraka",
+    "messageSent": "Ujumbe Umetumwa Kikamilifu!",
+    "thankYou": "Asante kwa kuwasiliana nasi. Tutawasiliana nawe hivi karibuni.",
+    "sendAnother": "Tuma ujumbe mwingine",
+    "fullName": "Jina Kamili",
+    "namePlaceholder": "Weka jina lako kamili",
+    "emailAddress": "Anwani ya Barua Pepe",
+    "emailPlaceholder": "Weka barua pepe yako",
+    "category": "Kategoria",
+    "selectCategory": "Chagua kategoria",
+    "subject": "Mada",
+    "subjectPlaceholder": "Mstari mfupi wa mada",
+    "message": "Ujumbe",
+    "messagePlaceholder": "Tuambie jinsi tunaweza kukusaidia...",
+    "sending": "Inatuma Ujumbe...",
+    "sendMessage": "Tuma Ujumbe",
+    "generalInquiry": "Uhoji wa Jumla",
+    "technicalSupport": "Usaidizi wa Kiufundi",
+    "billingQuestion": "Swali la Bili",
+    "featureRequest": "Ombi la Kipengele",
+    "bugReport": "Ripoti ya Hitilafu",
+    "partnership": "Ushirikiano",
+    "feedback": "Maoni & Mapendekezo",
+    "other": "Nyingine",
+    "title": "Usimamizi wa Mawasiliano",
+    "allContacts": "Mawasiliano Yote",
+    "submissionError": "Imeshindwa kutuma ujumbe. Tafadhali jaribu tena.",
+    "exportError": "Imeshindwa kusafirisha mawasiliano.",
+    "filters": {
+      "search": "Tafuta mawasiliano...",
+      "allStatus": "Hali Zote",
+      "allPriority": "Kipaumbele Zote",
+      "allCategories": "Kategoria Zote",
+      "filters": "Vichujio",
+      "sortBy": "Panga Kwa",
+      "newestFirst": "Mpya Zaidi Kwanza",
+      "lastUpdated": "Imesasishwa Mwisho",
+      "priority": "Kipaumbele",
+      "status": "Hali",
+      "advanced": "Zaidi",
+      "clearAll": "Futa Zote",
+      "dateRange": "Muda wa Tarehe",
+      "responseCount": "Idadi ya Majibu",
+      "source": "Chanzo",
+      "clearAdvanced": "Futa Zaidi",
+      "any": "Yoyote",
+      "noResponses": "Hakuna Majibu",
+      "responses1to3": "Majibu 1-3",
+      "responses4plus": "Majibu 4+",
+      "allSources": "Vyanzo Vyote",
+      "filtered": "imechujwa",
+      "from": "Kutoka",
+      "to": "Hadi",
+      "responses": "Majibu"
+    },
+    "status": {
+      "new": "Mpya",
+      "open": "Wazi",
+      "in_progress": "Inaendelea",
+      "awaiting_reply": "Inasubiri Jibu",
+      "resolved": "Imetatuliwa",
+      "closed": "Imefungwa"
+    },
+    "priority": {
+      "urgent": "Ya Haraka",
+      "high": "Ya Juu",
+      "medium": "Ya Wastani",
+      "low": "Ya Chini"
+    },
+    "category": {
+      "general": "Uhoji wa Jumla",
+      "technical": "Usaidizi wa Kiufundi",
+      "billing": "Swali la Bili",
+      "feature": "Ombi la Kipengele",
+      "bug_report": "Ripoti ya Hitilafu",
+      "partnership": "Ushirikiano",
+      "feedback": "Maoni & Mapendekezo",
+      "other": "Nyingine"
+    },
+    "stats": {
+      "totalContacts": "Jumla ya Mawasiliano",
+      "newContacts": "Mawasiliano Mapya",
+      "inProgress": "Inaendelea",
+      "resolved": "Yametatuliwa",
+      "responseRate": "Kiwango cha Majibu",
+      "resolutionRate": "Kiwango cha Utatuzi",
+      "avgResponseTime": "Muda wa Majibu",
+      "statusDistribution": "Usambazaji wa Hali",
+      "priorityOverview": "Muhtasari wa Kipaumbele",
+      "categoryBreakdown": "Mgawanyo wa Kategoria",
+      "performanceMetrics": "Vipimo vya Utendaji"
+    },
+    "settings": {
+      "refresh": "Onyesha upya",
+      "export": "Hamisha",
+      "title": "Mipangilio ya Mawasiliano",
+      "subtitle": "Dhibiti maelezo yako ya mawasiliano yanayoonyeshwa kwa watumiaji kwenye fomu ya mawasiliano",
+      "supportEmail": "Barua Pepe ya Usaidizi",
+      "emailPlaceholder": "support@oliviuus.com",
+      "emailDescription": "Barua pepe hii itaonyeshwa kwa watumiaji kwa maswali ya usaidizi",
+      "supportPhone": "Simu ya Usaidizi",
+      "phonePlaceholder": "+250 788 123 456",
+      "phoneDescription": "Nambari hii ya simu itaonyeshwa kwa watumiaji kwa simu za usaidizi",
+      "saveChanges": "Hifadhi Mabadiliko",
+      "saving": "Inahifadhi...",
+      "preview": "Hakiki",
+      "defaultEmail": "support@oliviuus.com",
+      "defaultPhone": "+250 788 123 456",
+      "loadError": "Imeshindwa kupakia maelezo ya mawasiliano",
+      "updateSuccess": "Maelezo ya mawasiliano yamesasishwa kikamilifu",
+      "updateError": "Imeshindwa kusasisha maelezo ya mawasiliano"
+    },
+    "list": {
+      "noContacts": "Hakuna mawasiliano yaliyopatikana",
+      "adjustFilters": "Jaribu kurekebisha vichujio au maneno ya utafutaji",
+      "loadMore": "Pakia Zaidi"
+    },
+    "time": {
+      "justNow": "Hivi punde",
+      "hoursAgo": "saa {{hours}} zilizopita",
+      "daysAgo": "siku {{days}} zilizopita"
+    },
+    "modal": {
+      "changeStatus": "Badilisha Hali",
+      "details": "Maelezo",
+      "conversation": "Mazungumzo",
+      "reply": "Jibu",
+      "contactInfo": "Maelezo ya Mawasiliano",
+      "technicalDetails": "Maelezo ya Kiufundi",
+      "submitted": "Iliyowasilishwa",
+      "lastResponse": "Jibu la Mwisho",
+      "source": "Chanzo",
+      "notAvailable": "Haipatikani",
+      "ipAddress": "Anwani ya IP",
+      "responses": "Majibu",
+      "firstRead": "Kusoma kwa Mara ya Kwanza",
+      "message": "Ujumbe",
+      "refresh": "Onyesha upya",
+      "supportTeam": "Timu ya Usaidizi",
+      "noResponses": "Hakuna majibu bado",
+      "sendFirstResponse": "Tuma jibu la kwanza kuanza mazungumzo",
+      "sendReply": "Tuma Jibu",
+      "originalMessage": "Ujumbe wa Asili",
+      "replyPlaceholder": "Andika jibu lako hapa...",
+      "cancel": "Ghairi",
+      "sending": "Inatumwa...",
+      "statusUpdateError": "Imeshindwa kusasisha hali ya mawasiliano",
+      "replySuccess": "Jibu limetumwa kikamilifu!",
+      "replyError": "Imeshindwa kutuma jibu",
+      "never": "Kamwe"
+    },
+    "categoryLabel": "Kategoria",
+    "priorityLabel": "Kipaumbele",
+    "statusLabel": "Hali",
+    "stats": {
+      "title": "Takwimu za Mawasiliano",
+      "subtitle": "Muhtasari kamili wa utendaji wako wa usimamizi wa mawasiliano",
+      "loading": "Inapakia takwimu...",
+      "failedToLoad": "Imeshindwa kupakia takwimu",
+      "tryAgain": "Jaribu Tena",
+      "refresh": "Onyesha upya",
+      "fromLastPeriod": "kutoka kipindi cha mwisho",
+      "totalContacts": "Jumla ya Mawasiliano",
+      "allTimeContacts": "Mawasiliano yote",
+      "responseRate": "Kiwango cha Majibu",
+      "respondedOfTotal": "{{responded}} kati ya {{total}} yamejibiwa",
+      "avgResponseTime": "Muda wa Majibu wa Wastani",
+      "acrossAllContacts": "Kwenye mawasiliano yote",
+      "resolutionRate": "Kiwango cha Ufumbuzi",
+      "resolvedContacts": "{{resolved}} yametatuliwa",
+      "statusDistribution": "Usambazaji wa Hali",
+      "priorityOverview": "Muhtasari wa Kipaumbele",
+      "categoryBreakdown": "Mgawanyo wa Kategoria",
+      "performanceMetrics": "Vipimo vya Utendaji",
+      "emailResponses": "Majibu ya Barua Pepe",
+      "totalSentReplies": "Jumla ya majibu yaliyotumwa",
+      "satisfactionRate": "Kiwango cha Kuridhika",
+      "estimatedFromResolutions": "Imekadiriwa kutoka kwa ufumbuzi",
+      "activeConversations": "Mazungumzo Yanayoendelea",
+      "currentlyInProgress": "Inaendelea sasa",
+      "newToday": "Mpya Leo",
+      "timeRanges": {
+        "all": "Muda Wote",
+        "today": "Leo",
+        "week": "Wiki Hii",
+        "month": "Mwezi Huu"
+      }
+    }
+  },
+  "contactAdmin": {
+    "tabs": {
+      "allContacts": "Mawasiliano Yote",
+      "statistics": "Takwimu",
+      "contactSettings": "Mipangilio ya Mawasiliano"
+    },
+    "more": "Zaidi",
+    "loading": "Inapakia..."
+  },
+  "seo": {
+    "siteName": "Oliviuus",
+    "defaultTitle": "Tazama Filamu & Vipindi Mtandaoni",
+    "defaultDescription": "Tazama filamu mpya na vipindi mtandaoni. Kutiririsha bila kikomo, mapendekezo binafsi, na maudhui rafiki kwa familia.",
+    "keywords": "filamu, vipindi, kutiririsha, video mtandaoni, burudani"
+  },
+  "actions": {
+    "play": "Cheza",
+    "stop": "Simamisha",
+    "trailer": "Trailer",
+    "mute": "Funga sauti",
+    "unmute": "Fungua sauti",
+    "viewAll": "Angalia Zote",
+    "swipeToBrowse": "Kwepa kutafuta →",
+    "tryAgain": "Jaribu Tena",
+    "inList": "Kwenye Orodha",
+    "myList": "Orodha Yangu",
+    "liked": "Nimeipenda",
+    "like": "Penda",
+    "details": "Maelezo"
+  },
+  "sections": {
+    "popularInRwanda": "Inayopendwa Rwanda",
+    "popularInRwandaSubtitle": "Vipendwa na watazamaji wengi wa Rwanda",
+    "trendingNow": "Inayopendelewa Sasa",
+    "trendingNowSubtitle": "Kinachotazamwa na kila mtu",
+    "newReleases": "Vipindi Vipya",
+    "newReleasesSubtitle": "Maudhui mapya yaliyoongezwa"
+  },
+  "errors": {
+    "contentLoad": "Kuna tatizo katika kupakia maudhui. Tafadhali jaribu tena hivi punde.",
+    "somethingWentWrong": "Kuna Kitu Kilienda Vibaya",
+    "error": "Hitilafu",
+    "noContent": "Hakuna maudhui",
+    "checkBackLater": "Rudi baadaye kuona vipya."
+  },
+  "ratings": {
+    "G": "Wote",
+    "PG": "PG",
+    "PG13": "13+",
+    "R": "18+",
+    "NC17": "18+"
+  },
+  "contentdetail": {
+    "seo": {
+      "siteName": "Oliviuus",
+      "defaultTitle": "Tazama Filamu & Vipindi",
+      "defaultDescription": "Tazama maudhui haya kwenye Oliviuus",
+      "keywords": "filamu, vipindi, kutiririsha"
+    },
+    "media": {
+      "trailers": "Trailers & Teasers",
+      "trailersDescription": "Tazama video za utangulizi na matangazo",
+      "behindScenes": "Nyuma ya Mazingira",
+      "behindScenesDescription": "Maudhui ya kipekee ya jinsi kilitengenezwa",
+      "posters": "Posta & Sanaa",
+      "postersDescription": "Posta rasmi na kazi za sanaa",
+      "photos": "Picha & Stills",
+      "photosDescription": "Picha za utayarishaji na skrini zilizopigwa",
+      "moviePoster": "Poster ya Filamu",
+      "mediaFrom": "{{category}} kutoka {{title}}",
+      "contentType": "Maudhui ya {{category}}",
+      "mediaFromTitle": "Media kutoka {{title}}",
+      "exclusiveContent": "Maudhui ya Kipekee ya {{category}}",
+      "mediaContent": "Maudhui ya Media"
+    },
+    "actions": {
+      "goHome": "Rudi Nyumbani",
+      "play": "Cheza",
+      "stop": "Simamisha",
+      "trailer": "Trailer",
+      "mute": "Funga sauti",
+      "unmute": "Fungua sauti",
+      "viewAll": "Angalia Zote",
+      "tryAgain": "Jaribu Tena",
+      "inList": "Kwenye Orodha",
+      "myList": "Orodha Yangu",
+      "liked": "Nimeipenda",
+      "like": "Penda",
+      "details": "Maelezo",
+      "share": "Sambaza",
+      "watchTrailer": "Tazama Trailer",
+      "addToList": "Ongeza kwenye Orodha",
+      "removeFromList": "Ondoa kwenye Orodha",
+      "goBack": "Rudi",
+      "playNow": "Cheza Sasa",
+      "fullscreen": "Skrini Kamili",
+      "unlike": "Ondoa upendo",
+      "stopTrailer": "Simamisha Trailer",
+      "browseAll": "Vinjari Vyote",
+      "browseAllContent": "Vinjari Maudhui Yote",
+      "watch": "Tazama",
+      "view": "Angalia",
+      "close": "Funga",
+      "exploreMore": "Gundua Zaidi",
+      "openFloatingTrailer": "Fungua Trela Inayoelea",
+      "goToHomepage": "Nenda kwenye Ukurasa wa Nyumbani"
+    },
+    "share": {
+      "title": "Shiriki maudhui haya",
+      "shareText": "Tazama \"{{title}}\"",
+      "copyLink": "Nakili Kiungo",
+      "moreOptions": "Chaguo Zaidi",
+      "shareOn": "Shiriki kwenye {{platform}}",
+      "platforms": {
+        "facebook": "Facebook",
+        "twitter": "Twitter",
+        "instagram": "Instagram",
+        "whatsapp": "WhatsApp",
+        "tiktok": "TikTok",
+        "telegram": "Telegram",
+        "email": "Barua pepe",
+        "sms": "SMS"
+      }
+    },
+    "sections": {
+      "synopsis": "Muhtasari",
+      "cast": "Wachezaji",
+      "crew": "Crew",
+      "details": "Maelezo",
+      "media": "Vyombo vya Habari",
+      "seasons": "Msimu",
+      "episodes": "Sehemu",
+      "similar": "Maudhui Yanayofanana",
+      "overview": "Muhtasari Mkuu",
+      "gallery": "Galeri & Ziada",
+      "findingSimilar": "Tunatafuta maudhui yanayofanana...",
+      "youMightAlsoLike": "Huenda ukapenda pia",
+      "movieDetails": "Maelezo ya Filamu",
+      "featuresCategories": "Vipengele & Aina",
+      "castAndCrew": "Waigizaji & Timu ya Uzalishaji",
+      "productionCrew": "Timu ya Uzalishaji",
+      "fullCastCrew": "Waigizaji & Timu Kamili"
+    },
+    "tabs": {
+      "overview": "Muhtasari",
+      "cast": "Wachezaji & Crew",
+      "details": "Maelezo",
+      "media": "Vyombo vya Habari",
+      "seasons": "Msimu",
+      "awards": "Tuzo",
+      "similar": "Yanayofanana"
+    },
+    "metadata": {
+      "rating": "Uhakikisho wa Umri",
+      "duration": "Muda",
+      "ageRating": "Umri Unaofaa",
+      "releaseDate": "Tarehe ya Kutolewa",
+      "contentType": "Aina",
+      "originalLanguage": "Lugha Asili",
+      "director": "Mkurugenzi",
+      "categories": "Aina",
+      "genres": "Jamii",
+      "seasonsCount": "Msimu",
+      "episodesCount": "Sehemu",
+      "notAvailable": "N/A",
+      "durationHours": "{{hours}}h {{mins}}m",
+      "durationMinutes": "{{mins}}m",
+      "views": "Maoni {{count}}",
+      "series": "Mfululizo",
+      "movie": "Filamu",
+      "documentary": "Makala",
+      "content": "Maudhui",
+      "itemsCount": "Vitu {{count}}",
+      "contentWarnings": "Tahadhari za Maudhui",
+      "availableLanguages": "Lugha Zinazopatikana",
+      "default": "Chaguo-Msingi",
+      "seasons": "Msimu",
+      "tvSeries": "Mfululizo wa TV",
+      "seasonsSingular": "Msimu {{count}}",
+      "seasonsPlural": "Msimu {{count}}",
+      "episodesPerSeason": "Sehemu {{count}} kwa kila msimu"
+    },
+    "errors": {
+      "contentNotFound": "Maudhui Hayapatikani",
+      "error": "Hitilafu",
+      "somethingWentWrong": "Kitu kimeenda vibaya",
+      "noContent": "Hakuna maudhui",
+      "checkBackLater": "Rudi baadaye kwa maudhui mapya.",
+      "failedToLoad": "Imeshindikana kupakia maudhui",
+      "failedToRemove": "Imeshindikana kuondoa kwenye orodha",
+      "failedToAdd": "Imeshindikana kuongeza kwenye orodha",
+      "failedToUnlike": "Imeshindikana kuondoa upendo",
+      "failedToLike": "Imeshindikana kupenda maudhui",
+      "unableToLoad": "Haiwezekani kupakia maudhui",
+      "noSimilarContent": "Hakuna maudhui yanayofanana yaliyopatikana",
+      "noContentAvailable": "Hakuna Maudhui",
+      "videoNotAvailable": "Video Haipatikani",
+      "imageNotAvailable": "Picha Haipatikani",
+      "noCastInfo": "Hakuna taarifa za waigizaji",
+      "noCrewInfo": "Hakuna taarifa za timu ya uzalishaji"
+    },
+    "roles": {
+      "director": "Mkurugenzi",
+      "producer": "Mtayarishaji",
+      "writer": "Mwandishi",
+      "cinematographer": "Mpiga Picha za Filamu",
+      "composer": "Mtunzi wa Muziki",
+      "editor": "Mhariri"
+    },
+    "creditTypes": {
+      "supporting": "Msaidizi",
+      "lead": "Kiongozi",
+      "guest": "Mgeni",
+      "cameo": "Cameo"
+    },
+    "messages": {
+      "linkCopied": "Kiungo kimekopiwa kwa mafanikio!",
+      "addedToList": "Imeongezwa kwenye orodha yako",
+      "removedFromList": "Imeondolewa kwenye orodha yako",
+      "contentLiked": "Maudhui yamependwa",
+      "contentUnliked": "Kuondoa pendwa kumefanyika",
+      "addingMoreContent": "Tunafanya kazi kuongeza maudhui zaidi yanayolingana na mapendeleo yako.",
+      "discoverExclusive": "Gundua maudhui ya kipekee kutoka {{title}}",
+      "checkBackLater": "Rudi baadaye kwa maudhui ya kipekee ya {{category}}.",
+      "discoverAllExclusive": "Gundua maudhui yote ya kipekee ya {{title}}",
+      "noDescription": "Hakuna maelezo yaliyopo.",
+      "meetTheTeam": "Kutana na watu wenye vipaji walioleta {{title}}",
+      "talentedActors": "Waigizaji {{count}} wenye vipaji",
+      "asCharacter": "kama",
+      "creativeMinds": "Watu wabunifu walio nyuma ya utengenezaji",
+      "exploreMore": "Gundua zaidi kuhusu watu wenye vipaji waliounda hadithi hii"
+    }
+  },
+  "viewerdashboardnavs": {
+    "navigation": {
+      "home": "Nyumbani",
+      "tvShows": "Vipindi vya TV",
+      "movies": "Filamu",
+      "newPopular": "Vipya & Maarufu",
+      "myList": "Orodha Yangu",
+      "browse": "Vinjari"
+    },
+    "settings": {
+      "title": "Mipangilio ya Akaunti",
+      "back": "Rudi nyuma",
+      "loading": "Inapakia...",
+      "more": "Zaidi",
+      "tabs": {
+        "account": "Akaunti",
+        "security": "Usalama",
+        "preferences": "Mapendeleo",
+        "sessions": "Vikako",
+        "subscription": "Usajili",
+        "profiles": "Profaili za Familia",
+        "parental": "Udhibiti wa Wazazi"
+      }
+    },
+    "header": {
+      "searchButton": "Tafuta",
+      "subscriptionAlert": {
+        "criticalTitle": "Usajili Umeisha!",
+        "expiringTitle": "Usajili Unakaribia Kwisha",
+        "criticalMessage": "Fanya upya sasa ili kuepuka kusitishwa kwa huduma",
+        "expiringMessage": "Fanya upya ili kuendelea kufikia huduma za premium",
+        "renewButton": "Fanya Upya Usajili"
+      }
+    }
+  },
+  "notification": {
+    "time": {
+      "justNow": "Sasa hivi",
+      "minutesAgo": "{{count}} dk zilizopita",
+      "hoursAgo": "{{count}} saa zilizopita",
+      "daysAgo": "{{count}} siku zilizopita"
+    },
+    "status": {
+      "read": "Imesomwa",
+      "new": "Mpya"
+    },
+    "dropdown": {
+      "title": "Arifa",
+      "unreadCount": "{{count}} hazijasomwa",
+      "allCaughtUp": "Uko sawa kabisa!",
+      "refresh": "Pakia upya",
+      "loading": "Inapakia arifa...",
+      "connectionIssue": "Tatizo la muunganisho",
+      "unableToLoad": "Imeshindwa kupakia arifa",
+      "tryAgain": "Jaribu tena",
+      "noNotifications": "Hakuna arifa",
+      "allCaughtUpMessage": "Umemaliza zote!",
+      "viewAll": "Tazama Arifa Zote"
+    },
+    "modal": {
+      "title": "Arifa",
+      "subtitle": "Endelea kufahamu shughuli zako za karibuni",
+      "loading": "Inapakia arifa zako...",
+      "noNotifications": "Hakuna arifa bado",
+      "allCaughtUp": "Umefika mwisho! Tutakuarifu kutakapokuwa na jipya.",
+      "actions": {
+        "refresh": "Pakia arifa upya",
+        "markAllRead": "Weka zote kuwa zimesomwa",
+        "close": "Funga",
+        "retrying": "Inajaribu tena...",
+        "tryAgain": "Jaribu tena"
+      },
+      "sections": {
+        "unread": "Hazijasomwa",
+        "read": "Zimesomwa"
+      },
+      "footer": {
+        "total": "Jumla: {{count}} arifa",
+        "unread": "{{count}} hazijasomwa",
+        "read": "{{count}} zimesomwa"
+      },
+      "errors": {
+        "failedToLoadCount": "Imeshindwa kupakia idadi ya arifa",
+        "failedToLoad": "Imeshindwa kupakia arifa",
+        "failedToLoadTitle": "Imeshindwa kupakia arifa"
+      }
+    }
+  },
+  "search": {
+    "modal": {
+      "title": "Tafuta Maktaba",
+      "subtitle": "Gundua maudhui bora",
+      "inputPlaceholder": "Ungependa kutazama nini leo?",
+      "instructions": {
+        "tryExamples": "Jaribu: \"filamu za action\" au \"vipindi vya comedy\"",
+        "voiceSearch": "Alt+V kwa utafutaji wa sauti",
+        "highContrast": "Washa/Zima high contrast"
+      },
+      "quickSearches": {
+        "title": "Utafutaji wa Haraka",
+        "actionMovies": "Filamu za Action",
+        "comedyShows": "Vipindi vya Comedy",
+        "newReleases": "Matoleo Mapya",
+        "topRated": "Zilizokadiriwa Juu",
+        "dramaSeries": "Series za Drama",
+        "familyMovies": "Filamu za Familia"
+      },
+      "popularSearches": {
+        "title": "Utafutaji Maarufu",
+        "items": [
+          "Action Movies 2024",
+          "Comedy Shows",
+          "New Releases",
+          "Trending Now",
+          "Family Movies",
+          "Drama Series",
+          "Romantic Movies",
+          "Sci-Fi"
+        ]
+      },
+      "results": {
+        "searching": "Inatafuta...",
+        "resultsFor": "Matokeo ya \"{{query}}\"",
+        "found": "{{count}} zimepatikana",
+        "noResults": "Hakuna matokeo",
+        "noResultsMessage": "Jaribu maneno tofauti au tazama mapendekezo yetu hapa chini",
+        "suggestionsTitle": "Jaribu utafutaji huu:",
+        "relatedContentTitle": "Unaweza pia kupenda haya:"
+      },
+      "errors": {
+        "searchFailed": "Utafutaji Umeshindwa",
+        "tryAgain": "Jaribu Tena"
+      },
+      "footer": {
+        "pressEsc": "Bonyeza ESC kufunga",
+        "navigate": "↑↓ kwa kusogeza",
+        "select": "Enter kuchagua",
+        "voiceSearch": "Alt+V kwa utafutaji wa sauti",
+        "voiceAvailable": "Utafutaji wa sauti unapatikana"
+      },
+      "actions": {
+        "close": "Funga",
+        "showHelp": "Onyesha msaada",
+        "highContrast": "Badili high contrast",
+        "voiceSearch": "Utafutaji wa sauti",
+        "stopVoice": "Sitisha utafutaji wa sauti"
+      }
+    }
+  },
+  "profile": {
+    "dropdown": {
+      "toggle": "Badili menyu ya profaili",
+      "avatarAlt": "Picha ya profaili ya mtumiaji",
+      "welcome": "Karibu",
+      "library": {
+        "title": "Maktaba Yako",
+        "downloads": "Vipakuliwa",
+        "myList": "Orodha Yangu",
+        "continueWatching": "Historia",
+        "topPicks": "Mapendekezo Bora"
+      },
+      "accountSettings": "Akaunti & Mipangilio",
+      "signOut": "Toka",
+      "companyName": "Oliviuus Ltd",
+      "footer": {
+        "privacy": "Faragha",
+        "terms": "Masharti",
+        "help": "Msaada"
+      }
+    }
+  },
+  "browse": {
+    "title": "Vinjari Maudhui",
+    "subtitle": "Gundua mkusanyiko wetu",
+    "emptyState": {
+      "title": "Inakuja Hivi Karibuni",
+      "message": "Maudhui mapya yanawasili muda si mrefu"
+    },
+    "errors": {
+      "unableToLoadTitle": "Imeshindwa Kupakia",
+      "unableToLoad": "Imeshindwa kupakia maudhui. Tafadhali jaribu tena.",
+      "tryAgain": "Jaribu Tena"
+    }
+  },
+  "watchlist": {
+    "title": "Orodha Yangu ya Kutazama",
+    "itemCount_one": "{{count}} kipengee kwenye orodha yako",
+    "itemCount_other": "{{count}} vipengee kwenye orodha yako",
+    "emptyState": {
+      "title": "Orodha yako ya kutazama bado haina chochote",
+      "message": "Anza kujenga orodha yako kwa kubonyeza kitufe cha \"+\" kwenye maudhui yoyote."
+    },
+    "errors": {
+      "unableToLoadTitle": "Imeshindwa Kupakia Orodha",
+      "unableToLoad": "Imeshindwa kupakia orodha yako. Tafadhali jaribu tena.",
+      "endpointNotFound": "Endpoint ya orodha haijapatikana. Tafadhali angalia usanidi wa API.",
+      "unauthorized": "Tafadhali ingia ili kuona orodha yako ya kutazama.",
+      "tryAgain": "Jaribu Tena"
+    }
+  },
+  "newPopular": {
+    "title": "Gundua",
+    "tabs": {
+      "new": "Matoleo Mapya",
+      "trending": "Yanayotrend Sasa",
+      "popular": "Chaguo Maarufu",
+      "descriptions": {
+        "new": "Maudhui mapya yaliyoongezwa hivi karibuni",
+        "trending": "Kile ambacho watu wengi wanatazama kwa sasa",
+        "popular": "Maudhui yaliyopendwa na kukadiriwa juu",
+        "default": "Gundua maudhui mapya na bora zaidi"
+      }
+    },
+    "emptyState": {
+      "noContentTitle": "Hakuna maudhui yanayopatikana",
+      "noContentMessage": "Tunafanya kazi kuongeza maudhui zaidi ya kuvutia kwa ajili yako.",
+      "welcomeTitle": "Karibu kwenye Jukwaa Letu",
+      "welcomeMessage": "Maudhui yatapatikana hivi karibuni. Endelea kufuatilia matoleo mapya yenye msisimko!"
+    },
+    "errors": {
+      "unableToLoadTitle": "Imeshindwa Kupakia Maudhui",
+      "unableToLoad": "Imeshindwa kupakia maudhui. Tafadhali jaribu tena.",
+      "tryAgain": "Jaribu Tena"
+    }
+  },
+  "tvShows": {
+    "title": "Mkusanyiko wa TV Shows",
+    "subtitle": "Gundua series nzuri na maudhui ya kuangalia kwa wingi",
+    "hero": {
+      "featuredBadge": "Series Iliyopendekezwa"
+    },
+    "filters": {
+      "title": "Vichujio & Muonekano",
+      "browse": "Vinjari",
+      "allCategories": "Vikundi Vyote",
+      "sort": {
+        "latest": "Mpya Zaidi",
+        "oldest": "Za Zamani",
+        "popular": "Maarufu"
+      },
+      "reset": "Weka Upya Vichujio",
+      "view": "Muonekano:"
+    },
+    "resultsCount": "Inaonyesha {{count}} series",
+    "emptyState": {
+      "title": "Hakuna TV Shows zilizopatikana",
+      "noShowsAvailable": "Hakuna TV Shows kwa sasa.",
+      "adjustFilters": "Jaribu kurekebisha vichujio ili kuona matokeo zaidi."
+    },
+    "errors": {
+      "unableToLoadTitle": "Imeshindwa Kupakia TV Shows",
+      "unableToLoad": "Imeshindwa kupakia TV Shows. Tafadhali jaribu tena.",
+      "tryAgain": "Jaribu Tena"
+    }
+  },
+  "movies": {
+    "title": "Mkusanyiko wa Filamu",
+    "subtitle": "Gundua filamu bora na uzoefu wa kisinema",
+    "hero": {
+      "featuredBadge": "Filamu Iliyoangaziwa"
+    },
+    "filters": {
+      "title": "Vichujio & Muonekano",
+      "browse": "Vinjari",
+      "allCategories": "Vikundi Vyote",
+      "sort": {
+        "latest": "Mpya Zaidi",
+        "oldest": "Za Zamani",
+        "popular": "Maarufu"
+      },
+      "reset": "Weka Upya Vichujio",
+      "view": "Muonekano:"
+    },
+    "resultsCount": "Inaonyesha {{count}} filamu",
+    "emptyState": {
+      "title": "Hakuna filamu zilizopatikana",
+      "noMoviesAvailable": "Hakuna filamu kwa sasa.",
+      "adjustFilters": "Jaribu kurekebisha vichujio ili kuona matokeo zaidi."
+    },
+    "errors": {
+      "unableToLoadTitle": "Imeshindwa Kupakia Filamu",
+      "unableToLoad": "Imeshindwa kupakia filamu. Tafadhali jaribu tena.",
+      "tryAgain": "Jaribu Tena"
+    }
+  },
+  "userSubscription": {
+    "title": "Kamilisha Malipo Yako",
+    "subtitle": "Malipo salama ya Mobile Money kwa usajili wako",
+    "navigation": {
+      "backToPlans": "Rudi kwenye Mipango"
+    },
+    "invalidRequest": {
+      "title": "Ombi Batili",
+      "message": "Hakuna mpango wa usajili uliouchagua.",
+      "choosePlan": "Chagua Mpango"
+    },
+    "planSummary": {
+      "plan": "Mpango",
+      "selectedSubscription": "Usajili Uliouchaguliwa",
+      "popular": "INAJULIKANA SANA",
+      "amount": "Kiasi:",
+      "billing": "Malipo:",
+      "monthly": "Kila Mwezi",
+      "devices": "Vifaa:",
+      "devicesCount": "Vifaa {{count}} kwa Wakati Mmoja",
+      "quality": "Ubora:"
+    },
+    "userInfo": {
+      "title": "Akaunti Yako",
+      "email": "Barua pepe:",
+      "name": "Jina:"
+    },
+    "paymentForm": {
+      "amountLabel": "Kiasi cha Malipo",
+      "fixedAmount": "Kiasi Kisichoweza Kubadilishwa",
+      "amountDescription": "Kiasi hiki kimewekwa kulingana na mpango uliouchagua na hakiwezi kubadilishwa",
+      "phoneLabel": "Namba ya Simu",
+      "phonePlaceholder": "0781234567",
+      "phoneDescription": "Ingiza namba yako ya simu iliyosajiliwa na Mobile Money",
+      "nameLabel": "Jina Lako",
+      "namePlaceholder": "John Doe",
+      "emailLabel": "Barua Pepe Yako",
+      "emailPlaceholder": "john@example.com",
+      "emailDescription": "Barua pepe haiwezi kubadilishwa kwa sababu za ulinzi",
+      "processing": "Inachakata...",
+      "payButton": "Lipa {{amount}} kwa Mobile Money"
+    },
+    "validation": {
+      "phoneRequired": "Namba ya simu inahitajika kwa malipo ya Mobile Money",
+      "phoneInvalid": "Tafadhali ingiza namba sahihi ya simu"
+    },
+    "securityNotice": {
+      "title": "Malipo Salama",
+      "description": "Taarifa zako za malipo ziko salama. Kiasi kimethibitishwa na seva yetu. Utapokea ujumbe wa uthibitisho kwenye simu yako."
+    },
+    "security": {
+      "title": "Ulinzi wa Malipo",
+      "description": "Tunatumia Link Mobile Technology Ltd kuchakata na kulinda malipo yako kwa ushirikiano na Intouch Communication Ltd. Muamala wako umetunzwa kwa usimbaji fiche wa kiwango cha benki na unafuata viwango vya PCI DSS.",
+      "encrypted": "Imesimbwa kwa SSL 256-bit"
+    },
+    "pending": {
+      "title": "Malipo Yanachakatwa",
+      "description": "Malipo yako yanachakatwa kwa usalama kupitia Intouch Communication Ltd. Kwa kawaida huchukua dakika 1–2. Ikichukua zaidi, tafadhali angalia arifa za Mobile Money.",
+      "ussdCodes": "Mikodo ya USSD ya Mobile Money:",
+      "cashOutNote": "Inawezesha kutoa fedha muda mfupi ikiwa inahitajika"
+    },
+    "status": {
+      "success": {
+        "title": "Malipo Yamefanikiwa! 🎉",
+        "message": "Malipo yako yamefanikiwa na usajili wako sasa umeamilishwa."
+      },
+      "pending": {
+        "title": "Malipo Yanachakatwa",
+        "message": "Malipo yako yanachakatwa. Tafadhali subiri."
+      },
+      "failed": {
+        "title": "Malipo Yameshindikana",
+        "message": "Hatukuweza kuchakata malipo yako. Tafadhali jaribu tena."
+      },
+      "default": {
+        "title": "Hali ya Malipo",
+        "message": "Tunakusanya taarifa za malipo yako..."
+      },
+      "checking": "Inakagua...",
+      "checkStatus": "Kagua Hali",
+      "needHelp": "Unahitaji msaada?"
+    },
+    "paymentInfo": {
+      "title": "Taarifa za Malipo",
+      "referenceId": "Namba ya Marejeo",
+      "amount": "Kiasi",
+      "method": "Njia ya Malipo",
+      "mobileMoney": "Mobile Money",
+      "status": "Hali"
+    },
+    "transactionDetails": {
+      "title": "Maelezo ya Muamala",
+      "date": "Tarehe",
+      "type": "Aina ya Muamala",
+      "providerId": "Kitambulisho cha Mtoa Huduma"
+    },
+    "planDetails": {
+      "title": "Maelezo ya Mpango",
+      "planName": "Jina la Mpango",
+      "billingCycle": "Mzunguko wa Malipo",
+      "monthly": "Kila Mwezi",
+      "amountPaid": "Kiasi Kilicholipwa",
+      "special": "Maalum",
+      "mostPopular": "Chaguo Linalopendwa Zaidi"
+    },
+    "planFeatures": {
+      "title": "Vipengele vya Mpango",
+      "devices": "Vifaa {{count}} kwa Wakati Mmoja",
+      "videoQuality": "Ubora wa Video {{quality}}",
+      "unlimitedDownloads": "Upakuaji Usio na Kikomo",
+      "downloads": "Upakuaji {{count}}",
+      "hdrSupport": "Inasaidia HDR"
+    },
+    "subscriptionDetails": {
+      "title": "Usajili Umeamilishwa",
+      "plan": "Mpango",
+      "started": "Imeanza",
+      "renews": "Inarejelewa",
+      "status": "Hali",
+      "active": "IMEEZESHWA"
+    },
+    "actions": {
+      "proceedToDashboard": "Anza Kutazama",
+      "tryAgain": "Jaribu Tena"
+    },
+    "payment": {
+      "initiationFailed": "Imeshindikana kuanzisha malipo. Tafadhali jaribu tena."
+    },
+    "errors": {
+      "insufficientFunds": {
+        "title": "Salio Halitoshi 💰",
+        "message": "Akaunti yako ya Mobile Money haina salio la kutosha kulipia mpango wa {{planType}}.",
+        "details": "Unahitaji {{amount}} kwenye akaunti yako ya Mobile Money ili kujisajili kwenye mpango wa {{planType}}.",
+        "actions": {
+          "addMoney": "Ongeza Salio",
+          "addMoneyDesc": "Ongeza pesa kwenye akaunti yako ya Mobile Money kisha ujaribu tena",
+          "chooseDifferent": "Chagua Mpango Mwingine",
+          "chooseDifferentDesc": "Chagua mpango unaolingana na bajeti yako ya sasa"
+        }
+      },
+      "invalidPhone": {
+        "title": "Namba ya Simu Batili 📱",
+        "message": "Namba uliyoingiza si sahihi kwa malipo ya Mobile Money.",
+        "details": "Hakikisha namba yako imeandikishwa kwa Mobile Money.",
+        "actions": {
+          "checkNumber": "Kagua Namba",
+          "checkNumberDesc": "Hakikisha namba ni sahihi kisha ujaribu tena"
+        }
+      },
+      "networkIssue": {
+        "title": "Tatizo la Mtandao 📶",
+        "message": "Tumeshindwa kuunganisha na huduma ya malipo.",
+        "details": "Tafadhali kagua muunganisho wako wa intaneti kisha ujaribu tena.",
+        "actions": {
+          "checkConnection": "Kagua Muunganisho",
+          "checkConnectionDesc": "Hakikisha una mtandao thabiti",
+          "tryAgain": "Jaribu Tena",
+          "tryAgainDesc": "Jaribu tena baada ya muda mfupi"
+        }
+      },
+      "paymentDeclined": {
+        "title": "Malipo Yamekataliwa ❌",
+        "message": "Malipo yako yamekataliwa na huduma ya Mobile Money.",
+        "details": "Huenda ni sababu za usalama au vikwazo kwenye akaunti.",
+        "actions": {
+          "contactOperator": "Wasiliana na Mtandao Wako",
+          "contactOperatorDesc": "Kagua kama kuna vizuizi kwenye akaunti yako",
+          "tryDifferentMethod": "Tumia Njia Nyingine",
+          "tryDifferentMethodDesc": "Jaribu namba nyingine au chaguo tofauti la malipo"
+        }
+      },
+      "defaultError": {
+        "title": "Imeshindikana Kuchakata Malipo ⚠️",
+        "message": "Tatizo limetokea wakati wa kuchakata malipo yako.",
+        "details": "Timu yetu imejulishwa. Tafadhali jaribu tena baada ya muda.",
+        "actions": {
+          "tryAgain": "Jaribu Tena Baadaye",
+          "tryAgainDesc": "Subiri dakika chache kisha ujaribu tena",
+          "contactSupport": "Wasiliana na Usaidizi",
+          "contactSupportDesc": "Pata msaada endapo tatizo litaendelea"
+        }
+      }
+    }
+  },
+  "subscription": {
+    "title": "Usimamizi wa Usajili",
+    "subtitle": "Simamia mpango wako wa usajili na malipo",
+    "refresh": "Pakia Upya",
+    "loading": "Inapakia taarifa za usajili...",
+    "more": "Zaidi",
+    "tabs": {
+      "current": "Mpango wa Sasa",
+      "history": "Historia",
+      "payment": "Mbinu za Malipo",
+      "usage": "Takwimu za Matumizi"
+    },
+    "status": {
+      "active": {
+        "title": "Usajili Uliohai",
+        "description": "Usajili wako uko hai na unaendelea vizuri"
+      },
+      "cancelled": {
+        "title": "Usajili Umebatilishwa",
+        "description": "Usajili wako utaisha mwisho wa kipindi cha malipo"
+      },
+      "expired": {
+        "title": "Usajili Umeisha Muda",
+        "description": "Usajili wako umeisha. Fanya upya ili kuendelea kupata huduma"
+      },
+      "renews": "Unarejelewa tarehe",
+      "ends": "Unaisha tarehe"
+    },
+    "errors": {
+      "title": "Hitilafu ya Kupakia",
+      "loadFailed": "Imeshindikana kupakia taarifa za usajili",
+      "tryAgain": "Jaribu Tena"
+    }
+  },
+  "watchHistory": {
+    "title": "Historia ya Kutazama",
+    "itemCount": "Kipengele {{count}}",
+    "itemCount_plural": "Vipengele {{count}}",
+    "today": "Leo",
+    "yesterday": "Jana",
+    "daysAgo": "Siku {{days}} zilizopita",
+    "completed": "imekamilika",
+    "progress": "Maendeleo",
+    "continueWatching": "Endelea",
+    "startWatching": "Anza",
+    "watchNow": "Tazama Sasa",
+    "watchedOn": "Imetazamwa tarehe",
+    "emptyState": {
+      "title": "Hakuna Historia ya Kutazama Hivi Sasa",
+      "message": "Yale unayotazama yataonekana hapa. Anza kuchunguza ili kujenga historia yako ya kutazama!",
+      "browseContent": "Vinjari Maudhui"
+    },
+    "errors": {
+      "unableToLoadTitle": "Imeshindikana Kupakia Historia ya Kutazama",
+      "unableToLoad": "Hatukuweza kupakia historia yako kwa sasa.",
+      "unauthorized": "Tafadhali ingia ili uone historia yako ya kutazama.",
+      "endpointNotFound": "Huduma ya historia ya kutazama haipatikani kwa sasa.",
+      "tryAgain": "Jaribu Tena"
+    }
+  },
+  "family": {
+    "invitations": {
+      "pendingInvitations": "Mialiko Inayosubiri",
+      "pendingCount": "{{count}} inasubiri",
+      "clickForDetails": "Bofya mwaliko kuona maelezo",
+      "noInvitations": {
+        "title": "Hakuna Mialiko Inayosubiri",
+        "description": "Huna mwaliko wowote wa familia unaosubiri kwa sasa."
+      },
+      "sent": "Imetumwa",
+      "stats": {
+        "pendingInvitations": "Mialiko inayosubiri",
+        "familyStatus": "Hali ya Familia",
+        "member": "Mwanachama",
+        "noFamily": "Hakuna familia",
+        "yourRole": "Jukumu lako",
+        "individual": "Binafsi"
+      },
+      "familyMember": {
+        "title": "Mwanachama wa Familia",
+        "joined": "Amejiunga",
+        "dashboard": "Dashibodi"
+      },
+      "details": {
+        "title": "Maelezo ya Mwaliko",
+        "from": "Kutoka:",
+        "yourRole": "Jukumu lako:",
+        "relationship": "Uhusiano:",
+        "dashboard": "Dashibodi:"
+      },
+      "status": {
+        "title": "Hali ya Mwaliko",
+        "status": "Hali:",
+        "pending": "Inasubiri",
+        "expires": "Inaisha:",
+        "timeLeft": "Muda uliosalia:",
+        "expired": "Imeisha",
+        "oneDayLeft": "Siku 1 imebaki",
+        "daysLeft": "{{days}} siku zimebaki"
+      },
+      "actions": {
+        "accept": "Kubali Mwaliko",
+        "decline": "Kataa",
+        "leaveFamily": "Ondoka kwenye Familia",
+        "accepting": "inakubaliwa",
+        "rejecting": "inakataliwa"
+      },
+      "leaveConfirmation": "Una uhakika unataka kuondoka kwenye familia hii? Utapoteza ufikiaji wa manufaa ya usajili wa familia.",
+      "aboutFamilyPlans": {
+        "title": "Kuhusu Mipango ya Familia",
+        "accepting": {
+          "title": "Kukubali Mwaliko",
+          "benefit1": "Utashiriki manufaa ya usajili ya mwenye familia",
+          "benefit2": "Historia yako ya kutazama na mapendekezo yako yatabaki binafsi",
+          "benefit3": "Unaweza kuondoka kwenye familia wakati wowote kupitia ukurasa huu"
+        },
+        "subscription": {
+          "title": "Kumbuka Kuhusu Usajili",
+          "note1": "Kama una usajili unaofanya kazi, utasimamishwa kiotomatiki",
+          "note2": "Utatumia mpango wa familia badala ya mpango wako binafsi",
+          "note3": "Unaweza kuurudisha mpango wako binafsi ukiondoka kwenye familia"
+        }
+      },
+      "mobile": {
+        "pendingCount": "{{count}} mwaliko unasubiri",
+        "scrollToReview": "Sogeza chini kutazama"
+      },
+      "errors": {
+        "loadFailed": "Imeshindwa kupakua mialiko ya familia",
+        "actionFailed": "Imeshindwa {{action}} mwaliko",
+        "leaveFailed": "Imeshindwa kuondoka kwenye familia"
+      }
+    },
+    "roles": {
+      "owner": "Mmiliki",
+      "parent": "Mzazi",
+      "teen": "Kijana",
+      "child": "Mtoto",
+      "guest": "Mgeni"
+    },
+    "dashboardTypes": {
+      "normal": "Kawaida",
+      "kid": "Mtoto",
+      "adult": "Kawaida"
+    },
+    "memberRoles": {
+      "parent": "Mzazi wa Familia",
+      "teen": "Kijana wa Familia",
+      "child": "Mtoto wa Familia",
+      "owner": "Mmiliki wa Familia",
+      "guest": "Mgeni wa Familia",
+      "familyMember": "Mwanachama wa Familia"
+    }
+  },
+  "common": {
+    "yes": "Ndiyo",
+    "no": "Hapana",
+    "cancel": "Ghairi",
+    "delete": "Futa",
+    "error": "Hitilafu",
+    "dismiss": "Funga",
+    "never": "Kamwe",
+    "notSet": "Haijawekwa",
+    "invalidDate": "Tarehe si sahihi",
+    "invalidTime": "Muda si sahihi",
+    "unknownEmail": "Barua pepe haijulikani",
+    "noEmail": "Hakuna barua pepe",
+    "noDate": "Hakuna tarehe"
+  },
+  "parentalControls": {
+    "title": "Udhibiti wa Wazazi",
+    "subtitle": "Lindaa mipangilio ya familia kwa ulinzi wa PIN",
+    "accessRestricted": {
+      "title": "Ufikiaji Umezuiwa",
+      "description": "Unapaswa kuwa Mmiliki wa Familia au Mzazi mwenye mpango wa familia unaofanya kazi ili kufikia udhibiti wa wazazi."
+    },
+    "roles": {
+      "familyOwner": "Mmiliki wa Familia",
+      "familyParent": "Mzazi wa Familia"
+    },
+    "tabs": {
+      "pinManagement": "Usimamizi wa PIN",
+      "securityLogs": "Kumbukumbu za Usalama"
+    },
+    "pinSection": {
+      "activeTitle": "PIN Kuu Inafanya Kazi",
+      "setupTitle": "Weka PIN Kuu",
+      "activeDescription": "PIN yako kuu inalinda udhibiti wa wazazi. Thibitisha PIN yako ili kufanya mabadiliko.",
+      "setupDescription": "Tengeneza PIN kuu ya tarakimu 4 ili kulinda udhibiti wa wazazi na mipangilio ya familia.",
+      "activeStatus": "PIN kuu inafanya kazi na inalinda mipangilio yako",
+      "createPin": "Tengeneza PIN yako",
+      "enterPinPlaceholder": "Weka PIN ya tarakimu 4",
+      "digits": "tarakimu"
+    },
+    "verification": {
+      "title": "Thibitisha Utambulisho Wako",
+      "description": "Tafadhali weka PIN yako ya sasa ili kuendelea",
+      "currentPin": "PIN ya Sasa",
+      "enterCurrentPin": "Weka PIN ya sasa"
+    },
+    "newPin": {
+      "title": "Weka PIN Mpya",
+      "description": "Tengeneza PIN yako mpya ya tarakimu 4",
+      "newPin": "PIN Mpya",
+      "enterNewPin": "Weka PIN mpya"
+    },
+    "familyMembers": {
+      "title": "Wanaukoo wa Familia",
+      "status": "Hali",
+      "active": "Inafanya kazi",
+      "inactive": "Haifanyi kazi",
+      "pinStatus": "Hali ya PIN",
+      "locked": "Imefungwa"
+    },
+    "securityLogs": {
+      "action": "Kitendo",
+      "dateTime": "Tarehe & Muda",
+      "noLogs": "Hakuna kumbukumbu za usalama",
+      "noLogsDescription": "Shughuli za usalama zitaonekana hapa zinapotokea"
+    },
+    "actions": {
+      "setMasterPin": "Weka PIN Kuu",
+      "changePin": "Badilisha PIN",
+      "resetPin": "Weka upya PIN",
+      "verifyPin": "Thibitisha PIN",
+      "updatePin": "Sasisha PIN",
+      "cancel": "Ghairi",
+      "settingPin": "Inaweka PIN...",
+      "verifying": "Inathibitisha...",
+      "updating": "Inasasisha..."
+    },
+    "success": {
+      "pinVerified": "PIN Imethibitishwa",
+      "pinVerifiedDesc": "PIN yako imethibitishwa kikamilifu",
+      "pinSet": "PIN Imewekwa",
+      "pinSetDesc": "PIN kuu imewekwa kikamilifu!",
+      "pinChanged": "PIN Imebadilishwa",
+      "pinChangedDesc": "PIN kuu imebadilishwa kikamilifu!",
+      "pinReset": "PIN Imewekwa Upya",
+      "pinResetDesc": "PIN kuu imewekwa upya kikamilifu! Ulinzi wa PIN umeondolewa."
+    },
+    "errors": {
+      "loadFailed": "Imeshindwa Kupakia",
+      "loadPinStatus": "Imeshindwa kupakia hali ya PIN. Tafadhali jaribu tena.",
+      "loadSecurityLogs": "Imeshindwa kupakia kumbukumbu za usalama. Tafadhali jaribu tena.",
+      "pinRequired": "PIN Inahitajika",
+      "enterCurrentPin": "Tafadhali weka PIN ya sasa",
+      "enterNewPin": "Tafadhali weka PIN mpya",
+      "invalidPin": "PIN Batili",
+      "verificationFailed": "Uthibitishaji Umeshindwa",
+      "setupFailed": "Uwekaji Umeshindwa",
+      "changeFailed": "Mabadiliko Yameshindwa",
+      "resetFailed": "Uwekaji Upya Umeshindwa",
+      "setPinFailed": "Imeshindwa kuweka PIN kuu. Tafadhali jaribu tena.",
+      "changePinFailed": "Imeshindwa kubadilisha PIN kuu. Tafadhali jaribu tena.",
+      "resetPinFailed": "Imeshindwa kuweka upya PIN kuu. Tafadhali jaribu tena."
+    },
+    "pinValidation": {
+      "mustBe4Digits": "PIN lazima iwe tarakimu 4 kamili",
+      "tooCommon": "PIN hii ni rahisi sana. Tafadhali chagua PIN salama zaidi.",
+      "sequentialNotAllowed": "Nambari zinazoendelea haziruhusiwi kwa sababu za usalama."
+    },
+    "modal": {
+      "success": "Mafanikio",
+      "error": "Hitilafu",
+      "warning": "Onyo"
+    }
+  },
+  "familyProfiles": {
+    "title": "Profaili za Familia",
+    "subtitle": "Dhibiti profaili za watoto na wanachama wa familia kwa mpango wako wa familia",
+    "planStatus": "Mpango wa Familia Unatumika",
+    "tabs": {
+      "kidsProfiles": "Profaili za Watoto",
+      "familyMembers": "Wanachama wa Familia"
+    },
+    "kidsTab": {
+      "title": "Profaili za Watoto",
+      "subtitle": "Unda na dhibiti profaili maalum za watoto",
+      "noProfiles": "Hakuna Profaili za Watoto",
+      "noProfilesDescription": "Unda profaili ili watoto wapate uzoefu wao binafsi",
+      "createFirstProfile": "Unda Profaili ya Kwanza",
+      "addProfile": "Ongeza Profaili",
+      "editProfile": "Hariri Profaili",
+      "deleteProfile": "Futa Profaili",
+      "kidsMode": "Hali ya Watoto",
+      "switchError": "Imeshindikana kubadili kwenda profaili ya mtoto. Jaribu tena.",
+      "yearsOld": "miaka",
+      "dailyTime": "Kila siku",
+      "pinRequired": "PIN",
+      "switchTo": "Badili kwenda",
+      "limitReached": "Kiwango Kimefikiwa",
+      "limitReachedDescription": "Umefikia idadi ya juu ya profaili za watoto ({{maxProfiles}}) kwa mpango wako",
+      "deleteConfirmationTitle": "Futa Profaili ya Mtoto",
+      "deleteConfirmationDescription": "Una uhakika unataka kufuta profaili ya {{name}}? Hii itafuta historia yake yote na mapendeleo."
+    },
+    "membersTab": {
+      "title": "Wanachama wa Familia",
+      "subtitle": "Dhibiti wanachama wa familia wanaoweza kufikia akaunti yako",
+      "planAllows": "Mpango unaruhusu wanachama {{maxMembers}}",
+      "noMembers": "Hakuna Wanachama Hivi Sasa",
+      "noMembersDescription": "Alika hadi wanachama {{maxMembers}} kushiriki manufaa ya mpango",
+      "upgradeRequired": "Inahitajika kuboresha mpango ili kualika wanachama",
+      "inviteMember": "Alika Mwanachama",
+      "inviteFirstMember": "Alika Mwanachama wa Kwanza",
+      "upgradePlanRequired": "Uboreshaji Unahitajika",
+      "removeMember": "Ondoa Mwanachama",
+      "editSettings": "Hariri Mipangilio",
+      "left": "ameondoka",
+      "joined": "Amejiunga",
+      "invited": "Amealikwa",
+      "lastActive": "Mara ya mwisho alikuwa mtandaoni",
+      "suspended": "Amesimamishwa",
+      "pending": "Inasubiri",
+      "active": "Anafanya kazi",
+      "rejected": "Amekataa",
+      "expired": "Imeisha muda",
+      "sleepTime": "Muda wa Kulala",
+      "accessWindow": "Muda wa Ufikiaji",
+      "memberLimitReached": "Kiwango Kimefikiwa",
+      "memberLimitReachedDescription": "Umefikia idadi ya juu ya wanachama ({{maxMembers}}) katika mpango wako",
+      "individualPlan": "Mpango wa Mtu Binafsi",
+      "upgradeSuggestion": "Boresha mpango kwenda wa familia ili ualike wanachama na kushiriki upatikanaji",
+      "removeError": "Imeshindikana kuondoa mwanachama",
+      "removeConfirmationTitle": "Ondoa Mwanachama",
+      "removeConfirmationDescription": "Una uhakika unataka kumwondoa <strong>{{email}}</strong> kutoka mpango wa familia? Hatapata tena ufikiaji."
+    },
+    "modals": {
+      "createKidProfile": {
+        "title": "Unda Profaili ya Mtoto",
+        "childName": "Jina la Mtoto",
+        "childNamePlaceholder": "Ingiza jina la mtoto",
+        "birthDate": "Tarehe ya Kuzaliwa",
+        "age": "Umri: {{age}} miaka",
+        "maxAgeRating": "Kiwango cha Umri Kinachoruhusiwa",
+        "custom": "Maalum",
+        "enterAge": "Ingiza umri",
+        "yearsOld": "miaka",
+        "dailyTimeLimit": "Kikomo cha Muda kwa Siku",
+        "enterMinutes": "Ingiza dakika",
+        "minutes": "dakika",
+        "themeColor": "Rangi ya Mandhari",
+        "upgradeToModify": "Boresha mpango kuhariri",
+        "selected": "Imechaguliwa",
+        "default": "Chaguo-msingi",
+        "defaultThemeDescription": "Profaili zote za watoto zinatumia mandhari salama na rafiki",
+        "requirePin": "Hitaji PIN Kutoka",
+        "requirePinDescription": "Inazuia mtoto kubadili kwenda hali ya watu wazima",
+        "creating": "Inaundwa...",
+        "createProfile": "Unda Profaili",
+        "error": "Imeshindikana kuunda profaili",
+        "avatarCategories": {
+          "People": "Watu",
+          "Animals": "Wanyama",
+          "Fantasy": "Kubuni",
+          "Abstract": "Abstrakti"
+        }
+      },
+      "editKidProfile": {
+        "title": "Hariri Profaili ya {{name}}",
+        "subtitle": "Sasisha mipangilio ya profaili",
+        "basicInformation": "Taarifa za Msingi",
+        "childName": "Jina la Mtoto",
+        "childNamePlaceholder": "Ingiza jina la mtoto",
+        "birthDate": "Tarehe ya Kuzaliwa",
+        "contentRestrictions": "Vizuizi vya Maudhui",
+        "maxAgeRating": "Kiwango cha Umri Kinachoruhusiwa",
+        "allowedContentTypes": "Aina za Maudhui Zinazoruhusiwa",
+        "blockedGenres": "Aina Zilizozuiliwa",
+        "timeAndAccess": "Muda & Ufikiaji",
+        "dailyTimeLimit": "Kikomo cha Muda kwa Siku",
+        "appearanceAndSecurity": "Mwonekano & Usalama",
+        "themeColor": "Rangi ya Mandhari",
+        "upgradeToModify": "Boresha mpango kuhariri",
+        "selected": "Imechaguliwa",
+        "default": "Chaguo-msingi",
+        "defaultThemeDescription": "Profaili zote za watoto zinatumia mandhari salama na rafiki",
+        "requirePin": "Hitaji PIN Kutoka",
+        "requirePinDescription": "Inazuia kubadili kwenda hali ya watu wazima",
+        "updating": "Inasasishwa...",
+        "updateProfile": "Sasisha Profaili",
+        "error": "Imeshindikana kusasisha profaili",
+        "contentCategories": {
+          "cartoons": "Vikatuni",
+          "educational": "Elimu",
+          "family": "Familia",
+          "adventure": "Vituko",
+          "comedy": "Vichekesho",
+          "music": "Muziki"
+        },
+        "blockedGenres": {
+          "horror": "Hofu",
+          "violence": "Vurugu",
+          "romance": "Mahaba",
+          "thriller": "Msisimko",
+          "drama": "Tamthilia",
+          "action": "Vitendo",
+          "fantasy": "Kubuni",
+          "sciFi": "Sayansi-Fiksi",
+          "mystery": "Mafumbo",
+          "crime": "Uhalifu"
+        },
+        "allowMovies": "Ruhusu Filamu",
+        "allowSeries": "Ruhusu Mfululizo",
+        "allowSearch": "Ruhusu Utafutaji",
+        "allowTrending": "Ruhusu Maarufu"
+      },
+      "inviteMember": {
+        "title": "Alika Mwanachama wa Familia",
+        "invitationsRemaining": "{{count}} mwaliko umebaki",
+        "noInvitationsRemaining": "Hakuna mwaliko uliobaki",
+        "unableToSend": "Imeshindikana kutuma mwaliko",
+        "memberLimitReached": "Kiwango Kimefikiwa",
+        "memberLimitReachedDescription": "Umefikia idadi ya juu ya wanachama ({{maxMembers}}). Boresha mpango wako.",
+        "invitationDetails": "Maelezo ya Mwaliko",
+        "invitationDescription": "Mtumiaji anayewalikiwa lazima awe na akaunti ya Oliviuus. Atapokea mwaliko kupitia barua pepe.",
+        "emailAddress": "Barua Pepe",
+        "memberRole": "Nafasi",
+        "relationship": "Uhusiano",
+        "relationshipPlaceholder": "mf. Mwenza, Mtoto, Mzazi, Ndugu",
+        "dashboardType": "Aina ya Dashibodi",
+        "preview": "Hakiki",
+        "role": "Nafasi",
+        "dashboard": "Dashibodi",
+        "sendInvitation": "Tuma Mwaliko",
+        "error": "Imeshindikana kutuma mwaliko",
+        "roles": {
+          "parent": "Mzazi",
+          "parentDescription": "Ufikiaji kamili na udhibiti wa wazazi",
+          "teen": "Kijana",
+          "teenDescription": "Vizuizi vya wastani",
+          "child": "Mtoto",
+          "childDescription": "Uzoefu rafiki kwa watoto",
+          "guest": "Mgeni",
+          "guestDescription": "Ufikiaji mdogo"
+        },
+        "dashboards": {
+          "normal": "Dashibodi ya Kawaida",
+          "normalDescription": "Uzoefu wa kawaida",
+          "kid": "Dashibodi ya Watoto",
+          "kidDescription": "Muonekano rahisi kwa watoto"
+        }
+      },
+      "editMember": {
+        "title": "Hariri {{email}}",
+        "subtitle": "Dhibiti mipangilio na vizuizi kwa mwanachama huyu",
+        "updateFailed": "Imeshindikana kusasisha",
+        "basicSettings": "Mipangilio ya Msingi",
+        "memberRole": "Nafasi",
+        "dashboardType": "Aina ya Dashibodi",
+        "relationship": "Uhusiano",
+        "relationshipPlaceholder": "mf. Mwenza, Mtoto, Mzazi, Ndugu",
+        "temporarilySuspend": "Sitisha kwa Muda",
+        "suspendDescription": "Inazuia mwanachama kufikia jukwaa",
+        "accessControl": "Udhibiti wa Ufikiaji",
+        "sleepTimeRestrictions": "Muda wa Kulala",
+        "sleepTimeDescription": "Weka saa ambazo mwanachama haruhusiwi kutumia jukwaa",
+        "accessTimeWindow": "Muda wa Ufikiaji",
+        "accessTimeDescription": "Weka muda wa ufikiaji unaoruhusiwa kila siku",
+        "dailyWatchTimeLimit": "Kikomo cha Muda wa Kutazama kwa Siku (Dakika)",
+        "unlimited": "Bila Kiwango",
+        "unlimitedDescription": "Acha wazi kwa ufikiaji usio na kikomo",
+        "contentAndSpending": "Maudhui & Matumizi",
+        "monthlySpendingLimit": "Kikomo cha Matumizi kwa Mwezi (RWF)",
+        "spendingLimitDescription": "Weka 0 kuzima ununuzi ndani ya app",
+        "contentRestrictions": "Vizuizi vya Maudhui",
+        "contentRestrictionsDescription": "Vizuizi vinawekwa kiotomatiki kulingana na umri na nafasi. Kwa ulinzi zaidi, tumia profaili ya mtoto.",
+        "currentSettings": "Muhtasari wa Mipangilio",
+        "saveChanges": "Hifadhi Mabadiliko",
+        "error": "Imeshindikana kusasisha",
+        "roles": {
+          "parent": "Mzazi",
+          "parentDescription": "Ufikiaji kamili na udhibiti wa wazazi",
+          "teen": "Kijana",
+          "teenDescription": "Vizuizi vya wastani",
+          "child": "Mtoto",
+          "childDescription": "Uzoefu wa watoto",
+          "guest": "Mgeni",
+          "guestDescription": "Ufikiaji mdogo"
+        },
+        "dashboards": {
+          "normal": "Dashibodi ya Kawaida",
+          "normalDescription": "Uzoefu wa kawaida",
+          "kid": "Dashibodi ya Watoto",
+          "kidDescription": "Muonekano rahisi kwa watoto"
+        },
+        "tabs": {
+          "basic": "Msingi",
+          "access": "Ufikiaji",
+          "restrictions": "Vizuizi"
+        },
+        "sleepStart": "Mwanzo wa Kulala",
+        "sleepEnd": "Mwisho wa Kulala",
+        "activeFrom": "Inapatikana kutoka {{start}} hadi {{end}}",
+        "accessStart": "Mwanzo wa Ufikiaji",
+        "accessEnd": "Mwisho wa Ufikiaji",
+        "canAccessFrom": "Anaweza kufikia kutoka {{start}} hadi {{end}}",
+        "accountStatus": "Hali ya Akaunti",
+        "suspended": "Amesimamishwa",
+        "active": "Anafanya kazi"
+      }
+    }
+  },
+  "landingPage": {
+    "header": {
+      "signIn": "Ingia"
+    },
+    "hero": {
+      "title": "Bila Kikomo",
+      "subtitle": "Burudani",
+      "tagline": "Mahali Hadithi za Afrika Hukutana na Jukwaa la Dunia",
+      "startingAt": "Kuanzia",
+      "cancelAnytime": "Futa muda wowote",
+      "ctaDescription": "Uko tayari kuonja mustakabali wa utazamaji? Weka barua pepe yako uanze safari.",
+      "welcomeBack": "Karibu Tena!",
+      "continueJourney": "Uko Tayari Kuendelea na Safari Yako",
+      "restartDescription": "Anza upya uanachama wako na urudi kwenye burudani isiyo na kikomo.",
+      "restartMembership": "Anza Uanachama Upya"
+    },
+    "emailInput": {
+      "getStarted": "Anza",
+      "alreadyLoggedIn": "Umeingia tayari. Endelea kwenye akaunti yako.",
+      "continueToAccount": "Endelea kwenye Akaunti"
+    },
+    "trending": {
+      "title": "Zinazovuma Sasa",
+      "subtitle": "Gundua kile ambacho kila mtu anaangalia kwa sasa"
+    },
+    "contentModal": {
+      "close": "Funga",
+      "duration": "Muda",
+      "language": "Lugha",
+      "getStarted": "Anza"
+    },
+    "contentCard": {
+      "noImage": "Hakuna Picha",
+      "rwanda": "RWANDA"
+    },
+    "features": {
+      "title": "Kwa Nini Kuchagua",
+      "titleHighlight": "Oliviuus",
+      "subtitle": "Vipengele vya kiwango cha juu vilivyoundwa kwa uzoefu bora wa kutazama",
+      "streamDevices": {
+        "title": "Tazama Kwenye Vifaa Vyako Vyote",
+        "description": "Tazama bila usumbufu kwenye Smart TV, PlayStation, Xbox, Chromecast, Apple TV, vifaa vya michezo, na vifaa vyote unavyopenda.",
+        "highlight": "Majukwaa Mbalimbali"
+      },
+      "downloadOffline": {
+        "title": "Pakua Utazame Bila Mtandao",
+        "description": "Hifadhi filamu na vipindi unavyovipenda utazame popote, wakati wowote – bora kwa safari au unapokuwa bila mtandao.",
+        "highlight": "Tazama Popote"
+      },
+      "watchAcrossScreens": {
+        "title": "Tazama Kwenye Skrini Zote",
+        "description": "Anza kwenye simu yako, endelea kwenye tablet, na umalizie kwenye TV. Burudani yako inakufuata kila mahali.",
+        "highlight": "Ulinganifu Mwepesi"
+      },
+      "kidsExperience": {
+        "title": "Uzoefu Maalum kwa Watoto",
+        "description": "Profaili salama na zenye kuvutia kwa watoto, pamoja na udhibiti wa wazazi na maudhui yanayofaa umri wao.",
+        "highlight": "Rafiki kwa Familia"
+      },
+      "premiumAudio": {
+        "title": "Uzoefu wa Sauti wa Kipekee",
+        "description": "Jizamishe kwenye sauti ya Dolby Atmos na ubora wa juu unaoleta kila tukio hai.",
+        "highlight": "Dolby Atmos"
+      },
+      "ultraHd": {
+        "title": "Ubora wa 4K Ultra HD",
+        "description": "Furahia uwazi wa hali ya juu kupitia 4K Ultra HD na msaada wa HDR kwenye vifaa vinavyounga mkono.",
+        "highlight": "Ultra HD"
+      },
+      "ctaTitle": "Anza Safari Yako ya Kutazama",
+      "ctaDescription": "Jiunge sasa na ufurahie burudani ya kiwango cha juu iliyoandaliwa kwa ajili yako."
+    },
+    "faq": {
+      "title": "Maswali Yanayoulizwa",
+      "titleHighlight": "Mara Kwa Mara",
+      "subtitle": "Kila kitu unachohitaji kujua kuhusu Oliviuus na uzoefu wako wa kutazama",
+      "ctaTitle": "Uko Tayari Kuanza Kutazama?",
+      "ctaDescription": "Jiunge na Oliviuus leo na ufurahie burudani ya kiwango cha juu",
+      "contactSupport": "Wasiliana na Usaidizi",
+      "closeContact": "Funga Mawasiliano",
+      "directMessage": "Ujumbe wa Moja kwa Moja",
+      "closeForm": "Funga Fomu",
+      "visitHelpCenter": "Tembelea Kituo cha Msaada",
+      "contactTeam": "Wasiliana na Timu Yetu ya Usaidizi",
+      "contactDescription": "Timu yetu ya usaidizi ipo tayari kukusaidia kwa maswali au changamoto zozote.",
+      "emailSupport": "Barua pepe: {{email}}",
+      "callSupport": "Piga: {{phone}}",
+      "sendMessageTitle": "Tuma Ujumbe wa Moja kwa Moja",
+      "sendMessageDescription": "Jaza fomu hapa chini nasi tutakujibu haraka iwezekanavyo.",
+      "loading": "Inapakia...",
+      "questions": {
+        "difference": {
+          "question": "Nini kinaitofautisha Oliviuus na majukwaa mengine ya utazamaji?",
+          "answer": "Oliviuus inaunganisha maudhui ya kiwango cha kimataifa na filamu za Rwanda pekee, ikikuza simulizi za Kiafrika huku ikitoa burudani ya kimataifa."
+        },
+        "cost": {
+          "question": "Oliviuus inagharimu kiasi gani?",
+          "answer": "Oliviuus hutoa mipango rahisi kuanzia RWF 3,000 hadi RWF 10,000 kwa mwezi, kulingana na mahitaji yako ya kutazama."
+        },
+        "multipleDevices": {
+          "question": "Je, naweza kutazama Oliviuus kwenye vifaa vingi kwa wakati mmoja?",
+          "answer": "Ndiyo! Tazama kwenye simu, tablet, laptop, Smart TV na vifaa vya michezo kwa wakati mmoja, kulingana na mpango wako."
+        },
+        "rwandanContent": {
+          "question": "Ni aina gani ya maudhui ya Rwanda yanapatikana?",
+          "answer": "Filamu nyingi, tamthilia, makala na kazi asilia kutoka Rwanda — tukikuza vipaji vya ndani."
+        },
+        "changeSubscription": {
+          "question": "Ninawezaje kubadili au kuboresha mpango wangu?",
+          "answer": "Badilisha mpango wako wakati wowote kupitia mipangilio ya akaunti."
+        },
+        "paymentMethods": {
+          "question": "Mnatumia njia gani za malipo nchini Rwanda?",
+          "answer": "Mobile money (MTN, Airtel), kadi, na uhamisho wa benki — vyote salama."
+        },
+        "downloadOffline": {
+          "question": "Je, naweza kupakua filamu kutazama bila mtandao?",
+          "answer": "Ndiyo! Pakua maudhui upendayo utazame bila mtandao. Kiasi na upatikanaji hutegemea mpango uliouchagua."
+        },
+        "outsideRwanda": {
+          "question": "Je, Oliviuus inapatikana nje ya Rwanda?",
+          "answer": "Kwa sasa imejikita Rwanda, lakini mpango ni kupanua eneo la huduma Afrika Mashariki."
+        },
+        "videoQuality": {
+          "question": "Nitapata ubora gani wa video?",
+          "answer": "Kuanzia SD hadi 4K Ultra HD kulingana na mpango wako na kifaa unachotumia."
+        },
+        "supportFilmmakers": {
+          "question": "Oliviuus inawasaidiaje watayarishaji wa filamu wa Rwanda?",
+          "answer": "Tunakishirikiana na studio za ndani, kufadhili miradi, na kuhakikisha malipo bora kwao."
+        }
+      }
+    }
+  }
+}

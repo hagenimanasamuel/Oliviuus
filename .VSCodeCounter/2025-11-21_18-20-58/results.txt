@@ -1,0 +1,129 @@
+Date : 2025-11-21 18:20:58
+Directory : c:\Users\SAMUEL\Documents\Github\Oliviuus\backend
+Total : 92 files,  28195 codes, 1573 comments, 3165 blanks, all 32933 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |         84 |     21,456 |      1,562 |      3,148 |     26,166 |
+| JSON       |          6 |      6,695 |          0 |          2 |      6,697 |
+| Log        |          1 |         29 |          0 |          1 |         30 |
+| Docker     |          1 |         15 |         11 |         14 |         40 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                             | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                |         92 |     28,195 |      1,573 |      3,165 |     32,933 |
+| . (Files)                                                                                        |          9 |      6,969 |         58 |         93 |      7,120 |
+| config                                                                                           |          1 |      1,799 |         44 |         83 |      1,926 |
+| controllers                                                                                      |         35 |     17,196 |      1,198 |      2,543 |     20,937 |
+| locales                                                                                          |          4 |        144 |          0 |          0 |        144 |
+| middlewares                                                                                      |          8 |        326 |         30 |         65 |        421 |
+| models                                                                                           |          1 |         22 |          1 |          5 |         28 |
+| routes                                                                                           |         28 |        657 |        122 |        177 |        956 |
+| seeds                                                                                            |          1 |         23 |          0 |          6 |         29 |
+| services                                                                                         |          4 |      1,044 |        120 |        190 |      1,354 |
+| utils                                                                                            |          1 |         15 |          0 |          3 |         18 |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                         | language   | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\Dockerfile                                     | Docker     |         15 |         11 |         14 |         40 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\PaymentSystem.js                               | JavaScript |        127 |         24 |         30 |        181 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\config\dbConfig.js                             | JavaScript |      1,799 |         44 |         83 |      1,926 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\ContentAnalyticsController.js      | JavaScript |        333 |         16 |         48 |        397 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\analyticsController.js             | JavaScript |        442 |         11 |         37 |        490 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\authController.js                  | JavaScript |        763 |        107 |        139 |      1,009 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\billingManagementController.js     | JavaScript |        137 |          3 |         20 |        160 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\categoryController.js              | JavaScript |        469 |         26 |         73 |        568 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\contactController.js               | JavaScript |        695 |         61 |        113 |        869 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\contentController.js               | JavaScript |      1,246 |        149 |        202 |      1,597 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\customerManagementController.js    | JavaScript |        203 |         10 |         29 |        242 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\emailVerificationController.js     | JavaScript |         44 |          7 |         10 |         61 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\genreController.js                 | JavaScript |        295 |         19 |         58 |        372 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\imageProxyController.js            | JavaScript |         46 |          4 |         13 |         63 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\kidController.js                   | JavaScript |        954 |         60 |        117 |      1,131 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\kidProfileController.js            | JavaScript |        503 |         33 |         80 |        616 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\kidSessionController.js            | JavaScript |        170 |          1 |         34 |        205 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\mediaController.js                 | JavaScript |        301 |         35 |         51 |        387 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\newPlanController.js               | JavaScript |        225 |         27 |         32 |        284 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\notificationController.js          | JavaScript |        490 |         29 |         87 |        606 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\overviewController.js              | JavaScript |        167 |          9 |         13 |        189 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\paymentController.js               | JavaScript |        513 |         58 |         79 |        650 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\peopleController.js                | JavaScript |        799 |         46 |        134 |        979 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\preferencesController.js           | JavaScript |         74 |          6 |         12 |         92 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\profileSelectionController.js      | JavaScript |        116 |          4 |         23 |        143 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\publicSubscriptionController.js    | JavaScript |         95 |         15 |         10 |        120 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\rolesController.js                 | JavaScript |         91 |         12 |         21 |        124 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\searchController.js                | JavaScript |        692 |         28 |        124 |        844 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\sessionController.js               | JavaScript |         57 |          5 |         14 |         76 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\shareController.js                 | JavaScript |         85 |          6 |         13 |        104 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\subscriptionAnalyticsController.js | JavaScript |        654 |         26 |         65 |        745 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\subscriptionController.js          | JavaScript |        985 |         58 |        117 |      1,160 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\upgradeController.js               | JavaScript |        249 |         28 |         48 |        325 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\uploadController.js                | JavaScript |        371 |         24 |         57 |        452 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\userController.js                  | JavaScript |      2,122 |         92 |        290 |      2,504 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\userSubscriptionController.js      | JavaScript |      1,098 |         72 |        165 |      1,335 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\viewerController.js                | JavaScript |      1,339 |         87 |        155 |      1,581 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\watchController.js                 | JavaScript |        373 |         24 |         60 |        457 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\index.js                                       | JavaScript |        123 |          7 |         10 |        140 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\locales\en.json                                | JSON       |         36 |          0 |          0 |         36 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\locales\fr.json                                | JSON       |         36 |          0 |          0 |         36 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\locales\rw.json                                | JSON       |         36 |          0 |          0 |         36 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\locales\sw.json                                | JSON       |         36 |          0 |          0 |         36 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\adminMiddleware.js                 | JavaScript |         33 |          4 |         10 |         47 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\authMiddleware.js                  | JavaScript |         39 |          0 |         11 |         50 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\checkKidProfileLimit.js            | JavaScript |         42 |          3 |          9 |         54 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\checkTimeLimits.js                 | JavaScript |         43 |          5 |          9 |         57 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\kidContentFilter.js                | JavaScript |         31 |          6 |          7 |         44 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\kidSessionAuth.js                  | JavaScript |         76 |          7 |          8 |         91 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\requireFamilyPlan.js               | JavaScript |         31 |          3 |          5 |         39 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\validateParentOwnership.js         | JavaScript |         31 |          2 |          6 |         39 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\models\User.js                                 | JavaScript |         22 |          1 |          5 |         28 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\package-lock.json                              | JSON       |      6,513 |          0 |          1 |      6,514 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\package.json                                   | JSON       |         38 |          0 |          1 |         39 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\payment_debug.log                              | Log        |         29 |          0 |          1 |         30 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\registerIPN.js                                 | JavaScript |         64 |          4 |         20 |         88 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\analyticsRoutes.js                      | JavaScript |         17 |          2 |          3 |         22 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\authRoutes.js                           | JavaScript |         14 |          9 |         11 |         34 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\categoryRoutes.js                       | JavaScript |         26 |          2 |          4 |         32 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\contactRoutes.js                        | JavaScript |         27 |          4 |          4 |         35 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\contentRoutes.js                        | JavaScript |         47 |          3 |          7 |         57 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\emailVerificationRoutes.js              | JavaScript |          5 |          0 |          2 |          7 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\genreRoutes.js                          | JavaScript |         21 |          2 |          4 |         27 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\imageProxyRoutes.js                     | JavaScript |          5 |          1 |          3 |          9 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\kidProfileRoutes.js                     | JavaScript |         28 |          4 |          5 |         37 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\kidRoutes.js                            | JavaScript |         25 |          5 |          6 |         36 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\kidSessionRoutes.js                     | JavaScript |         14 |          2 |          2 |         18 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\newPlanRoutes.js                        | JavaScript |         27 |          2 |          8 |         37 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\notificationRoutes.js                   | JavaScript |         18 |          3 |          4 |         25 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\overviewRoutes.js                       | JavaScript |          8 |          0 |          2 |         10 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\paymentRoutes.js                        | JavaScript |         15 |          6 |          5 |         26 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\peopleRoutes.js                         | JavaScript |         31 |          3 |          5 |         39 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\preferencesRoutes.js                    | JavaScript |          7 |          2 |          4 |         13 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\profileSelectionRoutes.js               | JavaScript |         12 |          2 |          2 |         16 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\rolesRoutes.js                          | JavaScript |          9 |          4 |          8 |         21 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\searchRoutes.js                         | JavaScript |         13 |          2 |          4 |         19 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\sessionRoutes.js                        | JavaScript |          7 |          2 |          5 |         14 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\subscriptionRoutes.js                   | JavaScript |         86 |          9 |         16 |        111 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\upgradeRoutes.js                        | JavaScript |         18 |          3 |          4 |         25 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\uploadRoutes.js                         | JavaScript |         17 |          5 |          7 |         29 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\userRoutes.js                           | JavaScript |         77 |         32 |         35 |        144 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\userSubscriptionRoutes.js               | JavaScript |         37 |          5 |          7 |         49 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\viewerRoutes.js                         | JavaScript |         32 |          3 |          4 |         39 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\watchRoutes.js                          | JavaScript |         14 |          5 |          6 |         25 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\seeds\seedAdmin.js                             | JavaScript |         23 |          0 |          6 |         29 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\services\emailService.js                       | JavaScript |        206 |         10 |         24 |        240 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\services\paymentService.js                     | JavaScript |        253 |         21 |         53 |        327 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\services\pesapalService.js                     | JavaScript |        147 |          2 |         22 |        171 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\services\upgradeService.js                     | JavaScript |        438 |         87 |         91 |        616 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\test-mtn.js                                    | JavaScript |         28 |          3 |          7 |         38 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\testCardPayment.js                             | JavaScript |         32 |          9 |          9 |         50 |
+| c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\utils\filePaths.js                             | JavaScript |         15 |          0 |          3 |         18 |
+| Total                                                                                            |            |     28,195 |      1,573 |      3,165 |     32,933 |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

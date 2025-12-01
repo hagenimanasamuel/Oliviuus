@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /*.js
+Allow: /*.css
+
+# Sitemap
+Sitemap: https://oliviuus.pages.dev/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
+
+# Disallow admin pages (if any)
+Disallow: /admin
+Disallow: /private

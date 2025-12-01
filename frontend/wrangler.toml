@@ -1,0 +1,8 @@
+Project name: oliviuus
+Production branch: main
+
+Build settings:
+Build command: npm run build
+Build output directory: dist
+
+Root directory: /frontend 

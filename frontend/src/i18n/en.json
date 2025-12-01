@@ -1,0 +1,2193 @@
+{
+  "footer": {
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "help": "Help Center",
+    "feedback": "Feedback",
+    "rights": "All rights reserved."
+  },
+  "notfound": {
+    "title": "Page Not Found",
+    "description": "Oops! The page you are looking for does not exist.",
+    "home_button": "Go Back Home"
+  },
+  "auth": {
+    "enter_email": "Please enter your email address",
+    "enter_email_desc": "Enter your email to continue",
+    "email_placeholder": "Email Address",
+    "continue": "Continue",
+    "welcome": "Welcome",
+    "email_exists": "Email exists. Please enter your password.",
+    "email_not_exists": "Email not found. Please verify your email to continue.",
+    "server_error": "Something went wrong. Please try again.",
+    "login_title": "Login to your account",
+    "signup_title": "Create a new account",
+    "password_placeholder": "Enter your password",
+    "enter_password": "Please enter your password",
+    "forgot_password": "Forgot password?",
+    "login": "Login",
+    "create_account": "Create Account",
+    "loading": "Processing...",
+    "reset_password": "Reset Password",
+    "reset_link_confirm": "Do you want to send a reset link to",
+    "cancel": "Cancel",
+    "send_reset_link": "Send Reset Link",
+    "sending": "Sending...",
+    "reset_link_sent": "Password reset link sent to {{email}}",
+    "reset_link_error": "Failed to send reset link. Please try again.",
+    "invalid_reset_link": "Invalid password reset link.",
+    "password_mismatch": "Passwords do not match.",
+    "password_reset_success": "Your password has been reset successfully!",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "reset_password_button": "Reset Password"
+  },
+  "verifyEmail": {
+    "code_required": "Verification code is required",
+    "invalid_or_expired_code": "The code is invalid or has expired",
+    "server_error": "Something went wrong. Please try again.",
+    "enter_code_desc": "Please enter the code sent to your email",
+    "code_placeholder": "Verification Code",
+    "loading": "Verifying...",
+    "verify": "Verify",
+    "not_received": "Didn't get the email?",
+    "resend_code": "Resend code",
+    "resend_in": "Resend available in {{seconds}}s",
+    "resend_failed": "Failed to resend verification code. Please try again.",
+    "tips": "Make sure to check your Spam or Junk folder. It may take a few minutes for the email to arrive."
+  },
+  "userInfo": {
+    "enter_details_desc": "Set a strong password for your account",
+    "password_placeholder": "Password",
+    "confirm_password_placeholder": "Confirm Password",
+    "continue": "Continue",
+    "loading": "Saving...",
+    "disclaimer_before": "By signing up or creating an account you agree to our",
+    "terms": "Terms & Conditions",
+    "and": "and",
+    "privacy": "Privacy Policy",
+    "server_error": "Something went wrong. Please try again.",
+    "password_required": "Password is required",
+    "password_length": "Password must be between 8-24 characters",
+    "password_uppercase": "Password must include an uppercase letter",
+    "password_lowercase": "Password must include a lowercase letter",
+    "password_number": "Password must include a number",
+    "password_special": "Password must include a special character",
+    "passwords_mismatch": "Passwords do not match"
+  },
+  "preferences": {
+    "language": "Language",
+    "lang_rw": "Kinyarwanda",
+    "lang_en": "English",
+    "lang_fr": "French",
+    "lang_sw": "Swahili",
+    "notifications": "Allow Notifications",
+    "subtitles": "Enable Auto Subtitles",
+    "genres": "Preferred Genres",
+    "save": "Save Preferences",
+    "saving": "Saving...",
+    "update_success": "Preferences updated successfully!",
+    "update_error": "Failed to update preferences."
+  },
+  "genres": {
+    "comedy": "Comedy",
+    "drama": "Drama",
+    "action": "Action",
+    "romance": "Romance",
+    "horror": "Horror",
+    "documentary": "Documentary",
+    "animation": "Animation"
+  },
+  "settings": {
+    "title": "Account Settings",
+    "back": "Go Back",
+    "loading": "Loading...",
+    "more": "More",
+    "tabs": {
+      "account": "Account Info",
+      "security": "Security",
+      "preferences": "Preferences",
+      "sessions": "Active Sessions",
+      "subscription": "Subscription",
+      "profiles": "Family / Profiles",
+      "parental": "Parental Controls",
+      "family_invitations": "Family Invitations"
+    }
+  },
+  "accountInfo": {
+    "avatarAlt": "Avatar",
+    "changeAvatar": "Change Profile Picture",
+    "close": "Close",
+    "categories": {
+      "People": "People",
+      "Animals": "Animals",
+      "Fantasy": "Fantasy",
+      "Abstract": "Abstract"
+    },
+    "email": "Email",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "success": "Account info updated successfully!",
+    "error": "Failed to update account info."
+  },
+  "sessions": {
+    "logoutSuccess": "Session logged out successfully.",
+    "logoutFail": "Failed to log out this session.",
+    "logoutAllSuccess": "All other sessions logged out successfully.",
+    "logoutAllFail": "Failed to log out other sessions.",
+    "noActive": "No active sessions.",
+    "logoutAll": "Logout All Other Sessions",
+    "loggingOut": "Logging out...",
+    "current": "Current Session",
+    "ip": "IP",
+    "location": "Location",
+    "login": "Login",
+    "logout": "Logout",
+    "status": "Status",
+    "active": "Active",
+    "loggedOut": "Logged out",
+    "unknown": "Unknown"
+  },
+  "sidebar": {
+    "overview": "Overview",
+    "users": "Users",
+    "library": "Library",
+    "subscriptions": "Subscriptions",
+    "analytics": "Analytics",
+    "globalManagement": "Global Management",
+    "support": "Support"
+  },
+  "usersHeader": {
+    "allUsers": "All Users",
+    "filtered": "filtered",
+    "searchPlaceholder": "Search users by email or role...",
+    "refresh": "Refresh users",
+    "bulkActions": "Bulk Actions ({{count}})",
+    "activateSelected": "Activate Selected",
+    "deactivateSelected": "Deactivate Selected",
+    "deleteSelected": "Delete Selected",
+    "export": "Export",
+    "addUser": "Add User",
+    "filters": "Filters",
+    "allRoles": "All Roles",
+    "roles": {
+      "admin": "Admin",
+      "viewer": "Viewer",
+      "moderator": "Moderator",
+      "editor": "Editor"
+    },
+    "allStatus": "All Status",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended",
+      "pending": "Pending"
+    },
+    "lastLogin": "Last Login",
+    "lastLoginOptions": {
+      "today": "Today",
+      "week": "This Week",
+      "month": "This Month",
+      "quarter": "This Quarter",
+      "year": "This Year",
+      "never": "Never Logged In"
+    },
+    "advanced": "Advanced",
+    "clearAll": "Clear All",
+    "sortBy": "Sort by:",
+    "sort": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "emailAsc": "Email (A → Z)",
+      "emailDesc": "Email (Z → A)",
+      "role": "Role",
+      "lastLogin": "Last Login"
+    },
+    "registrationDate": "Registration Date",
+    "clearAdvanced": "Clear Advanced"
+  },
+  "usersTabs": {
+    "allUsers": "All Users",
+    "rolesPermissions": "Roles & Permissions",
+    "specials": "Specials",
+    "familyPlan": "Family Plan",
+    "bulkOperations": "Bulk Operations",
+    "more": "More"
+  },
+  "passwordSettings": {
+    "currentPassword": "Current Password",
+    "currentPasswordPlaceholder": "Enter current password",
+    "forgotCurrent": "Forgot your current password?",
+    "requestReset": "Request a reset link",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password",
+    "newPasswordHelp": "Must be 8+ chars, include uppercase, lowercase, number & symbol",
+    "confirmPassword": "Confirm New Password",
+    "confirmPasswordPlaceholder": "Confirm new password",
+    "update": "Update Password",
+    "saving": "Saving...",
+    "errorPasswordsMismatch": "Passwords do not match",
+    "errorPasswordCriteria": "Password must be 8+ chars and include uppercase, lowercase, number & symbol.",
+    "errorCurrentRequired": "Current password is required.",
+    "successUpdate": "Password updated successfully!",
+    "errorUpdate": "Failed to update password.",
+    "sendingReset": "Sending reset link...",
+    "resetSent": "Password reset link sent to your email.",
+    "resetFailed": "Failed to send reset link."
+  },
+  "criticalActions": {
+    "warning": "Warning: Critical account actions",
+    "deactivate": "Deactivate Account",
+    "delete": "Delete Account",
+    "processing": "Processing...",
+    "info": "Deactivating will temporarily disable your account. Deleting will permanently remove all data.",
+    "confirm": "Are you sure you want to {{action}} your account? This action cannot be undone.",
+    "deleteSuccess": "Account deleted successfully.",
+    "deactivateSuccess": "Account deactivated successfully.",
+    "actionFailed": "Failed to perform action."
+  },
+  "securitySettings": {
+    "title": "Security Settings",
+    "tabs": {
+      "password": "Password",
+      "critical": "Critical Actions"
+    },
+    "more": "More"
+  },
+  "userForm": {
+    "title": "Invite User",
+    "subtitle": "Send invitation to join platform",
+    "fields": {
+      "email": "Email Address",
+      "role": "Role",
+      "language": "Language",
+      "sendInvitation": "Send invitation email"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "viewer": "Viewer"
+    },
+    "languages": {
+      "en": "English",
+      "rw": "Kinyarwanda",
+      "fr": "French",
+      "sw": "Kiswahili"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "sendInvitation": "Send Invitation",
+      "createUser": "Create User"
+    },
+    "alerts": {
+      "emailRequired": "Email address is required",
+      "emailInvalid": "Please enter a valid email address",
+      "roleRequired": "Please select a role for the user",
+      "languageRequired": "Please select a language for the user",
+      "successInvitation": "User created successfully! An email has been sent to set up their password.",
+      "successManual": "User created successfully! You can send an invitation later.",
+      "failed": "Failed to create user. Please try again."
+    }
+  },
+  "users": {
+    "pageTitle": "User Management"
+  },
+  "userModal": {
+    "tabs": {
+      "overview": "Overview",
+      "activity": "Activity",
+      "subscription": "Subscription",
+      "security": "Security",
+      "securityLogs": "Security Logs",
+      "notifications": "Notifications & Emails"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended",
+      "banned": "Banned"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "moderator": "Moderator",
+      "viewer": "Viewer",
+      "user": "User"
+    },
+    "actions": {
+      "editEmail": "Edit Email",
+      "save": "Save",
+      "cancel": "Cancel",
+      "makeAdmin": "Make Admin",
+      "makeViewer": "Make Viewer",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "loginHistory": "History",
+      "delete": "Delete",
+      "more": "More"
+    },
+    "confirmation": {
+      "changeRole": "Change {{email}}'s role to {{role}}?",
+      "deleteAccount": "Are you sure you want to delete {{email}}'s account?",
+      "processing": "Processing..."
+    },
+    "errors": {
+      "updateRole": "Failed to update user role",
+      "updateStatus": "Failed to update user status",
+      "deleteUser": "Failed to delete user account",
+      "updateEmail": "Failed to update email",
+      "networkError": "Network error. Please check server.",
+      "sameEmail": "New email is the same as current email.",
+      "invalidEmail": "Please enter a valid email address."
+    },
+    "prompts": {
+      "enterNewEmail": "Enter new email:"
+    },
+    "success": {
+      "emailUpdated": "Email updated successfully!"
+    }
+  },
+  "overviewTab": {
+    "title": "User Information",
+    "activitySummary": "Activity Summary",
+    "status": "Status",
+    "plan": "Plan",
+    "memberSince": "Member Since",
+    "lastLogin": "Last Login",
+    "language": "Language",
+    "emailVerified": "Email Verified",
+    "lastIp": "Last IP",
+    "verified": "Verified",
+    "pending": "Pending",
+    "stats": {
+      "totalLogins": "Total Logins",
+      "currentStreak": "Current Streak",
+      "failedLogins": "Failed Logins",
+      "avgSession": "Avg. Session",
+      "todayLogins": "Today's Logins",
+      "thisWeek": "This Week",
+      "lastDevice": "Last Device",
+      "subscription": "Subscription",
+      "active": "Active",
+      "inactive": "Inactive",
+      "avgSessionTime": "Avg Session Time",
+      "activeSessions": "Active Sessions",
+      "totalSessions": "Total Sessions"
+    },
+    "recentActivity": "Recent Activity",
+    "subscriptionPlans": {
+      "premium": "Premium",
+      "enterprise": "Enterprise",
+      "standard": "Standard",
+      "basic": "Basic",
+      "free": "Free"
+    },
+    "time": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{count}} days ago",
+      "weeksAgo": "{{count}} weeks ago",
+      "monthsAgo": "{{count}} months ago",
+      "yearsAgo": "{{count}} years ago",
+      "never": "Never",
+      "unknown": "Unknown"
+    }
+  },
+  "activityTab": {
+    "title": "Login History & Sessions",
+    "stats": {
+      "totalSessions": "Total Sessions",
+      "activeNow": "Active Now",
+      "completed": "Completed",
+      "lastLogin": "Last Login"
+    },
+    "filters": {
+      "all": "All Sessions",
+      "active": "Active Only",
+      "completed": "Completed"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "logoutAll": "Logout All",
+      "terminate": "Terminate",
+      "terminateAllConfirm": "Are you sure you want to terminate all active sessions for this user?"
+    },
+    "session": {
+      "status": {
+        "active": "Active",
+        "completed": "Completed"
+      },
+      "deviceTypes": {
+        "mobile": "📱 Mobile",
+        "tablet": "📟 Tablet",
+        "desktop": "🖥️ Desktop",
+        "default": "💻 Device"
+      },
+      "login": "Login",
+      "duration": "Duration",
+      "active": "Active",
+      "justNow": "Just now",
+      "unknownLocation": "Unknown location"
+    },
+    "messages": {
+      "loading": "Loading sessions...",
+      "noSessions": "No login sessions found",
+      "noFilteredSessions": "No {{filter}} sessions found",
+      "noSessionsYet": "This user doesn't have any login sessions yet",
+      "terminateSuccess": "Session terminated successfully",
+      "terminateAllSuccess": "All sessions terminated successfully",
+      "terminateError": "Failed to terminate session",
+      "terminateAllError": "Failed to terminate all sessions",
+      "permissionDenied": "Permission denied: You don't have access to view user sessions"
+    },
+    "debug": {
+      "userId": "User ID",
+      "sessionsLoaded": "Sessions loaded",
+      "activeSessions": "active",
+      "filter": "Filter",
+      "loading": "Loading"
+    }
+  },
+  "securityTab": {
+    "title": "Security",
+    "passwordManagement": "Password Management",
+    "sessionManagement": "Session Management",
+    "stats": {
+      "emailStatus": "Email Status",
+      "lastLogin": "Last Login",
+      "pendingResets": "Pending Resets",
+      "failedLogins": "Failed Logins",
+      "verified": "Verified",
+      "unverified": "Unverified"
+    },
+    "passwordReset": {
+      "sendResetEmail": "Send Password Reset Email",
+      "sendResetEmailShort": "Send Reset Email",
+      "description": "User will receive a reset link in their preferred language",
+      "sending": "Sending...",
+      "sendResetLink": "Send Reset Link",
+      "forceReset": "Force Password Reset",
+      "forceDescription": "Immediately set a new password (will log out all sessions)",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "enterNewPassword": "Enter new password",
+      "confirmNewPassword": "Confirm new password",
+      "resetting": "Resetting...",
+      "resetPassword": "Reset Password",
+      "confirmSendReset": "Send password reset email to {{email}}?",
+      "confirmForceReset": "Reset password for {{email}}? This will log them out of all sessions.",
+      "successResetSent": "Password reset email sent successfully!",
+      "successResetDone": "Password reset successfully! User will need to use this new password."
+    },
+    "sessions": {
+      "terminateAll": "Terminate All Active Sessions",
+      "terminateAllShort": "Terminate Sessions",
+      "description": "Log out user from all devices and browsers",
+      "terminating": "Terminating...",
+      "logoutAll": "Logout All",
+      "confirmTerminate": "Terminate all active sessions for {{email}}? This will log them out from all devices.",
+      "successTerminate": "All sessions terminated successfully!",
+      "activeSessions": "{{count}} active session",
+      "activeSessions_plural": "{{count}} active sessions"
+    },
+    "messages": {
+      "processing": "Processing...",
+      "enterPassword": "Please enter a new password",
+      "passwordsMatch": "Passwords do not match",
+      "passwordLength": "Password must be at least 8 characters",
+      "failedAction": "Failed to {{action}}",
+      "failedSendReset": "Failed to send password reset",
+      "failedForceReset": "Failed to reset password",
+      "failedTerminate": "Failed to terminate sessions"
+    },
+    "time": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{count}} days ago",
+      "weeksAgo": "{{count}} weeks ago",
+      "monthsAgo": "{{count}} months ago",
+      "never": "Never",
+      "unknown": "Unknown"
+    }
+  },
+  "usersList": {
+    "loading": "Loading...",
+    "emptyState": {
+      "title": "No users found",
+      "description": "There are no users matching your criteria."
+    },
+    "loadMore": "Load More Users"
+  },
+  "subscriptionPage": {
+    "title": "Choose Your Plan",
+    "subtitle": "Unlimited streaming. No commitments. Cancel anytime.",
+    "pricesIn": "Prices in",
+    "convertedFromRWF": "converted from RWF",
+    "fetchError": "Failed to load subscription plans",
+    "noPlans": "No Plans Available",
+    "checkBackLater": "Please check back later for available subscription plans",
+    "selectPlan": "Select Plan",
+    "processing": "Processing...",
+    "mostPopular": "MOST POPULAR",
+    "serverError": "Server error. Please try again.",
+    "selectError": "Failed to select plan. Please try again.",
+    "loading": "Loading subscription plans...",
+    "comparePlans": "Compare Plans",
+    "compareSubtitle": "Find the perfect plan for your entertainment needs",
+    "perMonth": "/month",
+    "device": "Device",
+    "devices": "Devices",
+    "perfectFor": "Perfect for",
+    "moreFeatures": "more features",
+    "getPlan": "Get {{plan}}",
+    "watchOn": "Watch on {count} {devices} simultaneously",
+    "videoQuality": "video quality",
+    "unlimitedDownloads": "Unlimited downloads for offline viewing",
+    "downloadLimit": "Download {count} items for offline viewing",
+    "simultaneousDownloads": "{count} simultaneous downloads",
+    "downloadExpiry": "Downloads expire after {days} days",
+    "noDownloads": "No downloads available",
+    "hdrSupport": "HDR support for enhanced visuals",
+    "adFree": "Ad-free streaming experience",
+    "fullLibrary": "Access to entire content library",
+    "prioritySupport": "Priority customer support",
+    "parentalControls": "Parental controls for family safety",
+    "quality": {
+      "SD": "SD (480p)",
+      "HD": "HD (720p)",
+      "FHD": "Full HD (1080p)",
+      "UHD": "4K Ultra HD"
+    },
+    "plans": {
+      "mobile": {
+        "title": "Mobile Plan",
+        "tagline": "Entertainment on the go",
+        "description": "Perfect for mobile viewers who want affordable access to Oliviuus on a single device.",
+        "idealFor": "Individuals seeking mobile-only access"
+      },
+      "basic": {
+        "title": "Basic Plan",
+        "tagline": "Your daily dose of movies and series",
+        "description": "The Basic Plan offers improved quality and flexibility for regular viewers.",
+        "idealFor": "Couples or roommates sharing screens"
+      },
+      "standard": {
+        "title": "Standard Plan",
+        "tagline": "Step up your viewing experience",
+        "description": "Upgrade to the Standard Plan for better quality and flexibility across multiple devices.",
+        "idealFor": "Small families or quality-focused users"
+      },
+      "family": {
+        "title": "Family Plan",
+        "tagline": "The complete family entertainment experience",
+        "description": "Our Premium Family Plan offers everything Oliviuus has to offer with the best quality.",
+        "idealFor": "Families with multiple viewers and devices"
+      }
+    },
+    "comparison": {
+      "features": "Features",
+      "simultaneousStreams": "Simultaneous Streams",
+      "videoQuality": "Video Quality",
+      "offlineDownloads": "Offline Downloads",
+      "downloadLimit": "Download Limit",
+      "downloadQuality": "Download Quality",
+      "hdrSupport": "HDR Support",
+      "parentalControls": "Parental Controls",
+      "supportedPlatforms": "Supported Platforms",
+      "maxRegisteredDevices": "Max Registered Devices",
+      "simultaneousDownloads": "Simultaneous Downloads",
+      "downloadExpiry": "Download Expiry",
+      "videoBitrate": "Video Bitrate",
+      "devices": "{count} {devices}",
+      "unlimited": "Unlimited",
+      "notAvailable": "Not Available",
+      "downloadItems": "{count} items",
+      "platformsCount": "{count} platforms",
+      "allPlatforms": "All platforms",
+      "registeredDevices": "{count} devices",
+      "downloadsAtOnce": "{count} at once",
+      "expiryDays": "{days} days",
+      "neverExpires": "Never expires",
+      "mbps": "{value} Mbps",
+      "kbps": "{value} kbps"
+    },
+    "helpSection": {
+      "title": "Having issues with your subscription?",
+      "checkStatus": "Check Your Subscription Status",
+      "contactSupport": "Contact Support Team"
+    }
+  },
+  "profileMenu": {
+    "profileMenu": "Profile menu",
+    "profilePicture": "Profile picture",
+    "user": "User",
+    "activeAccount": "Active account",
+    "signOut": "Sign out",
+    "account": "Account"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Get answers to common questions about our subscription plans",
+    "needMoreHelp": "Need more help?",
+    "contactSupport": "Our support team is here to assist you with any additional questions",
+    "contactUs": "Contact Support",
+    "canChangePlan": "Can I change my plan later?",
+    "changePlanAnswer": "Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle. Upgrades are prorated, while downgrades take effect after your current billing period ends.",
+    "commitmentPeriod": "Is there a commitment period?",
+    "commitmentAnswer": "No, all plans are month-to-month with no long-term commitment. Cancel anytime without fees. Your subscription will remain active until the end of your current billing period.",
+    "devicesSimultaneously": "How many devices can I use simultaneously?",
+    "devicesAnswer": "The number of simultaneous streams varies by plan. Please check the specific device limits for each plan in our comparison table to find the one that best suits your household's needs.",
+    "discountsAvailable": "Do you offer student, military, or loyalty discounts?",
+    "discountsAnswer": "While we currently don't support loyalty or special discounts, we're actively working on implementing a comprehensive loyalty program. Stay tuned for future updates as we continue to enhance our subscription offerings.",
+    "paymentMethods": "What payment methods do you accept?",
+    "paymentAnswer": "We accept mobile money (MTN, Airtel), credit/debit cards (Visa, MasterCard), and bank transfers. All payments are secure and encrypted for your protection.",
+    "offlineViewing": "Can I download content for offline viewing?",
+    "offlineAnswer": "Offline download availability depends on your selected plan. Please review the feature comparison between plans to see which ones include download capabilities and their respective limits.",
+    "regionalAvailability": "Is content available in all regions?",
+    "regionalAnswer": "Due to licensing agreements, some content may not be available in all regions. Our catalog is optimized for East African audiences with a rich mix of local and international content.",
+    "cancelSubscription": "How do I cancel my subscription?",
+    "cancelAnswer": "You can cancel anytime from your account settings. Navigate to 'Subscription' → 'Manage Plan' → 'Cancel Subscription'. Your access will continue until the end of your current billing period.",
+    "videoQuality": "What video quality can I expect?",
+    "qualityAnswer": "Video quality varies by subscription plan, ranging from standard definition to 4K Ultra HD. Please refer to the plan comparison for specific quality offerings that match each tier.",
+    "billingCycle": "When does my billing cycle start?",
+    "billingAnswer": "Your billing cycle starts immediately upon subscription and renews automatically every 30 days. You'll receive a notification before each renewal, and you can cancel at any time without penalty."
+  },
+  "contact": {
+    "contactUs": "Contact Us",
+    "helpSubtitle": "We're here to help with any questions or concerns",
+    "needHelp": "Need Help?",
+    "ctaDescription": "Our team is here to assist you with any questions, feedback, or concerns. We're always happy to help!",
+    "getInTouch": "Get In Touch",
+    "emailSupport": "Email Support",
+    "responseTime": "Response within 2 hours",
+    "phoneSupport": "Phone Support",
+    "phoneHours": "Mon-Sun, 8AM-10PM",
+    "liveChat": "Live Chat",
+    "available247": "Available 24/7",
+    "instantSupport": "Instant support",
+    "messageSent": "Message Sent Successfully!",
+    "thankYou": "Thank you for reaching out. We'll get back to you soon.",
+    "sendAnother": "Send another message",
+    "fullName": "Full Name",
+    "namePlaceholder": "Enter your full name",
+    "emailAddress": "Email Address",
+    "emailPlaceholder": "Enter your email",
+    "category": "Category",
+    "selectCategory": "Select a category",
+    "subject": "Subject",
+    "subjectPlaceholder": "Brief subject line",
+    "message": "Message",
+    "messagePlaceholder": "Tell us how we can help you...",
+    "sending": "Sending Message...",
+    "sendMessage": "Send Message",
+    "generalInquiry": "General Inquiry",
+    "technicalSupport": "Technical Support",
+    "billingQuestion": "Billing Question",
+    "featureRequest": "Feature Request",
+    "bugReport": "Bug Report",
+    "partnership": "Partnership",
+    "feedback": "Feedback & Suggestions",
+    "other": "Other",
+    "title": "Contact Management",
+    "allContacts": "All Contacts",
+    "submissionError": "Failed to send message. Please try again.",
+    "exportError": "Failed to export contacts.",
+    "filters": {
+      "search": "Search contacts...",
+      "allStatus": "All Status",
+      "allPriority": "All Priority",
+      "allCategories": "All Categories",
+      "filters": "Filters",
+      "sortBy": "Sort By",
+      "newestFirst": "Newest First",
+      "lastUpdated": "Last Updated",
+      "priority": "Priority",
+      "status": "Status",
+      "advanced": "Advanced",
+      "clearAll": "Clear All",
+      "dateRange": "Date Range",
+      "responseCount": "Response Count",
+      "source": "Source",
+      "clearAdvanced": "Clear Advanced",
+      "any": "Any",
+      "noResponses": "No Responses",
+      "responses1to3": "1-3 Responses",
+      "responses4plus": "4+ Responses",
+      "allSources": "All Sources",
+      "filtered": "filtered",
+      "from": "From",
+      "to": "To",
+      "responses": "Responses"
+    },
+    "status": {
+      "new": "New",
+      "open": "Open",
+      "in_progress": "In Progress",
+      "awaiting_reply": "Awaiting Reply",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "category": {
+      "general": "General Inquiry",
+      "technical": "Technical Support",
+      "billing": "Billing Question",
+      "feature": "Feature Request",
+      "bug_report": "Bug Report",
+      "partnership": "Partnership",
+      "feedback": "Feedback & Suggestions",
+      "other": "Other"
+    },
+    "stats": {
+      "totalContacts": "Total Contacts",
+      "newContacts": "New Contacts",
+      "inProgress": "In Progress",
+      "resolved": "Resolved",
+      "responseRate": "Response Rate",
+      "resolutionRate": "Resolution Rate",
+      "avgResponseTime": "Avg Response Time",
+      "statusDistribution": "Status Distribution",
+      "priorityOverview": "Priority Overview",
+      "categoryBreakdown": "Category Breakdown",
+      "performanceMetrics": "Performance Metrics"
+    },
+    "settings": {
+      "refresh": "Refresh",
+      "export": "Export",
+      "title": "Contact Settings",
+      "subtitle": "Manage your contact information displayed to users on the contact form",
+      "supportEmail": "Support Email",
+      "emailPlaceholder": "support@oliviuus.com",
+      "emailDescription": "This email will be displayed to users for support inquiries",
+      "supportPhone": "Support Phone",
+      "phonePlaceholder": "+250 788 123 456",
+      "phoneDescription": "This phone number will be displayed to users for support calls",
+      "saveChanges": "Save Changes",
+      "saving": "Saving...",
+      "preview": "Preview",
+      "defaultEmail": "support@oliviuus.com",
+      "defaultPhone": "+250 788 123 456",
+      "loadError": "Failed to load contact information",
+      "updateSuccess": "Contact information updated successfully",
+      "updateError": "Failed to update contact information"
+    },
+    "list": {
+      "noContacts": "No contacts found",
+      "adjustFilters": "Try adjusting your filters or search terms",
+      "loadMore": "Load More"
+    },
+    "time": {
+      "justNow": "Just now",
+      "hoursAgo": "{{hours}}h ago",
+      "daysAgo": "{{days}}d ago"
+    },
+    "modal": {
+      "changeStatus": "Change Status",
+      "details": "Details",
+      "conversation": "Conversation",
+      "reply": "Reply",
+      "contactInfo": "Contact Information",
+      "technicalDetails": "Technical Details",
+      "submitted": "Submitted",
+      "lastResponse": "Last Response",
+      "source": "Source",
+      "notAvailable": "N/A",
+      "ipAddress": "IP Address",
+      "responses": "Responses",
+      "firstRead": "First Read",
+      "message": "Message",
+      "refresh": "Refresh",
+      "supportTeam": "Support Team",
+      "noResponses": "No responses yet",
+      "sendFirstResponse": "Send the first response to start the conversation",
+      "sendReply": "Send Reply",
+      "originalMessage": "Original Message",
+      "replyPlaceholder": "Type your reply here...",
+      "cancel": "Cancel",
+      "sending": "Sending...",
+      "statusUpdateError": "Failed to update contact status",
+      "replySuccess": "Reply sent successfully!",
+      "replyError": "Failed to send reply",
+      "never": "Never"
+    },
+    "categoryLabel": "Category",
+    "priorityLabel": "Priority",
+    "statusLabel": "Status",
+    "stats": {
+      "title": "Contact Analytics",
+      "subtitle": "Comprehensive overview of your contact management performance",
+      "loading": "Loading statistics...",
+      "failedToLoad": "Failed to load statistics",
+      "tryAgain": "Try Again",
+      "refresh": "Refresh",
+      "fromLastPeriod": "from last period",
+      "totalContacts": "Total Contacts",
+      "allTimeContacts": "All time contacts",
+      "responseRate": "Response Rate",
+      "respondedOfTotal": "{{responded}} of {{total}} responded",
+      "avgResponseTime": "Avg Response Time",
+      "acrossAllContacts": "Across all contacts",
+      "resolutionRate": "Resolution Rate",
+      "resolvedContacts": "{{resolved}} resolved",
+      "statusDistribution": "Status Distribution",
+      "priorityOverview": "Priority Overview",
+      "categoryBreakdown": "Category Breakdown",
+      "performanceMetrics": "Performance Metrics",
+      "emailResponses": "Email Responses",
+      "totalSentReplies": "Total sent replies",
+      "satisfactionRate": "Satisfaction Rate",
+      "estimatedFromResolutions": "Estimated from resolutions",
+      "activeConversations": "Active Conversations",
+      "currentlyInProgress": "Currently in progress",
+      "newToday": "New Today",
+      "timeRanges": {
+        "all": "All Time",
+        "today": "Today",
+        "week": "This Week",
+        "month": "This Month"
+      }
+    }
+  },
+  "contactAdmin": {
+    "tabs": {
+      "allContacts": "All Contacts",
+      "statistics": "Statistics",
+      "contactSettings": "Contact Settings"
+    },
+    "more": "More",
+    "loading": "Loading..."
+  },
+  "seo": {
+    "siteName": "Oliviuus",
+    "defaultTitle": "Stream Movies & TV Shows Online",
+    "defaultDescription": "Watch the latest movies and TV shows online. Unlimited streaming, personalized recommendations, and family-friendly content.",
+    "keywords": "movies, tv shows, streaming, online videos, entertainment"
+  },
+  "actions": {
+    "play": "Play",
+    "stop": "Stop",
+    "trailer": "Trailer",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "viewAll": "View All",
+    "swipeToBrowse": "Swipe to browse →",
+    "tryAgain": "Try Again",
+    "inList": "In List",
+    "myList": "My List",
+    "liked": "Liked",
+    "like": "Like",
+    "details": "Details"
+  },
+  "sections": {
+    "popularInRwanda": "Popular in Rwanda",
+    "popularInRwandaSubtitle": "Top picks loved by Rwandan viewers",
+    "trendingNow": "Trending Now",
+    "trendingNowSubtitle": "What everyone is watching",
+    "newReleases": "New Releases",
+    "newReleasesSubtitle": "Fresh content just added"
+  },
+  "errors": {
+    "contentLoad": "We encountered an issue loading content. Please try again shortly.",
+    "somethingWentWrong": "Something went wrong",
+    "error": "Error",
+    "noContent": "No content available",
+    "checkBackLater": "Check back later for new additions."
+  },
+  "ratings": {
+    "G": "All Ages",
+    "PG": "PG",
+    "PG13": "13+",
+    "R": "18+",
+    "NC17": "18+"
+  },
+  "contentdetail": {
+    "seo": {
+      "siteName": "Oliviuus",
+      "defaultTitle": "Stream Movies & TV Shows",
+      "defaultDescription": "Watch this content on Oliviuus",
+      "keywords": "movies, tv shows, streaming"
+    },
+    "media": {
+      "trailers": "Trailers & Teasers",
+      "trailersDescription": "Watch previews and promotional videos",
+      "behindScenes": "Behind the Scenes",
+      "behindScenesDescription": "Exclusive making-of content",
+      "posters": "Posters & Artwork",
+      "postersDescription": "Official posters and key artwork",
+      "photos": "Photos & Stills",
+      "photosDescription": "Production stills and screenshots",
+      "moviePoster": "Movie Poster",
+      "mediaFrom": "{{category}} from {{title}}",
+      "contentType": "{{category}} Content",
+      "mediaFromTitle": "Media from {{title}}",
+      "exclusiveContent": "Exclusive {{category}}",
+      "mediaContent": "Media Content"
+    },
+    "share": {
+      "title": "Share this content",
+      "shareText": "Check out \"{{title}}\"",
+      "copyLink": "Copy Link",
+      "moreOptions": "More Options",
+      "shareOn": "Share on {{platform}}",
+      "platforms": {
+        "facebook": "Facebook",
+        "twitter": "Twitter",
+        "instagram": "Instagram",
+        "whatsapp": "WhatsApp",
+        "tiktok": "TikTok",
+        "telegram": "Telegram",
+        "email": "Email",
+        "sms": "SMS"
+      }
+    },
+    "actions": {
+      "goHome": "Go Home",
+      "play": "Play",
+      "stop": "Stop",
+      "trailer": "Trailer",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "viewAll": "View All",
+      "tryAgain": "Try Again",
+      "inList": "In List",
+      "myList": "My List",
+      "liked": "Liked",
+      "like": "Like",
+      "details": "Details",
+      "share": "Share",
+      "watchTrailer": "Watch Trailer",
+      "addToList": "Add to List",
+      "removeFromList": "Remove from List",
+      "goBack": "Go Back",
+      "playNow": "Play Now",
+      "fullscreen": "Fullscreen",
+      "unlike": "Unlike",
+      "stopTrailer": "Stop Trailer",
+      "browseAll": "Browse All",
+      "browseAllContent": "Browse All Content",
+      "watch": "Watch",
+      "view": "View",
+      "close": "Close",
+      "exploreMore": "Explore More",
+      "openFloatingTrailer": "Open Floating Trailer",
+      "goToHomepage": "Go to Homepage"
+    },
+    "sections": {
+      "synopsis": "Synopsis",
+      "cast": "Cast",
+      "crew": "Crew",
+      "details": "Details",
+      "media": "Media",
+      "seasons": "Seasons",
+      "episodes": "Episodes",
+      "similar": "Similar Content",
+      "overview": "Overview",
+      "gallery": "Gallery & Extras",
+      "findingSimilar": "Finding Similar Content...",
+      "youMightAlsoLike": "You Might Also Like",
+      "movieDetails": "Movie Details",
+      "featuresCategories": "Features & Categories",
+      "castAndCrew": "Cast & Crew",
+      "productionCrew": "Production Crew",
+      "fullCastCrew": "Full Cast & Crew"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "cast": "Cast & Crew",
+      "details": "Details",
+      "media": "Media",
+      "seasons": "Seasons",
+      "similar": "Similar",
+      "awards": "Awards"
+    },
+    "metadata": {
+      "rating": "Rating",
+      "duration": "Duration",
+      "ageRating": "Age Rating",
+      "releaseDate": "Release Date",
+      "contentType": "Type",
+      "originalLanguage": "Original Language",
+      "director": "Director",
+      "categories": "Categories",
+      "genres": "Genres",
+      "seasonsCount": "Seasons",
+      "episodesCount": "Episodes",
+      "notAvailable": "N/A",
+      "durationHours": "{{hours}}h {{mins}}m",
+      "durationMinutes": "{{mins}}m",
+      "views": "{{count}} views",
+      "series": "Series",
+      "movie": "Movie",
+      "documentary": "Documentary",
+      "content": "Content",
+      "itemsCount": "{{count}} items",
+      "contentWarnings": "Content Warnings",
+      "availableLanguages": "Available Languages",
+      "default": "Default",
+      "seasons": "Seasons",
+      "tvSeries": "TV Series",
+      "seasonsSingular": "{{count}} Season",
+      "seasonsPlural": "{{count}} Seasons",
+      "episodesPerSeason": "{{count}} episodes per season"
+    },
+    "errors": {
+      "contentNotFound": "Content Not Found",
+      "error": "Error",
+      "somethingWentWrong": "Something went wrong",
+      "noContent": "No content available",
+      "checkBackLater": "Check back later for new additions.",
+      "failedToLoad": "Failed to load content",
+      "failedToRemove": "Failed to remove from watchlist",
+      "failedToAdd": "Failed to add to watchlist",
+      "failedToUnlike": "Failed to unlike content",
+      "failedToLike": "Failed to like content",
+      "unableToLoad": "Unable to Load Content",
+      "noSimilarContent": "No Similar Content Found",
+      "noContentAvailable": "No Content Available",
+      "videoNotAvailable": "Video Not Available",
+      "imageNotAvailable": "Image Not Available",
+      "noCastInfo": "No cast information available",
+      "noCrewInfo": "No crew information available"
+    },
+    "roles": {
+      "director": "Director",
+      "producer": "Producer",
+      "writer": "Writer",
+      "cinematographer": "Cinematographer",
+      "composer": "Music Composer",
+      "editor": "Editor"
+    },
+    "creditTypes": {
+      "supporting": "Supporting",
+      "lead": "Lead",
+      "guest": "Guest",
+      "cameo": "Cameo"
+    },
+    "messages": {
+      "linkCopied": "Link copied successfully!",
+      "addedToList": "Added to your list",
+      "removedFromList": "Removed from your list",
+      "contentLiked": "Content liked",
+      "contentUnliked": "Content unliked",
+      "addingMoreContent": "We're working on adding more content that matches your interests.",
+      "discoverExclusive": "Discover exclusive content from {{title}}",
+      "checkBackLater": "Check back later for exclusive {{category}}.",
+      "discoverAllExclusive": "Discover all the exclusive content available for {{title}}",
+      "noDescription": "No description available.",
+      "meetTheTeam": "Meet the talented people behind {{title}}",
+      "talentedActors": "{{count}} talented actors",
+      "asCharacter": "as",
+      "creativeMinds": "The creative minds behind the production",
+      "exploreMore": "Explore more about the talented individuals who brought this story to life"
+    }
+  },
+  "viewerdashboardnavs": {
+    "navigation": {
+      "home": "Home",
+      "tvShows": "TV Shows",
+      "movies": "Movies",
+      "newPopular": "New & Popular",
+      "myList": "My List",
+      "browse": "Browse"
+    },
+    "settings": {
+      "title": "Account Settings",
+      "back": "Go back",
+      "loading": "Loading...",
+      "more": "More",
+      "tabs": {
+        "account": "Account",
+        "security": "Security",
+        "preferences": "Preferences",
+        "sessions": "Sessions",
+        "subscription": "Subscription",
+        "profiles": "Family Profiles",
+        "parental": "Parental Controls"
+      }
+    },
+    "header": {
+      "searchButton": "Search",
+      "subscriptionAlert": {
+        "criticalTitle": "Subscription Ending!",
+        "expiringTitle": "Subscription Expiring",
+        "criticalMessage": "Renew now to avoid service interruption",
+        "expiringMessage": "Renew to keep premium features access",
+        "renewButton": "Renew Subscription"
+      }
+    }
+  },
+  "notification": {
+    "time": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    },
+    "status": {
+      "read": "Read",
+      "new": "New"
+    },
+    "dropdown": {
+      "title": "Notifications",
+      "unreadCount": "{{count}} unread",
+      "allCaughtUp": "All caught up!",
+      "refresh": "Refresh",
+      "loading": "Loading notifications...",
+      "connectionIssue": "Connection Issue",
+      "unableToLoad": "Unable to load notifications",
+      "tryAgain": "Try Again",
+      "noNotifications": "No notifications",
+      "allCaughtUpMessage": "You're all caught up!",
+      "viewAll": "View All Notifications"
+    },
+    "modal": {
+      "title": "Notifications",
+      "subtitle": "Stay updated with your latest activities",
+      "loading": "Loading your notifications...",
+      "noNotifications": "No notifications yet",
+      "allCaughtUp": "You're all caught up! We'll notify you when there's something new.",
+      "actions": {
+        "refresh": "Refresh notifications",
+        "markAllRead": "Mark all read",
+        "close": "Close",
+        "retrying": "Retrying...",
+        "tryAgain": "Try Again"
+      },
+      "sections": {
+        "unread": "Unread",
+        "read": "Read"
+      },
+      "footer": {
+        "total": "Total: {{count}} notifications",
+        "unread": "{{count}} unread",
+        "read": "{{count}} read"
+      },
+      "errors": {
+        "failedToLoadCount": "Failed to load notification count",
+        "failedToLoad": "Failed to load notifications",
+        "failedToLoadTitle": "Failed to load notifications"
+      }
+    }
+  },
+  "search": {
+    "modal": {
+      "title": "Search Library",
+      "subtitle": "Discover amazing content",
+      "inputPlaceholder": "What would you like to watch today?",
+      "instructions": {
+        "tryExamples": "Try: \"action movies\" or \"comedy shows\"",
+        "voiceSearch": "Alt+V for voice search",
+        "highContrast": "Toggle high contrast"
+      },
+      "quickSearches": {
+        "title": "Quick Searches",
+        "actionMovies": "Action Movies",
+        "comedyShows": "Comedy Shows",
+        "newReleases": "New Releases",
+        "topRated": "Top Rated",
+        "dramaSeries": "Drama Series",
+        "familyMovies": "Family Movies"
+      },
+      "popularSearches": {
+        "title": "Popular Searches",
+        "items": [
+          "Action Movies 2024",
+          "Comedy Shows",
+          "New Releases",
+          "Trending Now",
+          "Family Movies",
+          "Drama Series",
+          "Romantic Movies",
+          "Sci-Fi"
+        ]
+      },
+      "results": {
+        "searching": "Searching...",
+        "resultsFor": "Results for \"{{query}}\"",
+        "found": "{{count}} found",
+        "noResults": "No results found",
+        "noResultsMessage": "Try different keywords or browse our suggestions below",
+        "suggestionsTitle": "Try these searches:",
+        "relatedContentTitle": "You might also like these popular titles:"
+      },
+      "errors": {
+        "searchFailed": "Search Failed",
+        "tryAgain": "Try Again"
+      },
+      "footer": {
+        "pressEsc": "Press ESC to close",
+        "navigate": "↑↓ to navigate",
+        "select": "Enter to select",
+        "voiceSearch": "Alt+V for voice search",
+        "voiceAvailable": "Voice search available"
+      },
+      "actions": {
+        "close": "Close",
+        "showHelp": "Show help",
+        "highContrast": "Toggle high contrast",
+        "voiceSearch": "Voice search",
+        "stopVoice": "Stop voice search"
+      }
+    }
+  },
+  "profile": {
+    "dropdown": {
+      "toggle": "Toggle profile menu",
+      "avatarAlt": "User profile picture",
+      "welcome": "Welcome",
+      "library": {
+        "title": "Your Library",
+        "downloads": "Downloads",
+        "myList": "My List",
+        "continueWatching": "History",
+        "topPicks": "Top Picks"
+      },
+      "accountSettings": "Account & Settings",
+      "signOut": "Sign Out",
+      "companyName": "Oliviuus Ltd",
+      "footer": {
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "help": "Help"
+      }
+    }
+  },
+  "browse": {
+    "title": "Browse Content",
+    "subtitle": "Explore our collection",
+    "emptyState": {
+      "title": "Coming Soon",
+      "message": "New content arriving shortly"
+    },
+    "errors": {
+      "unableToLoadTitle": "Unable to Load",
+      "unableToLoad": "Unable to load content. Please try again.",
+      "tryAgain": "Try Again"
+    }
+  },
+  "watchlist": {
+    "title": "My Watchlist",
+    "itemCount_one": "{{count}} item in your list",
+    "itemCount_other": "{{count}} items in your list",
+    "emptyState": {
+      "title": "Your watchlist is empty",
+      "message": "Start building your watchlist by clicking the \"+\" button on any content."
+    },
+    "errors": {
+      "unableToLoadTitle": "Unable to Load Watchlist",
+      "unableToLoad": "Unable to load your watchlist. Please try again.",
+      "endpointNotFound": "Watchlist endpoint not found. Please check the API configuration.",
+      "unauthorized": "Please log in to view your watchlist.",
+      "tryAgain": "Try Again"
+    }
+  },
+  "newPopular": {
+    "title": "Discover",
+    "tabs": {
+      "new": "New Releases",
+      "trending": "Trending Now",
+      "popular": "Popular Picks",
+      "descriptions": {
+        "new": "Fresh content added recently",
+        "trending": "What everyone is watching right now",
+        "popular": "Highest rated and most loved content",
+        "default": "Discover the latest and greatest content"
+      }
+    },
+    "emptyState": {
+      "noContentTitle": "No content available",
+      "noContentMessage": "We're working on adding more amazing content for you.",
+      "welcomeTitle": "Welcome to Our Platform",
+      "welcomeMessage": "Content will be available soon. Stay tuned for exciting new releases!"
+    },
+    "errors": {
+      "unableToLoadTitle": "Unable to Load Content",
+      "unableToLoad": "Unable to load content. Please try again.",
+      "tryAgain": "Try Again"
+    }
+  },
+  "movies": {
+    "title": "Movies Collection",
+    "subtitle": "Discover amazing films and cinematic experiences",
+    "hero": {
+      "featuredBadge": "Featured Movie"
+    },
+    "filters": {
+      "title": "Filters & View",
+      "browse": "Browse",
+      "allCategories": "All Categories",
+      "sort": {
+        "latest": "Latest",
+        "oldest": "Oldest",
+        "popular": "Popular"
+      },
+      "reset": "Reset Filters",
+      "view": "View:"
+    },
+    "resultsCount": "Showing {{count}} movies",
+    "emptyState": {
+      "title": "No movies found",
+      "noMoviesAvailable": "No movies available at the moment.",
+      "adjustFilters": "Try adjusting your filters to see more results."
+    },
+    "errors": {
+      "unableToLoadTitle": "Unable to Load Movies",
+      "unableToLoad": "Unable to load movies. Please try again.",
+      "tryAgain": "Try Again"
+    }
+  },
+  "tvShows": {
+    "title": "TV Shows Collection",
+    "subtitle": "Discover amazing series and binge-worthy content",
+    "hero": {
+      "featuredBadge": "Featured Series"
+    },
+    "filters": {
+      "title": "Filters & View",
+      "browse": "Browse",
+      "allCategories": "All Categories",
+      "sort": {
+        "latest": "Latest",
+        "oldest": "Oldest",
+        "popular": "Popular"
+      },
+      "reset": "Reset Filters",
+      "view": "View:"
+    },
+    "resultsCount": "Showing {{count}} series",
+    "emptyState": {
+      "title": "No TV shows found",
+      "noShowsAvailable": "No TV shows available at the moment.",
+      "adjustFilters": "Try adjusting your filters to see more results."
+    },
+    "errors": {
+      "unableToLoadTitle": "Unable to Load TV Shows",
+      "unableToLoad": "Unable to load TV shows. Please try again.",
+      "tryAgain": "Try Again"
+    }
+  },
+  "userSubscription": {
+    "title": "Complete Your Payment",
+    "subtitle": "Secure Mobile Money payment for your subscription",
+    "navigation": {
+      "backToPlans": "Back to Plans"
+    },
+    "invalidRequest": {
+      "title": "Invalid Request",
+      "message": "No subscription plan selected.",
+      "choosePlan": "Choose a Plan"
+    },
+    "planSummary": {
+      "plan": "Plan",
+      "selectedSubscription": "Selected Subscription",
+      "popular": "POPULAR",
+      "amount": "Amount:",
+      "billing": "Billing:",
+      "monthly": "Monthly",
+      "devices": "Devices:",
+      "devicesCount": "{{count}} Simultaneous",
+      "quality": "Quality:"
+    },
+    "userInfo": {
+      "title": "Your Account",
+      "email": "Email:",
+      "name": "Name:"
+    },
+    "paymentForm": {
+      "amountLabel": "Payment Amount",
+      "fixedAmount": "Fixed Amount",
+      "amountDescription": "This amount is set by your selected plan and cannot be modified",
+      "phoneLabel": "Phone Number",
+      "phonePlaceholder": "0781234567",
+      "phoneDescription": "Enter your mobile money registered phone number",
+      "nameLabel": "Your Name",
+      "namePlaceholder": "John Doe",
+      "emailLabel": "Your Email",
+      "emailPlaceholder": "john@example.com",
+      "emailDescription": "Email cannot be modified for security reasons",
+      "processing": "Processing...",
+      "payButton": "Pay {{amount}} with Mobile Money"
+    },
+    "validation": {
+      "phoneRequired": "Phone number is required for Mobile Money payments",
+      "phoneInvalid": "Please enter a valid phone number"
+    },
+    "securityNotice": {
+      "title": "Secure Payment",
+      "description": "Your payment information is secure. The amount is fixed and verified by our server. You will receive a Mobile Money prompt on your phone."
+    },
+    "security": {
+      "title": "Payment Security",
+      "description": "We use Link Mobile Technology Ltd to encrypt and process your payment securely in partnership with Intouch Communication Ltd. Your transaction is protected with bank-level SSL encryption and follows PCI DSS compliance standards.",
+      "encrypted": "256-bit SSL Encrypted"
+    },
+    "pending": {
+      "title": "Payment Processing",
+      "description": "Your payment is being securely processed through our partnership with Intouch Communication Ltd. This usually takes 1-2 minutes. If it takes longer, please check your Mobile Money notifications.",
+      "ussdCodes": "Mobile Money USSD Codes:",
+      "cashOutNote": "Allows temporary cash out if needed"
+    },
+    "status": {
+      "success": {
+        "title": "Payment Successful! 🎉",
+        "message": "Your payment has been processed successfully and your subscription is now active."
+      },
+      "pending": {
+        "title": "Payment Processing",
+        "message": "Your payment is being processed. This may take a few moments."
+      },
+      "failed": {
+        "title": "Payment Failed",
+        "message": "We could not process your payment. Please try again."
+      },
+      "default": {
+        "title": "Payment Status",
+        "message": "Processing your payment..."
+      },
+      "checking": "Checking...",
+      "checkStatus": "Check Status",
+      "needHelp": "Need help?"
+    },
+    "paymentInfo": {
+      "title": "Payment Information",
+      "referenceId": "Reference ID",
+      "amount": "Amount",
+      "method": "Payment Method",
+      "mobileMoney": "Mobile Money",
+      "status": "Status"
+    },
+    "transactionDetails": {
+      "title": "Transaction Details",
+      "date": "Date",
+      "type": "Transaction Type",
+      "providerId": "Provider ID"
+    },
+    "planDetails": {
+      "title": "Plan Details",
+      "planName": "Plan Name",
+      "billingCycle": "Billing Cycle",
+      "monthly": "Monthly",
+      "amountPaid": "Amount Paid",
+      "special": "Special",
+      "mostPopular": "Most Popular Choice"
+    },
+    "planFeatures": {
+      "title": "Plan Features",
+      "devices": "{{count}} Simultaneous Devices",
+      "videoQuality": "{{quality}} Video Quality",
+      "unlimitedDownloads": "Unlimited Downloads",
+      "downloads": "{{count}} Downloads",
+      "hdrSupport": "HDR Support"
+    },
+    "subscriptionDetails": {
+      "title": "Subscription Active",
+      "plan": "Plan",
+      "started": "Started",
+      "renews": "Renews",
+      "status": "Status",
+      "active": "ACTIVE"
+    },
+    "actions": {
+      "proceedToDashboard": "Proceed to Start Watching",
+      "tryAgain": "Try Again"
+    },
+    "payment": {
+      "initiationFailed": "Failed to initiate payment. Please try again."
+    },
+    "errors": {
+      "insufficientFunds": {
+        "title": "Insufficient Funds 💰",
+        "message": "Your Mobile Money account doesn't have enough balance to pay for the {{planType}} plan.",
+        "details": "You need {{amount}} in your Mobile Money account to subscribe to the {{planType}} plan.",
+        "actions": {
+          "addMoney": "Add Money to Your Account",
+          "addMoneyDesc": "Top up your Mobile Money balance and try again",
+          "chooseDifferent": "Choose a Different Plan",
+          "chooseDifferentDesc": "Select a plan that fits your current budget"
+        }
+      },
+      "invalidPhone": {
+        "title": "Invalid Phone Number 📱",
+        "message": "The phone number you entered is not valid for Mobile Money payments.",
+        "details": "Please check your phone number and make sure it's registered with Mobile Money.",
+        "actions": {
+          "checkNumber": "Check Your Phone Number",
+          "checkNumberDesc": "Verify your phone number is correct and try again"
+        }
+      },
+      "networkIssue": {
+        "title": "Network Issue 📶",
+        "message": "We're having trouble connecting to the payment service.",
+        "details": "Please check your internet connection and try again in a moment.",
+        "actions": {
+          "checkConnection": "Check Your Connection",
+          "checkConnectionDesc": "Make sure you have a stable internet connection",
+          "tryAgain": "Try Again",
+          "tryAgainDesc": "Retry the payment after a few moments"
+        }
+      },
+      "paymentDeclined": {
+        "title": "Payment Declined ❌",
+        "message": "Your payment was declined by the Mobile Money service.",
+        "details": "This could be due to security reasons or account restrictions.",
+        "actions": {
+          "contactOperator": "Contact Your Mobile Operator",
+          "contactOperatorDesc": "Check if there are any restrictions on your account",
+          "tryDifferentMethod": "Try Different Payment Method",
+          "tryDifferentMethodDesc": "Consider using a different phone number or payment option"
+        }
+      },
+      "defaultError": {
+        "title": "Unable to Process Payment ⚠️",
+        "message": "We encountered an issue while processing your payment.",
+        "details": "Our team has been notified. Please try again in a few moments.",
+        "actions": {
+          "tryAgain": "Try Again Later",
+          "tryAgainDesc": "Wait a few minutes and retry the payment",
+          "contactSupport": "Contact Support",
+          "contactSupportDesc": "Get help from our support team if the issue persists"
+        }
+      }
+    }
+  },
+  "subscription": {
+    "title": "Subscription Management",
+    "subtitle": "Manage your subscription plan and billing",
+    "refresh": "Refresh",
+    "loading": "Loading subscription data...",
+    "more": "More",
+    "tabs": {
+      "current": "Current Plan",
+      "history": "History",
+      "payment": "Payment Methods",
+      "usage": "Usage Metrics"
+    },
+    "status": {
+      "active": {
+        "title": "Active Subscription",
+        "description": "Your subscription is active and in good standing"
+      },
+      "cancelled": {
+        "title": "Subscription Cancelled",
+        "description": "Your subscription will end on the billing period end date"
+      },
+      "expired": {
+        "title": "Subscription Expired",
+        "description": "Your subscription has expired. Renew to continue access"
+      },
+      "renews": "Renews on",
+      "ends": "Ends on"
+    },
+    "errors": {
+      "title": "Error Loading Subscription",
+      "loadFailed": "Failed to load subscription information",
+      "tryAgain": "Try Again"
+    }
+  },
+  "watchHistory": {
+    "title": "Watch History",
+    "itemCount": "{{count}} item",
+    "itemCount_plural": "{{count}} items",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{days}} days ago",
+    "completed": "completed",
+    "progress": "Progress",
+    "continueWatching": "Continue",
+    "startWatching": "Start",
+    "watchNow": "Watch Now",
+    "watchedOn": "Watched on",
+    "emptyState": {
+      "title": "No Watch History Yet",
+      "message": "Content you watch will appear here. Start exploring to build your watch history!",
+      "browseContent": "Browse Content"
+    },
+    "errors": {
+      "unableToLoadTitle": "Unable to Load Watch History",
+      "unableToLoad": "We couldn't load your watch history at this time.",
+      "unauthorized": "Please sign in to view your watch history.",
+      "endpointNotFound": "Watch history feature is currently unavailable.",
+      "tryAgain": "Try Again"
+    }
+  },
+  "family": {
+    "invitations": {
+      "pendingInvitations": "Pending Invitations",
+      "pendingCount": "{{count}} pending",
+      "clickForDetails": "Click on an invitation to view details",
+      "noInvitations": {
+        "title": "No Pending Invitations",
+        "description": "You don't have any pending family invitations at the moment."
+      },
+      "sent": "Sent",
+      "stats": {
+        "pendingInvitations": "Pending Invitations",
+        "familyStatus": "Family Status",
+        "member": "Member",
+        "noFamily": "No Family",
+        "yourRole": "Your Role",
+        "individual": "Individual"
+      },
+      "familyMember": {
+        "title": "Family Member",
+        "joined": "Joined",
+        "dashboard": "Dashboard"
+      },
+      "details": {
+        "title": "Invitation Details",
+        "from": "From:",
+        "yourRole": "Your Role:",
+        "relationship": "Relationship:",
+        "dashboard": "Dashboard:"
+      },
+      "status": {
+        "title": "Invitation Status",
+        "status": "Status:",
+        "pending": "Pending",
+        "expires": "Expires:",
+        "timeLeft": "Time Left:",
+        "expired": "Expired",
+        "oneDayLeft": "1 day left",
+        "daysLeft": "{{days}} days left"
+      },
+      "actions": {
+        "accept": "Accept Invitation",
+        "decline": "Decline",
+        "leaveFamily": "Leave Family",
+        "accepting": "accepting",
+        "rejecting": "rejecting"
+      },
+      "leaveConfirmation": "Are you sure you want to leave this family? You will lose access to their subscription benefits.",
+      "aboutFamilyPlans": {
+        "title": "About Family Plans",
+        "accepting": {
+          "title": "Accepting an Invitation",
+          "benefit1": "You'll share the family owner's subscription benefits",
+          "benefit2": "Your watch history and preferences remain private",
+          "benefit3": "You can leave the family anytime from this page"
+        },
+        "subscription": {
+          "title": "Subscription Note",
+          "note1": "If you have an active subscription, it will be paused automatically",
+          "note2": "You'll use the family plan instead of your individual plan",
+          "note3": "You can reactivate your individual plan if you leave the family"
+        }
+      },
+      "mobile": {
+        "pendingCount": "{{count}} pending invitation",
+        "scrollToReview": "Scroll to review"
+      },
+      "errors": {
+        "loadFailed": "Failed to load family invitations",
+        "actionFailed": "Failed to {{action}} invitation",
+        "leaveFailed": "Failed to leave family"
+      }
+    },
+    "roles": {
+      "owner": "Owner",
+      "parent": "Parent",
+      "teen": "Teen",
+      "child": "Child",
+      "guest": "Guest"
+    },
+    "dashboardTypes": {
+      "normal": "Normal",
+      "kid": "Kids",
+      "adult": "Adult"
+    },
+    "memberRoles": {
+      "parent": "Family Parent",
+      "teen": "Family Teen",
+      "child": "Family Child",
+      "owner": "Family Owner",
+      "guest": "Family Guest",
+      "familyMember": "Family Member"
+    }
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "error": "Error",
+    "dismiss": "Dismiss",
+    "never": "Never",
+    "notSet": "Not set",
+    "invalidDate": "Invalid date",
+    "invalidTime": "Invalid time",
+    "unknownEmail": "Unknown Email",
+    "noEmail": "No email",
+    "noDate": "No date"
+  },
+  "parentalControls": {
+    "title": "Parental Controls",
+    "subtitle": "Secure your family settings with PIN protection",
+    "accessRestricted": {
+      "title": "Access Restricted",
+      "description": "You need to be a Family Owner or have Parent role with active family plan to access parental controls."
+    },
+    "roles": {
+      "familyOwner": "Family Owner",
+      "familyParent": "Family Parent"
+    },
+    "tabs": {
+      "pinManagement": "PIN Management",
+      "securityLogs": "Security Logs"
+    },
+    "pinSection": {
+      "activeTitle": "Master PIN Active",
+      "setupTitle": "Set Master PIN",
+      "activeDescription": "Your master PIN is protecting parental controls. Verify your PIN to make changes.",
+      "setupDescription": "Create a 4-digit master PIN to secure parental controls and family settings.",
+      "activeStatus": "Master PIN is active and protecting your settings",
+      "createPin": "Create Your PIN",
+      "enterPinPlaceholder": "Enter 4-digit PIN",
+      "digits": "digits"
+    },
+    "verification": {
+      "title": "Verify Your Identity",
+      "description": "Please enter your current PIN to continue",
+      "currentPin": "Current PIN",
+      "enterCurrentPin": "Enter current PIN"
+    },
+    "newPin": {
+      "title": "Enter New PIN",
+      "description": "Create your new 4-digit PIN",
+      "newPin": "New PIN",
+      "enterNewPin": "Enter new PIN"
+    },
+    "familyMembers": {
+      "title": "Family Members",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "pinStatus": "PIN Status",
+      "locked": "Locked"
+    },
+    "securityLogs": {
+      "action": "Action",
+      "dateTime": "Date & Time",
+      "noLogs": "No security logs found",
+      "noLogsDescription": "Security activities will appear here as they occur"
+    },
+    "actions": {
+      "setMasterPin": "Set Master PIN",
+      "changePin": "Change PIN",
+      "resetPin": "Reset PIN",
+      "verifyPin": "Verify PIN",
+      "updatePin": "Update PIN",
+      "cancel": "Cancel",
+      "settingPin": "Setting PIN...",
+      "verifying": "Verifying...",
+      "updating": "Updating..."
+    },
+    "success": {
+      "pinVerified": "PIN Verified",
+      "pinVerifiedDesc": "Your PIN has been verified successfully",
+      "pinSet": "PIN Set",
+      "pinSetDesc": "Master PIN set successfully!",
+      "pinChanged": "PIN Changed",
+      "pinChangedDesc": "Master PIN changed successfully!",
+      "pinReset": "PIN Reset",
+      "pinResetDesc": "Master PIN reset successfully! PIN protection has been removed."
+    },
+    "errors": {
+      "loadFailed": "Load Failed",
+      "loadPinStatus": "Failed to load PIN status. Please try again.",
+      "loadSecurityLogs": "Failed to load security logs. Please try again.",
+      "pinRequired": "PIN Required",
+      "enterCurrentPin": "Please enter your current PIN",
+      "enterNewPin": "Please enter your new PIN",
+      "invalidPin": "Invalid PIN",
+      "verificationFailed": "Verification Failed",
+      "setupFailed": "Setup Failed",
+      "changeFailed": "Change Failed",
+      "resetFailed": "Reset Failed",
+      "setPinFailed": "Failed to set master PIN. Please try again.",
+      "changePinFailed": "Failed to change master PIN. Please try again.",
+      "resetPinFailed": "Failed to reset master PIN. Please try again."
+    },
+    "pinValidation": {
+      "mustBe4Digits": "PIN must be exactly 4 digits",
+      "tooCommon": "This PIN is too common. Please choose a more secure PIN.",
+      "sequentialNotAllowed": "Sequential numbers are not allowed for security reasons."
+    },
+    "modal": {
+      "success": "Success",
+      "error": "Error",
+      "warning": "Warning"
+    }
+  },
+  "familyProfiles": {
+    "title": "Family Profiles",
+    "subtitle": "Manage kid profiles and family members for your family plan",
+    "planStatus": "Family Plan Active",
+    "tabs": {
+      "kidsProfiles": "Kids Profiles",
+      "familyMembers": "Family Members"
+    },
+    "kidsTab": {
+      "title": "Kids Profiles",
+      "subtitle": "Create and manage individual profiles for children",
+      "noProfiles": "No Kid Profiles Yet",
+      "noProfilesDescription": "Create profiles to give kids their own personalized experience",
+      "createFirstProfile": "Create First Profile",
+      "addProfile": "Add Profile",
+      "editProfile": "Edit Profile",
+      "deleteProfile": "Delete Profile",
+      "kidsMode": "Kids mode",
+      "switchError": "Failed to switch to kid profile. Please try again.",
+      "yearsOld": "years old",
+      "dailyTime": "Daily",
+      "pinRequired": "PIN",
+      "switchTo": "Switch to",
+      "limitReached": "Profile Limit Reached",
+      "limitReachedDescription": "You've reached the maximum number of kid profiles ({{maxProfiles}}) on your plan",
+      "deleteConfirmationTitle": "Delete Kid Profile",
+      "deleteConfirmationDescription": "Are you sure you want to delete {{name}}'s profile? This will remove all their viewing history and preferences."
+    },
+    "membersTab": {
+      "title": "Family Members",
+      "subtitle": "Manage family members who can access your subscription",
+      "planAllows": "Plan allows {{maxMembers}} family members",
+      "noMembers": "No Family Members Yet",
+      "noMembersDescription": "Invite up to {{maxMembers}} family members to share your subscription benefits",
+      "upgradeRequired": "Upgrade to a family plan to invite members",
+      "inviteMember": "Invite Member",
+      "inviteFirstMember": "Invite First Member",
+      "upgradePlanRequired": "Upgrade Plan Required",
+      "removeMember": "Remove Member",
+      "editSettings": "Edit Settings",
+      "left": "left",
+      "joined": "Joined",
+      "invited": "Invited",
+      "lastActive": "Last active",
+      "suspended": "Suspended",
+      "pending": "Pending",
+      "active": "Active",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "sleepTime": "Sleep",
+      "accessWindow": "Access",
+      "memberLimitReached": "Member Limit Reached",
+      "memberLimitReachedDescription": "You've reached the maximum number of family members ({{maxMembers}}) on your plan",
+      "individualPlan": "Individual Plan",
+      "upgradeSuggestion": "Upgrade to a family plan to invite family members and share your subscription",
+      "removeError": "Failed to remove family member",
+      "removeConfirmationTitle": "Remove Family Member",
+      "removeConfirmationDescription": "Are you sure you want to remove <strong>{{email}}</strong> from your family plan? They will lose access to your subscription benefits."
+    },
+    "modals": {
+      "createKidProfile": {
+        "title": "Create Kid Profile",
+        "childName": "Child's Name",
+        "childNamePlaceholder": "Enter child's name",
+        "birthDate": "Birth Date",
+        "age": "Age: {{age}} years old",
+        "maxAgeRating": "Maximum Content Age Rating",
+        "custom": "Custom",
+        "enterAge": "Enter age",
+        "yearsOld": "years old",
+        "dailyTimeLimit": "Daily Time Limit",
+        "enterMinutes": "Enter minutes",
+        "minutes": "minutes",
+        "themeColor": "Theme Color",
+        "upgradeToModify": "Upgrade to modify",
+        "selected": "Selected",
+        "default": "Default",
+        "defaultThemeDescription": "All kid profiles use our safe and friendly default theme",
+        "requirePin": "Require PIN to Exit",
+        "requirePinDescription": "Prevents kids from switching to adult mode without permission",
+        "creating": "Creating...",
+        "createProfile": "Create Profile",
+        "error": "Failed to create kid profile",
+        "avatarCategories": {
+          "People": "People",
+          "Animals": "Animals",
+          "Fantasy": "Fantasy",
+          "Abstract": "Abstract"
+        }
+      },
+      "editKidProfile": {
+        "title": "Edit {{name}}'s Profile",
+        "subtitle": "Update settings and preferences for this kid profile",
+        "basicInformation": "Basic Information",
+        "childName": "Child's Name",
+        "childNamePlaceholder": "Enter child's name",
+        "birthDate": "Birth Date",
+        "contentRestrictions": "Content Restrictions",
+        "maxAgeRating": "Maximum Content Age Rating",
+        "allowedContentTypes": "Allowed Content Categories",
+        "blockedGenres": "Blocked Genres",
+        "timeAndAccess": "Time & Access",
+        "dailyTimeLimit": "Daily Time Limit",
+        "appearanceAndSecurity": "Appearance & Security",
+        "themeColor": "Theme Color",
+        "upgradeToModify": "Upgrade to modify",
+        "selected": "Selected",
+        "default": "Default",
+        "defaultThemeDescription": "All kid profiles use our safe and friendly default theme",
+        "requirePin": "Require PIN to Exit",
+        "requirePinDescription": "Prevents kids from switching to adult mode without permission",
+        "updating": "Updating...",
+        "updateProfile": "Update Profile",
+        "error": "Failed to update kid profile",
+        "contentCategories": {
+          "cartoons": "Cartoons",
+          "educational": "Educational",
+          "family": "Family",
+          "adventure": "Adventure",
+          "comedy": "Comedy",
+          "music": "Music"
+        },
+        "blockedGenres": {
+          "horror": "Horror",
+          "violence": "Violence",
+          "romance": "Romance",
+          "thriller": "Thriller",
+          "drama": "Drama",
+          "action": "Action",
+          "fantasy": "Fantasy",
+          "sciFi": "Sci-Fi",
+          "mystery": "Mystery",
+          "crime": "Crime"
+        },
+        "allowMovies": "Allow Movies",
+        "allowSeries": "Allow Series",
+        "allowSearch": "Allow Search",
+        "allowTrending": "Allow Trending"
+      },
+      "inviteMember": {
+        "title": "Invite Family Member",
+        "invitationsRemaining": "{{count}} invitation{{count !== 1 ? 's' : ''}} remaining",
+        "noInvitationsRemaining": "No invitations remaining",
+        "unableToSend": "Unable to Send Invitation",
+        "memberLimitReached": "Member Limit Reached",
+        "memberLimitReachedDescription": "You've reached the maximum of {{maxMembers}} family members. Upgrade your plan to invite more.",
+        "invitationDetails": "Invitation Details",
+        "invitationDescription": "The invited user must have an Oliviuus account. They'll receive an email invitation.",
+        "emailAddress": "Email Address",
+        "memberRole": "Member Role",
+        "relationship": "Relationship",
+        "relationshipPlaceholder": "e.g., Spouse, Child, Parent, Sibling",
+        "dashboardType": "Dashboard Type",
+        "preview": "Preview",
+        "role": "Role",
+        "dashboard": "Dashboard",
+        "sendInvitation": "Send Invitation",
+        "error": "Failed to send invitation",
+        "roles": {
+          "parent": "Parent",
+          "parentDescription": "Full access with parental controls",
+          "teen": "Teen",
+          "teenDescription": "Limited restrictions for teenagers",
+          "child": "Child",
+          "childDescription": "Kid-friendly experience",
+          "guest": "Guest",
+          "guestDescription": "Limited access visitor"
+        },
+        "dashboards": {
+          "normal": "Normal Dashboard",
+          "normalDescription": "Standard viewing experience",
+          "kid": "Kid Dashboard",
+          "kidDescription": "Simplified kid-friendly interface"
+        }
+      },
+      "editMember": {
+        "title": "Edit {{email}}",
+        "subtitle": "Manage settings and restrictions for this family member",
+        "updateFailed": "Update Failed",
+        "basicSettings": "Basic Settings",
+        "memberRole": "Member Role",
+        "dashboardType": "Dashboard Type",
+        "relationship": "Relationship",
+        "relationshipPlaceholder": "e.g., Spouse, Child, Parent, Sibling",
+        "temporarilySuspend": "Temporarily Suspend Account",
+        "suspendDescription": "Prevent this member from accessing the platform",
+        "accessControl": "Access Control",
+        "sleepTimeRestrictions": "Sleep Time Restrictions",
+        "sleepTimeDescription": "Set daily inactive hours for this member",
+        "accessTimeWindow": "Access Time Window",
+        "accessTimeDescription": "Set daily allowed access hours",
+        "dailyWatchTimeLimit": "Daily Watch Time Limit (Minutes)",
+        "unlimited": "Unlimited",
+        "unlimitedDescription": "Leave empty for unlimited viewing time",
+        "contentAndSpending": "Content & Spending Restrictions",
+        "monthlySpendingLimit": "Monthly Spending Limit (RWF)",
+        "spendingLimitDescription": "Set to 0 to disable in-app purchases",
+        "contentRestrictions": "Content Restrictions",
+        "contentRestrictionsDescription": "Content restrictions are automatically applied based on the member's role and age settings. For detailed content filtering, modify the member's role or use kid profiles for children.",
+        "currentSettings": "Current Settings Summary",
+        "saveChanges": "Save Changes",
+        "error": "Failed to update member settings",
+        "roles": {
+          "parent": "Parent",
+          "parentDescription": "Full access with parental controls",
+          "teen": "Teen",
+          "teenDescription": "Limited restrictions for teenagers",
+          "child": "Child",
+          "childDescription": "Kid-friendly experience",
+          "guest": "Guest",
+          "guestDescription": "Limited access visitor"
+        },
+        "dashboards": {
+          "normal": "Normal Dashboard",
+          "normalDescription": "Standard viewing experience",
+          "kid": "Kid Dashboard",
+          "kidDescription": "Simplified kid-friendly interface"
+        },
+        "tabs": {
+          "basic": "Basic",
+          "access": "Access",
+          "restrictions": "Restrictions"
+        },
+        "sleepStart": "Sleep Start",
+        "sleepEnd": "Sleep End",
+        "activeFrom": "Active from {{start}} to {{end}}",
+        "accessStart": "Access Start",
+        "accessEnd": "Access End",
+        "canAccessFrom": "Can access from {{start}} to {{end}}",
+        "accountStatus": "Account Status",
+        "suspended": "Suspended",
+        "active": "Active"
+      }
+    }
+  },
+  "landingPage": {
+    "header": {
+      "signIn": "Sign In"
+    },
+    "hero": {
+      "title": "Unlimited",
+      "subtitle": "Entertainment",
+      "tagline": "Where African Stories Meet Global Stage",
+      "startingAt": "Starts at",
+      "cancelAnytime": "Cancel anytime",
+      "ctaDescription": "Ready to experience the future of streaming? Enter your email to begin your journey.",
+      "welcomeBack": "Welcome Back!",
+      "continueJourney": "Ready to Continue Your Journey",
+      "restartDescription": "Restart your membership and dive back into unlimited entertainment.",
+      "restartMembership": "Restart Membership"
+    },
+    "emailInput": {
+      "getStarted": "Get Started",
+      "alreadyLoggedIn": "You're already logged in. Continue to your account.",
+      "continueToAccount": "Continue to Account"
+    },
+    "trending": {
+      "title": "Trending Now",
+      "subtitle": "Discover what everyone is watching right now"
+    },
+    "contentModal": {
+      "close": "Close",
+      "duration": "Duration",
+      "language": "Language",
+      "getStarted": "Get Started"
+    },
+    "contentCard": {
+      "noImage": "No Image",
+      "rwanda": "RWANDA"
+    },
+    "features": {
+      "title": "Why Choose",
+      "titleHighlight": "Oliviuus",
+      "subtitle": "Premium features designed for the ultimate streaming experience",
+      "streamDevices": {
+        "title": "Stream on All Your Devices",
+        "description": "Watch seamlessly on Smart TVs, PlayStation, Xbox, Chromecast, Apple TV, gaming consoles, and all your favorite devices.",
+        "highlight": "Multi-Platform"
+      },
+      "downloadOffline": {
+        "title": "Download for Offline Viewing",
+        "description": "Save your favorite movies and shows to watch anywhere, anytime - perfect for travel or when you're offline.",
+        "highlight": "Watch Anywhere"
+      },
+      "watchAcrossScreens": {
+        "title": "Watch Across All Screens",
+        "description": "Start watching on your phone, continue on your tablet, and finish on your TV. Your entertainment follows you everywhere.",
+        "highlight": "Seamless Sync"
+      },
+      "kidsExperience": {
+        "title": "Dedicated Kids Experience",
+        "description": "Safe and engaging profiles for children with parental controls and age-appropriate content curated just for them.",
+        "highlight": "Family Friendly"
+      },
+      "premiumAudio": {
+        "title": "Premium Audio Experience",
+        "description": "Immerse yourself with Dolby Atmos sound and crystal-clear audio that brings every scene to life.",
+        "highlight": "Dolby Atmos"
+      },
+      "ultraHd": {
+        "title": "4K Ultra HD Quality",
+        "description": "Experience stunning visual clarity with 4K Ultra HD streaming and HDR support on compatible devices.",
+        "highlight": "Ultra HD"
+      },
+      "ctaTitle": "Start Your Streaming Journey",
+      "ctaDescription": "Join now and experience premium entertainment tailored for you."
+    },
+    "faq": {
+      "title": "Frequently Asked",
+      "titleHighlight": "Questions",
+      "subtitle": "Everything you need to know about Oliviuus and your streaming experience",
+      "ctaTitle": "Ready to Start Streaming?",
+      "ctaDescription": "Join Oliviuus today and experience premium entertainment",
+      "contactSupport": "Contact Support",
+      "closeContact": "Close Contact",
+      "directMessage": "Direct Message",
+      "closeForm": "Close Form",
+      "visitHelpCenter": "Visit Help Center",
+      "contactTeam": "Contact Our Support Team",
+      "contactDescription": "Our dedicated support team is here to help you with any questions or issues.",
+      "emailSupport": "Email: {{email}}",
+      "callSupport": "Call: {{phone}}",
+      "sendMessageTitle": "Send us a Direct Message",
+      "sendMessageDescription": "Fill out the form below and we'll get back to you as soon as possible.",
+      "loading": "Loading...",
+      "questions": {
+        "difference": {
+          "question": "What makes Oliviuus different from other streaming platforms?",
+          "answer": "Oliviuus uniquely combines global premium content with exclusive Rwandan cinema, creating a platform that celebrates African storytelling while offering international entertainment. We're dedicated to elevating Rwandan filmmakers and bringing their stories to a global audience."
+        },
+        "cost": {
+          "question": "How much does Oliviuus cost?",
+          "answer": "Oliviuus offers flexible plans starting from RWF 3,000 to RWF 10,000 monthly. Each plan provides excellent value with features tailored to different viewing needs - from basic streaming to premium 4K quality and multiple simultaneous streams."
+        },
+        "multipleDevices": {
+          "question": "Can I watch Oliviuus on multiple devices?",
+          "answer": "Yes! Stream on your smartphone, tablet, laptop, Smart TV, and gaming consoles simultaneously. The number of devices depends on your chosen plan, with options perfect for individuals, couples, or entire families."
+        },
+        "rwandanContent": {
+          "question": "What type of Rwandan content is available?",
+          "answer": "We feature a rich collection of Rwandan movies, documentaries, series, and original productions. From acclaimed cinematic works to emerging local talent, we're building the largest platform dedicated to Rwandan storytelling and cultural expression."
+        },
+        "changeSubscription": {
+          "question": "How do I change or upgrade my subscription plan?",
+          "answer": "You can easily upgrade or downgrade your plan anytime from your account settings. Upgrades take effect immediately with prorated billing, while downgrades apply at the start of your next billing cycle."
+        },
+        "paymentMethods": {
+          "question": "What payment methods do you accept in Rwanda?",
+          "answer": "We accept all major payment methods including mobile money (MTN, Airtel), credit/debit cards (Visa, MasterCard), and bank transfers. All transactions are secure and encrypted for your protection."
+        },
+        "downloadOffline": {
+          "question": "Can I download movies and shows to watch offline?",
+          "answer": "Yes! Download your favorite content to watch without internet connection. Availability and download limits vary by subscription plan - perfect for travel or areas with limited connectivity."
+        },
+        "outsideRwanda": {
+          "question": "Is Oliviuus available outside Rwanda?",
+          "answer": "Currently, Oliviuus is optimized for Rwandan audiences with plans to expand across East Africa. Some content may have regional restrictions due to licensing agreements, but our Rwandan content library is available everywhere."
+        },
+        "videoQuality": {
+          "question": "What video quality can I expect?",
+          "answer": "Video quality ranges from standard definition to stunning 4K Ultra HD, depending on your subscription plan and device capability. Higher-tier plans offer the best visual experience with HDR support."
+        },
+        "supportFilmmakers": {
+          "question": "How does Oliviuus support Rwandan filmmakers?",
+          "answer": "We partner directly with Rwandan production houses, provide better distribution channels, offer funding opportunities, and ensure fair compensation. Our platform is designed to elevate local talent and bring Rwandan stories to global audiences."
+        }
+      }
+    }
+  }
+}

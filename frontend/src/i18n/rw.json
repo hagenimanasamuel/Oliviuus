@@ -1,0 +1,2190 @@
+{
+  "footer": {
+    "terms": "Amategeko",
+    "privacy": "Politiki y’Ubuzima bwite",
+    "help": "Ubufasha",
+    "feedback": "Icyifuzo & Igitekezo",
+    "rights": "Uburenganzira bwose burabitswe."
+  },
+  "notfound": {
+    "title": "Urupapuro Ntabwo Rwabonetse",
+    "description": "Oya! Urupapuro urigushaka ntirubaho.",
+    "home_button": "Subira Ahabanza"
+  },
+  "auth": {
+    "enter_email": "Nyamuneka shyiramo aderesi email yawe",
+    "enter_email_desc": "Shyiramo email yawe kugirango ukomeze",
+    "email_placeholder": "Aderesi Email",
+    "continue": "Komeza",
+    "welcome": "Murakaza neza",
+    "email_exists": "Email irabaho. Nyamuneka shyiramo ijambo ry’ibanga.",
+    "email_not_exists": "Email ntiyabonetse. Nyamuneka wemeze email yawe kugirango ukomeze.",
+    "server_error": "Habayeho ikosa. Ongera ugerageze.",
+    "login_title": "Injira muri konti yawe",
+    "signup_title": "Fungura konti nshya",
+    "password_placeholder": "Injiza ijambo ry'ibanga",
+    "enter_password": "Nyamuneka andika ijambo ry'ibanga",
+    "forgot_password": "Wibagiwe ijambo ry'ibanga?",
+    "login": "Injira",
+    "loading": "Birimo gutunganywa...",
+    "reset_password": "Kongera gusubiramo ijambo ry'ibanga",
+    "reset_link_confirm": "Ushaka kohereza umurongo wo gusubiramo ijambo ry'ibanga kuri",
+    "cancel": "Hagarika",
+    "send_reset_link": "Ohereza Umurongo",
+    "sending": "Birimo koherezwa...",
+    "reset_link_sent": "Link yo kongera ijambo ry’ibanga yoherejwe kuri {{email}}",
+    "reset_link_error": "Ntibyashobotse kohereza link. Ongera ugerageze.",
+    "invalid_reset_link": "Uru rukuta rwo guhindura ijambo ry'ibanga ntabwo ruriho cyangwa rwarangiritse.",
+    "password_mismatch": "Amagambo y’ibanga ntabwo ahuye.",
+    "password_reset_success": "Ijambo ryawe ry'ibanga ryahinduwe neza!",
+    "new_password": "Ijambo rishya ry'ibanga",
+    "confirm_password": "Emeza Ijambo ry'Ibanga",
+    "reset_password_button": "Hindura Ijambo ry'Ibanga"
+  },
+  "verifyEmail": {
+    "code_required": "Kode yo kugenzura irakenewe",
+    "invalid_or_expired_code": "Kode siyo cyangwa yarengeje igihe",
+    "server_error": "Habaye ikosa. Ongera ugerageze.",
+    "enter_code_desc": "Shyiramo kode woherejwe kuri imeri yawe",
+    "code_placeholder": "Kode yo Kugenzura",
+    "loading": "Irimo kugenzura...",
+    "verify": "Emeza",
+    "not_received": "Ntabwo wabonye email?",
+    "resend_code": "Ohereza kode kongera",
+    "resend_in": "Uzashobora kongera kohereza mu masegonda {{seconds}}",
+    "resend_failed": "Kohereza kode byanze. Ongera ugerageze.",
+    "tips": "Reba muri Spam cyangwa Junk. Email ishobora gufata iminota mike kugira ngo igere."
+  },
+  "userInfo": {
+    "enter_details_desc": "Shyiraho ijambo ry'ibanga rikomeye kuri konti yawe",
+    "password_placeholder": "Ijambo ry'ibanga",
+    "confirm_password_placeholder": "Emeza ijambo ry'ibanga",
+    "continue": "Komeza",
+    "loading": "Birimo kubikwa...",
+    "disclaimer_before": "Ukwiyandikisha cyangwa gukora konti wemera",
+    "terms": "Amategeko & Amabwiriza",
+    "and": "na",
+    "privacy": "Politiki y'Ibanga",
+    "server_error": "Ikosa rya server, gerageza kongera",
+    "password_required": "Ijambo ry'ibanga rirakenewe",
+    "password_length": "Ijambo ry'ibanga rigomba kuba hagati ya 8-24 inyuguti",
+    "password_uppercase": "Ijambo ry'ibanga rigomba kugira inyuguti nkuru",
+    "password_lowercase": "Ijambo ry'ibanga rigomba kugira inyuguti ntoya",
+    "password_number": "Ijambo ry'ibanga rigomba kugira nimero",
+    "password_special": "Ijambo ry'ibanga rigomba kugira ikimenyetso cyihariye",
+    "passwords_mismatch": "Amagambo y'ibanga ntahura"
+  },
+  "preferences": {
+    "language": "Ururimi",
+    "lang_rw": "Ikinyarwanda",
+    "lang_en": "Icyongereza(English)",
+    "lang_fr": "Igifaransa(Français)",
+    "lang_sw": "Igiswahili(Swahili)",
+    "notifications": "Emera kumenyeshwa",
+    "subtitles": "Hindura subtitles ku buryo bwikora",
+    "genres": "Ubwoko ukunda",
+    "save": "Bika Ibyifuzo",
+    "saving": "Ibikomeje kubikwa...",
+    "update_success": "Ibyifuzo byabitswe neza!",
+    "update_error": "Ntibyashobotse kubika ibyifuzo."
+  },
+  "genres": {
+    "comedy": "Ibyo gusetsa",
+    "drama": "Drama",
+    "action": "Ibikorwa",
+    "romance": "Urukundo",
+    "horror": "Gutera ubwoba",
+    "documentary": "Documentaire",
+    "animation": "Animation"
+  },
+  "settings": {
+    "title": "Amagenamiterere ya Konti",
+    "back": "Subira Inyuma",
+    "loading": "Birimo Gupakururwa...",
+    "more": "Ibindi",
+    "tabs": {
+      "account": "Amakuru ya Konti",
+      "security": "Umutekano",
+      "preferences": "Ibyihariye",
+      "sessions": "Ibihe biriho",
+      "subscription": "Ifatabuguzi",
+      "profiles": "Imiryango / Profayiri",
+      "parental": "Igenzura ry’Ababyeyi",
+      "family_invitations": "Ubutumire bw'Umuryango"
+    }
+  },
+  "accountInfo": {
+    "avatarAlt": "Ifoto y’umukoresha",
+    "changeAvatar": "Hindura Ifoto",
+    "close": "Funga",
+    "categories": {
+      "People": "Abantu",
+      "Animals": "Inyamaswa",
+      "Fantasy": "Imigani",
+      "Abstract": "Ibishushanyo"
+    },
+    "email": "Imeyili",
+    "save": "Bika Impinduka",
+    "saving": "Birimo Kubikwa...",
+    "success": "Amakuru ya konti abitswe neza!",
+    "error": "Byanze kubika amakuru ya konti."
+  },
+  "sessions": {
+    "logoutSuccess": "Icyiciro cyasohowe neza.",
+    "logoutFail": "Ntibyashobotse gusohora iki cyiciro.",
+    "logoutAllSuccess": "Ibindi byiciro byose byasohowe neza.",
+    "logoutAllFail": "Ntibyashobotse gusohora ibindi byiciro.",
+    "noActive": "Nta byiciro biri gukora.",
+    "logoutAll": "Sohora ibindi byose",
+    "loggingOut": "Birimo gusohoka...",
+    "current": "Icyiciro uri gukoresha",
+    "ip": "IP",
+    "location": "Aho uri",
+    "login": "Kwinjira",
+    "logout": "Gusohoka",
+    "status": "Imiterere",
+    "active": "Bikora",
+    "loggedOut": "Byasohotse",
+    "unknown": "Ntibizwi"
+  },
+  "sidebar": {
+    "overview": "Incamake",
+    "users": "Abakoresha",
+    "library": "Ububiko",
+    "subscriptions": "Ifatabuguzi",
+    "analytics": "Isesengura",
+    "globalManagement": "Ibyibanze",
+    "support": "Ubufasha"
+  },
+  "usersHeader": {
+    "allUsers": "Abakoresha Bose",
+    "filtered": "batoranyijwe",
+    "searchPlaceholder": "Shakisha abakoresha ukoresheje imeri cyangwa inshingano...",
+    "refresh": "Kongera kuvugurura abakoresha",
+    "bulkActions": "Ibikorwa Byinshi ({{count}})",
+    "activateSelected": "Koresha Abatoranyijwe",
+    "deactivateSelected": "Hagarika Abatoranyijwe",
+    "deleteSelected": "Siba Abatoranyijwe",
+    "export": "Ohereza hanze",
+    "addUser": "Ongeraho Umukoresha",
+    "filters": "Muyunguruzi",
+    "allRoles": "Inshingano Zose",
+    "roles": {
+      "admin": "Umuyobozi",
+      "viewer": "Umurebera",
+      "moderator": "Umuhuza",
+      "editor": "Umuhinduzi"
+    },
+    "allStatus": "Imimerere Yose",
+    "status": {
+      "active": "Akora",
+      "inactive": "Ntibikora",
+      "suspended": "Byahagaritswe",
+      "pending": "Birategereje"
+    },
+    "lastLogin": "Kwinjira Kwa Nyuma",
+    "lastLoginOptions": {
+      "today": "Uyu munsi",
+      "week": "Icyumweru Gishize",
+      "month": "Uku Kwezi",
+      "quarter": "Iki Gihembwe",
+      "year": "Uyu Mwaka",
+      "never": "Nta na rimwe yinjiye"
+    },
+    "advanced": "Byisumbuyeho",
+    "clearAll": "Siba Byose",
+    "sortBy": "Shungura ku:",
+    "sort": {
+      "newest": "Bishya Kurusha",
+      "oldest": "Bisanzwe Kurusha",
+      "emailAsc": "Imeri (A → Z)",
+      "emailDesc": "Imeri (Z → A)",
+      "role": "Inshingano",
+      "lastLogin": "Kwinjira Kwa Nyuma"
+    },
+    "registrationDate": "Itariki Yo Kwiyandikisha",
+    "clearAdvanced": "Siba Ibyisumbuyeho"
+  },
+  "usersTabs": {
+    "allUsers": "Abakoresha Bose",
+    "rolesPermissions": "Uruhushya n'Inshingano",
+    "specials": "Byihariye",
+    "familyPlan": "Ifatabuguzi y'Umuryango",
+    "more": "Ibindi"
+  },
+  "passwordSettings": {
+    "currentPassword": "Ijambo ry'ibanga rya none",
+    "currentPasswordPlaceholder": "Shyiramo ijambo ry'ibanga ryawe rya none",
+    "forgotCurrent": "Wibagiwe ijambo ry'ibanga ryawe rya none?",
+    "requestReset": "Saba kohereza link yo gusubiramo",
+    "newPassword": "Ijambo ry'ibanga rishya",
+    "newPasswordPlaceholder": "Shyiramo ijambo ry'ibanga rishya",
+    "newPasswordHelp": "Rigomba kuba rifite inyuguti 8+, harimwo inyuguti nkuru, nto, nimero & ikimenyetso",
+    "confirmPassword": "Emeza ijambo ry'ibanga rishya",
+    "confirmPasswordPlaceholder": "Emeza ijambo ry'ibanga rishya",
+    "update": "Hindura ijambo ry'ibanga",
+    "saving": "Birimo kuzigama...",
+    "errorPasswordsMismatch": "Amajambo y'ibanga ntabwo angana",
+    "errorPasswordCriteria": "Ijambo ry'ibanga rigomba kuba rifite inyuguti 8+, harimwo inyuguti nkuru, nto, nimero & ikimenyetso.",
+    "errorCurrentRequired": "Ijambo ry'ibanga rya none rirakenewe.",
+    "successUpdate": "Ijambo ry'ibanga ryahinduwe neza!",
+    "errorUpdate": "Ntibyashobotse guhindura ijambo ry'ibanga.",
+    "sendingReset": "Birimo kohereza link yo gusubiramo...",
+    "resetSent": "Link yo gusubiramo ijambo ry'ibanga yoherejwe kuri email yawe.",
+    "resetFailed": "Ntibyashobotse kohereza link yo gusubiramo."
+  },
+  "criticalActions": {
+    "warning": "Icyitonderwa: Ibikorwa bikomeye ku konte",
+    "deactivate": "Hagarika konte",
+    "delete": "Siba konte",
+    "processing": "Birimo gukora...",
+    "info": "Guhagarika konte bizayifunga by'agateganyo. Gusiba konte bizasiba byose burundu.",
+    "confirm": "Urashaka koko {{action}} konte yawe? Iki gikorwa ntigishobora gusubizwa inyuma.",
+    "deleteSuccess": "Konte yasibwe neza.",
+    "deactivateSuccess": "Konte yahagaritswe neza.",
+    "actionFailed": "Ntibyashobotse gukora igikorwa."
+  },
+  "securitySettings": {
+    "title": "Igenzura ry'Umutekano",
+    "tabs": {
+      "password": "Ijambo ry'Ibanga",
+      "critical": "Ibikorwa Bikomeye"
+    },
+    "more": "Ibindi"
+  },
+  "userForm": {
+    "title": "Tumira Umukoresha",
+    "subtitle": "Ohereza ubutumire bwo kwinjira ku rubuga",
+    "fields": {
+      "email": "Imeyili",
+      "role": "Inshingano",
+      "language": "Ururimi",
+      "sendInvitation": "Ohereza ubutumire kuri email"
+    },
+    "roles": {
+      "admin": "Umuyobozi",
+      "viewer": "Ureba gusa"
+    },
+    "languages": {
+      "en": "Icyongereza",
+      "rw": "Ikinyarwanda",
+      "fr": "Igifaransa",
+      "sw": "Kiswahili"
+    },
+    "buttons": {
+      "cancel": "Hagarika",
+      "sendInvitation": "Tuma Ubutumire",
+      "createUser": "Shyiraho Umukoresha"
+    },
+    "alerts": {
+      "emailRequired": "Imeyili irakenewe",
+      "emailInvalid": "Injiza imeyili ikwiriye",
+      "roleRequired": "Hitamo uruhare rw'umukoresha",
+      "languageRequired": "Hitamo ururimi rw'umukoresha",
+      "successInvitation": "Umukoresha yashyizweho neza! Email yo gushyiraho ijambo ry'ibanga yoherejwe.",
+      "successManual": "Umukoresha yashyizweho neza! Ushobora kohereza ubutumire nyuma.",
+      "failed": "Ntibyashobotse gushyiraho umukoresha. Ongera ugerageze."
+    }
+  },
+  "users": {
+    "pageTitle": "Iyobora ry’Abakoresha"
+  },
+  "userModal": {
+    "tabs": {
+      "overview": "Incamake",
+      "activity": "Ibikorwa",
+      "subscription": "Kwiyandikisha",
+      "security": "Umutekano",
+      "securityLogs": "Amakuru y'Umutekano",
+      "notifications": "Amatangazo & Imeri"
+    },
+    "status": {
+      "active": "Gikora",
+      "inactive": "Ntigikora",
+      "suspended": "Yahagaritswe",
+      "banned": "Yaziririjwe"
+    },
+    "roles": {
+      "admin": "Umuyobozi",
+      "moderator": "Umunyamabanga",
+      "viewer": "Umureba",
+      "user": "Ukoresha"
+    },
+    "actions": {
+      "editEmail": "Hindura Imeri",
+      "save": "Bika",
+      "cancel": "Hagarika",
+      "makeAdmin": "Kora Umuyobozi",
+      "makeViewer": "Kora Umureba",
+      "activate": "Koresha",
+      "deactivate": "Hagarika",
+      "loginHistory": "Amateka",
+      "delete": "Siba",
+      "more": "Birenzeho"
+    },
+    "confirmation": {
+      "changeRole": "Hindura urwego rwa {{email}} ujya kuri {{role}}?",
+      "deleteAccount": "Urageze ukuri ko ushaka gusiba konti ya {{email}}?",
+      "processing": "Birakorwa..."
+    },
+    "errors": {
+      "updateRole": "Ntibyakunze guhindura urwego rw'ukoresha",
+      "updateStatus": "Ntibyakunze guhindura imimerere y'ukoresha",
+      "deleteUser": "Ntibyakunze gusiba konti y'ukoresha",
+      "updateEmail": "Ntibyakunze guhindura imeri",
+      "networkError": "Ikosa ry'urubuga. Ongera usuzume seriveri.",
+      "sameEmail": "Imeri nshya ni kimwe n'iyo ufite ubu.",
+      "invalidEmail": "Mwongere mushire imeri yemewe."
+    },
+    "prompts": {
+      "enterNewEmail": "Shira imeri nshya:"
+    },
+    "success": {
+      "emailUpdated": "Imeri yahinduwe neza!"
+    }
+  },
+  "overviewTab": {
+    "title": "Amakuru y'Ukoresha",
+    "activitySummary": "Incamake y'Ibikorwa",
+    "status": "Imimerere",
+    "plan": "Ifatabuguzi",
+    "memberSince": "Yiyandikishije Kuva",
+    "lastLogin": "Injira Iheruka",
+    "language": "Ururimi",
+    "emailVerified": "Imeri Yemejwe",
+    "lastIp": "IP Iheruka",
+    "verified": "Yemejwe",
+    "pending": "Yegereje",
+    "stats": {
+      "totalLogins": "Injira Zose",
+      "currentStreak": "Uruhererekane",
+      "failedLogins": "Injira Zanze",
+      "avgSession": "Isaha Isanzwe",
+      "todayLogins": "Injira z'Uyu munsi",
+      "thisWeek": "Iyi Cyumweru",
+      "lastDevice": "Igikoresho Cya Nyuma",
+      "subscription": "Kwiyandikisha",
+      "active": "Gikora",
+      "inactive": "Ntigikora",
+      "avgSessionTime": "Igihe Isaha Isanzwe",
+      "activeSessions": "Isaha Zikora",
+      "totalSessions": "Isaha Zose"
+    },
+    "recentActivity": "Ibikorwa Byakozwe Buke",
+    "subscriptionPlans": {
+      "premium": "Premium",
+      "enterprise": "Enterprise",
+      "standard": "Standard",
+      "basic": "Basic",
+      "free": "Ubuntu"
+    },
+    "time": {
+      "today": "Uyu munsi",
+      "yesterday": "Ejo",
+      "daysAgo": "Hafi {{count}} iminsi",
+      "weeksAgo": "Hafi {{count}} ibyumweru",
+      "monthsAgo": "Hafi {{count}} amezi",
+      "yearsAgo": "Hafi {{count}} imyaka",
+      "never": "Ntabwo",
+      "unknown": "Ntibizwi"
+    }
+  },
+  "activityTab": {
+    "title": "Amateka yo Kwinjira & Isaha",
+    "stats": {
+      "totalSessions": "Isaha Zose",
+      "activeNow": "Zikora None",
+      "completed": "Byarangiye",
+      "lastLogin": "Injira Iheruka"
+    },
+    "filters": {
+      "all": "Isaha Zose",
+      "active": "Zikora Gusa",
+      "completed": "Byarangiye"
+    },
+    "actions": {
+      "refresh": "Ongera Usibe",
+      "logoutAll": "Sohoka Zose",
+      "terminate": "Hagarika",
+      "terminateAllConfirm": "Urageze ukuri ko ushaka guhagarika isaha zose zikora z'uyu ukoresha?"
+    },
+    "session": {
+      "status": {
+        "active": "Gikora",
+        "completed": "Byarangiye"
+      },
+      "deviceTypes": {
+        "mobile": "📱 Mobayile",
+        "tablet": "📟 Tabureti",
+        "desktop": "🖥️ Desktop",
+        "default": "💻 Igikoresho"
+      },
+      "login": "Injira",
+      "duration": "Igihe",
+      "active": "Gikora",
+      "justNow": "Vuba aha",
+      "unknownLocation": "Aho bitazwi"
+    },
+    "messages": {
+      "loading": "Isaha zirakururwa...",
+      "noSessions": "Nta mateka yo kwinjira abonetse",
+      "noFilteredSessions": "Nta isaha {{filter}} zibonetse",
+      "noSessionsYet": "Uyu ukoresha nta mateka yo kwinjira afite",
+      "terminateSuccess": "Isaha yahagaritswe neza",
+      "terminateAllSuccess": "Isaha zose zahagaritswe neza",
+      "terminateError": "Ntibyakunze guhagarika isaha",
+      "terminateAllError": "Ntibyakunze guhagarika isaha zose",
+      "permissionDenied": "Uburarire buhanitswe: Nta burenganzira bufite kubona isaha z'ukoresha"
+    },
+    "debug": {
+      "userId": "Numero y'Ukoresha",
+      "sessionsLoaded": "Isaha zikururwa",
+      "activeSessions": "zikora",
+      "filter": "Akayunguruzo",
+      "loading": "Irakurura"
+    }
+  },
+  "securityTab": {
+    "title": "Umutekano",
+    "passwordManagement": "Gucunga Ijambobanga",
+    "sessionManagement": "Gucunga Isaha",
+    "stats": {
+      "emailStatus": "Imimerere y'Imeri",
+      "lastLogin": "Injira Iheruka",
+      "pendingResets": "Gusubiramo Bigereje",
+      "failedLogins": "Injira Zanze",
+      "verified": "Yemejwe",
+      "unverified": "Ntacyayemejwe"
+    },
+    "passwordReset": {
+      "sendResetEmail": "Ohereza Imeri yo Gusubira mu Ijambobanga",
+      "sendResetEmailShort": "Ohereza Imeri yo Gusubira",
+      "description": "Ukoresha azakira umurongo wo gusubira mu ururimi yakizeye",
+      "sending": "Irahereza...",
+      "sendResetLink": "Ohereza Umurongo wo Gusubira",
+      "forceReset": "Gusubira mu Ijambobanga mu Ngufu",
+      "forceDescription": "Shiraho ijambobanga rishya ubu (bizasohoka mu isaha zose)",
+      "newPassword": "Ijambobanga Rishya",
+      "confirmPassword": "Emeza Ijambobanga",
+      "enterNewPassword": "Injiza ijambobanga rishya",
+      "confirmNewPassword": "Emeza ijambobanga rishya",
+      "resetting": "Irasubira...",
+      "resetPassword": "Subira mu Ijambobanga",
+      "confirmSendReset": "Ohereza imeri yo gusubira mu ijambobanga kuri {{email}}?",
+      "confirmForceReset": "Subira mu ijambobanga kuri {{email}}? Ibi bizamusoza mu isaha zose.",
+      "successResetSent": "Imeri yo gusubira mu ijambobanga yoherejwe neza!",
+      "successResetDone": "Gusubira mu ijambobanga byakozwe neza! Ukoresha agomba gukoresha iri jambobanga rishya."
+    },
+    "sessions": {
+      "terminateAll": "Hagarika Isaha Zose Zikora",
+      "terminateAllShort": "Hagarika Isaha",
+      "description": "Soza ukoresha mu bikoresho byose na porogaramu",
+      "terminating": "Irahagarika...",
+      "logoutAll": "Sohoka Zose",
+      "confirmTerminate": "Hagarika isaha zose zikora z'{{email}}? Ibi bizamusoza mu bikoresho byose.",
+      "successTerminate": "Isaha zose zahagaritswe neza!",
+      "activeSessions": "Isaha {{count}} ikora",
+      "activeSessions_plural": "Isaha {{count}} zikora"
+    },
+    "messages": {
+      "processing": "Irakora...",
+      "enterPassword": "Nyamuneka injiza ijambobanga rishya",
+      "passwordsMatch": "Amajambobanga ntabwo ari kimwe",
+      "passwordLength": "Ijambobanga rigomba kuba inyuguti 8 byibuze",
+      "failedAction": "Ntibyakunze {{action}}",
+      "failedSendReset": "Ntibyakunze kohereza gusubira mu ijambobanga",
+      "failedForceReset": "Ntibyakunze gusubira mu ijambobanga",
+      "failedTerminate": "Ntibyakunze guhagarika isaha"
+    },
+    "time": {
+      "today": "Uyu munsi",
+      "yesterday": "Ejo",
+      "daysAgo": "Hafi {{count}} iminsi",
+      "weeksAgo": "Hafi {{count}} ibyumweru",
+      "monthsAgo": "Hafi {{count}} amezi",
+      "never": "Ntabwo",
+      "unknown": "Ntibizwi"
+    }
+  },
+  "usersList": {
+    "loading": "Irakurura...",
+    "emptyState": {
+      "title": "Nta bakoresha abonetse",
+      "description": "Nta bakoresha bihuye n'ibisabwa byawe."
+    },
+    "loadMore": "Kurura Abakoresha Bindi"
+  },
+  "subscriptionPage": {
+    "title": "Hitamo Ifatabuguzi yawe",
+    "subtitle": "Kureba filime zidashira. Nta masezerano. Ushobora guhagarika igihe icyo aricyo cyose.",
+    "pricesIn": "Ibiciro biri muri",
+    "convertedFromRWF": "byahinduwe bivuye kuri RWF",
+    "fetchError": "Ntibyashobotse kubona Ifatabuguzi z'ubwishyu",
+    "noPlans": "Nta Ifatabuguzi ihari",
+    "checkBackLater": "Subira hanyuma urebe niba Ifatabuguzi ziboneka",
+    "selectPlan": "Hitamo Ifatabuguzi",
+    "processing": "Birimo gutunganywa...",
+    "mostPopular": "Bikunzwe cyane",
+    "serverError": "Ikosa rya seriveri. Ongera ugerageze.",
+    "selectError": "Ntibyashobotse guhitamo Ifatabuguzi. Ongera ugerageze.",
+    "loading": "Ifatabuguzi zirimo gutangazwa...",
+    "comparePlans": "Gereranya Ifatabuguzi",
+    "compareSubtitle": "Hitamo Ifatabuguzi ikubereye neza mu myidagaduro",
+    "perMonth": "/ukwezi",
+    "device": "Igikoresho",
+    "devices": "Ibikoresho",
+    "perfectFor": "Byiza kuri",
+    "moreFeatures": "ibindi biranga",
+    "getPlan": "Fata {{plan}}",
+    "watchOn": "Reba kuri {count} {devices} icyarimwe",
+    "videoQuality": "ubwiza bwa videwo",
+    "unlimitedDownloads": "Ushobora gukuramo byinshi udafite umupaka",
+    "downloadLimit": "Kura {count} ibintu byo kurebera utari ku murongo",
+    "simultaneousDownloads": "{count} byakurwaho icyarimwe",
+    "downloadExpiry": "Ibyakurwaho birangira nyuma y’iminsi {days}",
+    "noDownloads": "Nta byo gukuramo bihari",
+    "hdrSupport": "Ifite HDR ishyigikira amashusho asobanutse neza",
+    "adFree": "Kureba udafite amatangazo",
+    "fullLibrary": "Uburenganzira bwo kubona ibintu byose biri kuri Oliviuus",
+    "prioritySupport": "Ubufasha bwihutirwa",
+    "parentalControls": "Igenzura ry'ababyeyi ku mutekano w'umuryango",
+    "quality": {
+      "SD": "SD (480p)",
+      "HD": "HD (720p)",
+      "FHD": "Full HD (1080p)",
+      "UHD": "4K Ultra HD"
+    },
+    "plans": {
+      "mobile": {
+        "title": "Ifatabuguzi ya Telefoni",
+        "tagline": "Imyidagaduro aho uri hose",
+        "description": "Ikwiriye abakoresha telefoni bashaka uburyo buhendutse bwo kureba kuri Oliviuus kuri telefoni imwe.",
+        "idealFor": "Abantu bashaka gukoresha telefoni gusa"
+      },
+      "basic": {
+        "title": "Ifatabuguzi Isanzwe",
+        "tagline": "Filime na series za buri munsi",
+        "description": "Ifatabuguzi isanzwe itanga ubwiza bwiza no korohereza abayireba buri gihe.",
+        "idealFor": "Abashakanye cyangwa incuti zisangira ibikoresho"
+      },
+      "standard": {
+        "title": "Ifatabuguzi Yisumbuye",
+        "tagline": "Zamura uburyo bwo kureba filime",
+        "description": "Zamura kuri Ifatabuguzi yisumbuye kugira ngo urebe neza kandi ukoreshe ibikoresho byinshi icyarimwe.",
+        "idealFor": "Imiryango mito cyangwa abakunda ubwiza"
+      },
+      "family": {
+        "title": "Ifatabuguzi y’Umuryango",
+        "tagline": "Imyidagaduro y’umuryango wose",
+        "description": "Ifatabuguzi y’Umuryango ya Premium itanga byose bya Oliviuus mu bwiza buhebuje.",
+        "idealFor": "Imiryango ifite abantu benshi bareba"
+      }
+    },
+    "comparison": {
+      "features": "Ibintu biranga",
+      "simultaneousStreams": "Amashusho icyarimwe",
+      "videoQuality": "Ubwiza bwa videwo",
+      "offlineDownloads": "Ibyakurwaho udafite internet",
+      "downloadLimit": "Umupaka wo gukuramo",
+      "downloadQuality": "Ubwiza bwo gukuramo",
+      "hdrSupport": "Ishyigikira HDR",
+      "parentalControls": "Igenzura ry'ababyeyi",
+      "supportedPlatforms": "Urubuga rushyigikiwe",
+      "maxRegisteredDevices": "Ibikoresho byiyandikishije byinshi",
+      "simultaneousDownloads": "Ibishobora gukurwaho icyarimwe",
+      "downloadExpiry": "Igihe cyo kurangira kw'ibyakurwaho",
+      "videoBitrate": "Video Bitrate",
+      "devices": "{count} {devices}",
+      "unlimited": "Bidasanzwe",
+      "notAvailable": "Ntaboneka",
+      "downloadItems": "{count} ibintu",
+      "platformsCount": "{count} urubuga",
+      "allPlatforms": "Urubuga rwose",
+      "registeredDevices": "{count} ibikoresho",
+      "downloadsAtOnce": "{count} icyarimwe",
+      "expiryDays": "{days} iminsi",
+      "neverExpires": "Ntabwo birangira",
+      "mbps": "{value} Mbps",
+      "kbps": "{value} kbps"
+    },
+    "helpSection": {
+      "title": "Ufite ibibazo kuri subscription yawe? ",
+      "checkStatus": "Reba Imimerere ya Subscription Yawe",
+      "contactSupport": "Hamagara Itsinda rishinzwe Kugufasha"
+    }
+  },
+  "profileMenu": {
+    "profileMenu": "Konti Yange",
+    "profilePicture": "Ifoto ya konti",
+    "user": "Ukoresha",
+    "activeAccount": "Konti irigukora",
+    "signOut": "Sohoka",
+    "account": "Konti"
+  },
+  "faq": {
+    "title": "Ibibazo Byibanze",
+    "subtitle": "Wabona ibisubizo by'ibibazo byibanze kuri Ifatabuguzi z'abiyandikisha",
+    "needMoreHelp": "Ukeneye ubufasha bwinyongera?",
+    "contactSupport": "Itsinda ryacu ryaguha ubufasha mu bibazo byose by'inyongera",
+    "contactUs": "Vugana n'Abafasha",
+    "canChangePlan": "Nshobora guhindura ifatabuguzi yanje nyuma?",
+    "changePlanAnswer": "Yego, urashobora kongera cyangwa kugabanya Ifatabuguzi yawe igihe icyo aricyo cyose. Amahinduruko atangira gukora ku itangiriro ry'igihembwe cyawe gikurikira cyo kwishyura. Amahinduruko yo kongera aragabanurwa, mu gihe amahinduruko yo kugabanya atangira gukora nyuma y'igihembwe cyawe cyo kwishyura.",
+    "commitmentPeriod": "Hari igihe cyo kwiyandikisha?",
+    "commitmentAnswer": "Oya, Ifatabuguzi zose ni ukwezi kukwezi nta gihe kirekire cyo kwiyandikisha. Urashobora guhagarika igihe icyo aricyo cyose nta fee. Abiyandikisha bawe bazakomeza kuba bafite uburenganzira kugeza impera z'igihembwe cyawe cyo kwishyura.",
+    "devicesSimultaneously": "Ni mudasobwa zingahe nshobora gukoresha hamwe?",
+    "devicesAnswer": "Umubare w'imirongo ishobora kuyobora hamwe itandukanye bitewe n'iIfatabuguzi. Nyamuneka reba imipaka y'umudasi yateguwe kuri Ifatabuguzi zose muri tabilo yacu y'igereranyo kugirango usange iyo ishimye cyane mu ngingo z'urugo rwawe.",
+    "discountsAvailable": "Mutama abanyeshuri, ingabo, cyangwa abagurana?",
+    "discountsAnswer": "Nubwo ubu tutunga abagurana cyangwa amagabanyirizo yihariye, dukora imirimo yo gushyira mu bikorwa Ifatabuguzi yuzuye yo kugurana. Menya amakuru agezweho nk'uko dukomeza kongera ibyo dushyura mu biyandikisha byacu.",
+    "paymentMethods": "Mwemera ubuhe buryo bwo kwishyura?",
+    "paymentAnswer": "Temera amafaranga yo kumurongo (MTN, Airtel), amakarita y'inguzanyo/yo kwishyura (Visa, MasterCard), no kohereza amafaranga mu banki. Amashyura yose arinde kandi yasohotswe kugirango arinde.",
+    "offlineViewing": "Nshobora kurodosha ibirimo kugirango nsubiremwo ndi kumurongo?",
+    "offlineAnswer": "Kuboneka kwo kurodosha ibirimo kumurongo bitewe n'iIfatabuguzi wahisemo. Nyamuneka subira inyuma igenzura rigereranywa ry'imikorere hagati y'amaIfatabuguzi kugirango ubone ayo afite ubushobozi bwo kurodosha n'imipaka yayo.",
+    "regionalAvailability": "Ibirimo byaboneka mu nsi zose?",
+    "regionalAnswer": "Bitewe n'amasezerano y'uruhushya, birashoboka ko bimwe mu birimo ntibiboneka mu nsi zose. Urutonde rwacu rwateguwe neza kuri abateze amatwi bo mu Karere ka Afurika y'Iburasirazuba hamwe n'igice cy'igihugu n'icy'isi.",
+    "cancelSubscription": "Ntegeka gute abiyandikisha banje?",
+    "cancelAnswer": "Urashobora guhagarika igihe icyo aricyo cyose uva mu genamiterere yawe ya konti. Genda ku 'Abiyandikisha' → 'Gucunga Ifatabuguzi' → 'Hagarika Abiyandikisha'. Uburyo bwawe buzakomeza kugeza impera z'igihembwe cyawe cyo kwishyura.",
+    "videoQuality": "Ni ikihe kigero cya videwo narashobora gutegereza?",
+    "qualityAnswer": "Kigero cya videwo cyatandukanye bitewe n'iIfatabuguzi y'abiyandikisha, igera ku gisobanuro cya busanzwe kugeza kuri 4K Ultra HD. Nyamuneka reba igenzura ry'iIfatabuguzi ry'ibyo bitanga bisanzwe bihuye n'umwanya buri wese.",
+    "billingCycle": "Igihembwe cyanje cyo kwishyura kitangira ryari?",
+    "billingAnswer": "Igihembwe cyawe cyo kwishyura kitangira burundu mugihe wiyandikisha kandi gisubiramo ubwacyo buri minsi 30. Uzakira ikimenyetso mbere y'isubiramo rimwe na rimwe, kandi urashobora guhagarika igihe icyo aricyo cyose nta gihano."
+  },
+  "contact": {
+    "contactUs": "Twandikire",
+    "helpSubtitle": "Turimo kubafasha mubibazo byose cyangwa ibibazo",
+    "needHelp": "Ukeneye Gufashwa?",
+    "ctaDescription": "Itsinda ryacu riri hano kubafasha mubibazo byose, ingingurambaga, cyangwa ibibazo. Twishimiye kubafasha!",
+    "getInTouch": "Twandikire",
+    "emailSupport": "Gufasha kuri Email",
+    "responseTime": "Igisubizo mumasaha 2",
+    "phoneSupport": "Gufasha kuri Telefone",
+    "phoneHours": "Kuwa mbere - Kuwa gatandatu, saa 8 zamurambu - 10 zamanywa",
+    "liveChat": "Gutanga amakuru mu buryo buhagarariye",
+    "available247": "Biboneka masaha 24",
+    "instantSupport": "Gufasha byihuse",
+    "messageSent": "Ubutumwa Bwoherejwe Ntungane!",
+    "thankYou": "Murakoze kutwandikira. Tuzasubiza vuba.",
+    "sendAnother": "Ohereza undi butumwa",
+    "fullName": "Amazina yose",
+    "namePlaceholder": "Andika amazina yawe yose",
+    "emailAddress": "Aderesi ya Email",
+    "emailPlaceholder": "Andika email yawe",
+    "category": "Icyiciro",
+    "selectCategory": "Hitamo icyiciro",
+    "subject": "Ingingo",
+    "subjectPlaceholder": "Andika ingingo y'ubutumwa",
+    "message": "Ubutumwa",
+    "messagePlaceholder": "Tubwire uko dushobora kugufasha...",
+    "sending": "Ohereje Ubutumwa...",
+    "sendMessage": "Ohereza Ubutumwa",
+    "generalInquiry": "Ikibazo Gisanzwe",
+    "technicalSupport": "Gufasha mu bya Tehniki",
+    "billingQuestion": "Ikibazo cy'ishyura",
+    "featureRequest": "Gusaba Imikorere",
+    "bugReport": "Raporo y'ibyago",
+    "partnership": "Ubufatanye",
+    "feedback": "Ingingurambaga & Ibyifuzo",
+    "other": "Ibindi",
+    "title": "Gucunga Ibyemezo",
+    "allContacts": "Ibyemezo Byose",
+    "submissionError": "Ntibyakunze kohereza ubutumwa. Wongere ugerageze.",
+    "exportError": "Ntibyakunze soza ibyemezo.",
+    "filters": {
+      "search": "Shakisha ibyemezo...",
+      "allStatus": "Imimerere Yose",
+      "allPriority": "Ibiranga Byose",
+      "allCategories": "Ibyiciro Byose",
+      "filters": "Akayunguruzo",
+      "sortBy": "Gutondekanya",
+      "newestFirst": "Ibyashyizweho vuba",
+      "lastUpdated": "Byahinduwe nyuma",
+      "priority": "Ibiranga",
+      "status": "Imimerere",
+      "advanced": "Byimazeyo",
+      "clearAll": "Siba Byose",
+      "dateRange": "Igihe",
+      "responseCount": "Umubare w'ibisubizo",
+      "source": "Inkomoko",
+      "clearAdvanced": "Siba byimazeyo",
+      "any": "Icyaricyo cyose",
+      "noResponses": "Nta gisubizo",
+      "responses1to3": "Ibisubizo 1-3",
+      "responses4plus": "Ibisubizo 4 n'hejuru",
+      "allSources": "Inkomoko Zose",
+      "filtered": "yatoranijwe",
+      "from": "Kuva",
+      "to": "Kugeza",
+      "responses": "Ibisubizo"
+    },
+    "status": {
+      "new": "Gishya",
+      "open": "Gifunguye",
+      "in_progress": "Biri Ku Bikorwa",
+      "awaiting_reply": "Bitegereje Igisubizo",
+      "resolved": "Byakemuwe",
+      "closed": "Bifunze"
+    },
+    "priority": {
+      "urgent": "Bihutirwa",
+      "high": "Biremereye",
+      "medium": "Hagati",
+      "low": "Birutisha"
+    },
+    "category": {
+      "general": "Ikibazo Gisanzwe",
+      "technical": "Gufasha mu bya Tehniki",
+      "billing": "Ikibazo cy'ishyura",
+      "feature": "Gusaba Imikorere",
+      "bug_report": "Raporo y'ibyago",
+      "partnership": "Ubufatanye",
+      "feedback": "Ingingurambaga & Ibyifuzo",
+      "other": "Ibindi"
+    },
+    "stats": {
+      "totalContacts": "Ibyemezo Byose",
+      "newContacts": "Ibyemezo Bishya",
+      "inProgress": "Biri Ku Bikorwa",
+      "resolved": "Byakemuwe",
+      "responseRate": "Ingano y'Ibisubizo",
+      "resolutionRate": "Ingano yo Gukemura",
+      "avgResponseTime": "Igihe cyo Gusubiza",
+      "statusDistribution": "Gusasira Imimerere",
+      "priorityOverview": "Rekurura Ibiranga",
+      "categoryBreakdown": "Gutandukanya Ibyiciro",
+      "performanceMetrics": "Ibipimo by'Umusaruro"
+    },
+    "settings": {
+      "refresh": "Ongera usubize",
+      "export": "Kohereza hanze",
+      "title": "Igenamiterere yo Kuganira",
+      "subtitle": "Gucunga amakuru yawe yo kuganira agaragazwa ku bakoresha ku fomu yo kuganira",
+      "supportEmail": "Imeyili yo Gufasha",
+      "emailPlaceholder": "support@oliviuus.com",
+      "emailDescription": "Iyi imeyili izagaragazwa ku bakoresha kugirango babaze ibibazo by'ubufasha",
+      "supportPhone": "Telefoni yo Gufasha",
+      "phonePlaceholder": "+250 788 123 456",
+      "phoneDescription": "Iyi numero ya telefoni izagaragazwa ku bakoresha kugirango bahamagara ubufasha",
+      "saveChanges": "Bika Amahinduka",
+      "saving": "Kubika...",
+      "preview": "Reba mbere",
+      "defaultEmail": "support@oliviuus.com",
+      "defaultPhone": "+250 788 123 456",
+      "loadError": "Kuzana amakuru yo kuganira byanze",
+      "updateSuccess": "Amakuru yo kuganira yahinduwe neza",
+      "updateError": "Guhindura amakuru yo kuganira ntiyabitswe neza"
+    },
+    "list": {
+      "noContacts": "Nta mazimaboneka",
+      "adjustFilters": "Gerageza guhindura imyungurangendo cyangwa amagambo yoshakashaka",
+      "loadMore": "Zana Ibindi"
+    },
+    "time": {
+      "justNow": "Vuba aha",
+      "hoursAgo": "amasaha {{hours}} ishize",
+      "daysAgo": "iminsi {{days}} ishize"
+    },
+    "modal": {
+      "changeStatus": "Hindura Imimerere",
+      "details": "Ibisobanuro",
+      "conversation": "Ikiganiro",
+      "reply": "Subiza",
+      "contactInfo": "Amakuru yo kuganira",
+      "technicalDetails": "Ibisobanuro by'ikoranabuhanga",
+      "submitted": "Yoherejwe",
+      "lastResponse": "Isubiza ryanyuma",
+      "source": "Inkomoko",
+      "notAvailable": "Nta",
+      "ipAddress": "Aderesi ya IP",
+      "responses": "Ibisubiza",
+      "firstRead": "Gusoma bwa mbere",
+      "message": "Ubutumwa",
+      "refresh": "Ongera usubize",
+      "supportTeam": "Itsinda ryubufasha",
+      "noResponses": "Nta bisubiza byagezweho",
+      "sendFirstResponse": "Ohereza isubiza rya mbere kugirango utangire ikiganiro",
+      "sendReply": "Ohereza Isubiza",
+      "originalMessage": "Ubutumwa bw'ibanze",
+      "replyPlaceholder": "Andika isubiza ryawe hano...",
+      "cancel": "Hagarika",
+      "sending": "Kohereza...",
+      "statusUpdateError": "Kuhindura imimerere ntiyabitswe neza",
+      "replySuccess": "Isubiza ryakoherejwe neza!",
+      "replyError": "Kukohereza isubiza ntiyabitswe neza",
+      "never": "Nta narimwe"
+    },
+    "categoryLabel": "Icyiciro",
+    "priorityLabel": "Ibiranga",
+    "statusLabel": "Imimerere",
+    "stats": {
+      "title": "Ibipimo byo Kuganira",
+      "subtitle": "Incamake yuzuye y'ibikorwa byawe byo kuyobora imibanire",
+      "loading": "Kuzana ibipimo...",
+      "failedToLoad": "Kuzana ibipimo byanze",
+      "tryAgain": "Gerageza Nanone",
+      "refresh": "Ongera usubize",
+      "fromLastPeriod": "kuva mu gihe cyahise",
+      "totalContacts": "Imibanire Yose",
+      "allTimeContacts": "Imibanire yose",
+      "responseRate": "Ingano y'ibisubiza",
+      "respondedOfTotal": "{{responded}} bya {{total}} byasubijwe",
+      "avgResponseTime": "Igihe cyo gusubiza cyijoro",
+      "acrossAllContacts": "Muri mibanire yose",
+      "resolutionRate": "Ingano yo Gukemura",
+      "resolvedContacts": "{{resolved}} byakemuwe",
+      "statusDistribution": "Gusambaza Imimerere",
+      "priorityOverview": "Incamake y'Ibiranga",
+      "categoryBreakdown": "Gutandukanya Ibyiciro",
+      "performanceMetrics": "Ibipimo by'Ikora",
+      "emailResponses": "Ibisubiza by'Imeyili",
+      "totalSentReplies": "Ibisubiza byose byohererejwe",
+      "satisfactionRate": "Ingano yo Kwishima",
+      "estimatedFromResolutions": "Bigereranywe kubyo byakemuwe",
+      "activeConversations": "Imiganiro Ikora",
+      "currentlyInProgress": "Ikorera none",
+      "newToday": "Bishya Uyu munsi",
+      "timeRanges": {
+        "all": "Igihe Cyose",
+        "today": "Uyu munsi",
+        "week": "Iyi Cyumweru",
+        "month": "Uku Kwezi"
+      }
+    }
+  },
+  "contactAdmin": {
+    "tabs": {
+      "allContacts": "Ibyemezo Byose",
+      "statistics": "Ibaruramiterere",
+      "contactSettings": "Igenamiterere ry'Ibyemezo"
+    },
+    "more": "Ibindi",
+    "loading": "Irikuramo..."
+  },
+  "seo": {
+    "siteName": "Oliviuus",
+    "defaultTitle": "Reba Filime & Serie Uciye kuri Internet",
+    "defaultDescription": "Reba filime nshya na serie kuri internet. Ubufasha bwo kureba uko ushaka, uburyo bwo kuguhitishamo ibyakunogera, n’ibihangano bikwiye umuryango.",
+    "keywords": "filime, serie, kureba kuri internet, amashusho, imyidagaduro"
+  },
+  "actions": {
+    "play": "Reba",
+    "stop": "Hagarika",
+    "trailer": "Trailer",
+    "mute": "cecekesha",
+    "unmute": "Shiramo amajwi",
+    "viewAll": "Reba Byose",
+    "swipeToBrowse": "Kwepesha kugira ngo ushakishhe →",
+    "tryAgain": "Ongera Ugerageze",
+    "inList": "Birimo",
+    "myList": "Urutonde Rwanjye",
+    "liked": "ndayikunda",
+    "like": "Kunda",
+    "details": "Ibisobanuro"
+  },
+  "sections": {
+    "popularInRwanda": "Bikunzwe mu Rwanda",
+    "popularInRwandaSubtitle": "Ibyatoranyijwe bikunzwe n’abarebye benshi mu Rwanda",
+    "trendingNow": "Biri Kuvugwaho",
+    "trendingNowSubtitle": "Ibirimo kurebwa na bose ubu",
+    "newReleases": "Ibisohotse Bishya",
+    "newReleasesSubtitle": "Ibihangano bishya byongewe"
+  },
+  "errors": {
+    "contentLoad": "Habaye ikibazo mu gukurura ibyerekeranye n’ibyo ureba. Gerageza kongera nyuma y’akanya.",
+    "somethingWentWrong": "Habaye Ikosa",
+    "error": "Ikosa",
+    "noContent": "Nta contenido ihari",
+    "checkBackLater": "Subira nyuma ubone ibyiyongereye."
+  },
+  "ratings": {
+    "G": "Bose",
+    "PG": "PG",
+    "PG13": "13+",
+    "R": "18+",
+    "NC17": "18+"
+  },
+  "contentdetail": {
+    "seo": {
+      "siteName": "Oliviuus",
+      "defaultTitle": "Reba Filime & Serie",
+      "defaultDescription": "Reba ibi bikubiye kuri Oliviuus",
+      "keywords": "filime, serie, kureba kuri internet"
+    },
+    "media": {
+      "trailers": "Ama-Trailer & Amashusho Amatangiza",
+      "trailersDescription": "Reba amashyusho amatangiza n’amamaza",
+      "behindScenes": "Inyuma y’Ibikorwa",
+      "behindScenesDescription": "Amashusho yihariye agaragaza uko byakozwe",
+      "posters": "Amashusho y’Amatangazo",
+      "postersDescription": "Amatangazo n’amafoto yemewe",
+      "photos": "Amafoto & Amashusho",
+      "photosDescription": "Amafoto yo mu ikorwa n’amashusho yafashwe",
+      "moviePoster": "Ishusho y’Amatangazo ya Filime",
+      "mediaFrom": "{{category}} bivuye kuri {{title}}",
+      "contentType": "Ibikubiyemo bya {{category}}",
+      "mediaFromTitle": "Amashusho ya {{title}}",
+      "exclusiveContent": "Ibirimo Byihariye bya {{category}}",
+      "mediaContent": "Ibikubiyemo by’Amashusho"
+    },
+    "share": {
+      "title": "Sangiza iyi filime/serie",
+      "shareText": "Reba \"{{title}}\"",
+      "copyLink": "Gukoporora Link",
+      "moreOptions": "Ubundi Buryo",
+      "shareOn": "Sangiza kuri {{platform}}",
+      "platforms": {
+        "facebook": "Facebook",
+        "twitter": "Twitter",
+        "instagram": "Instagram",
+        "whatsapp": "WhatsApp",
+        "tiktok": "TikTok",
+        "telegram": "Telegram",
+        "email": "Email",
+        "sms": "SMS"
+      }
+    },
+    "actions": {
+      "goHome": "Jya Ahabanza",
+      "play": "Reba",
+      "stop": "Hagarika",
+      "trailer": "Trailer",
+      "mute": "Kcecekesha",
+      "unmute": "Subiramo ijwi",
+      "viewAll": "Reba Byose",
+      "tryAgain": "Ongera Ugerageze",
+      "inList": "Birimo",
+      "myList": "Urutonde Rwanjye",
+      "liked": "Yankoze Ku Mutima",
+      "like": "Kunda",
+      "details": "Ibisobanuro",
+      "share": "Sangiza",
+      "watchTrailer": "Reba Trailer",
+      "addToList": "Ongeramo mu Rutonde",
+      "removeFromList": "Kuramo mu Rutonde",
+      "goBack": "Garuka",
+      "playNow": "Reba Ubu",
+      "fullscreen": "Erekana Byuzuye",
+      "unlike": "Kura Mubyukunda",
+      "stopTrailer": "Hagarika Trailer",
+      "browseAll": "Shakisha Byose",
+      "browseAllContent": "Shakisha Ibikubiyemo Byose",
+      "watch": "Reba",
+      "view": "Fungura",
+      "close": "Funga",
+      "exploreMore": "Shakisha Ibindi",
+      "openFloatingTrailer": "Fungura Trailer",
+      "goToHomepage": "Jya Ahabanza"
+    },
+    "sections": {
+      "synopsis": "Incamake",
+      "cast": "Abakinnyi",
+      "crew": "Itsinda",
+      "details": "Ibisobanuro",
+      "media": "Amashusho",
+      "seasons": "season",
+      "episodes": "igice",
+      "similar": "izisa kyiyi",
+      "overview": "Incamake",
+      "gallery": "Amafoto & Ibindi",
+      "findingSimilar": "Turi gushaka ibisa n'ibi...",
+      "youMightAlsoLike": "Wakunda n'ibi",
+      "movieDetails": "Ibisobanuro bya Filime",
+      "featuresCategories": "Ibiranga & Ibyiciro",
+      "castAndCrew": "Abakinnyi & Abayiteguye",
+      "productionCrew": "Itsinda ry'abayiteguye",
+      "fullCastCrew": "Abakinnyi & Itsinda Ryabayiteguye Bose"
+    },
+    "tabs": {
+      "overview": "Incamake",
+      "cast": "Abakinnyi & Abayiteguye",
+      "details": "Ibisobanuro",
+      "media": "Amashusho",
+      "seasons": "Sizoni",
+      "similar": "izisa kyiyi",
+      "awards": "Ibihembo"
+    },
+    "metadata": {
+      "rating": "Uburyo Yakunzwe",
+      "duration": "Igihe",
+      "ageRating": "Urwego rw’Imyaka",
+      "releaseDate": "Itariki yo Gusohoka",
+      "contentType": "Ubwoko",
+      "originalLanguage": "Ururimi rw’Inyuma",
+      "director": "Umuyobozi",
+      "categories": "Amoko",
+      "genres": "Ibyiciro",
+      "seasonsCount": "Igihembwe",
+      "episodesCount": "Agace",
+      "notAvailable": "N/A",
+      "durationHours": "{{hours}}h {{mins}}m",
+      "durationMinutes": "{{mins}}m",
+      "views": "Imyirondoro {{count}}",
+      "series": "Serie",
+      "movie": "Filime",
+      "documentary": "Documentaire",
+      "content": "Ibikubiyemo",
+      "itemsCount": "Ibintu {{count}}",
+      "contentWarnings": "Amaburira y'Ibikubiyemo",
+      "availableLanguages": "Indimi Ibonekamo",
+      "default": "Mburabuzi",
+      "seasons": "Sizoni",
+      "tvSeries": "Serie za TV",
+      "seasonsSingular": "Igice {{count}}",
+      "seasonsPlural": "Sizoni {{count}}",
+      "episodesPerSeason": "Ibice {{count}} kuri buri gihembwe"
+    },
+    "errors": {
+      "contentNotFound": "Ntacyo Twabonye",
+      "error": "Ikosa",
+      "somethingWentWrong": "Habaye Ikosa",
+      "noContent": "Nta contenido ihari",
+      "checkBackLater": "Subira nyuma urebe ibyiyongereye.",
+      "failedToLoad": "Ntibyakunze gukurura ibikubiyemo",
+      "failedToRemove": "Ntibyakunze gukurwaho mu rutonde",
+      "failedToAdd": "Ntibyakunze kongerwaho mu rutonde",
+      "failedToUnlike": "Ntibyakunze gukuraho gukundwa",
+      "failedToLike": "Ntibyakunze gukunda ibikubiyemo",
+      "unableToLoad": "Ntibishobotse gukurura ibikubiyemo",
+      "noSimilarContent": "Nta bihuje twabonye",
+      "noContentAvailable": "Nta Bikubiyemo Bihari",
+      "videoNotAvailable": "Video Ntiboneka",
+      "imageNotAvailable": "Ishusho Ntiboneka",
+      "noCastInfo": "Nta makuru y'abakinnyi ahari",
+      "noCrewInfo": "Nta makuru y'abayiteguye ahari"
+    },
+    "roles": {
+      "director": "Umuyobozi",
+      "producer": "Umushyushyarugamba / Producer",
+      "writer": "Umwanditsi",
+      "cinematographer": "Umufatankuru",
+      "composer": "Umwandika Indirimbo",
+      "editor": "Umusesenguzi / Editor"
+    },
+    "creditTypes": {
+      "supporting": "Abafasha",
+      "lead": "Bayoboye",
+      "guest": "Umushyitsi",
+      "cameo": "Cameo"
+    },
+    "messages": {
+      "linkCopied": "Uruhushya rwakoporowe neza!",
+      "addedToList": "Byongewe mu rutonde rwawe",
+      "removedFromList": "Byakuwe mu rutonde rwawe",
+      "contentLiked": "Byakunze",
+      "contentUnliked": "Byakuweho gukundwa",
+      "addingMoreContent": "Turimo kongeramo ibindi bikubiyemo bijyanye n'ibyo ukunda.",
+      "discoverExclusive": "Sobanukirwa ibirimo byihariye bya {{title}}",
+      "checkBackLater": "Subira nyuma urebe ibindi byihariye bya {{category}}.",
+      "discoverAllExclusive": "Reba ibirimo byose byihariye bya {{title}}",
+      "noDescription": "Nta bisobanuro bihari.",
+      "meetTheTeam": "Menya abantu bafite impano bari inyuma ya {{title}}",
+      "talentedActors": "Abakinnyi {{count}} bafite impano",
+      "asCharacter": "nk'",
+      "creativeMinds": "Impano zihanitse ziri inyuma y'iri korwa",
+      "exploreMore": "Sobanukirwa byinshi ku bafite impano bagize iyi nkuru"
+    }
+  },
+  "viewerdashboardnavs": {
+    "navigation": {
+      "home": "Ahabanza",
+      "tvShows": "Series",
+      "movies": "Filime",
+      "newPopular": "Nshya & Zikunzwe",
+      "myList": "Urutonde Rwanjye",
+      "browse": "Shakisha"
+    },
+    "settings": {
+      "title": "Igenamiterere ry'Akaunti",
+      "back": "Subira inyuma",
+      "loading": "Ibirimo Gutunganywa...",
+      "more": "Ibindi",
+      "tabs": {
+        "account": "Akaunti",
+        "security": "Umutekano",
+        "preferences": "Ibyihariye",
+        "sessions": "Sessions",
+        "subscription": "Gucungura",
+        "profiles": "Profayiri z’Umuryango",
+        "parental": "Igenzura ry’Ababyeyi"
+      }
+    },
+    "header": {
+      "searchButton": "Shakisha",
+      "subscriptionAlert": {
+        "criticalTitle": "Gucungura Birangiye!",
+        "expiringTitle": "Gucungura Birashira",
+        "criticalMessage": "Vugurura ubu wirinde guhagarikirwa serivisi",
+        "expiringMessage": "Vugurura kugirango ukomeze kubona ubushobozi bwa premium",
+        "renewButton": "Vugurura Gucungura"
+      }
+    }
+  },
+  "notification": {
+    "time": {
+      "justNow": "Nonaha",
+      "minutesAgo": "iminota {{count}} ishize",
+      "hoursAgo": "amasaha {{count}} ashize",
+      "daysAgo": "iminsi {{count}} ishize"
+    },
+    "status": {
+      "read": "Byasomwe",
+      "new": "Bishya"
+    },
+    "dropdown": {
+      "title": "Amatangazo",
+      "unreadCount": "{{count}} ntabyo wasomye",
+      "allCaughtUp": "Byose ubyamenye!",
+      "refresh": "Ongera usome",
+      "loading": "Harimo gupakira amatangazo...",
+      "connectionIssue": "Ikibazo cya Internet",
+      "unableToLoad": "Ntibyashoboye gupakirwa",
+      "tryAgain": "Ongera ugerageze",
+      "noNotifications": "Nta matangazo",
+      "allCaughtUpMessage": "Byose ubyamenye!",
+      "viewAll": "Reba Amatangazo Yose"
+    },
+    "modal": {
+      "title": "Amatangazo",
+      "subtitle": "Komeza kumenyeshwa ibikorwa byawe biheruka",
+      "loading": "Harimo gupakira amatangazo yawe...",
+      "noNotifications": "Nta matangazo araboneka",
+      "allCaughtUp": "Byose ubyamenye! Tuzakumenyesha nihaboneka ibishya.",
+      "actions": {
+        "refresh": "Ongera usome",
+        "markAllRead": "Shyira byose nk’ibyasomwe",
+        "close": "Funga",
+        "retrying": "Kongera kugerageza...",
+        "tryAgain": "Ongera ugerageze"
+      },
+      "sections": {
+        "unread": "Ntabyo wasomye",
+        "read": "Byasomwe"
+      },
+      "footer": {
+        "total": "Byose: Amatangazo {{count}} ",
+        "unread": "{{count}} ntabyo wasomye",
+        "read": "{{count}} byasomwe"
+      },
+      "errors": {
+        "failedToLoadCount": "Ntibyashoboye gupakira umubare w’amatangazo",
+        "failedToLoad": "Ntibyashoboye gupakira amatangazo",
+        "failedToLoadTitle": "Ntibyashoboye gupakira amatangazo"
+      }
+    }
+  },
+  "search": {
+    "modal": {
+      "title": "Shakisha Filime",
+      "subtitle": "Shakisha ibirimo bishimishije",
+      "inputPlaceholder": "Ni iki wifuza kureba uyu munsi?",
+      "instructions": {
+        "tryExamples": "Gerageza: \"filime z'action\" cyangwa \"ibyiganano bya comedy\"",
+        "voiceSearch": "Alt+V gushakisha n'ijwi",
+        "highContrast": "Hindura high contrast"
+      },
+      "quickSearches": {
+        "title": "Gushakisha Byihuse",
+        "actionMovies": "Filime z’Ikubita",
+        "comedyShows": "Ibiganiro bya Comedy",
+        "newReleases": "Ibyasohotse Bishya",
+        "topRated": "Iby’Indashyikirwa",
+        "dramaSeries": "Series za Drama",
+        "familyMovies": "Filime z’Umuryango"
+      },
+      "popularSearches": {
+        "title": "Gushakisha Bikunzwe",
+        "items": [
+          "Action Movies 2024",
+          "Comedy Shows",
+          "New Releases",
+          "Trending Now",
+          "Family Movies",
+          "Drama Series",
+          "Romantic Movies",
+          "Sci-Fi"
+        ]
+      },
+      "results": {
+        "searching": "Harimo gushakisha...",
+        "resultsFor": "Ibyabonetse kuri \"{{query}}\"",
+        "found": "{{count}} byabonetse",
+        "noResults": "Nta byabonetse",
+        "noResultsMessage": "Gerageza andi magambo cyangwa reba ibyadutanzwe munsi hano",
+        "suggestionsTitle": "Gerageza ibi bishakishwa:",
+        "relatedContentTitle": "Wakunda no kureba ibi bikunzwe:"
+      },
+      "errors": {
+        "searchFailed": "Gushakisha Byanze",
+        "tryAgain": "Ongera ugerageze"
+      },
+      "footer": {
+        "pressEsc": "Kanda ESC kugirango ufunge",
+        "navigate": "↑↓ kugenda hagati",
+        "select": "Enter kugirango uhitemo",
+        "voiceSearch": "Alt+V gushakisha n'ijwi",
+        "voiceAvailable": "Ushobora Gushakisha n'ijwi"
+      },
+      "actions": {
+        "close": "Funga",
+        "showHelp": "Erekana ubufasha",
+        "highContrast": "Hindura high contrast",
+        "voiceSearch": "Shakisha n’ijwi",
+        "stopVoice": "Hagarika gushakisha n’ijwi"
+      }
+    }
+  },
+  "profile": {
+    "dropdown": {
+      "toggle": "Hindura menu ya profayiri",
+      "avatarAlt": "Ifoto ya profire Yawe",
+      "welcome": "Murakaza neza",
+      "library": {
+        "title": "Filime zawe",
+        "downloads": "Ibikururwa",
+        "myList": "Urutonde Rwanjye",
+        "continueWatching": "Ibyo warebye",
+        "topPicks": "Ibyatoranyijwe"
+      },
+      "accountSettings": "Konte & Igenamiterere",
+      "signOut": "Sohoka",
+      "companyName": "Oliviuus Ltd",
+      "footer": {
+        "privacy": "Ibanga",
+        "terms": "Amabwiriza",
+        "help": "Ubufasha"
+      }
+    }
+  },
+  "browse": {
+    "title": "Shakisha Ibirimo",
+    "subtitle": "Sura ibyatoranyijwe",
+    "emptyState": {
+      "title": "Birimo Gutegurwa",
+      "message": "Ibirimo bishya biraje vuba"
+    },
+    "errors": {
+      "unableToLoadTitle": "Ntibyashobotse Kuboneka",
+      "unableToLoad": "Ntibyashobotse Kuboneka ibirimo. Ongera ugerageze.",
+      "tryAgain": "Ongera ugerageze"
+    }
+  },
+  "watchlist": {
+    "title": "Urutonde Rwo Kureba",
+    "itemCount_one": "{{count}} kintu kiri ku rutonde rwawe",
+    "itemCount_other": "{{count}} bintu biri ku rutonde rwawe",
+    "emptyState": {
+      "title": "Urutonde rwawe ntirurimo ibiriho",
+      "message": "Tangira kubaka urutonde rwawe ukanda buto ya \"+\" ku kirimo icyo ari cyo cyose."
+    },
+    "errors": {
+      "unableToLoadTitle": "Ntibyashoboye Gupakira Urutonde",
+      "unableToLoad": "Ntibyashoboye gupakira urutonde rwawe. Ongera ugerageze.",
+      "endpointNotFound": "Endpoint y’urutonde ntibonetse. Saba kugenzura API configuration.",
+      "unauthorized": "Kwinjira ni ngombwa kugira ngo urebe urutonde rwawe.",
+      "tryAgain": "Ongera ugerageze"
+    }
+  },
+  "newPopular": {
+    "title": "Menya Ibirimo",
+    "tabs": {
+      "new": "Ibyasohotse Bishya",
+      "trending": "Bikunzwe Ubu",
+      "popular": "Ibyakunzwe",
+      "descriptions": {
+        "new": "Ibirimo bishya byongewe vuba",
+        "trending": "Ibirimo buri wese ari kureba ubu",
+        "popular": "Ibirimo bikunzwe kandi byahize ibindi",
+        "default": "Menya ibigezweho n’ibishya"
+      }
+    },
+    "emptyState": {
+      "noContentTitle": "Ntakirimo gihari",
+      "noContentMessage": "Turimo kongeramo ibirimo bishimishije byagenewe wowe.",
+      "welcomeTitle": "Murakaza neza kuri Platform Yacu",
+      "welcomeMessage": "Ibirimo biraza vuba. Komeza ukurikire ibyasohoka bishya!"
+    },
+    "errors": {
+      "unableToLoadTitle": "Ntibyashoboye Gupakirwa",
+      "unableToLoad": "Ntibyashoboye gupakira ibirimo. Ongera ugerageze.",
+      "tryAgain": "Ongera ugerageze"
+    }
+  },
+  "tvShows": {
+    "title": "TV Shows Collection",
+    "subtitle": "Discover amazing series and binge-worthy content",
+    "hero": {
+      "featuredBadge": "Featured Series"
+    },
+    "filters": {
+      "title": "Filters & View",
+      "browse": "Browse",
+      "allCategories": "All Categories",
+      "sort": {
+        "latest": "Latest",
+        "oldest": "Oldest",
+        "popular": "Popular"
+      },
+      "reset": "Reset Filters",
+      "view": "View:"
+    },
+    "resultsCount": "Showing {{count}} series",
+    "emptyState": {
+      "title": "No TV shows found",
+      "noShowsAvailable": "No TV shows available at the moment.",
+      "adjustFilters": "Try adjusting your filters to see more results."
+    },
+    "errors": {
+      "unableToLoadTitle": "Unable to Load TV Shows",
+      "unableToLoad": "Unable to load TV shows. Please try again.",
+      "tryAgain": "Try Again"
+    }
+  },
+  "movies": {
+    "title": "Igereranyo rya Filime",
+    "subtitle": "Menya filime nziza n’utubonekamwe twa sinema",
+    "hero": {
+      "featuredBadge": "Filime Yihariye"
+    },
+    "filters": {
+      "title": "Muyungurura & Reba",
+      "browse": "Shakisha",
+      "allCategories": "Ibyiciro Byose",
+      "sort": {
+        "latest": "Ibyasohotse Vuba",
+        "oldest": "Ibyera Kera",
+        "popular": "Ibyakunzwe"
+      },
+      "reset": "Gusubiza Muyungurura",
+      "view": "Reba:"
+    },
+    "resultsCount": "Ibirimo kwerekanwa {{count}} za filime",
+    "emptyState": {
+      "title": "Nta filime zibonetse",
+      "noMoviesAvailable": "Nta filime zihari ubu.",
+      "adjustFilters": "Gerageza guhindura muyungurura kugira ngo ubone ibindi bisubizo."
+    },
+    "errors": {
+      "unableToLoadTitle": "Ntibyashoboye Gupakira Filime",
+      "unableToLoad": "Ntibyashoboye gupakira filime. Ongera ugerageze.",
+      "tryAgain": "Ongera ugerageze"
+    }
+  },
+  "userSubscription": {
+    "title": "Rangiza Kwishyura Kwawe",
+    "subtitle": "Kwishyura kwa Mobile Money gutekanye",
+    "navigation": {
+      "backToPlans": "Subira ku Mafatabuguzi"
+    },
+    "invalidRequest": {
+      "title": "Gusaba Kutari Kwo",
+      "message": "Nta fatabuguzi wahisemo.",
+      "choosePlan": "Hitemo ifatabuguzi"
+    },
+    "planSummary": {
+      "plan": "Ifatabuguzi",
+      "selectedSubscription": "Susipisiyo Wahisemo",
+      "popular": "ICYAMAMARE",
+      "amount": "Amafaranga:",
+      "billing": "Kwishyurwa:",
+      "monthly": "Buri kwezi",
+      "devices": "Ibikoresho:",
+      "devicesCount": "{{count}} Igihe kimwe",
+      "quality": "Ubwiza:"
+    },
+    "userInfo": {
+      "title": "Konti Yawe",
+      "email": "Email:",
+      "name": "Izina:"
+    },
+    "paymentForm": {
+      "amountLabel": "Amafaranga yo Kwishyura",
+      "fixedAmount": "Amafaranga Ahagazeho",
+      "amountDescription": "Aya mafaranga ahuye n’Ifatabuguzi wahisemo kandi ntiyahindurwa",
+      "phoneLabel": "Nimero ya Telefone",
+      "phonePlaceholder": "0781234567",
+      "phoneDescription": "Injiza nimero yanditswe kuri Mobile Money",
+      "nameLabel": "Izina Ryawe",
+      "namePlaceholder": "John Doe",
+      "emailLabel": "Email Yawe",
+      "emailPlaceholder": "john@example.com",
+      "emailDescription": "Email ntishobora guhindurwa ku mpamvu z'umutekano",
+      "processing": "Birimo gutunganywa...",
+      "payButton": "Kwishyura {{amount}} ukoresheje Mobile Money"
+    },
+    "validation": {
+      "phoneRequired": "Nimero ya telefone irakenewe kugira ngo wishyure ukoresheje Mobile Money",
+      "phoneInvalid": "Injiza nimero ya telefone yemewe"
+    },
+    "securityNotice": {
+      "title": "Kwishyura Gufite Umutekano",
+      "description": "Amakuru yawe yo kwishyura atekanye. Amafaranga ahamye kandi yemejwe na server. Uzahabwa ubutumwa bwa Mobile Money kuri telefone yawe."
+    },
+    "security": {
+      "title": "Umutekano w’Ubwishyu",
+      "description": "Dukoresha Link Mobile Technology Ltd mu kurinda no gutunganya ubwishyu bwawe ku bufatanye na Intouch Communication Ltd. Ubwishyu bwawe burinzwe na SSL yo ku rwego rwa banki kandi bikurikiza amabwiriza ya PCI DSS.",
+      "encrypted": "256-bit SSL Yarinze"
+    },
+    "pending": {
+      "title": "Kwishyura Birimo Gutunganywa",
+      "description": "Ukwishyura kwawe kurimo gutunganywa mu mutekano binyuze mu bufatanye na Intouch Communication Ltd. Bifata akanya ka 1–2. Nibirenza ayo masaha, reba ubutumwa bwa Mobile Money.",
+      "ussdCodes": "Kode za USSD za Mobile Money:",
+      "cashOutNote": "Bitanga uburyo bwo gukura amafaranga by’igihe gito nibiba ngombwa"
+    },
+    "status": {
+      "success": {
+        "title": "Kwishyura Byagenze Neza! 🎉",
+        "message": "Ukwishyura kwakunze neza kandi susipisiyo yawe yatangiye."
+      },
+      "pending": {
+        "title": "Kwishyura Biracyatunganywa",
+        "message": "Ukwishyura kurimo gutunganywa. Birashobora gufata akandi kanya."
+      },
+      "failed": {
+        "title": "Kwishyura Byanze",
+        "message": "Ntitwashoboye gutunganya ubwishyu bwawe. Ongera ugerageze."
+      },
+      "default": {
+        "title": "Imiterere y’Ubwishyu",
+        "message": "Turi gutunganya ubwishyu bwawe..."
+      },
+      "checking": "Birimo kugenzurwa...",
+      "checkStatus": "Reba Imiterere",
+      "needHelp": "Ukeneye ubufasha?"
+    },
+    "paymentInfo": {
+      "title": "Amakuru y’Ubwishyu",
+      "referenceId": "Indangamuntu y’Ubwishyu",
+      "amount": "Amafaranga",
+      "method": "Uburyo bwo Kwishyura",
+      "mobileMoney": "Mobile Money",
+      "status": "Imiterere"
+    },
+    "transactionDetails": {
+      "title": "Ibisobanuro by’Ubwishyu",
+      "date": "Itariki",
+      "type": "Ubwoko bw’Ubwishyu",
+      "providerId": "ID y'Umutanga Serivisi"
+    },
+    "planDetails": {
+      "title": "Ibisobanuro by'Ifatabuguzi",
+      "planName": "Izina ry'Ifatabuguzi",
+      "billingCycle": "Igihe cyo Kwishyura",
+      "monthly": "Buri kwezi",
+      "amountPaid": "Amafaranga Yishyuwe",
+      "special": "Special",
+      "mostPopular": "Ihitamo Rikunzwe"
+    },
+    "planFeatures": {
+      "title": "Ibirimo mu Mugambi",
+      "devices": "Ibikoresho {{count}} Bikoreshwa Igihe Kimwe",
+      "videoQuality": "Ubwiza bwa Video {{quality}}",
+      "unlimitedDownloads": "Download Zidafite Imbibi",
+      "downloads": "Downloads {{count}}",
+      "hdrSupport": "Inkunga ya HDR"
+    },
+    "subscriptionDetails": {
+      "title": "Susipisiyo Ikora",
+      "plan": "Ifatabuguzi",
+      "started": "Yatangiye",
+      "renews": "Izongera",
+      "status": "Imiterere",
+      "active": "IKORA"
+    },
+    "actions": {
+      "proceedToDashboard": "Komeza Utangire Kureba",
+      "tryAgain": "Ongera Ugerageze"
+    },
+    "payment": {
+      "initiationFailed": "Ntibyagenze neza gutangira ubwishyu. Ongera ugerageze."
+    },
+    "errors": {
+      "insufficientFunds": {
+        "title": "Amafaranga Adahagije 💰",
+        "message": "Konti yawe ya Mobile Money ntifite amafaranga ahagije yo kwishyura Ifatabuguzi ya {{planType}}.",
+        "details": "Ukeneye {{amount}} muri Mobile Money kugira ngo wiyandikishe ku mugambi wa {{planType}}.",
+        "actions": {
+          "addMoney": "Shyiraho Andi Mafanga",
+          "addMoneyDesc": "Ongera amafaranga kuri Mobile Money yawe maze ugerageze",
+          "chooseDifferent": "Hitamo Undi Mugambi",
+          "chooseDifferentDesc": "Hitamo Ifatabuguzi ukujyanye"
+        }
+      },
+      "invalidPhone": {
+        "title": "Nimero ya Telefone Itari Yo 📱",
+        "message": "Nimero winjije si iya Mobile Money.",
+        "details": "Reba neza nimero yawe wemeze ko yanditswe kuri Mobile Money.",
+        "actions": {
+          "checkNumber": "Reba Nimero",
+          "checkNumberDesc": "Emeza neza nimero hanyuma ugerageze"
+        }
+      },
+      "networkIssue": {
+        "title": "Ikibazo cya Network 📶",
+        "message": "Turabona ikibazo mu guhura na serivisi y’Ubwishyu.",
+        "details": "Reba internet yawe maze ugerageze nyuma gato.",
+        "actions": {
+          "checkConnection": "Reba Internet",
+          "checkConnectionDesc": "Emeza ko ufite internet ihamye",
+          "tryAgain": "Ongera Ugerageze",
+          "tryAgainDesc": "Ongera ugerageze nyuma y’akanya"
+        }
+      },
+      "paymentDeclined": {
+        "title": "Ukwishyura Kwanzwe ❌",
+        "message": "Ubwishyu bwawe bwanzwe na Mobile Money.",
+        "details": "Ibi bishobora guterwa n’umutekano cyangwa ibibazo byo kuri konti.",
+        "actions": {
+          "contactOperator": "Hamagara Ikigo cya Telefone",
+          "contactOperatorDesc": "Reba niba hari imbogamizi kuri konti yawe",
+          "tryDifferentMethod": "Koresha Uburyo Butandukanye",
+          "tryDifferentMethodDesc": "Gerageza indi nimero cyangwa ubundi buryo"
+        }
+      },
+      "defaultError": {
+        "title": "Ntibyashobotse Gutunganya Ubwishyu ⚠️",
+        "message": "Habaye ikibazo mu gutunganya ubwishyu bwawe.",
+        "details": "Iki kibazo cyamenyeshejwe itsinda ryacu. Gerageza nyuma gato.",
+        "actions": {
+          "tryAgain": "Gerageza Nyuma",
+          "tryAgainDesc": "Tegereza iminota mike maze wongere ugerageze",
+          "contactSupport": "Hamagara Ubufasha",
+          "contactSupportDesc": "Twandikire niba ikibazo gikomeje"
+        }
+      }
+    }
+  },
+  "subscription": {
+    "title": "Kugenzura ifatabuguzi",
+    "subtitle": "Tunganya ifatabuguzi yawe y'ifatabuguzi n’imisoro yo kwishyura",
+    "refresh": "Kongera Kuvugurura",
+    "loading": "Gukuraho amakuru y'ifatabuguzi...",
+    "more": "Ibindi",
+    "tabs": {
+      "current": "ifatabuguzi Uriho",
+      "history": "Amateka",
+      "payment": "Uburyo bwo Kwishyura",
+      "usage": "Ikoreshwa"
+    },
+    "status": {
+      "active": {
+        "title": "Ifatabuguzi Ikirimo",
+        "description": "Ifatabuguzi yawe irakora kandi iri mu mwanya mwiza"
+      },
+      "cancelled": {
+        "title": "Ifatabuguzi Yahagaritswe",
+        "description": "Ifatabuguzi yawe izarangira ku itariki y’isozwa ry’ukwezi kwa serivisi"
+      },
+      "expired": {
+        "title": "Ifatabuguzi Yararangiye",
+        "description": "Ifatabuguzi yawe yararangiye. Iyisubize kugira ngo ukomeze gukoresha serivisi"
+      },
+      "renews": "Izongerwa ku",
+      "ends": "Izarangira ku"
+    },
+    "errors": {
+      "title": "Ikosa mu Gukuraho Ifatabuguzi",
+      "loadFailed": "Ntibyashobotse kubona amakuru y'Ifatabuguzi",
+      "tryAgain": "Ongeraho Ugerageze"
+    }
+  },
+  "watchHistory": {
+    "title": "Amateka yo Kureba",
+    "itemCount": "Filime {{count}}",
+    "itemCount_plural": "Filime {{count}} ",
+    "today": "Uyu munsi",
+    "yesterday": "Ejo hashize",
+    "daysAgo": "Iminsi {{days}} ishize",
+    "completed": "Byarangiye",
+    "progress": "Imiterere",
+    "continueWatching": "Komeza",
+    "startWatching": "Tangira",
+    "watchNow": "Reba Ubu",
+    "watchedOn": "Mwabirebye kuri",
+    "emptyState": {
+      "title": "Nta Mateka yo Kureba Araboneka",
+      "message": "Ibyo ureba bizatangira kugaragara hano. Tangira gusura ibikubiye kuri Oliviuus kugira ngo wubake amateka yo kureba!",
+      "browseContent": "Reba Ibikubiyemo"
+    },
+    "errors": {
+      "unableToLoadTitle": "Ntibyashobotse Kwerekana Amateka yo Kureba",
+      "unableToLoad": "Ntitwashoboye kugaragaza amateka yo kureba muri aka kanya.",
+      "unauthorized": "Nyamuneka winjire kugira ngo ubone amateka yawe yo kureba.",
+      "endpointNotFound": "Ibiranga amateka yo kureba ntibiboneka ubu.",
+      "tryAgain": "Ongera Ugerageze"
+    }
+  },
+  "family": {
+    "invitations": {
+      "pendingInvitations": "Ubutumire butarasubizwa",
+      "pendingCount": "{{count}} bugitegerejwe gusubizwa",
+      "clickForDetails": "Kanda ku butumire ubone ibisobanuro",
+      "noInvitations": {
+        "title": "Nta Butumire Butarasubizwa",
+        "description": "Ubu nta butumire bwa family ufite butarasubizwa."
+      },
+      "sent": "Byoherejwe",
+      "stats": {
+        "pendingInvitations": "Ubutumire butarasubizwa",
+        "familyStatus": "Imiterere ya Family",
+        "member": "Umuryango",
+        "noFamily": "Nta Family ufite",
+        "yourRole": "Inshingano yawe",
+        "individual": "Ku giti cyawe"
+      },
+      "familyMember": {
+        "title": "Umunyamuryango",
+        "joined": "Yinjiye",
+        "dashboard": "Dashboard"
+      },
+      "details": {
+        "title": "Ibisobanuro by’Ubutumire",
+        "from": "Byaturutse kuri:",
+        "yourRole": "Inshingano yawe:",
+        "relationship": "Uburebana:",
+        "dashboard": "Dashboard:"
+      },
+      "status": {
+        "title": "Imiterere y’Ubutumire",
+        "status": "Imiterere:",
+        "pending": "Birategereje",
+        "expires": "Bizarangiriraho:",
+        "timeLeft": "Igihe gisigaye:",
+        "expired": "Byarangiye",
+        "oneDayLeft": "Hasigaye umunsi 1",
+        "daysLeft": "Hasigaye iminsi {{days}}"
+      },
+      "actions": {
+        "accept": "Kwemera Ubutumire",
+        "decline": "Kwanga",
+        "leaveFamily": "Gusohoka muri Family",
+        "accepting": "birimo kwemerwa",
+        "rejecting": "birimo kwangwa"
+      },
+      "leaveConfirmation": "Uremeza ko ushaka gusohoka muri iyi family? Uzahita utakaza uburenganzira bwo gukoresha subscription yabo.",
+      "aboutFamilyPlans": {
+        "title": "Ibyerekeye Family Plan",
+        "accepting": {
+          "title": "Kwemera Ubutumire",
+          "benefit1": "Uzagabana subscription nyir’umuryango afite",
+          "benefit2": "Amateka yo kureba n'ibikunogeye birahishirwa",
+          "benefit3": "Ushobora gusohoka muri family igihe ushakiye kuri uru rubuga"
+        },
+        "subscription": {
+          "title": "Icyitonderwa kuri Subscription",
+          "note1": "Niba ufite subscription ikora, irahagarikwa byikora",
+          "note2": "Uzakoreshwa family plan aho gukoresha iyawe",
+          "note3": "Ushobora kongera gukoresha iyawe iyo usohotse muri family"
+        }
+      },
+      "mobile": {
+        "pendingCount": "{{count}} ubutumire butarasubizwa",
+        "scrollToReview": "Sunikira hejuru urebe"
+      },
+      "errors": {
+        "loadFailed": "Ntibyakunze gupakurura ubutumire bwa family",
+        "actionFailed": "Ntibyakunze {{action}} ubutumire",
+        "leaveFailed": "Ntibyakunze gusohoka muri family"
+      }
+    },
+    "roles": {
+      "owner": "Nyir’umuryango",
+      "parent": "Umubyeyi",
+      "teen": "Umusore/Inkumi",
+      "child": "Umwana",
+      "guest": "Umushyitsi"
+    },
+    "dashboardTypes": {
+      "normal": "Isanzwe",
+      "kid": "Umwana",
+      "adult": "Isanzwe"
+    },
+    "memberRoles": {
+      "parent": "Umubyeyi wa Family",
+      "teen": "Umusore/Inkumi wa Family",
+      "child": "Umwana wa Family",
+      "owner": "Nyir'umuryango",
+      "guest": "Umushyitsi wa Family",
+      "familyMember": "Umunyamuryango"
+    }
+  },
+  "common": {
+    "error": "Ikosa",
+    "dismiss": "Funga"
+  },
+  "parentalControls": {
+    "title": "Igenzura ry’Ababyeyi",
+    "subtitle": "Rinda igenamiterere rya family ukoresheje PIN yo kuburinzi",
+    "accessRestricted": {
+      "title": "Uburenganzira Bwarinzwe",
+      "description": "Ugomba kuba Nyir’umuryango cyangwa Umubyeyi ufite family plan ikora kugira ngo ubone igenzura ry’ababyeyi."
+    },
+    "roles": {
+      "familyOwner": "Nyir’umuryango",
+      "familyParent": "Umubyeyi wa Family"
+    },
+    "tabs": {
+      "pinManagement": "Gucunga PIN",
+      "securityLogs": "Ibarura ry’Umutekano"
+    },
+    "pinSection": {
+      "activeTitle": "Master PIN Ikora",
+      "setupTitle": "Shyiraho Master PIN",
+      "activeDescription": "Master PIN yawe irarinzanya igenzura ry’ababyeyi. Emeza PIN yawe kugira ngo uhindure ibintu.",
+      "setupDescription": "Hanga PIN ya nimero 4 kugirango urinde igenzura ry’ababyeyi n’amagenamiterere ya family.",
+      "activeStatus": "Master PIN irimo gukora kandi irinda igenamiterere yawe",
+      "createPin": "Hanga PIN yawe",
+      "enterPinPlaceholder": "Injiza PIN ya nimero 4",
+      "digits": "nimero"
+    },
+    "verification": {
+      "title": "Emeza Umwirondoro Wawe",
+      "description": "Injiza PIN yawe iriho kugira ngo ukomeze",
+      "currentPin": "PIN iriho",
+      "enterCurrentPin": "Injiza PIN iriho"
+    },
+    "newPin": {
+      "title": "Injiza PIN Nshya",
+      "description": "Hanga PIN nshya ya nimero 4",
+      "newPin": "PIN Nshya",
+      "enterNewPin": "Injiza PIN nshya"
+    },
+    "familyMembers": {
+      "title": "Abanyamuryango",
+      "status": "Imiterere",
+      "active": "Ikora",
+      "inactive": "Ntikora",
+      "pinStatus": "Imiterere ya PIN",
+      "locked": "Yakinzwe"
+    },
+    "securityLogs": {
+      "action": "Igikorwa",
+      "dateTime": "Itariki & Igihe",
+      "noLogs": "Nta barura ry’umutekano ribonetse",
+      "noLogsDescription": "Ibikorwa by’umutekano bizagaragara hano uko biza"
+    },
+    "actions": {
+      "setMasterPin": "Shyiraho Master PIN",
+      "changePin": "Hindura PIN",
+      "resetPin": "Sibanganya PIN",
+      "verifyPin": "Emeza PIN",
+      "updatePin": "Hindura PIN",
+      "cancel": "Kureka",
+      "settingPin": "Birimo gushyiraho PIN...",
+      "verifying": "Birimo kwemezwa...",
+      "updating": "Birimo kuvugururwa..."
+    },
+    "success": {
+      "pinVerified": "PIN Yemejwe",
+      "pinVerifiedDesc": "PIN yawe yemejwe neza",
+      "pinSet": "PIN Yashyizweho",
+      "pinSetDesc": "Master PIN yashyizweho neza!",
+      "pinChanged": "PIN Yahinduwe",
+      "pinChangedDesc": "Master PIN yahinduwe neza!",
+      "pinReset": "PIN Yasubijweho",
+      "pinResetDesc": "Master PIN yasubijweho neza! Uburinzi bwa PIN bwakuweho."
+    },
+    "errors": {
+      "loadFailed": "Byanze Gupakira",
+      "loadPinStatus": "Ntibyakunze gupakira imiterere ya PIN. Ongera ugerageze.",
+      "loadSecurityLogs": "Ntibyakunze gupakira ibarura ry’umutekano. Ongera ugerageze.",
+      "pinRequired": "PIN Irakenewe",
+      "enterCurrentPin": "Injiza PIN iriho",
+      "enterNewPin": "Injiza PIN nshya",
+      "invalidPin": "PIN Sibyo",
+      "verificationFailed": "Kwemeza Byanze",
+      "setupFailed": "Gushyiraho Byanze",
+      "changeFailed": "Guhindura Byanze",
+      "resetFailed": "Gusubiraho Byanze",
+      "setPinFailed": "Ntibikunze gushyiraho Master PIN. Ongera ugerageze.",
+      "changePinFailed": "Ntibikunze guhindura Master PIN. Ongera ugerageze.",
+      "resetPinFailed": "Ntibikunze gusubiraho Master PIN. Ongera ugerageze."
+    },
+    "pinValidation": {
+      "mustBe4Digits": "PIN igomba kuba nimero 4 gusa",
+      "tooCommon": "Iyi PIN iroroshye cyane. Hitamo PIN ifite umutekano.",
+      "sequentialNotAllowed": "Nimero zikurikiranye ntizemewe kubera umutekano."
+    },
+    "modal": {
+      "yes": "Yego",
+      "no": "Oya",
+      "cancel": "Kureka",
+      "delete": "Gusiba",
+      "error": "Ikosa",
+      "dismiss": "Funga",
+      "never": "Nta na rimwe",
+      "notSet": "Ntibyashyizweho",
+      "invalidDate": "Itariki itari yo",
+      "invalidTime": "Igihe kitari cyo",
+      "unknownEmail": "Imeyili itazwi",
+      "noEmail": "Nta imeyili",
+      "noDate": "Nta tariki"
+    }
+  },
+  "familyProfiles": {
+    "title": "Akaunti z’Umuryango",
+    "subtitle": "Tunganya profaili z’abana n’abanyamuryango b’umuryango ukoresha ifatabuguzi y’umuryango",
+    "planStatus": "ifatabuguzi y’Umuryango Irimo",
+    "tabs": {
+      "kidsProfiles": "Profaili z’Abana",
+      "familyMembers": "Abanyamuryango"
+    },
+    "kidsTab": {
+      "title": "Profaili z’Abana",
+      "subtitle": "Hanga no gutunganya profaili z’abana ku giti cyabo",
+      "noProfiles": "Nta Profaili z’Abana Zirabaho",
+      "noProfilesDescription": "Hanga profaili kugira ngo abana babone uburambe bwabo bwihariye",
+      "createFirstProfile": "Hanga Profaili ya Mbere",
+      "addProfile": "Ongeraho Profaili",
+      "editProfile": "Hindura Profaili",
+      "deleteProfile": "Siba Profaili",
+      "kidsMode": "Mode y’Abana",
+      "switchError": "Ntibyashobotse guhindura profaili y’umwana. Ongera ugerageze.",
+      "yearsOld": "imyaka",
+      "dailyTime": "Ku munsi",
+      "pinRequired": "PIN",
+      "switchTo": "Hindura kuri",
+      "limitReached": "Mugabane wuzuye",
+      "limitReachedDescription": "Wageze ku mubare ntarengwa wa profaili z’abana ({{maxProfiles}}) muri ifatabuguzi yawe",
+      "deleteConfirmationTitle": "Siba Profaili y’Umwana",
+      "deleteConfirmationDescription": "Urashaka koko gusiba profaili ya {{name}}? Bizakuraho amateka yose yo kureba n’ibyo yahisemo."
+    },
+    "membersTab": {
+      "title": "Abanyamuryango",
+      "subtitle": "Tunganya abanyamuryango bashobora gukoresha konti yawe",
+      "planAllows": "ifatabuguzi yemera abanyamuryango {{maxMembers}}",
+      "noMembers": "Nta Banyamuryango Barabaho",
+      "noMembersDescription": "Tumiira kugeza kuri {{maxMembers}} kugira ngo mugabane serivisi",
+      "upgradeRequired": "Ugomba Kuzamura ifatabuguzi kugira ngo utumire abandi",
+      "inviteMember": "Tumiira Umuntu",
+      "inviteFirstMember": "Tuma Umuntu wa Mbere",
+      "upgradePlanRequired": "Guhindura ifatabuguzi Birakenewe",
+      "removeMember": "Kuraho Umuntu",
+      "editSettings": "Hindura Igenamiterere",
+      "left": "yavuyeho",
+      "joined": "Yinjiye",
+      "invited": "Yatumiwe",
+      "lastActive": "Heruka gukora",
+      "suspended": "Yahagaritswe",
+      "pending": "Irategereje",
+      "active": "Iri gukora",
+      "rejected": "Yanze",
+      "expired": "Yarangiye",
+      "sleepTime": "Igihe cyo Kuryama",
+      "accessWindow": "Igihe cyo Kugera kuri Platformu",
+      "memberLimitReached": "Umubare wuzuye",
+      "memberLimitReachedDescription": "Wageze ku mubare ntarengwa w’abanyamuryango ({{maxMembers}}) muri ifatabuguzi yawe",
+      "individualPlan": "ifatabuguzi ku muntu ku giti cye",
+      "upgradeSuggestion": "Hindura ujye kuri ifatabuguzi y’umuryango kugira ngo ubashe gutumira abandi",
+      "removeError": "Ntibyashobotse gukuraho umunyamuryango",
+      "removeConfirmationTitle": "Kuraho Umunyamuryango",
+      "removeConfirmationDescription": "Urashaka koko gukuraho <strong>{{email}}</strong>? Nibiba bityo, nta burenganzira agifite kuri serivisi zawe."
+    },
+    "modals": {
+      "createKidProfile": {
+        "title": "Hanga Profaili y’Umwana",
+        "childName": "Izina ry’Umwana",
+        "childNamePlaceholder": "Andika izina ry’umwana",
+        "birthDate": "Itariki y’Amavuko",
+        "age": "Imyaka: {{age}}",
+        "maxAgeRating": "Ikigero cy’Ibikwiye ku myaka",
+        "custom": "Byihariye",
+        "enterAge": "Injiza imyaka",
+        "yearsOld": "imyaka",
+        "dailyTimeLimit": "Umwanya wo Kureba ku Munsi",
+        "enterMinutes": "Injiza iminota",
+        "minutes": "iminota",
+        "themeColor": "Ibara rya Theme",
+        "upgradeToModify": "Hindura ifatabuguzi kugira ngo ubikosore",
+        "selected": "Byatoranijwe",
+        "default": "Mburabuzi",
+        "defaultThemeDescription": "Profaili zose z’abana zikoresha theme yizewe kandi y’inshuti",
+        "requirePin": "Saba PIN kugira ngo asohoke",
+        "requirePinDescription": "Bituma umwana atabasha kujya muri mode y’abantu bakuru",
+        "creating": "Irimo kuremwa...",
+        "createProfile": "Hanga Profaili",
+        "error": "Ntibyashobotse kurema profaili",
+        "avatarCategories": {
+          "People": "Abantu",
+          "Animals": "Ibikoko",
+          "Fantasy": "Ibindi by’inkuru",
+          "Abstract": "Ibimenyetso"
+        }
+      },
+      "editKidProfile": {
+        "title": "Hindura Profaili ya {{name}}",
+        "subtitle": "Hindura ibisobanuro n’amahitamo ya profaili",
+        "basicInformation": "Amakuru Shingiro",
+        "childName": "Izina ry’Umwana",
+        "childNamePlaceholder": "Andika izina ry’umwana",
+        "birthDate": "Itariki y’Amavuko",
+        "contentRestrictions": "Ibyo Umwana Yemerewe Reba",
+        "maxAgeRating": "Ikigero cy’Ibikwiye ku myaka",
+        "allowedContentTypes": "Ibyemerewe Kugera Ku mwana",
+        "blockedGenres": "Ibyiciro bibujijwe",
+        "timeAndAccess": "Igihe n’Uburenganzira",
+        "dailyTimeLimit": "Umwanya wo Kureba ku Munsi",
+        "appearanceAndSecurity": "Imigaragarire n’Umutekano",
+        "themeColor": "Ibara rya Theme",
+        "upgradeToModify": "Hindura ifatabuguzi kugira ngo ubikosore",
+        "selected": "Byatoranijwe",
+        "default": "Mburabuzi",
+        "defaultThemeDescription": "Profaili zose z’abana zikoresha theme yizewe kandi y’inshuti",
+        "requirePin": "Saba PIN kugira ngo asohoke",
+        "requirePinDescription": "Bituma umwana atabasha kujya muri mode y’abantu bakuru",
+        "updating": "Irimo kuvugururwa...",
+        "updateProfile": "Vugurura Profaili",
+        "error": "Ntibyashobotse kuvugurura profaili",
+        "contentCategories": {
+          "cartoons": "Gushushanya",
+          "educational": "Amasomo",
+          "family": "Umuryango",
+          "adventure": "Udutembere",
+          "comedy": "Urusetsa",
+          "music": "Umuziki"
+        },
+        "blockedGenres": {
+          "horror": "Ibiteye ubwoba",
+          "violence": "Urugomo",
+          "romance": "Urukundo",
+          "thriller": "Intabaza",
+          "drama": "Drama",
+          "action": "Ubuguzi",
+          "fantasy": "Ibindi by’inkuru",
+          "sciFi": "Sci-fi",
+          "mystery": "Amayobera",
+          "crime": "Ibyaha"
+        },
+        "allowMovies": "Emerera Filime",
+        "allowSeries": "Emerera Ibyiciro",
+        "allowSearch": "Emerera Gushaka",
+        "allowTrending": "Emerera Ibikunzwe"
+      },
+      "inviteMember": {
+        "title": "Tumiira Umunyamuryango",
+        "invitationsRemaining": "{{count}} ubutumire busigaye",
+        "noInvitationsRemaining": "Nta butumire busigaye",
+        "unableToSend": "Ntibyashobotse kohereza ubutumire",
+        "memberLimitReached": "Umubare wuzuye",
+        "memberLimitReachedDescription": "Wageze ku mubare ntarengwa w’abanyamuryango ({{maxMembers}}). Hindura ifatabuguzi kugira ngo wongere ubundi bushobozi.",
+        "invitationDetails": "Ibisobanuro by’Ubutumire",
+        "invitationDescription": "Uwatumiwe agomba kugira konti ya Oliviuus, kandi aza kubona email imutumira.",
+        "emailAddress": "Imeyili",
+        "memberRole": "Inshingano",
+        "relationship": "Ubufitanye",
+        "relationshipPlaceholder": "nko: Umufasha, Umwana, Umubyeyi, Umuvandimwe",
+        "dashboardType": "Ubwoko bwa Dashboard",
+        "preview": "Reba Uburyo Buzagaragara",
+        "role": "Inshingano",
+        "dashboard": "Dashboard",
+        "sendInvitation": "Ohereza Ubutumire",
+        "error": "Ntibyashobotse kohereza ubutumire",
+        "roles": {
+          "parent": "Umubyeyi",
+          "parentDescription": "Uburenganzira bwuzuye hamwe n’ubugenzuzi bw’ababyeyi",
+          "teen": "Ingimbi",
+          "teenDescription": "Ubugenzuzi buringaniye bw’urubyiruko",
+          "child": "Umwana",
+          "childDescription": "Uburambe bw’abana",
+          "guest": "Umushyitsi",
+          "guestDescription": "Uburenganzira buringaniye"
+        },
+        "dashboards": {
+          "normal": "Dashboard Isanzwe",
+          "normalDescription": "Uburyo busanzwe bwo kureba",
+          "kid": "Dashboard y’Abana",
+          "kidDescription": "Imigaragarire yoroshye y’abana"
+        }
+      },
+      "editMember": {
+        "title": "Hindura {{email}}",
+        "subtitle": "Tunganya igenamiterere n’imipaka y’uyu munyamuryango",
+        "updateFailed": "Ntibyashobotse kuvugurura",
+        "basicSettings": "Igenamiterere Shingiro",
+        "memberRole": "Inshingano",
+        "dashboardType": "Ubwoko bwa Dashboard",
+        "relationship": "Ubufitanye",
+        "relationshipPlaceholder": "nko: Umufasha, Umwana, Umubyeyi, Umuvandimwe",
+        "temporarilySuspend": "Hagarika by’igihe gito",
+        "suspendDescription": "Bituma umunyamuryango atabasha gukoresha urubuga",
+        "accessControl": "Igenzura ry’Uburenganzira",
+        "sleepTimeRestrictions": "Igihe cyo Kuryama",
+        "sleepTimeDescription": "Shyiraho igihe buri munsi umunyamuryango atemerewe gukoresha platformu",
+        "accessTimeWindow": "Igihe cyo Kwemererwa Kwinjira",
+        "accessTimeDescription": "Shyiraho amasaha yemerewe kwinjira buri munsi",
+        "dailyWatchTimeLimit": "Umwanya wo Kureba ku Munsi (Iminota)",
+        "unlimited": "Ntariho Imbibi",
+        "unlimitedDescription": "Reka ubusa kugira ngo bibaye nta mbibi",
+        "contentAndSpending": "Ibikubiyemo n’Imikoreshereze",
+        "monthlySpendingLimit": "Umupaka w’Ikiranguzo (RWF) ku kwezi",
+        "spendingLimitDescription": "Shyira kuri 0 kugira ngo wirinde ko agura ibintu muri app",
+        "contentRestrictions": "Imipaka ku byo yemerewe kureba",
+        "contentRestrictionsDescription": "Imipaka y’ibikwiye ku myaka y’umunyamuryango iriho mu buryo bwikora. Ushaka imipaka irambye, ukoreshe profaili y’abana.",
+        "currentSettings": "Incamake y’Igenamiterere",
+        "saveChanges": "Bika Amahinduka",
+        "error": "Ntibyashobotse kuvugurura",
+        "roles": {
+          "parent": "Umubyeyi",
+          "parentDescription": "Uburenganzira bwuzuye hamwe n’ubugenzuzi",
+          "teen": "Ingimbi",
+          "teenDescription": "Ubugenzuzi buringaniye",
+          "child": "Umwana",
+          "childDescription": "Uburambe bw’abana",
+          "guest": "Umushyitsi",
+          "guestDescription": "Uburenganzira buringaniye"
+        },
+        "dashboards": {
+          "normal": "Dashboard Isanzwe",
+          "normalDescription": "Uburyo busanzwe bwo kureba",
+          "kid": "Dashboard y’Abana",
+          "kidDescription": "Imigaragarire yoroshye y’abana"
+        },
+        "tabs": {
+          "basic": "Shingiro",
+          "access": "Uburenganzira",
+          "restrictions": "Imipaka"
+        },
+        "sleepStart": "Igihe cyo Gutangira",
+        "sleepEnd": "Igihe cyo Kurangiza",
+        "activeFrom": "Irakora kuva {{start}} kugeza {{end}}",
+        "accessStart": "Igihe cyo Gutangira",
+        "accessEnd": "Igihe cyo Kurangiza",
+        "canAccessFrom": "Ashobora kubona serivisi kuva {{start}} kugeza {{end}}",
+        "accountStatus": "Imimerere ya Konti",
+        "suspended": "Yahagaritswe",
+        "active": "Irakora"
+      }
+    }
+  },
+  "landingPage": {
+    "header": {
+      "signIn": "Injira"
+    },
+    "hero": {
+      "title": "Imyidagaduro",
+      "subtitle": "Idashira",
+      "tagline": "Aho Inkuru z’Afurika Zihurira n’Isi Yose",
+      "startingAt": "Bitangira kuri",
+      "cancelAnytime": "Uhagarika igihe icyo aricyo cyose",
+      "ctaDescription": "Witeguye kugerageza ahazaza h’imyidagaduro? Andika imeyili yawe utangire urugendo.",
+      "welcomeBack": "Murakaza neza!",
+      "continueJourney": "Witeguye Gukomeza Urugendo Rwawe",
+      "restartDescription": "Tangira bushya ubunyamuryango maze ujye mu myidagaduro idafite imupaka.",
+      "restartMembership": "Tangira Ubunyamuryango Bushya"
+    },
+    "emailInput": {
+      "getStarted": "Tangira",
+      "alreadyLoggedIn": "Wamaze kwinjira. Komeza ujye kuri konti yawe.",
+      "continueToAccount": "Komeza kuri Konti Yawe"
+    },
+    "trending": {
+      "title": "Bikunzwe Ubu",
+      "subtitle": "Menya ibyo buri wese ari kureba muri iki gihe"
+    },
+    "contentModal": {
+      "close": "Funga",
+      "duration": "Igihe bimara",
+      "language": "Ururimi",
+      "getStarted": "Tangira"
+    },
+    "contentCard": {
+      "noImage": "Nta Ifoto",
+      "rwanda": "RWANDA"
+    },
+    "features": {
+      "title": "Impamvu yo Guhitamo",
+      "titleHighlight": "Oliviuus",
+      "subtitle": "Ibyo wunguka by’ikirenga byagenewe uburambe bwiza bwo kureba filime",
+      "streamDevices": {
+        "title": "Rebera ku Bikoresho Byose",
+        "description": "Rebera nta nkomyi kuri Smart TV, PlayStation, Xbox, Chromecast, Apple TV, imikino, n’ibindi bikoresho ukunda byose.",
+        "highlight": "Urubuga Rwose"
+      },
+      "downloadOffline": {
+        "title": "Kuramo Urebe utari kuri Murandasi",
+        "description": "Bika filime n’ibiganiro ukunda urebe aho uri hose – by’akarusho mu rugendo cyangwa igihe uri offline.",
+        "highlight": "Rebera Aho Uri Hose"
+      },
+      "watchAcrossScreens": {
+        "title": "Rebera ku Mbere Muri Ekrani Zose",
+        "description": "Tangira kuri telefoni, ukomeze kuri tablette, urangirize kuri TV — imyidagaduro yawe igukurikira hose.",
+        "highlight": "Guhuza Byoroshye"
+      },
+      "kidsExperience": {
+        "title": "Uburambe bw’Abana",
+        "description": "Profayiri z’abana zizewe kandi zibashimisha hamwe n’ibyiciro bijyanye n’imyaka n’ubusugire bw’ababyeyi.",
+        "highlight": "Umuryango"
+      },
+      "premiumAudio": {
+        "title": "Ijwi ry’Ireme Ryisumbuye",
+        "description": "Wiyumvemo ijwi rya Dolby Atmos n’amajwi asobanutse neza agushyira muri buri scene.",
+        "highlight": "Dolby Atmos"
+      },
+      "ultraHd": {
+        "title": "Ubwiza bwa 4K Ultra HD",
+        "description": "Wibonere amashusho asukuye cyane ya 4K Ultra HD hamwe na HDR ku bikoresho bibishobora.",
+        "highlight": "Ultra HD"
+      },
+      "ctaTitle": "Tangira Urugendo rwa Kureba",
+      "ctaDescription": "Injira ubu wiyumvemo imyidagaduro y’ikirenga igukwiriye."
+    },
+    "faq": {
+      "title": "Ibibazo Bikunze",
+      "titleHighlight": "Kubazwa",
+      "subtitle": "Byose ukeneye kumenya kuri Oliviuus n'uburyo bwo kureba filime",
+      "ctaTitle": "Witeguye Gutangira Kureba?",
+      "ctaDescription": "Injira kuri Oliviuus uyu munsi wiyumvemo imyidagaduro y’icyiciro cya mbere",
+      "contactSupport": "Vugana n'Abafasha",
+      "closeContact": "Funga Ubufasha",
+      "directMessage": "Ubutumwa Butaziguye",
+      "closeForm": "Funga Ifishi",
+      "visitHelpCenter": "Sura Ikigo cy'Ubufasha",
+      "contactTeam": "Vugana n'Ikipe y'Ubufasha",
+      "contactDescription": "Ikipe yacu yihariye yita ku bafasha ihari kugufasha ku bibazo byose ushobora kugira.",
+      "emailSupport": "Email: {{email}}",
+      "callSupport": "Hamagara: {{phone}}",
+      "sendMessageTitle": "Ohereza Ubutumwa Butaziguye",
+      "sendMessageDescription": "Uzuza ifishi iri hepfo turagusubiza bidatinze.",
+      "loading": "Ibirimo...",
+      "questions": {
+        "difference": {
+          "question": "Ni iki gitandukanye Oliviuus n’izindi mbuga zo kureberaho?",
+          "answer": "Oliviuus ihuza ibirimo by’isi yose by’icyiciro cya mbere n’amafilime yihariye yo mu Rwanda, bigatanga urubuga rwubaha inkuru z’Afurika rukanazigeza ku rwego mpuzamahanga. Dushyigikira abatunganya filime b’Abanyarwanda no kugeza ibikorwa byabo ku isi yose."
+        },
+        "cost": {
+          "question": "Oliviuus itwara angahe?",
+          "answer": "Oliviuus igira amafatabuguzi anyuranye atangira kuva kuri RWF 3,000 kugeza kuri RWF 10,000 buri kwezi. Buri ifatabuguzi itanga ibyo ukeneye bijyanye n’uburyo ureba—kuva kuri Kureba isanzwe kugeza kuri 4K n’indorerwamo nyinshi icyarimwe."
+        },
+        "multipleDevices": {
+          "question": "Nshobora kureba Oliviuus ku bikoresho byinshi icyarimwe?",
+          "answer": "Yego! Ushobora kurebera kuri telefoni, tablette, mudasobwa, Smart TV, ndetse n’imikino icyarimwe. Umubare w’ibikoresho ugenwa na ifatabuguzi wahisemo."
+        },
+        "rwandanContent": {
+          "question": "Ni ubuhe bwoko bw’ibirimo nyarwanda mubonekaho?",
+          "answer": "Dufite amoko menshi ya filime nyarwanda, documentaries, series n’ibikorwa byihariye. Uhereye ku byamamare kugeza ku talent nshya, turi kubaka urubuga runini mu gusigasira inkuru n'umuco nyarwanda."
+        },
+        "changeSubscription": {
+          "question": "Nshobora gute guhindura cyangwa kuzamura ifatabuguzi yanjye?",
+          "answer": "Ushobora guhindura ifatabuguzi igihe icyo ari cyo cyose muri konti yawe. Kuzamura bikorwa ako kanya, naho kugabanya bigatangira mu kwezi gukurikiyeho."
+        },
+        "paymentMethods": {
+          "question": "Ni ubuhe buryo bwo kwishyura mukoresha mu Rwanda?",
+          "answer": "Dukoresha uburyo bwose bukomeye burimo Mobile Money (MTN, Airtel), amakarita (Visa, MasterCard), n’inyungu z’amabanki. Amakuru yose acungwa mu buryo bwizewe."
+        },
+        "downloadOffline": {
+          "question": "Nshobora gukuramo filime nkazireba ntari kuri internet?",
+          "answer": "Yego! Ushobora gukuramo ibyo ukunda ukabireba aho uri hose. Igihe ndetse n’umubare w’ibyo ushobora gukuramo biterwa na ifatabuguzi wahisemo."
+        },
+        "outsideRwanda": {
+          "question": "Oliviuus iraboneka hanze y’u Rwanda?",
+          "answer": "Kugeza ubu, Oliviuus yibanda ku Banyarwanda ariko dufite ifatabuguzi yo kwaguka muri EAC. Bamwe mu birimo bishobora kugira imipaka bitewe n’amasezerano ya lisansi."
+        },
+        "videoQuality": {
+          "question": "Ni ubuhe bwiza bw’amashusho nshobora kubona?",
+          "answer": "Ubwiza bujya hejuru kuva kuri standard kugeza kuri 4K Ultra HD bitewe n’ipaki wahisemo n'igikoresho ukoresha. ifatabuguzi zo hejuru zifite HDR."
+        },
+        "supportFilmmakers": {
+          "question": "Oliviuus ishyigikira ite abatunganya filime nyarwanda?",
+          "answer": "Dukorana n’ingo z’itangizwa rya filime nyarwanda, tukabaha inzira nziza yo kuzikwirakwiza, amahirwe yo kubona inkunga, n’inyungu iruse izindi. Intego ni ukuzamura impano z’Abanyarwanda."
+        }
+      }
+    }
+  }
+}

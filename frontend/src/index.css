@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* Base text & background */
+body {
+  background-color: #121212; /* Dark background */
+  color: #ffffff; /* Text color */
+  font-family: 'Poppins', Arial, sans-serif; /* Use Poppins first */
+  height: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100%;
+}
+
+/* Links */
+a {
+  color: #ffffff;
+  transition: color 0.3s ease;
+}
+a:hover {
+  color: #9b69b2; /* primary hover color */
+}
+
+/* Buttons */
+.btn {
+  background-color: #9b69b2; /* primary */
+  color: #ffffff;
+  border-radius: 4px;
+  padding: 8px 16px;
+  border: 1px solid #9b69b2;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+.btn:hover {
+  background-color: #7b4a89; /* secondary / darker shade */
+  border-color: #7b4a89;
+}
+.btn:active {
+  background-color: #BC8BBC; /* primary active */
+  border-color: #BC8BBC;
+}
+
+/* Inputs */
+input, textarea, select {
+  background-color: #2d3748;
+  color: #ffffff;
+  border: 1px solid #4a5568;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: 'Poppins', Arial, sans-serif;
+  transition: all 0.3s ease;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: #9b69b2; /* primary focus */
+  outline: none;
+}
+
+/* Containers & Cards */
+.container, .card {
+  background-color: #2d3748;
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  transition: all 0.3s ease;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+/* Active / Selected Status (like tabs, nav links) */
+.active {
+  color: #ffffff;
+  background-color: #9b69b2;
+  border-radius: 4px;
+}
+
+/* Footer */
+footer {
+  background-color: #1a202c;
+  color: #ffffff;
+  border-top: 1px solid #4a5568;
+  padding: 16px;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255,255,255,0.5);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+
+/* Add to your global CSS */
+.modal-backdrop {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Smooth transitions */
+.modal-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.modal-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+

@@ -1,0 +1,45 @@
+{
+  "emailVerification": {
+    "verification_subject": "Verify Your Email Address",
+    "verification_body": "Please use this code to verify your account: {{code}}",
+    "code_expires": "This code expires in 10 minutes.",
+    "security_notice_title": "Security Notice:",
+    "security_notice_li1": "Never share this code",
+    "security_notice_li2": "We will never ask for it",
+    "security_notice_li3": "Ignore if you didn’t request it"
+  },
+  "welcomeEmail": {
+    "subject": "Welcome to Oliviuus 🎉",
+    "title": "Hello and Welcome!",
+    "body": "Your account has been successfully created. You can now explore movies, series, and more on Oliviuus.",
+    "tip_title": "Pro Tips to Get Started:",
+    "tips": [
+      "Personalize your preferences anytime in your profile",
+      "Check your email regularly for new updates"
+    ],
+    "closing": "Enjoy your journey with Oliviuus!"
+  },
+  "passwordReset": {
+    "subject": "Reset your Oliviuus password",
+    "title": "Password Reset Request",
+    "body": "We received a request to reset your password. Click the button below to reset it.",
+    "button_text": "Reset Password",
+    "expiry_notice": "This link will expire in 1 hour. If you didn’t request this, please ignore this email."
+  },
+  "accountCreated": {
+    "subject": "Your Oliviuus Account is Ready",
+    "title": "Welcome to Oliviuus!",
+    "body": "Your account has been successfully created. Click the button below to set your password and get started.",
+    "button_text": "Set Your Password",
+    "note": "This link is valid for 1 hour. If it expires, request a new password setup."
+  },
+  "familyInvitation": {
+    "subject": "👨‍👩‍👧‍👦 Family Invitation from {{owner}}",
+    "title": "You're Invited to Join a Family Plan!",
+    "body": "{{owner}} has invited you to join their Oliviuus family plan as a {{role}}. By accepting this invitation, you'll get access to all the benefits of their subscription.",
+    "button_text": "Accept Family Invitation",
+    "note_title": "What does this mean?",
+    "note_body": "You'll be able to stream content using the family plan subscription. Your watch history and preferences will remain private to you.",
+    "expiry_notice": "This invitation will expire in 7 days."
+  }
+}

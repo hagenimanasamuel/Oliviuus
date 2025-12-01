@@ -1,0 +1,45 @@
+{
+  "emailVerification": {
+    "verification_subject": "Thibitisha Barua Pepe Yako",
+    "verification_body": "Tafadhali tumia nambari hii kuthibitisha akaunti yako: {{code}}",
+    "code_expires": "Nambari hii itakuwa hai baada ya dakika 10.",
+    "security_notice_title": "Tahadhari ya Usalama:",
+    "security_notice_li1": "Usishirikishe nambari hii na mtu",
+    "security_notice_li2": "Hatutaikuhitaji kamwe",
+    "security_notice_li3": "Puuza ikiwa huikuomba"
+  },
+  "welcomeEmail": {
+    "subject": "Karibu Oliviuus 🎉",
+    "title": "Habari na Karibu!",
+    "body": "Akaunti yako imeundwa kikamilifu. Sasa unaweza kuanza kutazama filamu, tamthilia na mengine mengi kwenye Oliviuus.",
+    "tip_title": "Vidokezo vya Kuanza:",
+    "tips": [
+      "Binafsisha mapendeleo yako muda wowote kupitia profaili yako",
+      "Angalia barua pepe mara kwa mara kupata taarifa mpya"
+    ],
+    "closing": "Furahia safari yako na Oliviuus!"
+  },
+  "passwordReset": {
+    "subject": "Weka upya nenosiri lako la Oliviuus",
+    "title": "Ombi la kuweka upya nenosiri",
+    "body": "Tumepokea ombi la kuweka upya nenosiri lako. Bonyeza kitufe hapa chini ili kuendelea.",
+    "button_text": "Weka upya Nenosiri",
+    "expiry_notice": "Kiungo hiki kitaisha muda baada ya saa 1. Ikiwa hukutuma ombi hili, tafadhali puuza barua pepe hii."
+  },
+  "accountCreated": {
+    "subject": "Akaunti Yako ya Oliviuus Imekamilika",
+    "title": "Karibu Oliviuus!",
+    "body": "Akaunti yako imeundwa kwa mafanikio. Bonyeza kitufe hapa chini kuweka nenosiri lako na kuanza.",
+    "button_text": "Weka Nenosiri Lako",
+    "note": "Kiungo hiki kitadumu kwa saa 1. Ikiisha muda wake, tafadhali omba kuweka nenosiri jipya."
+  },
+  "familyInvitation": {
+    "subject": "👨‍👩‍👧‍👦 Mwaliko wa Familia kutoka kwa {{owner}}",
+    "title": "Umealikwa Kujiunga na Mpango wa Familia!",
+    "body": "{{owner}} amekualika ujiunge na mpango wao wa familia wa Oliviuus kama {{role}}. Ukikubali mwaliko huu, utapata faida zote za usajili wao.",
+    "button_text": "Kubali Mwaliko wa Familia",
+    "note_title": "Hii inamaanisha nini?",
+    "note_body": "Utaweza kutazama maudhui ukitumia usajili wa mpango wa familia. Historia yako ya kutazama na mapendeleo yako yatabaki kuwa binafsi.",
+    "expiry_notice": "Mwaliko huu utaisha baada ya siku 7."
+  }
+}

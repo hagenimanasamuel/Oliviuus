@@ -1,0 +1,45 @@
+{
+  "emailVerification": {
+    "verification_subject": "Emeza Email Yawe",
+    "verification_body": "Koresha iyi kode kwemeza konti yawe: {{code}}",
+    "code_expires": "Iyi kode irarangira mu minota 10.",
+    "security_notice_title": "Itangazo ry'Umutekano:",
+    "security_notice_li1": "Ntugashyire iyi kode hanze",
+    "security_notice_li2": "Ntituzagusaba kuyiduha",
+    "security_notice_li3": "irengagize iyi imeli niba utabisabye"
+  },
+  "welcomeEmail": {
+    "subject": "Murakaza neza kuri Oliviuus 🎉",
+    "title": "Muraho, Murakaza neza!",
+    "body": "Konti yanyu yemejwe neza. Noneho mushobora gutangira kureba filime, series, n'ibindi kuri Oliviuus.",
+    "tip_title": "Inama z'ibanze zo gutangira:",
+    "tips": [
+      "Mushobora guhindura ururimi igihe icyo ari cyo cyose muri profile yanyu",
+      "Muge mureba ubutumwa bwo kuri email kugira ngo mubone amakuru mashya"
+    ],
+    "closing": "Twishimiye urugendo rwanyu kuri Oliviuus!"
+  },
+  "passwordReset": {
+    "subject": "Hindura ijambo ry’ibanga ryawe kuri Oliviuus",
+    "title": "Gusaba guhindura ijambo ry’ibanga",
+    "body": "Twakiriye ubusabe bwo guhindura ijambo ry’ibanga ryawe. Kanda kuri buto iri hasi kugirango uhindure.",
+    "button_text": "Hindura Ijambo ry’ibanga",
+    "expiry_notice": "Ubu busabe buzarangira mu isaha 1. Niba utabisabye, wirengagize iyi imeli."
+  },
+  "accountCreated": {
+    "subject": "Konti yawe ya Oliviuus Yakozwe",
+    "title": "Murakaza neza kuri Oliviuus!",
+    "body": "Konti yawe yakozwe neza. Kanda ku buto hasi kugirango ushyire ijambo ry'ibanga maze utangire gukoresha.",
+    "button_text": "Shyiramo Ijambo ry'Ibanga",
+    "note": "Uru rukurikirane ruzamara isaha 1. Niba rurangiye, saba gushyiraho ijambo ry'ibanga nshya."
+  },
+  "familyInvitation": {
+    "subject": "👨‍👩‍👧‍👦 Ubutumire bw'umuryango buvuye kuri {{owner}}",
+    "title": "Watumiwe kwinjira muri Family Plan!",
+    "body": "{{owner}} yagutumiyemo ngo winjire muri family plan ye nka {{role}}. Nwemeye ubu butumire, uzahita ubona uburyo bwo gukoresha inyungu zose z'ubunyamuryango bwe.",
+    "button_text": "Emeza Ubutumire bw’Umuryango",
+    "note_title": "Ibi bisobanura iki?",
+    "note_body": "Uzashobora kureba filime n’ibindi bikoresho ukoresheje family plan. Amateka yo kureba n'ibyo ukunda bizaguma ari ibyawe bwite.",
+    "expiry_notice": "Ubu butumire buzarangira mu minsi 7."
+  }
+}

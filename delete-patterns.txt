@@ -1,0 +1,8 @@
+*.exe
+*.dll
+*.pak
+*.dat
+LICENSES.chromium.html
+resources.pak
+ngrok
+ngrok.exe

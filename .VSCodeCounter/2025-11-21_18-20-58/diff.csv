@@ -1,0 +1,357 @@
+"filename", "language", "JSON", "Log", "JavaScript", "Docker", "JavaScript JSX", "PostCSS", "HTML", "Markdown", "XML", "YAML", "comment", "blank", "total"
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\Dockerfile", "Docker", 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 11, 14, 40
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\PaymentSystem.js", "JavaScript", 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 24, 30, 181
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\config\dbConfig.js", "JavaScript", 0, 0, 1799, 0, 0, 0, 0, 0, 0, 0, 44, 83, 1926
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\ContentAnalyticsController.js", "JavaScript", 0, 0, 333, 0, 0, 0, 0, 0, 0, 0, 16, 48, 397
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\analyticsController.js", "JavaScript", 0, 0, 442, 0, 0, 0, 0, 0, 0, 0, 11, 37, 490
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\authController.js", "JavaScript", 0, 0, 763, 0, 0, 0, 0, 0, 0, 0, 107, 139, 1009
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\billingManagementController.js", "JavaScript", 0, 0, 137, 0, 0, 0, 0, 0, 0, 0, 3, 20, 160
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\categoryController.js", "JavaScript", 0, 0, 469, 0, 0, 0, 0, 0, 0, 0, 26, 73, 568
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\contactController.js", "JavaScript", 0, 0, 695, 0, 0, 0, 0, 0, 0, 0, 61, 113, 869
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\contentController.js", "JavaScript", 0, 0, 1246, 0, 0, 0, 0, 0, 0, 0, 149, 202, 1597
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\customerManagementController.js", "JavaScript", 0, 0, 203, 0, 0, 0, 0, 0, 0, 0, 10, 29, 242
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\emailVerificationController.js", "JavaScript", 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 7, 10, 61
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\genreController.js", "JavaScript", 0, 0, 295, 0, 0, 0, 0, 0, 0, 0, 19, 58, 372
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\imageProxyController.js", "JavaScript", 0, 0, 46, 0, 0, 0, 0, 0, 0, 0, 4, 13, 63
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\kidController.js", "JavaScript", 0, 0, 954, 0, 0, 0, 0, 0, 0, 0, 60, 117, 1131
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\kidProfileController.js", "JavaScript", 0, 0, 503, 0, 0, 0, 0, 0, 0, 0, 33, 80, 616
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\kidSessionController.js", "JavaScript", 0, 0, 170, 0, 0, 0, 0, 0, 0, 0, 1, 34, 205
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\mediaController.js", "JavaScript", 0, 0, 301, 0, 0, 0, 0, 0, 0, 0, 35, 51, 387
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\newPlanController.js", "JavaScript", 0, 0, 225, 0, 0, 0, 0, 0, 0, 0, 27, 32, 284
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\notificationController.js", "JavaScript", 0, 0, 490, 0, 0, 0, 0, 0, 0, 0, 29, 87, 606
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\overviewController.js", "JavaScript", 0, 0, 167, 0, 0, 0, 0, 0, 0, 0, 9, 13, 189
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\paymentController.js", "JavaScript", 0, 0, 513, 0, 0, 0, 0, 0, 0, 0, 58, 79, 650
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\peopleController.js", "JavaScript", 0, 0, 799, 0, 0, 0, 0, 0, 0, 0, 46, 134, 979
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\preferencesController.js", "JavaScript", 0, 0, 74, 0, 0, 0, 0, 0, 0, 0, 6, 12, 92
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\profileSelectionController.js", "JavaScript", 0, 0, 116, 0, 0, 0, 0, 0, 0, 0, 4, 23, 143
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\publicSubscriptionController.js", "JavaScript", 0, 0, 95, 0, 0, 0, 0, 0, 0, 0, 15, 10, 120
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\rolesController.js", "JavaScript", 0, 0, 91, 0, 0, 0, 0, 0, 0, 0, 12, 21, 124
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\searchController.js", "JavaScript", 0, 0, 692, 0, 0, 0, 0, 0, 0, 0, 28, 124, 844
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\sessionController.js", "JavaScript", 0, 0, 57, 0, 0, 0, 0, 0, 0, 0, 5, 14, 76
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\shareController.js", "JavaScript", 0, 0, 85, 0, 0, 0, 0, 0, 0, 0, 6, 13, 104
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\subscriptionAnalyticsController.js", "JavaScript", 0, 0, 654, 0, 0, 0, 0, 0, 0, 0, 26, 65, 745
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\subscriptionController.js", "JavaScript", 0, 0, 985, 0, 0, 0, 0, 0, 0, 0, 58, 117, 1160
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\upgradeController.js", "JavaScript", 0, 0, 249, 0, 0, 0, 0, 0, 0, 0, 28, 48, 325
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\uploadController.js", "JavaScript", 0, 0, 371, 0, 0, 0, 0, 0, 0, 0, 24, 57, 452
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\userController.js", "JavaScript", 0, 0, 2122, 0, 0, 0, 0, 0, 0, 0, 92, 290, 2504
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\userSubscriptionController.js", "JavaScript", 0, 0, 1098, 0, 0, 0, 0, 0, 0, 0, 72, 165, 1335
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\viewerController.js", "JavaScript", 0, 0, 1339, 0, 0, 0, 0, 0, 0, 0, 87, 155, 1581
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\controllers\watchController.js", "JavaScript", 0, 0, 373, 0, 0, 0, 0, 0, 0, 0, 24, 60, 457
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\index.js", "JavaScript", 0, 0, 123, 0, 0, 0, 0, 0, 0, 0, 7, 10, 140
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\locales\en.json", "JSON", 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\locales\fr.json", "JSON", 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\locales\rw.json", "JSON", 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\locales\sw.json", "JSON", 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\adminMiddleware.js", "JavaScript", 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 4, 10, 47
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\authMiddleware.js", "JavaScript", 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 11, 50
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\checkKidProfileLimit.js", "JavaScript", 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 3, 9, 54
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\checkTimeLimits.js", "JavaScript", 0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 5, 9, 57
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\kidContentFilter.js", "JavaScript", 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 6, 7, 44
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\kidSessionAuth.js", "JavaScript", 0, 0, 76, 0, 0, 0, 0, 0, 0, 0, 7, 8, 91
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\requireFamilyPlan.js", "JavaScript", 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 3, 5, 39
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\middlewares\validateParentOwnership.js", "JavaScript", 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 2, 6, 39
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\models\User.js", "JavaScript", 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 1, 5, 28
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\package-lock.json", "JSON", 6513, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6514
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\package.json", "JSON", 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 39
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\payment_debug.log", "Log", 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 30
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\registerIPN.js", "JavaScript", 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 4, 20, 88
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\analyticsRoutes.js", "JavaScript", 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 2, 3, 22
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\authRoutes.js", "JavaScript", 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 9, 11, 34
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\categoryRoutes.js", "JavaScript", 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 2, 4, 32
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\contactRoutes.js", "JavaScript", 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 4, 4, 35
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\contentRoutes.js", "JavaScript", 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 3, 7, 57
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\emailVerificationRoutes.js", "JavaScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\genreRoutes.js", "JavaScript", 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 2, 4, 27
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\imageProxyRoutes.js", "JavaScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1, 3, 9
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\kidProfileRoutes.js", "JavaScript", 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 4, 5, 37
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\kidRoutes.js", "JavaScript", 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 5, 6, 36
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\kidSessionRoutes.js", "JavaScript", 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 2, 2, 18
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\newPlanRoutes.js", "JavaScript", 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 2, 8, 37
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\notificationRoutes.js", "JavaScript", 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 3, 4, 25
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\overviewRoutes.js", "JavaScript", 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 2, 10
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\paymentRoutes.js", "JavaScript", 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 6, 5, 26
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\peopleRoutes.js", "JavaScript", 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 3, 5, 39
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\preferencesRoutes.js", "JavaScript", 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 2, 4, 13
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\profileSelectionRoutes.js", "JavaScript", 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 2, 2, 16
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\rolesRoutes.js", "JavaScript", 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 4, 8, 21
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\searchRoutes.js", "JavaScript", 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 2, 4, 19
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\sessionRoutes.js", "JavaScript", 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 2, 5, 14
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\subscriptionRoutes.js", "JavaScript", 0, 0, 86, 0, 0, 0, 0, 0, 0, 0, 9, 16, 111
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\upgradeRoutes.js", "JavaScript", 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 3, 4, 25
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\uploadRoutes.js", "JavaScript", 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 5, 7, 29
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\userRoutes.js", "JavaScript", 0, 0, 77, 0, 0, 0, 0, 0, 0, 0, 32, 35, 144
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\userSubscriptionRoutes.js", "JavaScript", 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 5, 7, 49
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\viewerRoutes.js", "JavaScript", 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 3, 4, 39
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\routes\watchRoutes.js", "JavaScript", 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 5, 6, 25
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\seeds\seedAdmin.js", "JavaScript", 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 6, 29
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\services\emailService.js", "JavaScript", 0, 0, 206, 0, 0, 0, 0, 0, 0, 0, 10, 24, 240
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\services\paymentService.js", "JavaScript", 0, 0, 253, 0, 0, 0, 0, 0, 0, 0, 21, 53, 327
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\services\pesapalService.js", "JavaScript", 0, 0, 147, 0, 0, 0, 0, 0, 0, 0, 2, 22, 171
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\services\upgradeService.js", "JavaScript", 0, 0, 438, 0, 0, 0, 0, 0, 0, 0, 87, 91, 616
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\test-mtn.js", "JavaScript", 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 3, 7, 38
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\testCardPayment.js", "JavaScript", 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 9, 9, 50
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\backend\utils\filePaths.js", "JavaScript", 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 3, 18
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\.github\workflows\deploy.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 0, 0, -30, 0, -7, -37
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\README.md", "Markdown", 0, 0, 0, 0, 0, 0, 0, -7, 0, 0, 0, -6, -13
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\eslint.config.js", "JavaScript", 0, 0, -28, 0, 0, 0, 0, 0, 0, 0, 0, -2, -30
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\index.html", "HTML", 0, 0, 0, 0, 0, 0, -33, 0, 0, 0, -9, -10, -52
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\package-lock.json", "JSON", -7260, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -7261
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\package.json", "JSON", -62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -63
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\public\BingSiteAuth.xml", "XML", 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0, -4
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\public\google3c312790d035d81c.html", "HTML", 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\public\sitemap.xml", "XML", 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, -6
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\App.css", "PostCSS", 0, 0, 0, 0, 0, -37, 0, 0, 0, 0, 0, -6, -43
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\App.jsx", "JavaScript JSX", 0, 0, 0, 0, -33, 0, 0, 0, 0, 0, -5, -6, -44
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\api\axios.js", "JavaScript", 0, 0, -9, 0, 0, 0, 0, 0, 0, 0, 0, -3, -12
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\api\userPreferencesApi.js", "JavaScript", 0, 0, -48, 0, 0, 0, 0, 0, 0, 0, -5, -5, -58
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\Footer.jsx", "JavaScript JSX", 0, 0, 0, 0, -52, 0, 0, 0, 0, 0, -5, -8, -65
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\LanguageSwitcher.jsx", "JavaScript JSX", 0, 0, 0, 0, -109, 0, 0, 0, 0, 0, -6, -17, -132
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\Logo.jsx", "JavaScript JSX", 0, 0, 0, 0, -14, 0, 0, 0, 0, 0, 0, -3, -17
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\MainLayout.jsx", "JavaScript JSX", 0, 0, 0, 0, -110, 0, 0, 0, 0, 0, -11, -13, -134
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\ProtectedRoute.jsx", "JavaScript JSX", 0, 0, 0, 0, -15, 0, 0, 0, 0, 0, -6, -7, -28
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\DashboardHeader.jsx", "JavaScript JSX", 0, 0, 0, 0, -520, 0, 0, 0, 0, 0, -54, -66, -640
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\NotificationModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -559, 0, 0, 0, 0, 0, -29, -45, -633
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\AdminLayout.jsx", "JavaScript JSX", 0, 0, 0, 0, -114, 0, 0, 0, 0, 0, -5, -17, -136
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\Sidebar\NavItems.jsx", "JavaScript JSX", 0, 0, 0, 0, -46, 0, 0, 0, 0, 0, -2, -4, -52
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\Sidebar\Sidebar.jsx", "JavaScript JSX", 0, 0, 0, 0, -82, 0, 0, 0, 0, 0, -10, -14, -106
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\Sidebar\index.js", "JavaScript", 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, -2, -4
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\AnalyticsExport.jsx", "JavaScript JSX", 0, 0, 0, 0, -203, 0, 0, 0, 0, 0, -5, -12, -220
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\AnalyticsFilters.jsx", "JavaScript JSX", 0, 0, 0, 0, -82, 0, 0, 0, 0, 0, -3, -6, -91
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\AnalyticsHeader.jsx", "JavaScript JSX", 0, 0, 0, 0, -40, 0, 0, 0, 0, 0, 0, -3, -43
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\AnalyticsMetrics.jsx", "JavaScript JSX", 0, 0, 0, 0, -138, 0, 0, 0, 0, 0, -1, -5, -144
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\ContentAnalytics.jsx", "JavaScript JSX", 0, 0, 0, 0, -138, 0, 0, 0, 0, 0, -3, -16, -157
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\EngagementMetrics.jsx", "JavaScript JSX", 0, 0, 0, 0, -184, 0, 0, 0, 0, 0, -3, -10, -197
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\GeographicAnalytics.jsx", "JavaScript JSX", 0, 0, 0, 0, -159, 0, 0, 0, 0, 0, -4, -15, -178
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\PlatformAnalytics.jsx", "JavaScript JSX", 0, 0, 0, 0, -165, 0, 0, 0, 0, 0, -3, -13, -181
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\RevenueAnalyticsChart.jsx", "JavaScript JSX", 0, 0, 0, 0, -139, 0, 0, 0, 0, 0, -1, -11, -151
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\TopPerformers.jsx", "JavaScript JSX", 0, 0, 0, 0, -195, 0, 0, 0, 0, 0, -2, -18, -215
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\analytics\UserAnalyticsChart.jsx", "JavaScript JSX", 0, 0, 0, 0, -125, 0, 0, 0, 0, 0, -2, -9, -136
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\index.js", "JavaScript", 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, -1, -1, -4
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\CastingModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -587, 0, 0, 0, 0, 0, -16, -54, -657
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\CategoryModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -308, 0, 0, 0, 0, 0, -10, -29, -347
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentCard.jsx", "JavaScript JSX", 0, 0, 0, 0, -288, 0, 0, 0, 0, 0, -18, -31, -337
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentCreationModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -1179, 0, 0, 0, 0, 0, 0, -103, -1282
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentCreationSteps\BasicInfoStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -545, 0, 0, 0, 0, 0, -24, -48, -617
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentCreationSteps\ClassificationStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -670, 0, 0, 0, 0, 0, -20, -36, -726
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentCreationSteps\ContentTypeStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -298, 0, 0, 0, 0, 0, -13, -15, -326
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentCreationSteps\MediaAssetsStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -1299, 0, 0, 0, 0, 0, -36, -71, -1406
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentCreationSteps\ReviewStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -518, 0, 0, 0, 0, 0, -18, -41, -577
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentCreationSteps\RightsDistributionStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -828, 0, 0, 0, 0, 0, -17, -43, -888
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentDetailModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -835, 0, 0, 0, 0, 0, -17, -77, -929
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentHeader.jsx", "JavaScript JSX", 0, 0, 0, 0, -251, 0, 0, 0, 0, 0, -11, -19, -281
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentList.jsx", "JavaScript JSX", 0, 0, 0, 0, -162, 0, 0, 0, 0, 0, -5, -12, -179
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentModalTabs\AnalyticsTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -579, 0, 0, 0, 0, 0, -16, -37, -632
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentModalTabs\CastingTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -1305, 0, 0, 0, 0, 0, -28, -107, -1440
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentModalTabs\MediaTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -1235, 0, 0, 0, 0, 0, -51, -118, -1404
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentModalTabs\OverviewTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -547, 0, 0, 0, 0, 0, -17, -42, -606
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentModalTabs\RightsTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -1123, 0, 0, 0, 0, 0, -46, -115, -1284
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\ContentModalTabs\SettingsTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -917, 0, 0, 0, 0, 0, -51, -108, -1076
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\GenreModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -285, 0, 0, 0, 0, 0, -13, -28, -326
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\library\PersonModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -664, 0, 0, 0, 0, 0, -16, -62, -742
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\overview\MetricsGrid.jsx", "JavaScript JSX", 0, 0, 0, 0, -73, 0, 0, 0, 0, 0, 0, -2, -75
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\overview\OverviewHeader.jsx", "JavaScript JSX", 0, 0, 0, 0, -35, 0, 0, 0, 0, 0, 0, -3, -38
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\overview\RecentActivities.jsx", "JavaScript JSX", 0, 0, 0, 0, -80, 0, 0, 0, 0, 0, 0, -7, -87
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\overview\RevenueAnalytics.jsx", "JavaScript JSX", 0, 0, 0, 0, -79, 0, 0, 0, 0, 0, -2, -7, -88
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\overview\SecurityOverview.jsx", "JavaScript JSX", 0, 0, 0, 0, -67, 0, 0, 0, 0, 0, -4, -7, -78
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\overview\SubscriptionAnalytics.jsx", "JavaScript JSX", 0, 0, 0, 0, -73, 0, 0, 0, 0, 0, -3, -6, -82
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\overview\SupportOverview.jsx", "JavaScript JSX", 0, 0, 0, 0, -80, 0, 0, 0, 0, 0, -3, -7, -90
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\overview\SystemHealth.jsx", "JavaScript JSX", 0, 0, 0, 0, -81, 0, 0, 0, 0, 0, -2, -8, -91
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\overview\UserStatistics.jsx", "JavaScript JSX", 0, 0, 0, 0, -78, 0, 0, 0, 0, 0, 0, -5, -83
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\subscriptions\BillingManagement.jsx", "JavaScript JSX", 0, 0, 0, 0, -322, 0, 0, 0, 0, 0, -14, -21, -357
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\subscriptions\CustomerManagement.jsx", "JavaScript JSX", 0, 0, 0, 0, -305, 0, 0, 0, 0, 0, -8, -22, -335
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\subscriptions\PlanDetailsModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -367, 0, 0, 0, 0, 0, -7, -27, -401
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\subscriptions\PlanSeeder.jsx", "JavaScript JSX", 0, 0, 0, 0, -117, 0, 0, 0, 0, 0, 0, -13, -130
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\subscriptions\SubscriptionAnalytics.jsx", "JavaScript JSX", 0, 0, 0, 0, -709, 0, 0, 0, 0, 0, -33, -54, -796
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\subscriptions\SubscriptionPlans.jsx", "JavaScript JSX", 0, 0, 0, 0, -383, 0, 0, 0, 0, 0, -15, -39, -437
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\subscriptions\SubscriptionsNavTabs.jsx", "JavaScript JSX", 0, 0, 0, 0, -167, 0, 0, 0, 0, 0, -11, -27, -205
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\support\ContactsHeader.jsx", "JavaScript JSX", 0, 0, 0, 0, -421, 0, 0, 0, 0, 0, -27, -34, -482
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\support\SupportNavTabs.jsx", "JavaScript JSX", 0, 0, 0, 0, -184, 0, 0, 0, 0, 0, -11, -28, -223
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserCard.jsx", "JavaScript JSX", 0, 0, 0, 0, -277, 0, 0, 0, 0, 0, -13, -26, -316
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserDetailsModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -695, 0, 0, 0, 0, 0, -13, -66, -774
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserForm.jsx", "JavaScript JSX", 0, 0, 0, 0, -192, 0, 0, 0, 0, 0, -8, -23, -223
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserModalTabs\ActivityTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -354, 0, 0, 0, 0, 0, -13, -50, -417
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserModalTabs\ModalHeader.jsx", "JavaScript JSX", 0, 0, 0, 0, -79, 0, 0, 0, 0, 0, 0, -8, -87
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserModalTabs\NotificationsTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -498, 0, 0, 0, 0, 0, -9, -50, -557
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserModalTabs\OverviewTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -385, 0, 0, 0, 0, 0, -15, -33, -433
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserModalTabs\SecurityLogsTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -400, 0, 0, 0, 0, 0, -9, -32, -441
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserModalTabs\SecurityTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -465, 0, 0, 0, 0, 0, -18, -50, -533
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UserModalTabs\SubscriptionTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -706, 0, 0, 0, 0, 0, -21, -66, -793
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UsersHeader.jsx", "JavaScript JSX", 0, 0, 0, 0, -347, 0, 0, 0, 0, 0, -14, -27, -388
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UsersList.jsx", "JavaScript JSX", 0, 0, 0, 0, -95, 0, 0, 0, 0, 0, -8, -11, -114
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\UsersNavTabs.jsx", "JavaScript JSX", 0, 0, 0, 0, -174, 0, 0, 0, 0, 0, -11, -28, -213
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\roles&permission\AssignFeatures.jsx", "JavaScript JSX", 0, 0, 0, 0, -64, 0, 0, 0, 0, 0, 0, -7, -71
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\roles&permission\AssignRoleToUser.jsx", "JavaScript JSX", 0, 0, 0, 0, -64, 0, 0, 0, 0, 0, 0, -7, -71
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\roles&permission\RoleForm.jsx", "JavaScript JSX", 0, 0, 0, 0, -314, 0, 0, 0, 0, 0, -13, -22, -349
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\admin\users\roles&permission\RolesList.jsx", "JavaScript JSX", 0, 0, 0, 0, -141, 0, 0, 0, 0, 0, -9, -12, -162
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\Header.jsx", "JavaScript JSX", 0, 0, 0, 0, -272, 0, 0, 0, 0, 0, -19, -35, -326
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\Header\Navigation.jsx", "JavaScript JSX", 0, 0, 0, 0, -97, 0, 0, 0, 0, 0, -4, -11, -112
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\Header\NotificationDropdown.jsx", "JavaScript JSX", 0, 0, 0, 0, -287, 0, 0, 0, 0, 0, -13, -27, -327
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\Header\ProfileDropdown.jsx", "JavaScript JSX", 0, 0, 0, 0, -125, 0, 0, 0, 0, 0, -1, -13, -139
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\Header\SearchModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -789, 0, 0, 0, 0, 0, -48, -61, -898
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -815, 0, 0, 0, 0, 0, -35, -101, -951
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\ContentRow\ContentRow.jsx", "JavaScript JSX", 0, 0, 0, 0, -163, 0, 0, 0, 0, 0, -8, -18, -189
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\ContentRow\ContentRowSkeleton.jsx", "JavaScript JSX", 0, 0, 0, 0, -19, 0, 0, 0, 0, 0, 0, -1, -20
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\ContentSections.jsx", "JavaScript JSX", 0, 0, 0, 0, -70, 0, 0, 0, 0, 0, -3, -7, -80
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\ErrorState\ErrorState.jsx", "JavaScript JSX", 0, 0, 0, 0, -34, 0, 0, 0, 0, 0, 0, -2, -36
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\HeroActions.jsx", "JavaScript JSX", 0, 0, 0, 0, -78, 0, 0, 0, 0, 0, 0, -5, -83
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\HeroContent.jsx", "JavaScript JSX", 0, 0, 0, 0, -57, 0, 0, 0, 0, 0, 0, -6, -63
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\HeroSection.jsx", "JavaScript JSX", 0, 0, 0, 0, -89, 0, 0, 0, 0, 0, -3, -9, -101
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\LoadingStates\ContentCardSkeleton.jsx", "JavaScript JSX", 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, -1, -9
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\LoadingStates\HeroSkeleton.jsx", "JavaScript JSX", 0, 0, 0, 0, -24, 0, 0, 0, 0, 0, 0, -1, -25
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\NewReleasesSection.jsx", "JavaScript JSX", 0, 0, 0, 0, -70, 0, 0, 0, 0, 0, -4, -6, -80
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\PopularInRwandaSection.jsx", "JavaScript JSX", 0, 0, 0, 0, -70, 0, 0, 0, 0, 0, -4, -6, -80
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLandingPage\TrendingNowSection.jsx", "JavaScript JSX", 0, 0, 0, 0, -70, 0, 0, 0, 0, 0, -4, -6, -80
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\ViewerLayout.jsx", "JavaScript JSX", 0, 0, 0, 0, -45, 0, 0, 0, 0, 0, -17, -11, -73
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ContentCard.jsx", "JavaScript JSX", 0, 0, 0, 0, -225, 0, 0, 0, 0, 0, -18, -38, -281
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ContentDetailModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -394, 0, 0, 0, 0, 0, -42, -56, -492
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\HoverModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -444, 0, 0, 0, 0, 0, -40, -65, -549
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\index.js", "JavaScript", 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\HeroSection.jsx", "JavaScript JSX", 0, 0, 0, 0, -438, 0, 0, 0, 0, 0, -23, -59, -520
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\ModalNavigation.jsx", "JavaScript JSX", 0, 0, 0, 0, -55, 0, 0, 0, 0, 0, -3, -10, -68
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\PageNavigation.jsx", "JavaScript JSX", 0, 0, 0, 0, -42, 0, 0, 0, 0, 0, -1, -7, -50
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\ShareModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -257, 0, 0, 0, 0, 0, -12, -17, -286
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabContent.jsx", "JavaScript JSX", 0, 0, 0, 0, -36, 0, 0, 0, 0, 0, -1, -3, -40
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabContent\AwardsTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -48, 0, 0, 0, 0, 0, -1, -4, -53
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabContent\CastTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -218, 0, 0, 0, 0, 0, -18, -25, -261
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabContent\DetailsTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -181, 0, 0, 0, 0, 0, -11, -15, -207
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabContent\MediaTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -457, 0, 0, 0, 0, 0, -22, -41, -520
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabContent\OverviewTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -197, 0, 0, 0, 0, 0, -11, -18, -226
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabContent\SeasonsTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -227, 0, 0, 0, 0, 0, -24, -32, -283
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabContent\SimilarTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -186, 0, 0, 0, 0, 0, -15, -23, -224
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabContent\mediatab.css", "PostCSS", 0, 0, 0, 0, 0, -116, 0, 0, 0, 0, -5, -19, -140
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\content\ontentDetailModal\TabNavigation.jsx", "JavaScript JSX", 0, 0, 0, 0, -225, 0, 0, 0, 0, 0, -16, -25, -266
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\kid\KidHeader.jsx", "JavaScript JSX", 0, 0, 0, 0, -357, 0, 0, 0, 0, 0, -32, -27, -416
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\kid\KidLayout.jsx", "JavaScript JSX", 0, 0, 0, 0, -51, 0, 0, 0, 0, 0, -8, -11, -70
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\kid\KidModeExitHandler.jsx", "JavaScript JSX", 0, 0, 0, 0, -74, 0, 0, 0, 0, 0, -1, -12, -87
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\kid\ProfileSelector.jsx", "JavaScript JSX", 0, 0, 0, 0, -150, 0, 0, 0, 0, 0, -17, -25, -192
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\kid\content\ContentCard.jsx", "JavaScript JSX", 0, 0, 0, 0, -225, 0, 0, 0, 0, 0, -3, -38, -266
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\layout\dashboard\viewer\kid\content\HoverModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -413, 0, 0, 0, 0, 0, -45, -64, -522
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\subscription\FAQAccordion.jsx", "JavaScript JSX", 0, 0, 0, 0, -105, 0, 0, 0, 0, 0, -1, -8, -114
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\subscription\HelpSupport.jsx", "JavaScript JSX", 0, 0, 0, 0, -400, 0, 0, 0, 0, 0, -9, -28, -437
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\subscription\PlanComparison.jsx", "JavaScript JSX", 0, 0, 0, 0, -320, 0, 0, 0, 0, 0, -8, -23, -351
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\subscription\SubscriptionCard.jsx", "JavaScript JSX", 0, 0, 0, 0, -185, 0, 0, 0, 0, 0, -20, -21, -226
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\subscription\SubscriptionHeader.jsx", "JavaScript JSX", 0, 0, 0, 0, -115, 0, 0, 0, 0, 0, -7, -10, -132
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\ui\Alert.jsx", "JavaScript JSX", 0, 0, 0, 0, -34, 0, 0, 0, 0, 0, -2, -5, -41
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\ui\EditableEmail.jsx", "JavaScript JSX", 0, 0, 0, 0, -21, 0, 0, 0, 0, 0, -1, -5, -27
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\ui\Modal.jsx", "JavaScript JSX", 0, 0, 0, 0, -19, 0, 0, 0, 0, 0, -3, -6, -28
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\ui\Popup.jsx", "JavaScript JSX", 0, 0, 0, 0, -26, 0, 0, 0, 0, 0, 0, -4, -30
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\ui\ProfileMenu.jsx", "JavaScript JSX", 0, 0, 0, 0, -126, 0, 0, 0, 0, 0, -8, -11, -145
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\components\ui\Toast.jsx", "JavaScript JSX", 0, 0, 0, 0, -19, 0, 0, 0, 0, 0, 0, -5, -24
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\config\navConfig.js", "JavaScript", 0, 0, -52, 0, 0, 0, 0, 0, 0, 0, -1, -2, -55
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\context\AuthContext.jsx", "JavaScript JSX", 0, 0, 0, 0, -338, 0, 0, 0, 0, 0, -104, -54, -496
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\context\SubscriptionContext.jsx", "JavaScript JSX", 0, 0, 0, 0, -455, 0, 0, 0, 0, 0, -3, -64, -522
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\hooks\useAuthCheck.js", "JavaScript", 0, 0, -26, 0, 0, 0, 0, 0, 0, 0, 0, -7, -33
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\hooks\useContentDetail.js", "JavaScript", 0, 0, -50, 0, 0, 0, 0, 0, 0, 0, -6, -9, -65
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\hooks\useViewerLanding.js", "JavaScript", 0, 0, -264, 0, 0, 0, 0, 0, 0, 0, -7, -50, -321
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\i18n\en.json", "JSON", -1588, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1588
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\i18n\fr.json", "JSON", -1586, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1586
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\i18n\i18n.js", "JavaScript", 0, 0, -25, 0, 0, 0, 0, 0, 0, 0, -4, -6, -35
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\i18n\rw.json", "JSON", -1586, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1586
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\i18n\sw.json", "JSON", -1586, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1586
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\index.css", "PostCSS", 0, 0, 0, 0, 0, -110, 0, 0, 0, 0, -10, -17, -137
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\main.jsx", "JavaScript JSX", 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, 0, -2, -11
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\AdminDashboard.jsx", "JavaScript JSX", 0, 0, 0, 0, -20, 0, 0, 0, 0, 0, -2, -4, -26
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\GlobalManagement\GlobalManagement.jsx", "JavaScript JSX", 0, 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, -3
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\analytics\Analytics.jsx", "JavaScript JSX", 0, 0, 0, 0, -134, 0, 0, 0, 0, 0, -1, -16, -151
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\library\AddNew.jsx", "JavaScript JSX", 0, 0, 0, 0, -254, 0, 0, 0, 0, 0, -7, -20, -281
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\library\AllContent.jsx", "JavaScript JSX", 0, 0, 0, 0, -236, 0, 0, 0, 0, 0, -32, -39, -307
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\library\GenresCategories.jsx", "JavaScript JSX", 0, 0, 0, 0, -1029, 0, 0, 0, 0, 0, -25, -67, -1121
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\library\Library.jsx", "JavaScript JSX", 0, 0, 0, 0, -175, 0, 0, 0, 0, 0, -12, -31, -218
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\library\PeopleManagement.jsx", "JavaScript JSX", 0, 0, 0, 0, -783, 0, 0, 0, 0, 0, -19, -46, -848
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\overview\Overview.jsx", "JavaScript JSX", 0, 0, 0, 0, -90, 0, 0, 0, 0, 0, -1, -11, -102
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\subscriptions\Subscriptions.jsx", "JavaScript JSX", 0, 0, 0, 0, -19, 0, 0, 0, 0, 0, 0, -1, -20
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\support\AllContacts.jsx", "JavaScript JSX", 0, 0, 0, 0, -174, 0, 0, 0, 0, 0, -13, -27, -214
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\support\ContactModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -524, 0, 0, 0, 0, 0, -10, -39, -573
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\support\ContactSettings.jsx", "JavaScript JSX", 0, 0, 0, 0, -198, 0, 0, 0, 0, 0, -9, -16, -223
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\support\ContactStats.jsx", "JavaScript JSX", 0, 0, 0, 0, -365, 0, 0, 0, 0, 0, -15, -26, -406
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\support\ContactsList.jsx", "JavaScript JSX", 0, 0, 0, 0, -172, 0, 0, 0, 0, 0, -10, -19, -201
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\support\Support.jsx", "JavaScript JSX", 0, 0, 0, 0, -16, 0, 0, 0, 0, 0, 0, -2, -18
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\users\ActiveUsers.jsx", "JavaScript JSX", 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, 0, -2, -11
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\users\AllUsers.jsx", "JavaScript JSX", 0, 0, 0, 0, -158, 0, 0, 0, 0, 0, -10, -21, -189
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\users\BulkOperations.jsx", "JavaScript JSX", 0, 0, 0, 0, -769, 0, 0, 0, 0, 0, -18, -57, -844
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\users\FamilyPlan.jsx", "JavaScript JSX", 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, 0, -2, -11
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\users\RolesPermissions.jsx", "JavaScript JSX", 0, 0, 0, 0, -129, 0, 0, 0, 0, 0, -12, -17, -158
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\users\Specials.jsx", "JavaScript JSX", 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, 0, -2, -11
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Admins\users\Users.jsx", "JavaScript JSX", 0, 0, 0, 0, -16, 0, 0, 0, 0, 0, 0, -3, -19
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\Dashboard.jsx", "JavaScript JSX", 0, 0, 0, 0, -107, 0, 0, 0, 0, 0, -14, -13, -134
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\ViewerDashboard.jsx", "JavaScript JSX", 0, 0, 0, 0, -35, 0, 0, 0, 0, 0, -4, -5, -44
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\AccountSettings.jsx", "JavaScript JSX", 0, 0, 0, 0, -197, 0, 0, 0, 0, 0, -14, -24, -235
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\AccountInfo.jsx", "JavaScript JSX", 0, 0, 0, 0, -188, 0, 0, 0, 0, 0, -7, -14, -209
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\FamilyProfiles.jsx", "JavaScript JSX", 0, 0, 0, 0, -94, 0, 0, 0, 0, 0, -8, -12, -114
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\ParentalControls.jsx", "JavaScript JSX", 0, 0, 0, 0, -37, 0, 0, 0, 0, 0, -2, -4, -43
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\Preferences.jsx", "JavaScript JSX", 0, 0, 0, 0, -172, 0, 0, 0, 0, 0, -10, -22, -204
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\SecuritySettings.jsx", "JavaScript JSX", 0, 0, 0, 0, -137, 0, 0, 0, 0, 0, -8, -17, -162
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\SubscriptionInfo.jsx", "JavaScript JSX", 0, 0, 0, 0, -377, 0, 0, 0, 0, 0, -26, -42, -445
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\UserSessions.jsx", "JavaScript JSX", 0, 0, 0, 0, -144, 0, 0, 0, 0, 0, -1, -21, -166
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\family\KidsProfilesTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -274, 0, 0, 0, 0, 0, -16, -21, -311
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\family\familyMembersTab.jsx", "JavaScript JSX", 0, 0, 0, 0, -164, 0, 0, 0, 0, 0, -6, -13, -183
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\family\modals\CreateKidProfileModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -457, 0, 0, 0, 0, 0, -21, -30, -508
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\family\modals\EditKidProfileModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -450, 0, 0, 0, 0, 0, -21, -33, -504
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\security\CriticalActions.jsx", "JavaScript JSX", 0, 0, 0, 0, -81, 0, 0, 0, 0, 0, 0, -9, -90
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\security\PasswordSettings.jsx", "JavaScript JSX", 0, 0, 0, 0, -189, 0, 0, 0, 0, 0, 0, -20, -209
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\subscription\CurrentPlan.jsx", "JavaScript JSX", 0, 0, 0, 0, -658, 0, 0, 0, 0, 0, -48, -55, -761
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\subscription\History.jsx", "JavaScript JSX", 0, 0, 0, 0, -761, 0, 0, 0, 0, 0, -21, -57, -839
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\subscription\NewPlanModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -763, 0, 0, 0, 0, 0, -53, -89, -905
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\subscription\PaymentMethods.jsx", "JavaScript JSX", 0, 0, 0, 0, -243, 0, 0, 0, 0, 0, -12, -22, -277
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\subscription\PlanChangeModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -799, 0, 0, 0, 0, 0, -56, -92, -947
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\subscription\SubscriptionActions.jsx", "JavaScript JSX", 0, 0, 0, 0, -376, 0, 0, 0, 0, 0, -13, -23, -412
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\setting\tabs\subscription\UsageMetrics.jsx", "JavaScript JSX", 0, 0, 0, 0, -381, 0, 0, 0, 0, 0, -22, -32, -435
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\BrowsePage.jsx", "JavaScript JSX", 0, 0, 0, 0, -166, 0, 0, 0, 0, 0, -10, -19, -195
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\ContentDetailPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -200, 0, 0, 0, 0, 0, -10, -27, -237
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\DownloadPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, -1, -2, -13
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\MoviesPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -749, 0, 0, 0, 0, 0, 0, -81, -830
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\MyLibrary.jsx", "JavaScript JSX", 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, -1, -2, -13
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\NewPopularPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -282, 0, 0, 0, 0, 0, -15, -26, -323
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\ProfilePage.jsx", "JavaScript JSX", 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, -1, -2, -13
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\TvShowsPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -758, 0, 0, 0, 0, 0, -53, -82, -893
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -779, 0, 0, 0, 0, 0, -87, -120, -986
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\EndScreen\EndScreen.jsx", "JavaScript JSX", 0, 0, 0, 0, -326, 0, 0, 0, 0, 0, -19, -26, -371
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\EpisodeSelector\EpisodeSelector.jsx", "JavaScript JSX", 0, 0, 0, 0, -322, 0, 0, 0, 0, 0, -18, -29, -369
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\Overlays\CDNIndicator.jsx", "JavaScript JSX", 0, 0, 0, 0, -61, 0, 0, 0, 0, 0, -3, -10, -74
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\Overlays\ConnectionIndicator.jsx", "JavaScript JSX", 0, 0, 0, 0, -27, 0, 0, 0, 0, 0, 0, -3, -30
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\Overlays\JumpIndicator.jsx", "JavaScript JSX", 0, 0, 0, 0, -23, 0, 0, 0, 0, 0, 0, -3, -26
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\Overlays\LoadingOverlay.jsx", "JavaScript JSX", 0, 0, 0, 0, -41, 0, 0, 0, 0, 0, -1, -4, -46
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\PlayerControls\PlayerControls.jsx", "JavaScript JSX", 0, 0, 0, 0, -321, 0, 0, 0, 0, 0, -23, -30, -374
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\Preview\PreviewThumbnail.jsx", "JavaScript JSX", 0, 0, 0, 0, -109, 0, 0, 0, 0, 0, -11, -22, -142
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\SettingsPanel\SettingsPanel.jsx", "JavaScript JSX", 0, 0, 0, 0, -396, 0, 0, 0, 0, 0, -6, -29, -431
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\components\VideoPlayer\VideoPlayer.jsx", "JavaScript JSX", 0, 0, 0, 0, -53, 0, 0, 0, 0, 0, -1, -3, -57
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\hooks\useEpisodeManager.js", "JavaScript", 0, 0, -96, 0, 0, 0, 0, 0, 0, 0, -6, -18, -120
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\hooks\useVideoControls.js", "JavaScript", 0, 0, -53, 0, 0, 0, 0, 0, 0, 0, -6, -9, -68
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\hooks\useVideoPlayer.js", "JavaScript", 0, 0, -188, 0, 0, 0, 0, 0, 0, 0, -5, -24, -217
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\hooks\useVideoQuality.js", "JavaScript", 0, 0, -93, 0, 0, 0, 0, 0, 0, 0, -18, -19, -130
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\hooks\useVideoState.js", "JavaScript", 0, 0, -176, 0, 0, 0, 0, 0, 0, 0, -12, -32, -220
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\utils\timeFormatters.js", "JavaScript", 0, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0, -2, -12
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\WatchPage\utils\videoHelpers.js", "JavaScript", 0, 0, -14, 0, 0, 0, 0, 0, 0, 0, -1, -3, -18
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\kid\KidDashboard.jsx", "JavaScript JSX", 0, 0, 0, 0, -54, 0, 0, 0, 0, 0, -4, -6, -64
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\kid\KidLandingPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -787, 0, 0, 0, 0, 0, -28, -97, -912
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\preferences\WatchlistPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -172, 0, 0, 0, 0, 0, -9, -20, -201
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\Dashboards\viewer\sample.html", "HTML", 0, 0, 0, 0, 0, 0, -110, 0, 0, 0, -3, -23, -136
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\LandingPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, -3, -23
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\NotFound.jsx", "JavaScript JSX", 0, 0, 0, 0, -33, 0, 0, 0, 0, 0, -4, -7, -44
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\auth\AuthForm.jsx", "JavaScript JSX", 0, 0, 0, 0, -132, 0, 0, 0, 0, 0, -9, -18, -159
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\auth\CodeStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -156, 0, 0, 0, 0, 0, -3, -19, -178
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\auth\EmailStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -102, 0, 0, 0, 0, 0, -2, -14, -118
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\auth\ForgotPasswordModal.jsx", "JavaScript JSX", 0, 0, 0, 0, -64, 0, 0, 0, 0, 0, -5, -9, -78
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\auth\PasswordStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -127, 0, 0, 0, 0, 0, -6, -20, -153
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\auth\ResetPassword.jsx", "JavaScript JSX", 0, 0, 0, 0, -121, 0, 0, 0, 0, 0, -4, -17, -142
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\auth\UserInfoStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -168, 0, 0, 0, 0, 0, -8, -24, -200
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\landing\EmailInput.jsx", "JavaScript JSX", 0, 0, 0, 0, -127, 0, 0, 0, 0, 0, -6, -14, -147
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\landing\EmailStep.jsx", "JavaScript JSX", 0, 0, 0, 0, -102, 0, 0, 0, 0, 0, -2, -13, -117
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\landing\FAQSection.jsx", "JavaScript JSX", 0, 0, 0, 0, -157, 0, 0, 0, 0, 0, -6, -12, -175
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\landing\FeaturesSection.jsx", "JavaScript JSX", 0, 0, 0, 0, -94, 0, 0, 0, 0, 0, -7, -8, -109
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\landing\Header.jsx", "JavaScript JSX", 0, 0, 0, 0, -66, 0, 0, 0, 0, 0, -8, -10, -84
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\landing\HeroSection.jsx", "JavaScript JSX", 0, 0, 0, 0, -129, 0, 0, 0, 0, 0, -14, -21, -164
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\landingpage.css", "PostCSS", 0, 0, 0, 0, 0, -374, 0, 0, 0, 0, -30, -63, -467
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\subscription\OliviuusPpt.jsx", "JavaScript JSX", 0, 0, 0, 0, -302, 0, 0, 0, 0, 0, -6, -16, -324
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\subscription\PaymentPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -998, 0, 0, 0, 0, 0, -69, -101, -1168
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\subscription\SecurityGridSystem.jsx", "JavaScript JSX", 0, 0, 0, 0, -1625, 0, 0, 0, 0, 0, -49, -118, -1792
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\subscription\SimpleGame.jsx", "JavaScript JSX", 0, 0, 0, 0, -257, 0, 0, 0, 0, 0, -27, -59, -343
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\pages\subscription\SubscriptionPage.jsx", "JavaScript JSX", 0, 0, 0, 0, -377, 0, 0, 0, 0, 0, -20, -48, -445
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\routes\AppRoutes.jsx", "JavaScript JSX", 0, 0, 0, 0, -202, 0, 0, 0, 0, 0, -25, -23, -250
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\routes\KidProtectedRoute.jsx", "JavaScript JSX", 0, 0, 0, 0, -74, 0, 0, 0, 0, 0, -16, -17, -107
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\routes\ProtectedSubscriptionRoute.jsx", "JavaScript JSX", 0, 0, 0, 0, -29, 0, 0, 0, 0, 0, -12, -7, -48
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\utils\urlState.js", "JavaScript", 0, 0, -17, 0, 0, 0, 0, 0, 0, 0, -12, -4, -33
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\utils\userService.js", "JavaScript", 0, 0, -25, 0, 0, 0, 0, 0, 0, 0, -2, -7, -34
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\src\utils\validate.js", "JavaScript", 0, 0, -25, 0, 0, 0, 0, 0, 0, 0, -1, -7, -33
+"c:\Users\SAMUEL\Documents\Github\Oliviuus\frontend\vite.config.js", "JavaScript", 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, -2, -22
+"Total", "-", -6973, 29, 20231, 15, -60263, -637, -144, -7, -10, -30, -1369, -3118, -52276

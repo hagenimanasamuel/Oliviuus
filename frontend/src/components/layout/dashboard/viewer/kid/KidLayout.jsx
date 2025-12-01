@@ -1,0 +1,70 @@
+// src/components/layout/dashboard/kid/KidLayout.jsx
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import KidHeader from "./KidHeader";
+
+export default function KidLayout({ children, kidProfile, onExit }) {
+  const [isMounted, setIsMounted] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  /**
+   * FIXED: Proper scroll detection with better logging
+   */
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      // Use a small threshold like ViewerLayout
+      const scrolled = scrollY > 10;
+      console.log("📜 Scroll detected - scrollY:", scrollY, "isScrolled:", scrolled);
+      setIsScrolled(scrolled);
+    };
+
+    // Add event listener
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    // Check initial scroll position
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  // Landing page is just the root path "/"
+  const isLandingPage = location.pathname === "/";
+
+  if (!isMounted) {
+    return (
+      <div className="flex h-screen bg-gradient-to-br from-[#BC8BBC] to-[#9A679A]">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-white text-center">
+            <div className="text-4xl sm:text-6xl mb-4 sm:mb-6 animate-bounce">🌈</div>
+            <p className="text-lg sm:text-2xl font-bold mb-2">Getting Ready!</p>
+            <p className="text-sm sm:text-lg">Loading your fun space... ✨</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#BC8BBC] to-[#9A679A]">
+      <KidHeader 
+        kidProfile={kidProfile} 
+        onExit={onExit} 
+        isScrolled={isScrolled} 
+      />
+      
+      <main className={`flex-1 ${isLandingPage ? 'pt-0' : 'pt-16'}`}>
+        {children}
+      </main>
+
+      <div className="h-4 sm:h-6 md:h-8 lg:hidden safe-area-inset-bottom"></div>
+    </div>
+  );
+}
