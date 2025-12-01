@@ -172,16 +172,20 @@ const TrendingSection = () => {
                       >
                         {/* Rank Badge Skeleton */}
                         <div className="absolute -top-2 -left-2 z-20 w-10 h-10 rounded-xl bg-gray-700 animate-pulse flex items-center justify-center shadow-2xl border-2 border-gray-600">
-                          <div className="w-3 h-3 bg-gray-600 rounded-full"></div>
+                          <div className="w-6 h-3 bg-gray-600 rounded"></div>
                         </div>
 
                         {/* Content Card Skeleton */}
-                        <div className="relative bg-gray-800 rounded-lg overflow-hidden shadow-2xl border border-gray-700/50">
+                        <div className="relative bg-gray-800 rounded-lg overflow-hidden shadow-2xl border border-gray-700/50 animate-pulse">
                           {/* Image Container Skeleton */}
-                          <div className="relative aspect-[2/3] overflow-hidden bg-gray-900">
-                            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                              <div className="w-6 h-6 border-2 border-[#BC8BBC] border-t-transparent rounded-full animate-spin"></div>
-                            </div>
+                          <div className="relative aspect-[2/3] overflow-hidden bg-gray-700">
+                            <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800"></div>
+                          </div>
+                          
+                          {/* Title Skeleton */}
+                          <div className="p-3">
+                            <div className="h-4 bg-gray-700 rounded mb-2"></div>
+                            <div className="h-3 bg-gray-700 rounded w-2/3"></div>
                           </div>
                         </div>
                       </div>
@@ -205,16 +209,20 @@ const TrendingSection = () => {
                       >
                         {/* Rank Badge Skeleton */}
                         <div className="absolute -top-2 -left-2 z-20 w-10 h-10 rounded-xl bg-gray-700 animate-pulse flex items-center justify-center shadow-2xl border-2 border-gray-600">
-                          <div className="w-3 h-3 bg-gray-600 rounded-full"></div>
+                          <div className="w-6 h-3 bg-gray-600 rounded"></div>
                         </div>
 
                         {/* Content Card Skeleton */}
-                        <div className="relative bg-gray-800 rounded-lg overflow-hidden shadow-2xl border border-gray-700/50">
+                        <div className="relative bg-gray-800 rounded-lg overflow-hidden shadow-2xl border border-gray-700/50 animate-pulse">
                           {/* Image Container Skeleton */}
-                          <div className="relative aspect-[2/3] overflow-hidden bg-gray-900">
-                            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                              <div className="w-6 h-6 border-2 border-[#BC8BBC] border-t-transparent rounded-full animate-spin"></div>
-                            </div>
+                          <div className="relative aspect-[2/3] overflow-hidden bg-gray-700">
+                            <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800"></div>
+                          </div>
+                          
+                          {/* Title Skeleton */}
+                          <div className="p-3">
+                            <div className="h-4 bg-gray-700 rounded mb-2"></div>
+                            <div className="h-3 bg-gray-700 rounded w-2/3"></div>
                           </div>
                         </div>
                       </div>
