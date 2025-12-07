@@ -336,12 +336,13 @@ const quickSessionLimitCheck = async (req, res) => {
          FROM user_session 
          WHERE user_id = ? 
            AND is_active = true 
+           AND session_mode IS NOT NULL  -- NEW: Only count sessions with mode selected
            AND last_activity > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 MINUTE)`,
         [userId]
       );
       
       const activeSessions = familySessionCount[0]?.active_count || 0;
-      const maxFamilySessions = 3; // Family members get more sessions
+      const maxFamilySessions = 3;
 
       if (activeSessions >= maxFamilySessions) {
         return res.status(429).json({
@@ -394,6 +395,7 @@ const quickSessionLimitCheck = async (req, res) => {
          FROM user_session 
          WHERE user_id = ? 
            AND is_active = true 
+           AND session_mode IS NOT NULL  -- NEW: Only count sessions with mode selected
            AND last_activity > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 MINUTE)`,
         [userId]
       );
@@ -434,6 +436,7 @@ const quickSessionLimitCheck = async (req, res) => {
       FROM user_session 
       WHERE user_id = ? 
         AND is_active = true 
+        AND session_mode IS NOT NULL  -- NEW: Only count sessions with mode selected
         AND last_activity > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 MINUTE)
     `;
 

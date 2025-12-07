@@ -7,11 +7,13 @@ import ForgotPasswordModal from "./ForgotPasswordModal";
 import Alert from "../../components/ui/Alert.jsx";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { useSubscription } from "../../context/SubscriptionContext";
 
 const PasswordStep = ({ email }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { loginUser, user: currentUser } = useAuth();
+  const { currentSubscription } = useSubscription();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -22,9 +24,14 @@ const PasswordStep = ({ email }) => {
   // ✅ Redirect immediately if already logged in
   useEffect(() => {
     if (currentUser) {
-      navigate("/", { replace: true });
+      // Check if user is a viewer without subscription
+      if (currentUser.role === "viewer" && !currentSubscription) {
+        navigate("/subscription", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, currentSubscription, navigate]);
 
   // ✅ Detect device and user info
   const getSessionInfo = () => {
@@ -66,8 +73,33 @@ const PasswordStep = ({ email }) => {
       const res = await api.get("/auth/me", { withCredentials: true });
       loginUser(res.data); // update context instantly
 
-      // ✅ Redirect to dashboard
-      navigate("/", { replace: true });
+      // ✅ Check subscription status immediately after login
+      try {
+        const subscriptionRes = await api.get("/subscriptions/user/current", {
+          withCredentials: true
+        });
+        
+        // Determine where to redirect based on user role and subscription
+        if (res.data.role === "viewer" && (!subscriptionRes.data.success || !subscriptionRes.data.data)) {
+          // Viewer without subscription → redirect to subscription page
+          window.location.href = "/subscription";
+        } else if (res.data.role === "admin") {
+          // Admin → redirect to admin dashboard
+          window.location.href = "/admin";
+        } else {
+          // Viewer with subscription or other users → redirect to home
+          window.location.href = "/";
+        }
+      } catch (subscriptionError) {
+        console.error("Subscription check failed:", subscriptionError);
+        // If subscription check fails, redirect based on user role
+        if (res.data.role === "admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/";
+        }
+      }
+      
     } catch (err) {
       console.error("❌ Login failed:", err);
       if (err.response?.data?.error) {

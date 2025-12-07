@@ -42,7 +42,7 @@ const SubscriptionPage = () => {
       ogDescription: "Unlimited streaming of Rwandan movies and global content. Plans from RWF 3,000/month."
     },
     rw: {
-      "title": "Amafatabuguzi ya Oliviuus - Hitamo ifatabuguzi ya Streaming",
+      "title": "Amafatabuguzi ya Oliviuus - Hitamo ifatabuguzi Ushaka",
       "description": "Reba ifatabuguzi za Oliviuus zitangira kuri RWF 3,000. Hitamo hagati ya Basic, Standard, Mobile, na Family. Ushobora guhagarika igihe icyo ari cyo cyose.",
       "keywords": "ifatabuguzi za Oliviuus, streaming Rwanda, serivisi za streaming mu Rwanda, streaming ihendutse Rwanda, alternative ya Netflix Rwanda",
       "ogTitle": "Hitamo ifatabuguzi ya Oliviuus",

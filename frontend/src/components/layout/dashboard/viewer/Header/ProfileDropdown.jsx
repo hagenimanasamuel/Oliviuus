@@ -106,7 +106,11 @@ const ProfileDropdown = ({ user, onLogout }) => {
             </button>
             
             <button 
-              onClick={onLogout}
+              onClick={() => {
+                onLogout();
+                // ✅ FULL PAGE RELOAD AFTER LOGOUT
+                window.location.reload();
+              }}
               className="flex items-center w-full px-4 py-3 text-sm text-[#BC8BBC] hover:bg-[#BC8BBC]/10 rounded-lg transition-colors"
             >
               <LogOut size={18} className="mr-3" />

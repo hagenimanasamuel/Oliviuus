@@ -1,7 +1,6 @@
 const { query } = require("../config/dbConfig");
-const jwt = require("jsonwebtoken");
 
-const createKidSession = async (req, res) => {
+const enterKidMode = async (req, res) => {
   try {
     const parentUserId = req.user.id;
     const { kid_profile_id } = req.body;
@@ -22,99 +21,37 @@ const createKidSession = async (req, res) => {
       return res.status(404).json({ error: "Kid profile not found or access denied" });
     }
 
-    const kidToken = jwt.sign(
-      {
-        id: parentUserId,
-        role: "viewer",
-        active_kid_profile: parseInt(kid_profile_id),
-        session_type: "kid"
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
-
+    // Update current session to kid mode
     await query(
-      `INSERT INTO kids_sessions 
-       (kid_profile_id, parent_user_id, session_token, expires_at)
-       VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR))`,
-      [kid_profile_id, parentUserId, kidToken]
+      `UPDATE user_session 
+       SET session_mode = 'kid', active_kid_profile_id = ?, updated_at = NOW()
+       WHERE user_id = ? AND is_active = TRUE`,
+      [kid_profile_id, parentUserId]
     );
-
-    await query(
-      "UPDATE kids_profiles SET last_active_at = NOW() WHERE id = ?",
-      [kid_profile_id]
-    );
-
-    res.cookie("token", kidToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
 
     res.json({
       success: true,
-      message: "Kid session started successfully",
+      message: "Kid mode activated",
       kid_profile: kidProfile[0]
-      // Removed redirect_to: "/kid-dashboard"
     });
 
   } catch (error) {
-    console.error("Error creating kid session:", error);
-    res.status(500).json({ error: "Failed to create kid session" });
+    console.error("Error entering kid mode:", error);
+    res.status(500).json({ error: "Failed to enter kid mode" });
   }
 };
 
-const exitKidSession = async (req, res) => {
+const exitKidMode = async (req, res) => {
   try {
     const parentUserId = req.user.id;
-    const currentToken = req.cookies?.token;
 
-    if (!currentToken) {
-      return res.status(400).json({ error: "No active session" });
-    }
-
-    let decoded;
-    try {
-      decoded = jwt.verify(currentToken, process.env.JWT_SECRET);
-    } catch (jwtError) {
-      return res.status(401).json({ error: "Invalid session token" });
-    }
-
-    if (!decoded.active_kid_profile) {
-      return res.status(400).json({ error: "Not in kid mode" });
-    }
-
+    // Update current session back to parent mode
     await query(
-      `UPDATE kids_sessions 
-       SET is_active = FALSE, logout_time = NOW() 
-       WHERE session_token = ? AND parent_user_id = ?`,
-      [currentToken, parentUserId]
+      `UPDATE user_session 
+       SET session_mode = 'parent', active_kid_profile_id = NULL, updated_at = NOW()
+       WHERE user_id = ? AND is_active = TRUE`,
+      [parentUserId]
     );
-
-    const parentToken = jwt.sign(
-      { id: parentUserId, role: "viewer" },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    await query(
-      `INSERT INTO user_session 
-       (user_id, session_token, is_active, token_expires)
-       VALUES (?, ?, TRUE, DATE_ADD(NOW(), INTERVAL 7 DAY))
-       ON DUPLICATE KEY UPDATE
-       session_token = VALUES(session_token),
-       token_expires = VALUES(token_expires),
-       is_active = VALUES(is_active)`,
-      [parentUserId, parentToken]
-    );
-
-    res.cookie("token", parentToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
 
     res.json({
       success: true,
@@ -122,73 +59,129 @@ const exitKidSession = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error exiting kid session:", error);
-    res.status(500).json({ error: "Failed to exit kid session" });
+    console.error("Error exiting kid mode:", error);
+    res.status(500).json({ error: "Failed to exit kid mode" });
   }
 };
 
-const getCurrentKidSession = async (req, res) => {
+const getCurrentSessionMode = async (req, res) => {
   try {
-    const parentUserId = req.user.id;
+    const userId = req.user.id;
     const currentToken = req.cookies?.token;
 
-    if (!currentToken) {
-      return res.json({ is_kid_mode: false });
+    // DEBUG: Log properly
+    console.log('getCurrentSessionMode called for user ID:', userId, {
+      is_family_member: req.user.is_family_member,
+      dashboard_type: req.user.dashboard_type,
+      member_role: req.user.member_role
+    });
+
+    // Check if user is an INVITED family member with kid dashboard
+    if (req.user.is_family_member && 
+        req.user.member_role !== 'owner' && 
+        req.user.dashboard_type === 'kid') {
+      
+      console.log('✅ Processing invited family member with kid dashboard for user:', userId);
+      
+      return res.status(200).json({
+        session_mode: 'kid',
+        active_kid_profile: {
+          id: userId,
+          name: req.user.email?.split('@')[0] || 'Kid',
+          is_family_member: true,
+          family_owner_id: req.user.family_owner_id,
+          member_role: req.user.member_role,
+          dashboard_type: 'kid',
+          max_age_rating: '7+'
+        }
+      });
     }
 
-    let decoded;
-    try {
-      decoded = jwt.verify(currentToken, process.env.JWT_SECRET);
-    } catch (jwtError) {
-      return res.json({ is_kid_mode: false });
+    // Family plan OWNERS and regular users check their session
+    const session = await query(`
+      SELECT 
+        us.session_mode,
+        us.active_kid_profile_id,
+        kp.name as kid_profile_name,
+        kp.avatar_url as kid_avatar,
+        kcr.max_age_rating
+      FROM user_session us
+      LEFT JOIN kids_profiles kp ON us.active_kid_profile_id = kp.id
+      LEFT JOIN kids_content_restrictions kcr ON kp.id = kcr.kid_profile_id
+      WHERE us.user_id = ? AND us.is_active = TRUE
+      ORDER BY us.created_at DESC
+      LIMIT 1
+    `, [userId]);
+
+    if (session.length === 0) {
+      console.log('❌ No active session found for user:', userId);
+      return res.status(200).json({ 
+        session_mode: null,
+        active_kid_profile: null 
+      });
     }
 
-    if (!decoded.active_kid_profile) {
-      return res.json({ is_kid_mode: false });
-    }
+    console.log('✅ Session found for user:', userId, {
+      session_mode: session[0].session_mode,
+      has_kid_profile: !!session[0].active_kid_profile_id
+    });
 
-    const kidSession = await query(
-      `SELECT ks.*, kp.name, kp.avatar_url, kcr.max_age_rating
-       FROM kids_sessions ks
-       JOIN kids_profiles kp ON ks.kid_profile_id = kp.id
-       LEFT JOIN kids_content_restrictions kcr ON kp.id = kcr.kid_profile_id
-       WHERE ks.session_token = ? 
-       AND ks.parent_user_id = ? 
-       AND ks.is_active = TRUE
-       AND ks.expires_at > NOW()`,
-      [currentToken, parentUserId]
-    );
-
-    if (kidSession.length === 0) {
-      return res.json({ is_kid_mode: false });
-    }
-
-    res.json({
-      is_kid_mode: true,
-      kid_session: kidSession[0]
+    return res.status(200).json({
+      session_mode: session[0].session_mode,
+      active_kid_profile: session[0].active_kid_profile_id ? {
+        id: session[0].active_kid_profile_id,
+        name: session[0].kid_profile_name,
+        avatar: session[0].kid_avatar,
+        max_age_rating: session[0].max_age_rating
+      } : null
     });
 
   } catch (error) {
-    console.error("Error getting kid session:", error);
-    res.json({ is_kid_mode: false });
+    console.error("Error getting session mode:", error);
+    return res.status(200).json({ 
+      session_mode: null,
+      active_kid_profile: null 
+    });
   }
 };
 
 const checkProfileSelection = async (req, res) => {
   try {
     const userId = req.user.id;
+    const currentToken = req.cookies?.token;
 
-    const kidProfiles = await query(
-      `SELECT COUNT(*) as kid_count FROM kids_profiles 
-       WHERE parent_user_id = ? AND is_active = TRUE`,
-      [userId]
-    );
+    // Family members with kid dashboard don't need profile selection
+    if (req.user.is_family_member && req.user.dashboard_type === 'kid') {
+      return res.json({ requires_profile_selection: false });
+    }
 
-    const requiresSelection = kidProfiles[0].kid_count > 0;
+    // Get current session mode
+    const session = await query(`
+      SELECT session_mode 
+      FROM user_session 
+      WHERE session_token = ? AND user_id = ? AND is_active = TRUE
+    `, [currentToken, userId]);
+
+    if (session.length === 0) {
+      return res.json({ requires_profile_selection: false });
+    }
+
+    // Check if user has family plan
+    const planCheck = await query(`
+      SELECT s.type as plan_type
+      FROM users u
+      LEFT JOIN user_subscriptions usub ON u.id = usub.user_id 
+        AND usub.status = 'active'
+      LEFT JOIN subscriptions s ON usub.subscription_id = s.id
+      WHERE u.id = ?
+    `, [userId]);
+
+    const requiresProfileSelection = 
+      planCheck[0]?.plan_type === 'family' && 
+      session[0].session_mode === null;
 
     res.json({
-      success: true,
-      requires_profile_selection: requiresSelection
+      requires_profile_selection: requiresProfileSelection
     });
 
   } catch (error) {
@@ -198,8 +191,8 @@ const checkProfileSelection = async (req, res) => {
 };
 
 module.exports = {
-  createKidSession,
-  exitKidSession,
-  getCurrentKidSession,
+  enterKidMode,  
+  exitKidMode,  
+  getCurrentSessionMode,
   checkProfileSelection
 };

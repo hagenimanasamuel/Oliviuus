@@ -1,21 +1,37 @@
 const { query } = require("../config/dbConfig");
-const jwt = require("jsonwebtoken");
 
 const checkProfileSelection = async (req, res) => {
   try {
     const userId = req.user.id;
+    const currentToken = req.cookies?.token;
 
-    const kidProfiles = await query(
-      `SELECT COUNT(*) as kid_count FROM kids_profiles 
-       WHERE parent_user_id = ? AND is_active = TRUE`,
-      [userId]
-    );
+    // Get current session mode
+    const session = await query(`
+      SELECT session_mode 
+      FROM user_session 
+      WHERE session_token = ? AND user_id = ? AND is_active = TRUE
+    `, [currentToken, userId]);
 
-    const requiresSelection = kidProfiles[0].kid_count > 0;
+    if (session.length === 0) {
+      return res.json({ requires_profile_selection: false });
+    }
+
+    // Check if user has family plan
+    const planCheck = await query(`
+      SELECT s.type as plan_type
+      FROM users u
+      LEFT JOIN user_subscriptions usub ON u.id = usub.user_id 
+        AND usub.status = 'active'
+      LEFT JOIN subscriptions s ON usub.subscription_id = s.id
+      WHERE u.id = ?
+    `, [userId]);
+
+    const requiresProfileSelection = 
+      planCheck[0]?.plan_type === 'family' && 
+      session[0].session_mode === null;
 
     res.json({
-      success: true,
-      requires_profile_selection: requiresSelection
+      requires_profile_selection: requiresProfileSelection
     });
 
   } catch (error) {
@@ -69,8 +85,7 @@ const getAvailableProfiles = async (req, res) => {
 
     res.json({
       success: true,
-      profiles: profiles,
-      requires_profile_selection: kidProfiles.length > 0
+      profiles: profiles
     });
 
   } catch (error) {
@@ -79,65 +94,7 @@ const getAvailableProfiles = async (req, res) => {
   }
 };
 
-const switchToAdultMode = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const currentToken = req.cookies?.token;
-
-    if (!currentToken) {
-      return res.status(400).json({ error: "No active session" });
-    }
-
-    const adultToken = jwt.sign(
-      {
-        id: userId,
-        role: "viewer"
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    await query(
-      `INSERT INTO user_session 
-       (user_id, session_token, is_active, token_expires)
-       VALUES (?, ?, TRUE, DATE_ADD(NOW(), INTERVAL 7 DAY))
-       ON DUPLICATE KEY UPDATE
-       session_token = VALUES(session_token),
-       token_expires = VALUES(token_expires),
-       is_active = VALUES(is_active)`,
-      [userId, adultToken]
-    );
-
-    if (req.user.active_kid_profile) {
-      await query(
-        `UPDATE kids_sessions 
-         SET is_active = FALSE, logout_time = NOW() 
-         WHERE parent_user_id = ? AND is_active = TRUE`,
-        [userId]
-      );
-    }
-
-    res.cookie("token", adultToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.json({
-      success: true,
-      message: "Switched to adult mode successfully",
-      session_type: "adult"
-    });
-
-  } catch (error) {
-    console.error("Error switching to adult mode:", error);
-    res.status(500).json({ error: "Failed to switch to adult mode" });
-  }
-};
-
 module.exports = {
   checkProfileSelection,
-  getAvailableProfiles,
-  switchToAdultMode
+  getAvailableProfiles
 };

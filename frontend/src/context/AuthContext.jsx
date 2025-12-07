@@ -1,4 +1,3 @@
-// context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "../api/axios";
 import i18n from "../i18n/i18n";
@@ -6,7 +5,6 @@ import i18n from "../i18n/i18n";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Authentication and user state management
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState(
@@ -15,31 +13,20 @@ export const AuthProvider = ({ children }) => {
   const [kidProfile, setKidProfile] = useState(null);
   const [showProfileSelector, setShowProfileSelector] = useState(false);
   const [availableKidProfiles, setAvailableKidProfiles] = useState([]);
-  const [tokenVersion, setTokenVersion] = useState(0);
   const [familyMemberData, setFamilyMemberData] = useState(null);
-
-  // Use localStorage to persist profile selection state across page reloads
   const [hasMadeProfileSelection, setHasMadeProfileSelection] = useState(
     () => localStorage.getItem('hasMadeProfileSelection') === 'true'
   );
 
-  /**
-   * Applies language preferences from user data or falls back to stored preference
-   */
   const applyLanguage = (userData) => {
     const lang = userData?.preferences?.language || currentLanguage;
     i18n.changeLanguage(lang);
     setCurrentLanguage(lang);
-
-    // Store language preference for non-authenticated users
     if (!userData) {
       localStorage.setItem("lang", lang);
     }
   };
 
-  /**
-   * Updates the profile selection state in both React state and localStorage
-   */
   const setProfileSelectionMade = (value) => {
     setHasMadeProfileSelection(value);
     if (value) {
@@ -49,9 +36,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Fetches current user data from the server
-   */
   const fetchUser = async () => {
     try {
       const res = await axios.get("/auth/me", {
@@ -85,9 +69,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Check if user is a family member and get family data
-   */
   const checkFamilyMembership = async (userId) => {
     try {
       const response = await axios.get(`/family/members/check/${userId}`, {
@@ -102,15 +83,11 @@ export const AuthProvider = ({ children }) => {
         return null;
       }
     } catch (error) {
-      console.error("Error checking family membership:", error);
       setFamilyMemberData(null);
       return null;
     }
   };
 
-  /**
-   * Retrieves and filters available profiles for selection
-   */
   const getAvailableProfiles = async () => {
     try {
       const profilesRes = await axios.get("/profile/profiles/available", {
@@ -119,12 +96,8 @@ export const AuthProvider = ({ children }) => {
 
       if (profilesRes.data.success) {
         const profiles = profilesRes.data.profiles || [];
-
-        // Find main account profile and kid profiles
         const mainAccount = profiles.find(p => p.type === 'adult' || p.type === 'main');
         const kidProfiles = profiles.filter(p => p.type === 'kid');
-
-        // Create clean array with only one main account
         const cleanProfiles = [];
 
         if (mainAccount) {
@@ -137,7 +110,6 @@ export const AuthProvider = ({ children }) => {
           });
         }
 
-        // Add formatted kid profiles
         const formattedKidProfiles = kidProfiles.map(kid => ({
           ...kid,
           display_name: kid.name,
@@ -145,144 +117,112 @@ export const AuthProvider = ({ children }) => {
         }));
 
         cleanProfiles.push(...formattedKidProfiles);
-
         setAvailableKidProfiles(cleanProfiles);
         return cleanProfiles;
       }
       return [];
     } catch (error) {
-      console.error("Error loading profiles:", error);
       return [];
     }
   };
 
-  /**
-   * Checks current kid session status and updates state accordingly
-   */
-  const checkKidSession = async () => {
+  const checkSessionMode = async () => {
     try {
-      // 🆕 Skip kid session check for family members with kid dashboard
-      if (familyMemberData && familyMemberData.dashboard_type === 'kid') {
-        console.log('🎯 Family member with kid dashboard - skipping kid session check');
-        return { isKidMode: true, kidProfile: null };
-      }
-
-      const res = await axios.get("/kids/session/current", {
+      console.log('🔄 Checking session mode...');
+      const res = await axios.get("/kids/current", {
         withCredentials: true
       });
 
-      if (res.data.is_kid_mode && res.data.kid_session) {
-        setKidProfile(res.data.kid_session);
+      console.log('📡 Session mode response:', res.data);
+
+      // Handle family members with kid dashboard
+      if (res.data && res.data.active_kid_profile?.is_family_member) {
+        console.log('✅ Family member with kid dashboard detected');
+        setKidProfile(res.data.active_kid_profile);
         setShowProfileSelector(false);
         setProfileSelectionMade(true);
-        return { isKidMode: true, kidProfile: res.data.kid_session };
+        return { isKidMode: true, kidProfile: res.data.active_kid_profile };
+      }
+
+      // Regular kid mode check
+      if (res.data && res.data.session_mode === 'kid' && res.data.active_kid_profile) {
+        console.log('✅ Regular kid mode detected');
+        setKidProfile(res.data.active_kid_profile);
+        setShowProfileSelector(false);
+        setProfileSelectionMade(true);
+        return { isKidMode: true, kidProfile: res.data.active_kid_profile };
       } else {
+        console.log('✅ Parent/normal mode detected');
         setKidProfile(null);
         return { isKidMode: false, kidProfile: null };
       }
     } catch (error) {
-      // 🆕 Handle 403 errors gracefully - they're expected for non-kid users
-      if (error.response?.status === 403) {
-        console.log('🔒 User not in kid mode - 403 is expected');
-        setKidProfile(null);
-        return { isKidMode: false, kidProfile: null };
-      }
-
-      // 🆕 Handle 401 errors - user not authenticated for kid endpoints
-      if (error.response?.status === 401) {
-        console.log('🔒 User not authorized for kid endpoints');
-        setKidProfile(null);
-        return { isKidMode: false, kidProfile: null };
-      }
-
-      console.error("Error checking kid session:", error);
+      console.error("❌ Session mode check error:", error);
       setKidProfile(null);
       return { isKidMode: false, kidProfile: null };
     }
   };
 
-  /**
-   * Checks if user requires profile selection
-   */
   const checkProfileSelectionRequired = async () => {
     try {
-      const selectionRes = await axios.get("/profile/check-selection", {
+      const selectionRes = await axios.get("/kids/check-selection", {
         withCredentials: true
       });
-
-      return selectionRes.data.success && selectionRes.data.requires_profile_selection;
+      return selectionRes.data.requires_profile_selection;
     } catch (error) {
-      console.error("Error checking profile selection:", error);
       return false;
     }
   };
 
-  /**
-   * Determines dashboard type based on user role and family membership
-   */
-  const determineDashboardType = (userData, familyData, kidSession) => {
-    // If in kid mode, always use kid dashboard
-    if (kidSession) return 'kid';
-
+  const determineDashboardType = (userData, familyData, sessionInfo) => {
     // If family member with kid dashboard type
     if (familyData && familyData.dashboard_type === 'kid') {
       return 'kid';
     }
+    
+    // If in kid mode via session
+    if (sessionInfo.isKidMode) return 'kid';
 
     // Regular user dashboard types
     if (userData.role === 'admin') return 'admin';
-    if (userData.role === 'viewer') return 'viewer';
-
-    return 'viewer'; // default
+    return 'viewer';
   };
 
-  /**
-   * Loads complete user data including profile information
-   */
   const loadUserData = async () => {
     try {
       setLoading(true);
-
-      // Fetch basic user authentication data
       const userData = await fetchUser();
 
       if (userData) {
-        // Check family membership
         const familyData = await checkFamilyMembership(userData.id);
+        const sessionInfo = await checkSessionMode();
+        
+        // IMPORTANT: If family member with kid dashboard, create kid profile
+        if (familyData && familyData.dashboard_type === 'kid' && !sessionInfo.kidProfile) {
+          const simulatedKidProfile = {
+            is_family_member: true,
+            family_owner_id: familyData.family_owner_id,
+            member_role: familyData.member_role,
+            dashboard_type: 'kid',
+            name: userData.email.split('@')[0] || 'Kid',
+            max_age_rating: '7+',
+            id: userData.id
+          };
+          setKidProfile(simulatedKidProfile);
+          setShowProfileSelector(false);
+          setProfileSelectionMade(true);
+          
+          // Update sessionInfo for dashboard type determination
+          sessionInfo.isKidMode = true;
+          sessionInfo.kidProfile = simulatedKidProfile;
+        }
+        
+        const dashboardType = determineDashboardType(userData, familyData, sessionInfo);
 
-        // Check current kid session status
-        const sessionInfo = await checkKidSession();
-
-        // Determine dashboard type
-        const dashboardType = determineDashboardType(userData, familyData, sessionInfo.kidProfile);
-
-        console.log("Dashboard type determined:", {
-          userId: userData.id,
-          role: userData.role,
-          familyData: !!familyData,
-          dashboardType: dashboardType,
-          isKidMode: sessionInfo.isKidMode
-        });
-
-        // If user should be in kid dashboard (either via kid mode or family member with kid dashboard)
         if (dashboardType === 'kid') {
           setShowProfileSelector(false);
           setProfileSelectionMade(true);
-
-          // If family member with kid dashboard but no active kid session, simulate kid profile
-          if (familyData && familyData.dashboard_type === 'kid' && !sessionInfo.isKidMode) {
-            setKidProfile({
-              is_family_member: true,
-              family_owner_id: familyData.family_owner_id,
-              member_role: familyData.member_role,
-              dashboard_type: 'kid',
-              kid_profile_id: `family_${userData.id}`,
-              name: userData.email.split('@')[0],
-              max_age_rating: '7+'
-            });
-          }
         } else {
-          // For viewers, check if they need to select a profile
           if (userData.role === 'viewer' && !hasMadeProfileSelection) {
             const requiresSelection = await checkProfileSelectionRequired();
             const profiles = await getAvailableProfiles();
@@ -300,7 +240,6 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } else {
-        // Clear all state for non-authenticated users
         setUser(null);
         setKidProfile(null);
         setFamilyMemberData(null);
@@ -323,20 +262,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Enters kid mode by creating a kid session
-   */
   const enterKidMode = async (kidProfileId) => {
     try {
-      const res = await axios.post("/kids/session", {
+      const res = await axios.post("/kids/enter", {
         kid_profile_id: kidProfileId
       }, { withCredentials: true });
 
       if (res.data.success) {
-        setTokenVersion(prev => prev + 1);
-        setKidProfile(res.data.kid_profile);
-        setShowProfileSelector(false);
-        setProfileSelectionMade(true);
+        await loadUserData();
         return true;
       }
       return false;
@@ -346,19 +279,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Exits kid mode and returns to main account
-   */
   const exitKidMode = async () => {
     try {
-      const res = await axios.post("/kids/session/exit", {}, {
+      const res = await axios.post("/kids/exit", {}, {
         withCredentials: true
       });
 
       if (res.data.success) {
-        setTokenVersion(prev => prev + 1);
-        setKidProfile(null);
-        setShowProfileSelector(false);
         await loadUserData();
         return true;
       }
@@ -369,58 +296,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Switches to main account mode (adult profile)
-   */
-  const selectMainAccount = async () => {
-    try {
-      if (kidProfile) {
-        await exitKidMode();
-      }
-
-      const res = await axios.post("/profile/switch-to-adult", {}, {
-        withCredentials: true
-      });
-
-      if (res.data.success) {
-        setTokenVersion(prev => prev + 1);
-        setKidProfile(null);
-        setShowProfileSelector(false);
-        setProfileSelectionMade(true);
-
-        await loadUserData();
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Error selecting main account:", error);
-      return false;
-    }
-  };
-
-  /**
-   * Handles profile selection for both main account and kid profiles
-   */
   const handleProfileSelection = async (profile) => {
     setShowProfileSelector(false);
     setProfileSelectionMade(true);
 
     if (profile.type === 'main') {
       window.location.href = "/";
-
-      selectMainAccount().then(success => {
-        if (!success) {
-          window.location.reload();
-        }
-      });
     } else {
       await enterKidMode(profile.id);
     }
   };
 
-  /**
-   * Manually shows the profile selection modal
-   */
   const showProfileSelection = async () => {
     try {
       const profiles = await getAvailableProfiles();
@@ -432,41 +318,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Hides the profile selection modal
-   */
   const hideProfileSelection = () => {
     setShowProfileSelector(false);
   };
 
-  /**
-   * Forces a refresh of authentication data
-   */
-  const forceRefresh = () => {
-    setTokenVersion(prev => prev + 1);
-  };
-
-  /**
-   * Handles user login and initializes profile selection if needed
-   */
   const loginUser = async (userData) => {
     setUser(userData);
     applyLanguage(userData);
-
-    // Reset session state on new login
     setKidProfile(null);
     setFamilyMemberData(null);
     setShowProfileSelector(false);
     setAvailableKidProfiles([]);
     setProfileSelectionMade(false);
 
-    // Check for profile selection requirement
     try {
-      const selectionRes = await axios.get("/profile/check-selection", {
+      const selectionRes = await axios.get("/kids/check-selection", {
         withCredentials: true
       });
 
-      if (selectionRes.data.success && selectionRes.data.requires_profile_selection) {
+      if (selectionRes.data.requires_profile_selection) {
         const profiles = await getAvailableProfiles();
         if (profiles.length > 0) {
           setAvailableKidProfiles(profiles);
@@ -474,22 +344,15 @@ export const AuthProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error("Error checking profile selection:", error);
       setShowProfileSelector(false);
     }
-
-    setTokenVersion(prev => prev + 1);
   };
 
-  /**
-   * Handles user logout with proper session cleanup
-   */
   const logoutUser = async () => {
     try {
       if (kidProfile) {
         await exitKidMode();
       }
-
       await axios.post("/auth/logout", {}, { withCredentials: true });
     } catch (error) {
       console.error("Logout error:", error);
@@ -501,33 +364,25 @@ export const AuthProvider = ({ children }) => {
       setAvailableKidProfiles([]);
       setProfileSelectionMade(false);
       applyLanguage(null);
-      setTokenVersion(prev => prev + 1);
     }
   };
 
-  /**
-   * Changes application language
-   */
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
     setCurrentLanguage(lang);
-
     if (!user) {
       localStorage.setItem("lang", lang);
     }
   };
 
-  // Initialize authentication data on component mount
   useEffect(() => {
     loadUserData();
-  }, [tokenVersion]);
+  }, []);
 
-  // Determine if user is in kid mode (either via kid session or family member with kid dashboard)
+  // Combined kid mode check - includes family members with kid dashboard
   const isKidMode = !!kidProfile || (familyMemberData && familyMemberData.dashboard_type === 'kid');
 
-  // Context value providing authentication state and methods
   const contextValue = {
-    // User authentication state
     user,
     loading,
     loginUser,
@@ -535,9 +390,6 @@ export const AuthProvider = ({ children }) => {
     currentLanguage,
     changeLanguage,
     refreshUser: loadUserData,
-    forceRefresh,
-
-    // Kid session management
     kidProfile,
     isKidMode,
     showProfileSelector,
@@ -546,11 +398,7 @@ export const AuthProvider = ({ children }) => {
     exitKidMode,
     showProfileSelection,
     hideProfileSelection,
-
-    // Family member data
     familyMemberData,
-
-    // Profile selection
     selectProfile: handleProfileSelection
   };
 

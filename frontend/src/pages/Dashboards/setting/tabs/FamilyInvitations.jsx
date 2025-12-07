@@ -62,13 +62,19 @@ export default function FamilyInvitations({ user, onInvitationUpdate }) {
         await api.post('/family/invitations/accept', {
           token: invitations.find(inv => inv.id === invitationId)?.invitation_token
         });
+        
+        // ✅ SHOW SUCCESS MESSAGE BEFORE RELOAD
+        console.log(`Invitation ${action}ed successfully!`);
+        
       } else if (action === 'reject') {
         await api.post('/family/invitations/reject', { invitation_id: invitationId });
+        
+        // ✅ SHOW SUCCESS MESSAGE BEFORE RELOAD
+        console.log(`Invitation ${action}ed successfully!`);
       }
 
-      // Refresh data
-      await loadFamilyData();
-      onInvitationUpdate?.();
+      // ✅ FULL PAGE RELOAD
+      window.location.reload();
 
     } catch (error) {
       console.error(`Error ${action}ing invitation:`, error);
@@ -89,9 +95,11 @@ export default function FamilyInvitations({ user, onInvitationUpdate }) {
 
       await api.post('/family/leave');
 
-      // Refresh data
-      await loadFamilyData();
-      onInvitationUpdate?.();
+      // ✅ SHOW SUCCESS MESSAGE BEFORE RELOAD
+      console.log("Successfully left family!");
+      
+      // ✅ FULL PAGE RELOAD
+      window.location.reload();
 
     } catch (error) {
       console.error("Error leaving family:", error);

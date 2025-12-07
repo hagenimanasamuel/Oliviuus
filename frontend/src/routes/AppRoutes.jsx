@@ -2,6 +2,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSubscription } from "../context/SubscriptionContext";
+import { useState, useEffect } from "react";
 import NotFound from "../pages/NotFound";
 import AuthForm from "../pages/auth/AuthForm";
 import ResetPassword from "../pages/auth/ResetPassword";
@@ -30,6 +31,9 @@ import DownloadPage from "../pages/Dashboards/viewer/DownloadPage";
 import ProfilePage from "../pages/Dashboards/viewer/ProfilePage";
 import ContentDetailPage from "../pages/Dashboards/viewer/ContentDetailPage.jsx";
 
+// Kid Dashboard modules (new routes)
+import KidLearningPage from "../pages/Dashboards/viewer/kid/KidLearningPage";
+
 // Sample subscription
 import PaymentPage from "../pages/subscription/PaymentPage.jsx";
 import SecurityGridSystem from "../pages/subscription/SecurityGridSystem.jsx";
@@ -43,25 +47,71 @@ import BrowsePage from "../pages/Dashboards/viewer/BrowsePage.jsx";
 import OliviuusInvestorPitch from "../pages/subscription/OliviuusPpt.jsx";
 import UmukinoWoKwiruka from "../pages/subscription/SimpleGame.jsx";
 import WatchHistoryPage from "../pages/Dashboards/viewer/WatchHistoryPage.jsx";
+import KidDashboard from "../pages/Dashboards/viewer/kid/KidDashboard.jsx";
+import KidFavoritesPage from "../pages/Dashboards/viewer/kid/KidFavoritesPage.jsx";
+import KidSongsMusicPage from "../pages/Dashboards/viewer/kid/KidSongsMusicPage.jsx";
+import KidGamesPage from "../pages/Dashboards/viewer/kid/KidGamesPage.jsx";
+import TermsOfService from "../pages/landing/Legal&Help/TermsOfService.jsx";
+import PrivacyPolicy from "../pages/landing/Legal&Help/PrivacyPolicy.jsx";
+import HelpCenter from "../pages/landing/Legal&Help/HelpCenter.jsx";
+import FeedbackPage from "../pages/landing/Legal&Help/FeedbackPage.jsx";
 
 export default function AppRoutes() {
-  const { user, loading, isKidMode } = useAuth();
-  const { currentSubscription } = useSubscription();
+  const { user, loading: authLoading, isKidMode } = useAuth();
+  const { currentSubscription, loading: subLoading } = useSubscription();
+  
+  const [showContent, setShowContent] = useState(false);
+  const [cachedContent, setCachedContent] = useState(null);
 
-  // Ultra-fast minimal loading component
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-black">
-        <div className="flex space-x-2">
-          <div className="w-2 h-2 bg-[#BC8BBC] rounded-full animate-pulse"></div>
-          <div className="w-2 h-2 bg-[#BC8BBC] rounded-full animate-pulse" style={{animationDelay: '0.1s'}}></div>
-          <div className="w-2 h-2 bg-[#BC8BBC] rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-        </div>
-      </div>
-    );
-  }
+  // INSTANT RENDER: Show content immediately, don't wait for auth
+  useEffect(() => {
+    // Immediate render - don't wait
+    setShowContent(true);
+    
+    // Only show minimal loader if it's taking too long
+    const timeout = setTimeout(() => {
+      // If still loading after 100ms, we'll show something
+      // but this rarely happens with instant rendering
+    }, 100);
 
-  // Simple helper to protect admin routes
+    return () => clearTimeout(timeout);
+  }, []);
+
+  // Cache the root element to prevent re-renders
+  useEffect(() => {
+    const getRootElement = () => {
+      if (!user) {
+        return <LandingPage />;
+      }
+      
+      // Admin users go to dashboard
+      if (user.role === "admin") {
+        return <Dashboard />;
+      }
+      
+      // Viewer users in kid mode go to dashboard
+      if (isKidMode) {
+        return <Dashboard />;
+      }
+      
+      // Viewer users WITHOUT subscription can access landing page
+      if (user.role === "viewer" && !currentSubscription) {
+        return <LandingPage />;
+      }
+      
+      // Viewer users WITH subscription go to dashboard
+      if (user.role === "viewer" && currentSubscription) {
+        return <Dashboard />;
+      }
+      
+      // Fallback to landing page
+      return <LandingPage />;
+    };
+
+    setCachedContent(getRootElement());
+  }, [user, currentSubscription, isKidMode]);
+
+  // SIMPLE HELPERS - Don't wait for loading
   const AdminRoute = ({ element }) => (
     <ProtectedRoute allowedRoles={["admin"]}>
       <KidProtectedRoute>
@@ -70,7 +120,6 @@ export default function AppRoutes() {
     </ProtectedRoute>
   );
 
-  // Simple helper to protect viewer routes with kid protection
   const ViewerRoute = ({ element }) => (
     <ProtectedRoute allowedRoles={["viewer"]}>
       <KidProtectedRoute>
@@ -79,7 +128,6 @@ export default function AppRoutes() {
     </ProtectedRoute>
   );
 
-  // Special route for watch page that needs both protections
   const ProtectedWatchRoute = ({ element }) => (
     <ProtectedRoute allowedRoles={["viewer"]}>
       <KidProtectedRoute>
@@ -88,44 +136,51 @@ export default function AppRoutes() {
     </ProtectedRoute>
   );
 
-  // Determine root route based on user status and subscription
-  const getRootElement = () => {
-    if (!user) {
-      return <LandingPage />;
-    }
-    
-    // Admin users go directly to admin dashboard
-    if (user.role === "admin") {
-      return <Navigate to="/admin" replace />;
-    }
-    
-    // Viewer users without subscription can access landing page
-    if (user.role === "viewer" && !currentSubscription) {
-      return <LandingPage />;
-    }
-    
-    // Viewer users with subscription go to dashboard
-    if (user.role === "viewer" && currentSubscription) {
-      return <Dashboard />;
-    }
-    
-    // Fallback
-    return <LandingPage />;
-  };
+  // Add Kid Route helper 
+  const KidRoute = ({ element }) => (
+    <ProtectedRoute allowedRoles={["viewer"]}>
+      <KidProtectedRoute requireKidMode={true}>
+        <KidDashboard bodyContent={element} />
+      </KidProtectedRoute>
+    </ProtectedRoute>
+  );
 
+  // INSTANT RENDER: Show content immediately, even if auth is still checking
+  // This is the Netflix approach - show UI instantly, update auth state in background
+  if (!showContent) {
+    // Only show blank screen for the first render (extremely brief)
+    return null;
+  }
+
+  // If auth is still loading but we have cached content, show it
+  // This prevents blocking the UI
+  const shouldShowLoading = authLoading && !cachedContent;
+
+  if (shouldShowLoading) {
+    // Minimal, non-blocking loader that doesn't delay content
+    return (
+      <div className="fixed inset-0 bg-black z-50">
+        <div className="absolute inset-0 opacity-0">
+          {/* This is invisible but keeps the layout */}
+        </div>
+      </div>
+    );
+  }
+
+  // Show routes immediately - auth checks happen in background
   return (
     <Routes>
-      {/* Root route - Now allows logged-in users without subscription to see landing page */}
+      {/* Root route - Show cached content immediately */}
       <Route 
         path="/" 
         element={
           <KidProtectedRoute>
-            {getRootElement()}
+            {cachedContent || <div className="h-screen bg-black" />}
           </KidProtectedRoute>
         } 
       />
 
-      {/* Auth route */}
+      {/* Auth route - Immediate render */}
       <Route
         path="/auth"
         element={
@@ -135,7 +190,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Password reset */}
+      {/* Password reset - Immediate render */}
       <Route
         path="/reset-password"
         element={
@@ -145,7 +200,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Subscription route - Forbidden in kid mode */}
+      {/* Subscription route - Render immediately */}
       <Route
         path="/subscription"
         element={
@@ -163,7 +218,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Payment route - Forbidden in kid mode */}
+      {/* Payment route - Render immediately */}
       <Route
         path="/payment"
         element={
@@ -179,7 +234,8 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Account settings route - Forbidden in kid mode */}
+
+      {/* Account settings - Render immediately */}
       <Route
         path="/account/settings"
         element={
@@ -191,7 +247,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Admin routes - Forbidden in kid mode */}
+      {/* Admin routes - Render immediately */}
       <Route path="/admin" element={<AdminRoute element={<Overview />} />} />
       <Route path="/admin/overview" element={<AdminRoute element={<Overview />} />} />
       <Route path="/admin/users" element={<AdminRoute element={<Users />} />} />
@@ -201,7 +257,7 @@ export default function AppRoutes() {
       <Route path="/admin/global-management" element={<AdminRoute element={<GlobalManagement />} />} />
       <Route path="/admin/support" element={<AdminRoute element={<Support />} />} />
 
-      {/* Viewer Dashboard Routes - Allowed in kid mode */}
+      {/* Viewer Dashboard Routes - Render immediately */}
       <Route path="/library" element={<ViewerRoute element={<MyLibrary />} />} />
       <Route path="/downloads" element={<ViewerRoute element={<DownloadPage />} />} />
       <Route path="/history" element={<ViewerRoute element={<WatchHistoryPage />} />} />
@@ -212,8 +268,20 @@ export default function AppRoutes() {
       <Route path="/browse" element={<ViewerRoute element={<BrowsePage />} />} />
       <Route path="/profile" element={<ViewerRoute element={<ProfilePage />} />} />
       <Route path="/search" element={<ViewerRoute element={<SearchModal isPage={true} />} />} />
+
+      {/* Kid routes */}
+      <Route path="/learn" element={<KidRoute element={<KidLearningPage />} />} />
+      <Route path="/favorites" element={<KidRoute element={<KidFavoritesPage />} />} />
+      <Route path="/music" element={<KidRoute element={<KidSongsMusicPage />} />} />
+      <Route path="/play" element={<KidRoute element={<KidGamesPage />} />} />
+
+      {/* public Routes */}
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/help" element={<HelpCenter />} />
+      <Route path="/feedback" element={<FeedbackPage />} />
       
-      {/* Watch and Content routes - Allowed in kid mode */}
+      {/* Watch and Content routes - Render immediately */}
       <Route 
         path="/watch/:id" 
         element={
@@ -227,7 +295,7 @@ export default function AppRoutes() {
         } 
       />
 
-      {/* Sample routes - Forbidden in kid mode */}
+      {/* Sample routes - Render immediately */}
       <Route 
         path="/sample/security" 
         element={
@@ -253,7 +321,7 @@ export default function AppRoutes() {
         } 
       />
 
-      {/* Catch-all */}
+      {/* Catch-all - Render immediately */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

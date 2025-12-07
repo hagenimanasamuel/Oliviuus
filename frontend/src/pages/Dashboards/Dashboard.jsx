@@ -1,4 +1,3 @@
-// src/pages/Dashboards/Dashboard.jsx
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -23,27 +22,33 @@ const Dashboard = () => {
   const [dataLoaded, setDataLoaded] = React.useState(false);
   const [loadAttempted, setLoadAttempted] = React.useState(false);
 
+  // Check if user is family member with kid dashboard
+  const isFamilyMemberKidDashboard = familyMemberData && familyMemberData.dashboard_type === 'kid';
+  
+  // Combined kid mode check - includes family members with kid dashboard
+  const shouldShowKidDashboard = isKidMode || isFamilyMemberKidDashboard;
+
   // Effect to load subscription data when user is a viewer - RUNS ONLY ONCE
   React.useEffect(() => {
     // Skip subscription checks for family members with plan access or kid mode
-    if (user && (isFamilyPlanAccess || isKidMode)) {
+    if (user && (isFamilyPlanAccess || shouldShowKidDashboard)) {
       setDataLoaded(true);
       setLoadAttempted(true);
       return;
     }
 
     // Only run for viewers who haven't attempted load yet
-    if (user && user.role === "viewer" && !loadAttempted && !isKidMode) {
+    if (user && user.role === "viewer" && !loadAttempted && !shouldShowKidDashboard) {
       setLoadAttempted(true);
       refreshSubscription().finally(() => {
         setDataLoaded(true);
       });
-    } else if (user && (user.role === "admin" || isKidMode)) {
+    } else if (user && (user.role === "admin" || shouldShowKidDashboard)) {
       // For admin or kid mode, mark as loaded immediately
       setDataLoaded(true);
       setLoadAttempted(true);
     }
-  }, [user, loadAttempted, refreshSubscription, isKidMode, isFamilyPlanAccess]);
+  }, [user, loadAttempted, refreshSubscription, shouldShowKidDashboard, isFamilyPlanAccess]);
 
   // Show generic loading during initial data fetch
   if (user && !dataLoaded && loadAttempted) {
@@ -58,7 +63,7 @@ const Dashboard = () => {
   }
 
   // Show generic error state (only for viewer mode without family plan)
-  if (error && !isKidMode && !isFamilyPlanAccess) {
+  if (error && !shouldShowKidDashboard && !isFamilyPlanAccess) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-900">
         <div className="text-center max-w-md">
@@ -85,9 +90,22 @@ const Dashboard = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  // 🎯 KID MODE: Highest priority - if in kid mode, show kid dashboard
-  if (isKidMode && kidProfile) {
-    return <KidDashboard />;
+  // 🎯 KID MODE: Highest priority - if in kid mode OR family member with kid dashboard
+  if (shouldShowKidDashboard) {
+    // Create effective kid profile for family members
+    const effectiveKidProfile = kidProfile || (isFamilyMemberKidDashboard ? {
+      is_family_member: true,
+      family_owner_id: familyMemberData.family_owner_id,
+      member_role: familyMemberData.member_role,
+      dashboard_type: 'kid',
+      name: user?.email?.split('@')[0] || 'Kid',
+      max_age_rating: '7+',
+      id: user.id
+    } : null);
+    
+    if (effectiveKidProfile) {
+      return <KidDashboard kidProfile={effectiveKidProfile} />;
+    }
   }
 
   // 👑 ADMIN: Admin users go to admin dashboard

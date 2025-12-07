@@ -1,34 +1,38 @@
-// src/pages/Dashboards/viewer/ViewerLandingPage/LandingPageContents.jsx
+// src/pages/Dashboards/kid/KidLandingPage/KidLandingPageContents.jsx
 import React, { useRef, useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronRight, ChevronLeft, Sparkles, TrendingUp, Clock as ClockIcon } from "lucide-react";
-import ContentCard from "../content/ContentCard";
+import { ChevronRight, ChevronLeft, Star, BookOpen, GamepadIcon, Sparkles, Check } from "lucide-react";
+import ContentCard from "../../../../components/layout/dashboard/viewer/content/ContentCard";
 
-const LandingPageContents = ({
+const KidLandingPageContents = ({
   featuredContent = [],
-  trendingContent = [],
+  educationalContent = [],
+  funContent = [],
   recentContent = [],
   onPlay,
   onAddToList,
   onMoreInfo,
   redirecting = false
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(); // Initialize translation hook
   
   const sectionRefs = useRef({
-    popular: null,
-    trending: null,
+    featured: null,
+    educational: null,
+    fun: null,
     recent: null
   });
 
   const [showLeftArrow, setShowLeftArrow] = useState({
-    popular: false,
-    trending: false,
+    featured: false,
+    educational: false,
+    fun: false,
     recent: false
   });
   const [showRightArrow, setShowRightArrow] = useState({
-    popular: true,
-    trending: true,
+    featured: true,
+    educational: true,
+    fun: true,
     recent: true
   });
 
@@ -55,7 +59,6 @@ const LandingPageContents = ({
         behavior: 'smooth'
       });
 
-      // Check position after scroll
       setTimeout(() => checkScrollPosition(sectionKey), 300);
     }
   }, [checkScrollPosition]);
@@ -77,31 +80,39 @@ const LandingPageContents = ({
     });
   }, [checkScrollPosition]);
 
-  // Section configurations with translations
+  // Section configurations for kids with translations
   const sections = [
     {
-      key: 'popular',
-      title: t('sections.popularInRwanda', 'Popular in Rwanda'),
-      subtitle: t('sections.popularInRwandaSubtitle', 'Top picks loved by Rwandan viewers'),
-      icon: Sparkles,
+      key: 'featured',
+      title: t('kidLanding.sections.featured.title', 'Featured Shows'),
+      subtitle: t('kidLanding.sections.featured.subtitle', 'Popular picks for kids'),
+      icon: Star,
       content: featuredContent,
-      color: 'from-purple-500 to-pink-500'
+      color: 'from-[#BC8BBC] to-[#9A679A]'
     },
     {
-      key: 'trending',
-      title: t('sections.trendingNow', 'Trending Now'),
-      subtitle: t('sections.trendingNowSubtitle', 'What everyone is watching'),
-      icon: TrendingUp,
-      content: trendingContent,
-      color: 'from-orange-500 to-red-500'
+      key: 'educational',
+      title: t('kidLanding.sections.educational.title', 'Learning Fun'),
+      subtitle: t('kidLanding.sections.educational.subtitle', 'Educational and fun content'),
+      icon: BookOpen,
+      content: educationalContent,
+      color: 'from-[#8B9ABC] to-[#677A9A]'
+    },
+    {
+      key: 'fun',
+      title: t('kidLanding.sections.fun.title', 'Fun & Games'),
+      subtitle: t('kidLanding.sections.fun.subtitle', 'Entertaining adventures'),
+      icon: GamepadIcon,
+      content: funContent,
+      color: 'from-[#BCBC8B] to-[#9A9A67]'
     },
     {
       key: 'recent',
-      title: t('sections.newReleases', 'New Releases'),
-      subtitle: t('sections.newReleasesSubtitle', 'Fresh content just added'),
-      icon: ClockIcon,
+      title: t('kidLanding.sections.recent.title', 'New Arrivals'),
+      subtitle: t('kidLanding.sections.recent.subtitle', 'Fresh content just added'),
+      icon: Sparkles,
       content: recentContent,
-      color: 'from-blue-500 to-cyan-500'
+      color: 'from-[#8BBC8B] to-[#679A67]'
     }
   ];
 
@@ -147,7 +158,6 @@ const LandingPageContents = ({
 
   return (
     <div className="bg-gray-900">
-      {/* Reduced vertical spacing */}
       <div className="space-y-8 lg:space-y-10 py-8 lg:py-10">
         {sections.map((section) => (
           <section key={section.key} className="mb-8 lg:mb-10 relative">
@@ -176,7 +186,7 @@ const LandingPageContents = ({
                   <button
                     onClick={() => scrollSection(section.key, 'left')}
                     className="p-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-200 transform hover:scale-105 border border-gray-700 hover:border-gray-600 lg:flex"
-                    aria-label={`Scroll ${section.title} left`}
+                    aria-label={t('kidLanding.actions.scrollLeft', { section: section.title }, `Scroll ${section.title} left`)}
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -187,7 +197,7 @@ const LandingPageContents = ({
                   <button
                     onClick={() => scrollSection(section.key, 'right')}
                     className="p-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-200 transform hover:scale-105 border border-gray-700 hover:border-gray-600 lg:flex"
-                    aria-label={`Scroll ${section.title} right`}
+                    aria-label={t('kidLanding.actions.scrollRight', { section: section.title }, `Scroll ${section.title} right`)}
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -195,9 +205,9 @@ const LandingPageContents = ({
               </div>
             </div>
 
-            {/* Content Container - Better spacing on mobile */}
+            {/* Content Container */}
             <div className="relative">
-              {/* Scrollable Content - Increased gap on mobile for better touch */}
+              {/* Scrollable Content */}
               <div
                 ref={(el) => (sectionRefs.current[section.key] = el)}
                 className="flex gap-3 lg:gap-3 overflow-x-auto px-3 sm:px-4 lg:px-6 py-1 no-scrollbar scroll-smooth"
@@ -208,12 +218,9 @@ const LandingPageContents = ({
               >
                 {section.content.length > 0 ? (
                   section.content.map((content) => {
-                    // CRITICAL FIX: Ensure content has the structure HoverModal expects
-                    // Check if content has media_assets for hover modal
                     const hasMediaAssets = content.media_assets && Array.isArray(content.media_assets) && content.media_assets.length > 0;
                     const hasPrimaryImage = content.primary_image_url && !content.primary_image_url.includes('null');
                     
-                    // If content is missing media_assets but has primary_image_url, create a media_assets array
                     const enhancedContent = !hasMediaAssets && hasPrimaryImage ? {
                       ...content,
                       media_assets: [{
@@ -224,40 +231,36 @@ const LandingPageContents = ({
                       }]
                     } : content;
 
-                    // Add trending data to content object for hover modal
-                    const contentWithTrending = section.key === 'trending' ? {
-                      ...enhancedContent,
-                      trending_score: content.trending_score,
-                      trending_rank: content.trending_rank
-                    } : enhancedContent;
-
                     return (
                       <div
                         key={content.id}
-                        // Responsive card sizes with better mobile spacing
                         className="flex-shrink-0 w-32 xs:w-36 sm:w-40 md:w-44 lg:w-48 xl:w-52 relative"
                       >
-                        {/* Add trending rank badge for trending section - OUTSIDE ContentCard */}
-                        {section.key === 'trending' && content.trending_rank && content.trending_rank <= 3 && (
-                          <div className="absolute -top-2 -left-2 z-20 w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center shadow-lg border-2 border-white/20 trending-badge">
-                            <span className="text-white text-xs font-bold">#{content.trending_rank}</span>
+                        {/* Age rating badge */}
+                        {content.age_rating && (
+                          <div className="absolute top-2 right-2 z-10">
+                            <div className="flex items-center gap-1 bg-black/80 backdrop-blur-sm rounded-full px-2 py-1 border border-[#BC8BBC]/30">
+                              <span className="text-xs font-medium text-white">
+                                {content.age_rating}
+                              </span>
+                            </div>
                           </div>
                         )}
-                        
-                        {/* Add trending score indicator - OUTSIDE ContentCard */}
-                        {section.key === 'trending' && content.trending_score && content.trending_score > 0.3 && (
-                          <div className="absolute top-2 right-2 z-10">
-                            <div className="flex items-center gap-1 bg-black/80 backdrop-blur-sm rounded-full px-2 py-1 border border-orange-500/30">
-                              <TrendingUp className="w-3 h-3 text-orange-400" />
-                              <span className="text-xs font-medium text-white">
-                                {Math.round(content.trending_score * 100)}%
+
+                        {/* Kid-safe badge for parent-approved content */}
+                        {content.parentApproved && (
+                          <div className="absolute top-12 right-2 z-10">
+                            <div className="flex items-center gap-1 bg-green-800/90 backdrop-blur-sm rounded-full px-2 py-1 border border-green-500/30">
+                              <span className="text-xs font-medium text-white flex items-center gap-1">
+                                <Check className="w-3 h-3" />
+                                {t('kidLanding.badges.approved', 'Approved')}
                               </span>
                             </div>
                           </div>
                         )}
 
                         <ContentCard
-                          content={contentWithTrending}  // Pass the enhanced content with media_assets
+                          content={enhancedContent}
                           onMoreInfo={onMoreInfo}
                           size="medium"
                         />
@@ -265,43 +268,25 @@ const LandingPageContents = ({
                     );
                   })
                 ) : (
-                  // Compact empty state with translation
+                  // Compact empty state
                   <div className="flex flex-col items-center justify-center w-full py-8 lg:py-10 text-center">
                     <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gray-800 rounded-full flex items-center justify-center mb-3">
                       <section.icon className="w-6 h-6 lg:w-7 lg:h-7 text-gray-500" />
                     </div>
                     <h3 className="text-white text-base lg:text-lg font-semibold mb-1.5">
-                      {t('errors.noContent', 'No content available')}
+                      {t('kidLanding.errors.noContent', 'No content available')}
                     </h3>
                     <p className="text-gray-400 text-xs lg:text-sm max-w-xs">
-                      {t('errors.checkBackLater', 'Check back later for new additions.')}
+                      {t('kidLanding.errors.checkBackLater', 'Check back later for new additions.')}
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* Mobile scroll indicators - subtle gradient overlays */}
+              {/* Mobile scroll indicators */}
               <div className="lg:hidden pointer-events-none absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-gray-900 to-transparent z-10" />
               <div className="lg:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-gray-900 to-transparent z-10" />
             </div>
-            
-            {/* Add trending section footer with simplified text */}
-            {section.key === 'trending' && trendingContent.length > 0 && (
-              <div className="mt-2 px-3 sm:px-4 lg:px-6">
-                <div className="text-xs text-gray-500 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                      <span>{t('newPopular.tabs.trending', 'Top 3 Trending')}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-orange-300"></div>
-                      <span>{t('common.highScore', 'High Score (>30%)')}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </section>
         ))}
       </div>
@@ -309,7 +294,7 @@ const LandingPageContents = ({
       {/* Minimal bottom spacing */}
       <div className="h-4 lg:h-6"></div>
 
-      {/* Global CSS to hide scrollbars across all browsers */}
+      {/* Global CSS */}
       <style jsx>{`
         .no-scrollbar::-webkit-scrollbar {
           display: none;
@@ -318,23 +303,9 @@ const LandingPageContents = ({
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-        
-        /* Animation for trending badges */
-        @keyframes pulse-glow {
-          0%, 100% {
-            box-shadow: 0 0 5px rgba(249, 115, 22, 0.5);
-          }
-          50% {
-            box-shadow: 0 0 15px rgba(249, 115, 22, 0.8);
-          }
-        }
-        
-        .trending-badge {
-          animation: pulse-glow 2s infinite;
-        }
       `}</style>
     </div>
   );
 };
 
-export default LandingPageContents;
+export default KidLandingPageContents;

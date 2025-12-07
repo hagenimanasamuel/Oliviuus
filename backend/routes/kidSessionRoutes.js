@@ -1,18 +1,16 @@
-// routes/kidSessionRoutes.js
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const {
-  createKidSession,
-  exitKidSession,
-  getCurrentKidSession,
+  enterKidMode,
+  exitKidMode,
+  getCurrentSessionMode,
   checkProfileSelection
 } = require("../controllers/kidSessionController");
 
-// Make sure all route handlers are properly defined
-router.post("/session", authMiddleware, createKidSession);
-router.post("/session/exit", authMiddleware, exitKidSession);
-router.get("/session/current", authMiddleware, getCurrentKidSession);
+router.post("/enter", authMiddleware, enterKidMode);
+router.post("/exit", authMiddleware, exitKidMode);
+router.get("/current", authMiddleware, getCurrentSessionMode);
 router.get("/check-selection", authMiddleware, checkProfileSelection);
 
 module.exports = router;

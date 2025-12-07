@@ -12,26 +12,25 @@ export default function KidLayout({ children, kidProfile, onExit }) {
     setIsMounted(true);
   }, []);
 
-  /**
-   * FIXED: Proper scroll detection with better logging
-   */
+  // Handle scroll detection like ViewerLayout
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      // Use a small threshold like ViewerLayout
       const scrolled = scrollY > 10;
-      console.log("📜 Scroll detected - scrollY:", scrollY, "isScrolled:", scrolled);
       setIsScrolled(scrolled);
     };
 
-    // Add event listener
     window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("scroll", handleScroll, { passive: true });
     
-    // Check initial scroll position
     handleScroll();
+    
+    window.addEventListener("resize", handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
   }, []);
 
@@ -60,7 +59,8 @@ export default function KidLayout({ children, kidProfile, onExit }) {
         isScrolled={isScrolled} 
       />
       
-      <main className={`flex-1 ${isLandingPage ? 'pt-0' : 'pt-16'}`}>
+      {/* ✅ FIXED: Apply pt-0 only for landing page, all other pages get pt-16 */}
+      <main className={`flex-1 ${isLandingPage ? 'pt-0' : 'pt-26'}`}>
         {children}
       </main>
 

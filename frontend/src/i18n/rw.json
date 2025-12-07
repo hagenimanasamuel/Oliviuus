@@ -111,6 +111,12 @@
       "profiles": "Imiryango / Profayiri",
       "parental": "Igenzura ry’Ababyeyi",
       "family_invitations": "Ubutumire bw'Umuryango"
+    },
+    "parental": {
+      "pinModal": {
+        "title": "Emeza PIN kugira ngo winjire mu bugenzuzi bw'ababyeyi",
+        "description": "Injiza PIN y'umuryango kugira ngo ubone igenamiterere ry'ubugenzuzi bw'ababyeyi"
+      }
     }
   },
   "accountInfo": {
@@ -151,7 +157,7 @@
     "overview": "Incamake",
     "users": "Abakoresha",
     "library": "Ububiko",
-    "subscriptions": "Ifatabuguzi",
+    "Ifatabuguzi": "Ifatabuguzi",
     "analytics": "Isesengura",
     "globalManagement": "Ibyibanze",
     "support": "Ubufasha"
@@ -1706,8 +1712,22 @@
     }
   },
   "common": {
+    "yes": "Yego",
+    "no": "Oya",
+    "cancel": "Kureka",
+    "delete": "Gusiba",
     "error": "Ikosa",
-    "dismiss": "Funga"
+    "dismiss": "Funga",
+    "never": "Nta na rimwe",
+    "notSet": "Ntabwo byashyizweho",
+    "invalidDate": "Itariki itari yo",
+    "invalidTime": "Igihe kitari cyo",
+    "unknownEmail": "Imeli itazwi",
+    "noEmail": "Nta imeli",
+    "noDate": "Nta tariki",
+    "highScore": "Amanota Menshi (>30%)",
+    "topTrending": "Bikunzwe Kurusha Ibindi",
+    "home": "Ahabanza"
   },
   "parentalControls": {
     "title": "Igenzura ry’Ababyeyi",
@@ -2185,6 +2205,817 @@
           "answer": "Dukorana n’ingo z’itangizwa rya filime nyarwanda, tukabaha inzira nziza yo kuzikwirakwiza, amahirwe yo kubona inkunga, n’inyungu iruse izindi. Intego ni ukuzamura impano z’Abanyarwanda."
         }
       }
+    }
+  },
+  "kidDashboard": {
+    "navigation": {
+      "home": "Ahabanza",
+      "music": "Indirimbo",
+      "play": "Imikino",
+      "learn": "Kwiga",
+      "favorites": "Iby'ukunze"
+    },
+    "buttons": {
+      "logout": "Gusohoka",
+      "exit": "Gusohoka",
+      "checkingPin": "Biragenzurwa..."
+    },
+    "tooltips": {
+      "logout": "Sohoka kuri konti yawe",
+      "exitWithPin": "Sohoka muri kid mode (usabwa PIN)",
+      "exitNoPin": "Sohoka muri kid mode (nta PIN wahaye)",
+      "checkingPin": "Kugenzura niba PIN ihari...",
+      "enterFullscreen": "Jya muri Ecran Yose",
+      "exitFullscreen": "Sohoka muri Ecran Yose",
+      "toggleNavigation": "Hindura Navigation",
+      "navigateTo": "Jya kuri {{destination}}"
+    },
+    "greeting": "Bite, {{name}}!",
+    "defaultName": "Inshuti",
+    "status": {
+      "familyFun": "Ibyishimo By'umuryango! 🎉",
+      "letsPlay": "Reka dukine! 🎮"
+    },
+    "pinModal": {
+      "title": "Emeza PIN kugira ngo usohoke muri Kid Mode",
+      "description": "Injiza PIN y'umuryango kugira ngo usohoke muri kid mode usubire kuri dashboard y'ababyeyi"
+    }
+  },
+  "pinModal": {
+    "defaultTitle": "Ukwemeza PIN birasabwa",
+    "defaultDescription": "Injiza PIN y'umuryango kugira ngo ukomeze",
+    "labels": {
+      "enterPin": "Injiza PIN y'umuryango",
+      "digits": "inyuguti"
+    },
+    "placeholders": {
+      "enterPin": "Injiza PIN y'imibare 4"
+    },
+    "buttons": {
+      "close": "Funga",
+      "hidePin": "Hisha PIN",
+      "showPin": "Garagaza PIN",
+      "cancel": "Hagarika",
+      "verify": "Emeza",
+      "verifying": "Birimo kwemezwa..."
+    },
+    "errors": {
+      "emptyPin": "Injiza PIN yawe",
+      "invalidLength": "PIN igomba kugira imibare 4 gusa",
+      "invalidPin": "PIN si yo. Ongera ugerageze."
+    },
+    "success": {
+      "verified": "PIN yemejwe neza!"
+    },
+    "securityNote": "Iyi PIN irinda igenamiterere ry'umuryango n'ubugenzuzi bw'ababyeyi"
+  },
+  "songsMusic": {
+    "seo": {
+      "title": "Indirimbo & Umuziki - Oliviuus Yabana",
+      "description": "Indirimbo zishimishije, indirimbo z'abana, amavidiyo y'umuziki n'imbyino. Ririmba, kubyina no kwishimira urugendo rw'umuziki!"
+    },
+    "header": {
+      "title": "INDIRIMBO & UMUZIKI",
+      "subtitle": "Ririmba & Byina • Reka turirimbe kandi tubyine! 🎵",
+      "popular": "Ibyiciro by'Umuziki Bikunzwe 🔥"
+    },
+    "search": {
+      "placeholder": "🔍 Shakisha indirimbo, umuziki, amavidiyo y'imbyino, indirimbo z'abana..."
+    },
+    "buttons": {
+      "gridView": "Reba mu Mbonerahamwe",
+      "listView": "Reba mu Rutonde",
+      "filters": "Muyunguruzo",
+      "clearAll": "Siba byose",
+      "clearAllFilters": "Siba Muyunguruzo Yose ✨",
+      "tryAgain": "Ongera ugerageze 🔄",
+      "playNow": "Kina Ubu ▶️",
+      "details": "Birambuye ℹ️"
+    },
+    "activeFilters": "Muyunguruzo akora",
+    "filterPanel": {
+      "title": "Yungurura Ibirimo by'Umuziki 🎯",
+      "sortBy": "Tondeka ukoresheje 📊",
+      "musicTypes": "Ubwoko bw'Umuziki 🎶",
+      "musicStyles": "Imisusire y'Umuziki 🎨",
+      "contentType": "Ubwoko bw'Ibirimo 📺",
+      "clearAllFilters": "Siba muyunguruzo yose 🗑️",
+      "cancel": "Hagarika",
+      "applyFilters": "Shyiraho Muyunguruzo ✨"
+    },
+    "errors": {
+      "title": "Yoo! Habaye ikosa 😢",
+      "loading": "Yoo! Habaye ikibazo mu gukuramo indirimbo n'umuziki. Ongera ugerageze! 🎵"
+    },
+    "noContent": {
+      "title": "Nta birimo by'umuziki bibonetse 🎵",
+      "description": "Gerageza guhindura muyunguruzo cyangwa ushake ubwoko butandukanye bw'umuziki."
+    },
+    "badges": {
+      "topMusic": "Umuziki w'Ikirenga! 🎵",
+      "greatMusic": "Umuziki Mwiza! 🎶",
+      "musicFun": "Umuziki Ushimishije! 🎤",
+      "awesomeSong": "Indirimbo Isumba Izindi! 🎧"
+    },
+    "metadata": {
+      "durationNA": "N/A",
+      "durationNAFull": "Igihe: N/A",
+      "musicVideo": "Ishusho y'Umuziki 🎵",
+      "noDescription": "Nta bisobanuro bihari"
+    },
+    "pagination": {
+      "previous": "Ibanze",
+      "next": "Ibikurikira"
+    }
+  },
+  "learning": {
+    "seo": {
+      "title": "Ahantu ho Kwiga - Oliviuus Yabana",
+      "description": "Ibirimo byiza kandi byigisha abana. Wige ibijyanye na siyanse, amateka, ibidukikije, imibare, ubuhanzi, umuziki n'ibindi binyuze mu mashusho yishimirwa."
+    },
+    "header": {
+      "title": "AHANTU HO KWIGA",
+      "subtitle": "Tembera & Wige • Aho Uburyohe buhuza n'Ubumenyi! 🎈"
+    },
+    "search": {
+      "placeholder": "🔍 Shakisha amashusho yo kwiga (siyanse, imibare, amateka, ubugeni...)"
+    },
+    "buttons": {
+      "gridView": "Reba mu Mbonerahamwe",
+      "listView": "Reba mu Rutonde",
+      "filters": "Muyunguruzo",
+      "clearAll": "Siba byose",
+      "clearAllFilters": "Siba Muyunguruzo Yose ✨",
+      "tryAgain": "Ongera ugerageze 🔄",
+      "watch": "Reba ▶️",
+      "watchNow": "Reba Ubu ▶️",
+      "details": "Birambuye ℹ️"
+    },
+    "activeFilters": "Muyunguruzo akora",
+    "filterPanel": {
+      "title": "Yungurura Ibirimo byo Kwiga 🎯",
+      "sortBy": "Tondeka ukoresheje 📊",
+      "ageGroup": "Ibyiciro by'Imyaka 👶",
+      "subjects": "Ibigwa 📚",
+      "learningStyles": "Uburyo bwo Kwiga 🎨",
+      "contentType": "Ubwoko bw'Ibirimo 📺",
+      "clearAllFilters": "Siba muyunguruzo yose 🗑️",
+      "cancel": "Hagarika",
+      "applyFilters": "Shyiraho Muyunguruzo ✨"
+    },
+    "errors": {
+      "title": "Yoo! Habaye ikosa 😢",
+      "loading": "Yoo! Habaye ikibazo mu gukuramo ibirimo byo kwiga. Ongera ugerageze! 🎈"
+    },
+    "noContent": {
+      "title": "Nta birimo byo kwiga bibonetse 🧐",
+      "description": "Gerageza guhindura muyunguruzo cyangwa ushake ibindi."
+    },
+    "badges": {
+      "superSmart": "Inyabwenge Cyane! 🎓",
+      "learningTime": "Igihe cyo Kwiga! 📚",
+      "funLearning": "Kwiga Bishimishije! 🎈",
+      "awesomeContent": "Ibirimo Bitangaje! ✨"
+    },
+    "metadata": {
+      "durationNA": "N/A",
+      "durationNAFull": "Igihe: N/A",
+      "kidSafe": "Bitunganye ku Bana 🛡️",
+      "educational": "Bigisha 📚",
+      "noDescription": "Nta bisobanuro bihari"
+    },
+    "pagination": {
+      "previous": "Ibanze",
+      "next": "Ibikurikira"
+    },
+    "ageGroups": {
+      "preschool": "Abana batarajya ku Ishuri 👶",
+      "earlyElementary": "Ishuri Ribanza Ryo Hasi 🧒",
+      "upperElementary": "Ishuri Ribanza Ryo Hejuru 👦",
+      "middleSchool": "Ishuri Ryo Hagati 🎓"
+    }
+  },
+  "favorites": {
+    "seo": {
+      "title": "Ibyo Nkunda - Oliviuus Yabana",
+      "description": "Amashusho yo kwiga ukunda n’urutonde rwo kureba nyuma. Geraho byose ukunda mu buryo bworoshye!"
+    },
+    "header": {
+      "title": "IBYO NKUNDA",
+      "subtitle": "Ibyo Nkunda • Amashusho yose ukunda! ❤️"
+    },
+    "tabs": {
+      "all": "Byose",
+      "liked": "Byakunzwe",
+      "watchLater": "Reba Nyuma"
+    },
+    "search": {
+      "placeholder": "🔍 Shakisha ibyo ukunda..."
+    },
+    "buttons": {
+      "gridView": "Reba mu Mbonerahamwe",
+      "listView": "Reba mu Rutonde",
+      "clearFilters": "Siba Muyunguruzo",
+      "tryAgain": "Ongera ugerageze 🔄",
+      "watch": "Reba ▶️",
+      "clearSearch": "Siba Ishakisha ✨",
+      "browseVideos": "Tembera Amashusho 🎈",
+      "remove": "Kuraho"
+    },
+    "activeFilters": "Ibirimo",
+    "badges": {
+      "liked": "Byakunzwe ❤️",
+      "watchLater": "Reba Nyuma ⏰"
+    },
+    "results": {
+      "videosFound": "amashusho yabonetse",
+      "searchFor": "kubijyanye na \"{{query}}\""
+    },
+    "errors": {
+      "title": "Yoo! Habaye ikosa 😢",
+      "loading": "Yoo! Habaye ikibazo mu gukuramo ibyo ukunda. Ongera ugerageze! 🎈"
+    },
+    "emptyStates": {
+      "noMatches": "Nta byabonetse 🧐",
+      "noLikedVideos": "Ntamashusho wakunze uracyafite ❤️",
+      "noWatchLater": "Nta mashusho yo kureba nyuma ufite ⏰",
+      "noFavorites": "Nta byakunzwe uracyafite ✨",
+      "tryDifferentSearch": "Gerageza ijambo rishakishwa ritandukanye",
+      "likeSomeVideos": "Kunda amashusho kugira ngo uyarebe hano!",
+      "addToWatchLater": "Ongeramo amashusho yo kureba nyuma kugira ngo uyarebe hano!",
+      "startLiking": "Tangira gukunda amashusho cyangwa kongeramo ayo uzareba nyuma!"
+    },
+    "metadata": {
+      "durationNA": "N/A",
+      "durationNAFull": "N/A",
+      "kidSafe": "Bibereye Abana 🛡️",
+      "noDescription": "Nta bisobanuro bihari"
+    },
+    "pagination": {
+      "previous": "Ibanze",
+      "next": "Ibikurikira"
+    },
+    "tooltips": {
+      "removeFromLiked": "Kuraho mu byakunzwe",
+      "addToLiked": "Ongeramo mu byakunzwe",
+      "removeFromWatchLater": "Kuraho mu byo uzareba nyuma",
+      "addToWatchLater": "Ongeramo mu byo uzareba nyuma",
+      "removeFromList": "Kuraho mu rutonde"
+    }
+  },
+  "games": {
+    "seo": {
+      "title": "Imikino y'Abana - Vuba Bidatinze",
+      "description": "Imikino y'abana ishimishije kandi yigisha iri mu nzira! Vuba Bidatinze."
+    },
+    "header": {
+      "title": "Agace k'Imikino",
+      "subtitle": "Imikino Ishimishije Iri Hafi Hano! 🎮",
+      "description": "Turimo gukora imikino myiza, y’abana, ishimishije kandi yigisha. Komeza ube hafi kugira ngo ubone amakuru mashya!"
+    },
+    "features": {
+      "title": "Ibirimo Kuza?",
+      "funEducational": "Imikino Ishimishije kandi Yigisha",
+      "puzzles": "Udukino Dutera Gutekereza",
+      "skillBuilding": "Ibikorwa byubaka Ubumenyi",
+      "safeContent": "Ibikurikiranwa kandi Bibereye Abana"
+    },
+    "construction": {
+      "title": "Mu Kubakwa",
+      "description": "Turimo kubaka urutonde rw’imikino y'abana! Subira vuba urebe imikino ishimishije, iyigisha, kandi ituma kwiga birushaho kuba byiza! ✨"
+    },
+    "buttons": {
+      "comingSoon": "Vuba Bidatinze!"
+    }
+  },
+  "kidLanding": {
+    "seo": {
+      "siteName": "Oliviuus Yabana",
+      "defaultTitle": "Ibikorwa Bishimishije kandi Binezeza  Abana",
+      "defaultDescription": "Reba udukino, amashusho y’uburezi, n’ubuzima tw’abana. Ibikubiye bitekerejwe ku bana kandi bibarinda.",
+      "keywords": "abana, udukino, uburezi, umuryango, umutekano, videwo"
+    },
+    "sections": {
+      "featured": {
+        "title": "Ibikunzwe",
+        "subtitle": "Ibyatoranyirijwe abana"
+      },
+      "educational": {
+        "title": "Kwiga ni Umunezero",
+        "subtitle": "Ibikubiye byigisha kandi bishimishije"
+      },
+      "fun": {
+        "title": "Ishimishamubiri & Imikino",
+        "subtitle": "Inkuru n’udushya dusetsa"
+      },
+      "recent": {
+        "title": "Ibyahageze Bishya",
+        "subtitle": "Ibishya byongewe vuba"
+      }
+    },
+    "actions": {
+      "play": "Kina",
+      "stop": "Hagarika",
+      "trailer": "Trailer",
+      "mute": "Cecekesha",
+      "unmute": "Subizamo Amajwi",
+      "addToList": "Ongeraho kuri Lisiti Yanjye",
+      "removeFromList": "Kuraho kuri Lisiti Yanjye",
+      "myList": "Lisiti Yanjye",
+      "inList": "Birimo",
+      "like": "Kunda",
+      "unlike": "Ntibikunde",
+      "liked": "Byakunzwe",
+      "details": "Ibisobanuro",
+      "tryAgain": "Ongera ugerageze",
+      "scrollLeft": "Sunika {{section}} ibumoso",
+      "scrollRight": "Sunika {{section}} iburyo"
+    },
+    "badges": {
+      "learning": "Kwiga",
+      "approved": "Byemejwe"
+    },
+    "ratings": {
+      "all": "Yose",
+      "G": "Yose",
+      "TV-Y": "Abana",
+      "TV-Y7": "Abana 7+",
+      "TV-G": "Abyose",
+      "PG": "Ababyeyi Bagenzura",
+      "7+": "Imyaka 7+",
+      "8+": "Imyaka 8+",
+      "9+": "Imyaka 9+",
+      "10+": "Imyaka 10+",
+      "11+": "Imyaka 11+",
+      "12+": "Imyaka 12+",
+      "default": "Byemewe ku Bana"
+    },
+    "errors": {
+      "contentLoad": "Habaye ikibazo mu gukura ibikubiyeho. Ongera ugerageze mu kanya.",
+      "somethingWentWrong": "Hari ikitagendekeye neza",
+      "error": "Ikosa",
+      "noContent": "Nta bikubiye bihari",
+      "checkBackLater": "Subira hano nyuma urebe ibishya."
+    }
+  },
+  "termsOfService": {
+    "title": "Amabwiriza y'Imikoreshereze",
+    "lastUpdated": "Aheruka Kuvugururwa",
+    "welcome": "Murakaza neza kuri Oliviuus, urubuga rwa streaming rugamije kugeza ibyishimo n'imyidagaduro ku baturage ba Rwanda no hanze yarwo. Aya Mabwiriza y'Imikoreshereze (\"Amabwiriza\") agenga uburyo ukoresha n'uburenganzira bwawe ku rubuga rwa Oliviuus, harimo urubuga rwacu, porogaramu za mobile, serivisi za streaming, n'ibindi byose bifitanye isano (buri hamwe bitwa \"Serivisi\").",
+    "agreementNotice": "Ukoresha konti, wiyandikisha, cyangwa ukoresha Serivisi, wemera aya Mabwiriza. Niba utayemera, ntushobora gukoresha Oliviuus.",
+    "sections": {
+      "eligibility": {
+        "title": "Ubusabwa",
+        "description": "Kugira ngo ukoreshe Oliviuus:",
+        "points": [
+          "Ugomba kuba ufite nibura imyaka 13.",
+          "Niba uri munsi ya 18, ugomba kugira uruhushya rw'ababyeyi cyangwa abarinzi gukoresha Serivisi.",
+          "Ugomba gutanga amakuru y'ukuri ku rubuga rwa konti yawe.",
+          "Dushobora guhagarika cyangwa gufunga konti zica aya mabwiriza."
+        ]
+      },
+      "accountRegistration": {
+        "title": "Iyandikishwa rya Konti",
+        "description": "Iyo wiyandikishije konti:",
+        "points1": [
+          "Ugomba gutanga amakuru y'ukuri kandi yuzuye.",
+          "Wowe ni wowe ushinzwe kurinda amakuru ya login yawe.",
+          "Ugomba kutumenyesha ako kanya ibikorwa byose bidafututse."
+        ],
+        "separator": "Ntushobora:",
+        "points2": [
+          "Gukora konti nyinshi ngo wibeshye ku gihe cy'igerageza cy'ubuntu.",
+          "Gusangira ijambo ry'ibanga ryawe n'abandi batari mu rugo rwawe.",
+          "Gukoresha cyangwa kwinjira muri konti y'undi utabiherewe uburenganzira."
+        ]
+      },
+      "freeTrial": {
+        "title": "Igerageza ry'Ubuntu",
+        "description": "Oliviuus ishobora gutanga igerageza rimwe ku muntu umwe n'uburyo bwo kwishyura.",
+        "duringTrial": "Mu gihe cy'igerageza ry'ubuntu:",
+        "points": [
+          "Ntuzishyurwe.",
+          "Urashobora guhagarika igihe icyo ari cyo cyose mbere y'uko igerageza rirangira kugira ngo wirinde kwishyuzwa."
+        ],
+        "warning": "Kugerageza kwinyereza cyangwa kwirenga sisitemu y'igerageza ry'ubuntu birabujijwe."
+      },
+      "subscriptionsPayments": {
+        "title": "Ububiko & Kwishyura",
+        "description": "Ukoresheje ububiko:",
+        "points": [
+          "Wemerera Oliviuus kwishyura uburyo wahisemo bwo kwishyura (nko Mobile Money, ikarita).",
+          "Amafaranga y'ububiko yishyurwa buri kwezi keretse hari ibyo twavuze ukundi.",
+          "Amafaranga yose ntabwo asubizwa keretse amategeko abisaba.",
+          "Dushobora guhindura ibiciro, ariko tuzagutangariza mbere."
+        ]
+      },
+      "contentUsageRules": {
+        "title": "Amabwiriza ku Bikoreshwa by'Ibirimo",
+        "description": "Oliviuus iguha uburenganzira buke, budashobora kwimurirwa, butari bwihariye bwo kubona ibirimo byacu ku mpamvu z'umuntu ku giti cye, zidafite inyungu z'ubucuruzi.",
+        "notAllowed": "Wemera kutabikora:",
+        "points": [
+          "Gupakira, gukoporora, gufata amashusho yerekana kuri ecran, cyangwa gusakaza ibirimo utabiherewe uburenganzira.",
+          "Gukoresha Serivisi mu kwerekana rusange utabiherewe uburenganzira.",
+          "Kwirenga imipaka y'akarere cyangwa uburyo bwo kubungabunga umutekano.",
+          "Gukoresha bots, scripts, cyangwa ibikoresho byikora mu gukoresha Serivisi."
+        ],
+        "deviceLimit": "Dushobora kugena umubare w'ibikoresho bishobora gukina icyarimwe."
+      },
+      "intellectualProperty": {
+        "title": "Uburenganzira ku Mutungo w'Ubwenge",
+        "description": "Ibirimo byose bya Oliviuus (filime, series, igishushanyo cy'urubuga, ibirango, logos, software) birakingirwa n'amategeko y'uburenganzira bwo guhanga n'ayandi mategeko y'umutungo w'ubwenge.",
+        "notAllowed": "Ntushobora:",
+        "points": [
+          "Guhindura cyangwa gukoporora ibikorwa byacu.",
+          "Gukora ibihangano bishingiye ku bikorwa byacu utabiherewe uburenganzira.",
+          "Gukoresha izina rya Oliviuus utabiherewe uruhushya rwanditse."
+        ]
+      },
+      "thirdPartyIntegrations": {
+        "title": "Imikoranire n'Abandi",
+        "description": "Oliviuus ishobora gukorana n'abafatanyabikorwa b'abandi (ibikoresho by'isuzuma, abacuruzi b'amafaranga, hosting ya cloud).",
+        "notResponsible": "Ntitwihanganira:",
+        "points": [
+          "Ibirimo byabo,",
+          "Amabwiriza yabo, cyangwa",
+          "Amakosa aterwa n'ibikorwa byabo."
+        ]
+      },
+      "termination": {
+        "title": "Guhagarika Konti",
+        "description": "Dushobora guhagarika cyangwa gufunga konti yawe niba:",
+        "points": [
+          "Wica aya Mabwiriza,",
+          "Ukora ibikorwa binyuranyije n'amategeko cyangwa bishobora kugira ingaruka mbi,",
+          "Wica Serivisi cyangwa sisitemu y'ubwishyu."
+        ],
+        "userRight": "Urashobora kandi gusiba konti yawe igihe icyo ari cyo cyose."
+      },
+      "serviceAvailability": {
+        "title": "Kugera kuri Serivisi",
+        "description": "Duharanira gutanga serivisi itarangwamo interuro, ariko:",
+        "points": [
+          "Guhagarara, ibikorwa byo kubungabunga, cyangwa amakosa birashobora kubaho.",
+          "Ntitwiyemeza 100% uptime.",
+          "Ibirimo bimwe birashobora kongerwa cyangwa gukurwaho utabibwiwe."
+        ]
+      },
+      "disclaimer": {
+        "title": "Itangazo ry'Ubufasha",
+        "description": "Oliviuus itangwa \"nk'uko iri\" kandi \"nk'uko iboneka.\"",
+        "notGuarantee": "Ntitwiyemeza ko:",
+        "points": [
+          "Serivisi izuzura ibyo wategereje,",
+          "Ntakibazo cyangwa interuro izabaho,",
+          "Ibirimo byose bizahora bihari."
+        ]
+      },
+      "limitationOfLiability": {
+        "title": "Guhagarika Uburenganzira bwo Kwishyuzwa",
+        "description": "Ku rugero runini rushoboka nk'uko amategeko abigena:",
+        "points": [
+          "Oliviuus ntiyishyuza ku byangiritse bitaziguye, ibyo biba impanuka, cyangwa ibihariye.",
+          "Uburenganzira bwacu bwose ntiburenza amafaranga wishyuye kuri Serivisi mu mezi 3 ashize."
+        ]
+      },
+      "changesToTerms": {
+        "title": "Impinduka ku Mabwiriza",
+        "description": "Dushobora kuvugurura aya Mabwiriza igihe cyose.",
+        "continuation": "Gukomeza gukoresha Oliviuus nyuma yo kuvugurura bisobanura ko wemeye aya Mabwiriza mashya."
+      },
+      "contactInformation": {
+        "title": "Amakuru yo Kuvugana",
+        "description": "Niba ufite ibibazo kuri aya Mabwiriza:",
+        "email": "oliviuusteam@gmail.com",
+        "location": "Musanze, Rwanda"
+      }
+    },
+    "footer": "Aya Mabwiriza y'Imikoreshereze atangirira ku itariki ya {{date}}. Ukoresha Oliviuus, wemera ko wasomye, wumvise, kandi wemeye gukurikiza aya Mabwiriza.",
+    "seo": {
+      "title": "Amabwiriza ya Oliviuus | Amategeko n'Amabwiriza ya Streaming",
+      "description": "Soma Amabwiriza y'Imikoreshereze ya Oliviuus. Menya amategeko y'urubuga rwa streaming, amabwiriza y'ububiko, amabwiriza ku ikoreshwa ry'ibirimo, n'amasezerano y'abakoresha mu Rwanda no ku isi hose.",
+      "keywords": "amabwiriza ya Oliviuus, amategeko ya streaming, amabwiriza y'ububiko, amabwiriza yo gukoresha ibirimo, amasezerano y'abakoresha, serivisi za streaming mu Rwanda, amabwiriza y'urubuga rw'imyidagaduro"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Politiki y'Ubwirinzi bw'Amakuru",
+    "lastUpdated": "Aheruka Kuvugururwa",
+    "introduction": "Oliviuus (\"twebwe,\" \"turi,\" cyangwa \"yacu\") yihaye inshingano zo kurinda ubwirinzi bwawe. Iyi Politiki y'Ubwirinzi isobanura uburyo dukusanya, dukoresha, tubika, kandi turinda amakuru yawe bwite.",
+    "sections": {
+      "informationWeCollect": {
+        "title": "Amakuru Dukusanya",
+        "subsections": {
+          "informationYouProvide": {
+            "title": "A. Amakuru utanga",
+            "points": [
+              "Amazina yose",
+              "Email",
+              "Ijambo ry'ibanga",
+              "Uburyo bwo kwishyura (Mobile Money cyangwa ikarita)",
+              "Ibyifuzo bya konti",
+              "Ubutumwa bwo gutanga ibitekerezo cyangwa ubufasha bw'abakiriya"
+            ],
+            "note": "Ntitubika amakuru yose ya konti yawe y'ubwishyu—tubika gusa amakuru akenewe ku gikorwa."
+          },
+          "informationCollectedAutomatically": {
+            "title": "B. Amakuru akusanywa nezawe",
+            "points": [
+              "IP address",
+              "Amakuru y'igikoresho (model, OS, browser)",
+              "Igihe winjiye muri konti",
+              "Amateka yo kureba",
+              "Uko ukoresha platform",
+              "Ibyerekeye ururimi n'imyenda (theme) ya konti"
+            ]
+          },
+          "cookiesTracking": {
+            "title": "C. Cookies & Gukurikirana",
+            "description": "Dukoresha cookies kugira ngo:",
+            "points": [
+              "Tubike session yawe winjiye muri konti,",
+              "Tuhuze ibyifuzo byawe n'ibikubereye,",
+              "Tuzamure imikorere ya platform."
+            ]
+          }
+        }
+      },
+      "howWeUseYourInformation": {
+        "title": "Uko Dukoresha Amakuru Yawe",
+        "description": "Dukoresha amakuru yawe kugira ngo:",
+        "points": [
+          "Dushyireho kandi twitware ku konti yawe",
+          "Tutanga ibyegeranyo byo kureba (filime/cinema content)",
+          "Tuhuze experience yawe n'ibyo ukunda",
+          "Tukore ubwishyu kandi twemeze trials",
+          "Twirinde uburiganya cyangwa gukoresha nabi",
+          "Tutanga ubufasha ku bakiriya",
+          "Tuzamure ubuziranenge bwa platform"
+        ],
+        "importantNote": "Ntiducuruza amakuru yawe bwite."
+      },
+      "sharingYourInformation": {
+        "title": "Gusangira Amakuru Yawe",
+        "subsections": {
+          "serviceProviders": {
+            "title": "A. Abatanga serivisi",
+            "points": [
+              "Abatanga serivisi zo kwishyura",
+              "Abatanga storage muri cloud",
+              "Ibikoresho bya analytics",
+              "Sisteme za email n'ibimenyetso"
+            ]
+          },
+          "legalRequirements": {
+            "title": "B. Ibisabwa n'amategeko",
+            "description": "Niba bisabwe na:",
+            "points": [
+              "Abashinzwe gukurikirana amategeko",
+              "Amategeko y'urukiko",
+              "Abashinzwe kugenzura amategeko"
+            ],
+            "note": "Tuzasangiza gusa ibikenewe n'amategeko."
+          }
+        }
+      },
+      "dataStorageSecurity": {
+        "title": "Kubika Amakuru & Ubutekano",
+        "description": "Dukoresha:",
+        "points": [
+          "Ububiko bufite encryption,",
+          "Servers zitekanye,",
+          "Ubuyobozi bwo kugenzura access,",
+          "Igenzura rya security kenshi."
+        ],
+        "warning": "Ariko, nta system 100% yizewe.",
+        "recommendation": "Turagusaba gukoresha ijambo ry'ibanga rikomeye."
+      },
+      "yourRights": {
+        "title": "Uburenganzira bwawe",
+        "description": "Ushobora:",
+        "points": [
+          "Kureba amakuru yawe",
+          "Guhindura profile yawe",
+          "Gusaba gusibwa kwa konti",
+          "Gusaba kopi y'amakuru yawe",
+          "Guhindura ururimi cyangwa ibyerekeye privacy"
+        ],
+        "requestTitle": "Kubisaba:",
+        "email": "oliviuusteam@gmail.com"
+      },
+      "dataRetention": {
+        "title": "Kubika Amakuru",
+        "description": "Tubika:",
+        "points": [
+          "Amakuru ya konti kugeza uyisibye",
+          "Amakuru y'ubwishyu nk'uko amategeko abisaba",
+          "Amateka yo kureba kugirango recommendations zibe nziza"
+        ]
+      },
+      "childrensPrivacy": {
+        "title": "Ubwirinzi bw'Abana",
+        "description1": "Oliviuus ntabwo ikusanya amakuru y'abana bari munsi y'imyaka 13 ku bushake.",
+        "description2": "Niba wumva umwana yatanzwe amakuru, twandikire kugirango tuyakurweho."
+      },
+      "changesToPolicy": {
+        "title": "Impinduka kuri Politiki",
+        "description": "Dushobora kuvugurura iyi Politiki igihe icyo aricyo cyose.",
+        "notification": "Tuzakumenyesha impinduka zikomeye."
+      },
+      "contactInformation": {
+        "title": "Amakuru yo Guhamagara",
+        "email": "oliviuusteam@gmail.com",
+        "location": "Musanze, Rwanda"
+      }
+    },
+    "footer": {
+      "consent": "Ukoresheje Oliviuus, wemeye gukusanywa no gukoresha amakuru yawe nk'uko bisobanurwa muri iyi Politiki y'Ubwirinzi. Niba ufite impungenge ku bwirinzi bwawe, twandikire.",
+      "effectiveDate": "Iyi Politiki y'Ubwirinzi ikurikizwa guhera ku {{date}}."
+    },
+    "seo": {
+      "title": "Politiki y'Ubwirinzi ya Oliviuus | Kurinda Amakuru & Privacy y'Umukoresha",
+      "description": "Soma Politiki y'Ubwirinzi ya Oliviuus. Menya uko turinda amakuru yawe, amakuru dukusanya, uburyo tuyakoresha, n'uburenganzira bwawe kuri platform ya filime/cinema.",
+      "keywords": "politiki y'ubwirinzi Oliviuus, kurinda amakuru, ubwirinzi bw'umukoresha, gukusanya amakuru platform, GDPR, privacy Rwanda, umutekano w'amakuru bwite"
+    }
+  },
+  "helpCenter": {
+    "title": "Ikigo cy'Ubufasha",
+    "subtitle": "Shaka ibisubizo by'ibibazo bisanzwe cyangwa ubone ubufasha bwihariye bw'itsinda ryacu",
+    "search": {
+      "placeholder": "Ukeneye gufashwa ku ki? Andika ikibazo cyawe...",
+      "button": "Shaka",
+      "popularTags": [
+        "Gusubiramo Ijambo ry'Ibanga",
+        "Ibibazo by'Ubwishyu",
+        "Ibibazo byo Kureba",
+        "App Ntikora",
+        "Umutekano wa Konti"
+      ],
+      "clear": "Siba ubushakashatsi",
+      "noResults": {
+        "title": "Nta gisubizo cyuzuye cyabonetse kuri \"{{query}}\"",
+        "description": "Gerageza gukoresha amagambo atandukanye cyangwa urebe ibyiciro by'ubufasha hasi",
+        "clear": "Siba ubushakashatsi",
+        "contact": "Hamagara Ubufasha"
+      }
+    },
+    "results": {
+      "title": "Ibisubizo by'Ubushakashatsi",
+      "found": "Habonetse ibisubizo {{count}} kuri \"{{query}}\"",
+      "viewInCategory": "Reba mu cyiciro →",
+      "defaultAnswer": "Nyamuneka urebe icyiciro cyihariye cy'ubutabazi kugira ngo ubone ibisobanuro birambuye kuri iki kibazo."
+    },
+    "categories": {
+      "title": "Reba ibyiciro by'Ubushakashatsi",
+      "questions": "{{count}} ibibazo",
+      "account": {
+        "title": "Konti & Kwinjira",
+        "icon": "👤",
+        "questions": [
+          {
+            "question": "Uko wakora konti",
+            "answer": "Kanda kuri 'Injira' ku rubuga rwacu. Shyiramo email yawe, wihere ijambo ry'ibanga rikomeye, hanyuma urangize uburyo bwo kwemeza. Uzahabwa email yo kwemeza konti ya Oliviuus."
+          },
+          {
+            "question": "Uko wasubiramo ijambo ry'ibanga",
+            "answer": "Jya ku rupapuro rwo kwinjira, kanda 'Forgot Password'. Shyiramo email yawe yanditswe, maze tuzohereze link yo gusubiramo ijambo ry'ibanga. Link irangirira mu masaha 24."
+          },
+          {
+            "question": "Uko wemeza email yawe",
+            "answer": "Reba inbox ya email yawe ku butumwa bwa Oliviuus. Kanda ku link yo kwemeza kugirango wemeze konti yawe. Niba utabonye email, reba mu spam cyangwa junk folder."
+          },
+          {
+            "question": "Uko wahindura amakuru ya konti yawe",
+            "answer": "Injira muri menu ya profile, hitamo 'Account Settings'. Hano ushobora kuvugurura amakuru yawe, email, ijambo ry'ibanga, n'amahitamo yo guhana amakuru mu buryo butekanye."
+          }
+        ]
+      },
+      "payment": {
+        "title": "Ubwishyu & Ifatabuguzi",
+        "icon": "💳",
+        "questions": [
+          {
+            "question": "Uburyo bwo kwishyura bwemewe",
+            "answer": "Oliviuus yemera Mobile Money (MTN, Airtel), Visa, MasterCard, hamwe n'uburyo bw'imbere mu Rwanda. Ibikorwa byose bikorerwa mu nzira zitekanye zifite encryption."
+          },
+          {
+            "question": "Uko trials zikorwa",
+            "answer": "Oliviuus rimwe na rimwe itanga trial z’igihe gito mu birori cyangwa ibikorwa byihariye. Izi trials zivugwa ku rubuga rwacu no ku mbuga nkoranyambaga. Ifatabuguzi zisanzwe zishyurwa buri kwezi."
+          },
+          {
+            "question": "Uko wahindura uburyo bwo kwishyura",
+            "answer": "Muri 'Billing & Payments' muri account settings, kanda 'Update Payment Method' kugirango winjize amakuru mashya y'ubwishyu. Subscription izakomeza nta nkomyi."
+          },
+          {
+            "question": "Uko wasiba cyangwa wongera subscription",
+            "answer": "Gusiba: Jya muri 'Subscription Management', hitamo 'Cancel Subscription'. Kugarura: Jya ku rupapuro rwa subscription, hitamo 'Reactivate Subscription'. Impinduka zikorwa ku musozo w'igihe cyishyurwa."
+          }
+        ]
+      },
+      "watching": {
+        "title": "Kureba kuri Oliviuus",
+        "icon": "🎬",
+        "questions": [
+          {
+            "question": "Ibikoresho n’ahantu byemewe",
+            "answer": "Reba kuri: Web browsers (Chrome, Safari, Firefox, Edge), mobile apps (iOS/Android), Smart TVs (Android TV, Samsung Tizen), consoles, na tablets. Internet ikenewe: 5 Mbps HD, 25 Mbps 4K."
+          },
+          {
+            "question": "Impamvu video irimo buffering cyangwa ifite quality mbi",
+            "answer": "Buffering ikunze guterwa n'ikibazo cya network. Icyo wakora: 1) Kora speed test 2) Reba modem/router 3) Gabanya quality 4) Funga apps zikoresha internet nyinshi 5) Koresha connection ya wired."
+          },
+          {
+            "question": "Uko wakura content kugirango urebe offline",
+            "answer": "Shaka icon yo download (↓) ku bintu byemewe. Bikora gusa muri mobile app. Content irangira mu masaha 48 bitewe n'amasezerano ya license."
+          },
+          {
+            "question": "Gukemura ibibazo bya playback cyangwa audio",
+            "answer": "Ibikorwa: 1) Refresh app 2) Reba audio output 3) Update browser/app 4) Siba cache & cookies 5) Gerageza ku kindi gikoresho 6) Reba service status."
+          }
+        ]
+      },
+      "technical": {
+        "title": "Ubufasha bwa Tekiniki",
+        "icon": "🔧",
+        "questions": [
+          {
+            "question": "App irimo kugwa cyangwa gufunga",
+            "answer": "Uko wakemura: 1) Update version 2) Force quit & restart 3) Clear cache/data 4) Reinstall 5) Reba storage 6) Reba compatibility"
+          },
+          {
+            "question": "Website cyangwa app ntikora neza",
+            "answer": "Check: 1) Internet 2) Browser compatibility 3) Disable extensions/ad-blockers 4) Clear cache 5) Test incognito 6) Reba status.oliviuus.com"
+          },
+          {
+            "question": "Gusiba cache & cookies",
+            "answer": "Browser: Settings → Privacy & Security → Clear Data. Mobile: Device Settings → Apps → Oliviuus → Storage → Clear Cache. Byemera gukemura ibibazo byinshi."
+          },
+          {
+            "question": "Kugumana app yawe ivuguruye",
+            "answer": "iOS: App Store → Profile → Updates. Android: Google Play → My Apps → Updates. Tuma automatic updates zibe ON."
+          }
+        ]
+      },
+      "security": {
+        "title": "Umutekano",
+        "icon": "🔒",
+        "questions": [
+          {
+            "question": "Kurinda konti yawe",
+            "answer": "Uko bikorwa: Shyira Ijambo banga rikomeye, ntugasangire Ijambo banga, sohoka ku bikoresho rusange, reba ibikorwa, wite ku batubuzi."
+          },
+          {
+            "question": "Uko Oliviuus irinda Amakuru yawe",
+            "answer": "Twubahiriza Umutekano: Uburinzi busesuye, amakuru abikanwa umutekano ukomeye, Igenzura, GDPR/DPA, Kwishyura bitekanye. Amakuru y'ubwishyu ntabwo abikwa ku seriveri zacu."
+          },
+          {
+            "question": "Kumenyesha ibibazo by'umutekano",
+            "answer": "Hamagara oliviuusteam@gmail.com ushyiremo Igihe, Igikoresho(Device), ibisobanuro. Itsinda ryacu rizagufasha."
+          },
+          {
+            "question": "Igenzura ryihariye n'ubuyobozi bw'amakuru",
+            "answer": "Jya muri Igenamiterere rya Konti ugene: amateka, ibyugenerwa, (guhanahana)sharing, uruhushya rwo kubika(download permissions), itumanaho. Ushobora gusaba data export cyangwa account deletion."
+          }
+        ]
+      },
+      "support": {
+        "title": "Ubufasha Bwakokanya(Bwihuse)",
+        "subtitle": "Fata ubufasha bwihariye",
+        "description": "Ntabwo wabonye icyo ukeneye? Itsinda ryacu ryiteguye kugufasha.",
+        "email": "Email Support",
+        "directMessage": "Ubutumwa Bwerekeye"
+      }
+    },
+    "contact": {
+      "title": "Hamagara Ubufasha",
+      "directMessage": {
+        "title": "Ubufasha cg Ubutumwa butaziguye",
+        "subtitle": "Bona ubufasha bwihariye bw'itsinda ryacu",
+        "close": "Funga",
+        "description": "Shyira mu form hasi, itsinda ryacu rizagusubiza mu masaha 24."
+      },
+      "email": {
+        "title": "Ubufasha bwa Email",
+        "response": "Igihe cyo gusubiza: amasaha 24"
+      },
+      "phone": {
+        "title": "Ubufasha Bwa telefone",
+        "description": "Ubufasha butaziguye"
+      },
+      "hours": {
+        "title": "Igihe cy'Ubufasha",
+        "days": "Kuwa Mbere - Ku Cyumweru"
+      },
+      "buttons": {
+        "sendEmail": "Ohereza Email",
+        "callNow": "Hamagara Ubu",
+        "directMessage": "Ubutumwa Bwerekeye"
+      },
+      "responseTime": "Itsinda ryacu ryiyemeje kuguha ubufasha bwiza. Igihe gisanzwe cyo gusubiza ni 2-4 amasaha mu gihe cy'akazi."
+    },
+    "seo": {
+      "title": "Ikigo cy'Ubufasha Oliviuus | Customer Support & FAQs",
+      "description": "Fata ubufasha kuri Oliviuus streaming. Shaka ibisubizo by'ibibazo, guides, account, payment, technical support. Biboneka mu Cyongereza, Igifaransa, n'Ikinyarwanda.",
+      "keywords": "Oliviuus help center, streaming support, account troubleshooting, payment help, technical support Rwanda, customer service, FAQ, contact Oliviuus"
     }
   }
 }

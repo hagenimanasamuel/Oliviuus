@@ -28,10 +28,10 @@ export default function Header({ user, onLogout, isScrolled }) {
 
   const {
     getTimeRemaining,
-    isKidMode // ✅ Get kid mode status
+    isKidMode
   } = useSubscription();
 
-  const { isKidMode: authKidMode } = useAuth(); // ✅ Get kid mode from auth
+  const { isKidMode: authKidMode } = useAuth();
 
   const subscriptionAlertRef = useRef(null);
   const notificationDropdownRef = useRef(null);

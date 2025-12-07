@@ -111,6 +111,12 @@
       "profiles": "Famille / Profils",
       "parental": "Contrôle Parental",
       "family_invitations": "Invitations Familiales"
+    },
+    "parental": {
+      "pinModal": {
+        "title": "Vérifiez le PIN pour accéder aux contrôles parentaux",
+        "description": "Entrez le PIN familial pour accéder aux paramètres des contrôles parentaux"
+      }
     }
   },
   "accountInfo": {
@@ -1718,7 +1724,10 @@
     "invalidTime": "Heure invalide",
     "unknownEmail": "Email inconnu",
     "noEmail": "Aucun email",
-    "noDate": "Aucune date"
+    "noDate": "Aucune date",
+    "highScore": "Score Élevé (>30%)",
+    "topTrending": "Tendances du Moment",
+    "home": "Accueil"
   },
   "parentalControls": {
     "title": "Contrôle Parental",
@@ -2186,6 +2195,821 @@
           "answer": "Nous collaborons avec les studios locaux, offrons des possibilités de financement, et assurons une rémunération équitable."
         }
       }
+    }
+  },
+  "kidDashboard": {
+    "navigation": {
+      "home": "Accueil",
+      "music": "Musique",
+      "play": "Jouer",
+      "learn": "Apprendre",
+      "favorites": "Favoris"
+    },
+    "buttons": {
+      "logout": "Se déconnecter",
+      "exit": "Quitter",
+      "checkingPin": "Vérification..."
+    },
+    "tooltips": {
+      "logout": "Se déconnecter de votre compte",
+      "exitWithPin": "Quitter le mode enfant (PIN requis)",
+      "exitNoPin": "Quitter le mode enfant (aucun PIN défini)",
+      "checkingPin": "Vérification du statut du PIN...",
+      "enterFullscreen": "Plein écran",
+      "exitFullscreen": "Quitter le plein écran",
+      "toggleNavigation": "Basculer la navigation",
+      "navigateTo": "Aller à {{destination}}"
+    },
+    "greeting": "Salut, {{name}}!",
+    "defaultName": "Ami",
+    "status": {
+      "familyFun": "Amusement en famille ! 🎉",
+      "letsPlay": "Jouons ! 🎮"
+    },
+    "pinModal": {
+      "title": "Vérifiez le PIN pour quitter le mode enfant",
+      "description": "Entrez le PIN familial pour quitter le mode enfant et revenir au tableau de bord parent"
+    }
+  },
+  "pinModal": {
+    "defaultTitle": "Vérification du PIN requise",
+    "defaultDescription": "Entrez le PIN familial pour continuer",
+    "labels": {
+      "enterPin": "Entrez le PIN familial",
+      "digits": "chiffres"
+    },
+    "placeholders": {
+      "enterPin": "Entrez un PIN de 4 chiffres"
+    },
+    "buttons": {
+      "close": "Fermer la fenêtre",
+      "hidePin": "Masquer le PIN",
+      "showPin": "Afficher le PIN",
+      "cancel": "Annuler",
+      "verify": "Vérifier",
+      "verifying": "Vérification..."
+    },
+    "errors": {
+      "emptyPin": "Veuillez entrer votre PIN",
+      "invalidLength": "Le PIN doit contenir exactement 4 chiffres",
+      "invalidPin": "PIN incorrect. Veuillez réessayer."
+    },
+    "success": {
+      "verified": "PIN vérifié avec succès !"
+    },
+    "securityNote": "Ce PIN protège les paramètres familiaux et les contrôles parentaux"
+  },
+  "songsMusic": {
+    "seo": {
+      "title": "Chansons & Musique - Oliviuus Kids",
+      "description": "Chansons amusantes, comptines, clips musicaux et contenus de danse pour enfants. Chante, danse et profite des aventures musicales !"
+    },
+    "header": {
+      "title": "CHANSONS & MUSIQUE",
+      "subtitle": "Chante & Danse • Chantons et dansons ! 🎵",
+      "popular": "Catégories musicales populaires 🔥"
+    },
+    "search": {
+      "placeholder": "🔍 Rechercher des chansons, musiques, vidéos de danse, comptines..."
+    },
+    "buttons": {
+      "gridView": "Vue Grille",
+      "listView": "Vue Liste",
+      "filters": "Filtres",
+      "clearAll": "Tout effacer",
+      "clearAllFilters": "Effacer tous les filtres ✨",
+      "tryAgain": "Réessayer 🔄",
+      "playNow": "Lire Maintenant ▶️",
+      "details": "Détails ℹ️"
+    },
+    "activeFilters": "Filtres actifs",
+    "filterPanel": {
+      "title": "Filtrer le contenu musical 🎯",
+      "sortBy": "Trier par 📊",
+      "musicTypes": "Types de musique 🎶",
+      "musicStyles": "Styles de musique 🎨",
+      "contentType": "Type de contenu 📺",
+      "clearAllFilters": "Effacer tous les filtres 🗑️",
+      "cancel": "Annuler",
+      "applyFilters": "Appliquer les filtres ✨"
+    },
+    "errors": {
+      "title": "Oups ! Une erreur s'est produite 😢",
+      "loading": "Oups ! Impossible de charger les chansons et la musique. Réessayez ! 🎵"
+    },
+    "noContent": {
+      "title": "Aucun contenu musical trouvé 🎵",
+      "description": "Essayez d’ajuster vos filtres ou recherchez d’autres types de musique."
+    },
+    "badges": {
+      "topMusic": "Meilleure Musique ! 🎵",
+      "greatMusic": "Super Musique ! 🎶",
+      "musicFun": "Musique Amusante ! 🎤",
+      "awesomeSong": "Chanson Géniale ! 🎧"
+    },
+    "metadata": {
+      "durationNA": "N/A",
+      "durationNAFull": "Durée : N/A",
+      "musicVideo": "Clip Musical 🎵",
+      "noDescription": "Aucune description disponible"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant"
+    }
+  },
+  "learning": {
+    "seo": {
+      "title": "Zone d'Apprentissage - Oliviuus Kids",
+      "description": "Contenu amusant et éducatif pour les enfants. Apprenez la science, l'histoire, la nature, les mathématiques, l'art, la musique et plus grâce à des vidéos captivantes."
+    },
+    "header": {
+      "title": "ZONE D'APPRENTISSAGE",
+      "subtitle": "Explore & Apprends • Là où la curiosité rencontre le plaisir ! 🎈"
+    },
+    "search": {
+      "placeholder": "🔍 Rechercher des vidéos éducatives (science, maths, histoire, art...)"
+    },
+    "buttons": {
+      "gridView": "Vue Grille",
+      "listView": "Vue Liste",
+      "filters": "Filtres",
+      "clearAll": "Tout effacer",
+      "clearAllFilters": "Effacer Tous les Filtres ✨",
+      "tryAgain": "Réessayer 🔄",
+      "watch": "Regarder ▶️",
+      "watchNow": "Regarder Maintenant ▶️",
+      "details": "Détails ℹ️"
+    },
+    "activeFilters": "Filtres actifs",
+    "filterPanel": {
+      "title": "Filtrer le Contenu Éducatif 🎯",
+      "sortBy": "Trier par 📊",
+      "ageGroup": "Groupe d'âge 👶",
+      "subjects": "Sujets 📚",
+      "learningStyles": "Styles d'Apprentissage 🎨",
+      "contentType": "Type de contenu 📺",
+      "clearAllFilters": "Effacer tous les filtres 🗑️",
+      "cancel": "Annuler",
+      "applyFilters": "Appliquer les filtres ✨"
+    },
+    "errors": {
+      "title": "Oups ! Une erreur s'est produite 😢",
+      "loading": "Oups ! Impossible de charger le contenu éducatif. Réessayez ! 🎈"
+    },
+    "noContent": {
+      "title": "Aucun contenu éducatif trouvé 🧐",
+      "description": "Essayez d’ajuster vos filtres ou recherchez autre chose."
+    },
+    "badges": {
+      "superSmart": "Super Intelligent ! 🎓",
+      "learningTime": "Heure d'Apprentissage ! 📚",
+      "funLearning": "Apprentissage Amusant ! 🎈",
+      "awesomeContent": "Contenu Génial ! ✨"
+    },
+    "metadata": {
+      "durationNA": "N/A",
+      "durationNAFull": "Durée : N/A",
+      "kidSafe": "Sans danger pour les enfants 🛡️",
+      "educational": "Éducatif 📚",
+      "noDescription": "Aucune description disponible"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant"
+    },
+    "ageGroups": {
+      "preschool": "Maternelle 👶",
+      "earlyElementary": "Primaire (Début) 🧒",
+      "upperElementary": "Primaire (Avancé) 👦",
+      "middleSchool": "Collège 🎓"
+    }
+  },
+  "favorites": {
+    "seo": {
+      "title": "Mes Favoris - Oliviuus Kids",
+      "description": "Vos vidéos éducatives préférées et votre liste à regarder plus tard. Accédez à tout ce que vous aimez au même endroit !"
+    },
+    "header": {
+      "title": "MES FAVORIS",
+      "subtitle": "Mes Favoris • Toutes les vidéos que tu aimes ! ❤️"
+    },
+    "tabs": {
+      "all": "Tout",
+      "liked": "Aimés",
+      "watchLater": "À regarder plus tard"
+    },
+    "search": {
+      "placeholder": "🔍 Rechercher dans les favoris..."
+    },
+    "buttons": {
+      "gridView": "Vue Grille",
+      "listView": "Vue Liste",
+      "clearFilters": "Effacer les filtres",
+      "tryAgain": "Réessayer 🔄",
+      "watch": "Regarder ▶️",
+      "clearSearch": "Effacer la recherche ✨",
+      "browseVideos": "Explorer les vidéos 🎈",
+      "remove": "Retirer"
+    },
+    "activeFilters": "Affichage",
+    "badges": {
+      "liked": "Aimé ❤️",
+      "watchLater": "À regarder plus tard ⏰"
+    },
+    "results": {
+      "videosFound": "vidéos trouvées",
+      "searchFor": "pour \"{{query}}\""
+    },
+    "errors": {
+      "title": "Oups ! Une erreur s'est produite 😢",
+      "loading": "Oups ! Impossible de charger vos favoris. Réessayez ! 🎈"
+    },
+    "emptyStates": {
+      "noMatches": "Aucun résultat 🧐",
+      "noLikedVideos": "Aucune vidéo aimée pour l’instant ❤️",
+      "noWatchLater": "Votre liste à regarder plus tard est vide ⏰",
+      "noFavorites": "Aucun favori pour l’instant ✨",
+      "tryDifferentSearch": "Essayez un autre terme de recherche",
+      "likeSomeVideos": "Aime des vidéos pour les voir ici !",
+      "addToWatchLater": "Ajoutez des vidéos à regarder plus tard pour les voir ici !",
+      "startLiking": "Commence à aimer des vidéos ou à en ajouter pour plus tard !"
+    },
+    "metadata": {
+      "durationNA": "N/A",
+      "durationNAFull": "N/A",
+      "kidSafe": "Adapté aux enfants 🛡️",
+      "noDescription": "Aucune description disponible"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant"
+    },
+    "tooltips": {
+      "removeFromLiked": "Retirer des vidéos aimées",
+      "addToLiked": "Ajouter aux vidéos aimées",
+      "removeFromWatchLater": "Retirer de la liste à regarder plus tard",
+      "addToWatchLater": "Ajouter à la liste à regarder plus tard",
+      "removeFromList": "Retirer de la liste"
+    }
+  },
+  "games": {
+    "seo": {
+      "title": "Jeux pour Enfants - Bientôt Disponible",
+      "description": "Des jeux amusants et éducatifs pour enfants seront bientôt disponibles !"
+    },
+    "header": {
+      "title": "Zone de Jeux",
+      "subtitle": "Des Jeux Amusants Arrivent Bientôt ! 🎮",
+      "description": "Nous travaillons à vous apporter des jeux incroyables, adaptés aux enfants, amusants et éducatifs. Restez à l’écoute pour des nouveautés passionnantes !"
+    },
+    "features": {
+      "title": "Qu’est-ce qui Arrive ?",
+      "funEducational": "Jeux Amusants et Éducatifs",
+      "puzzles": "Casse-têtes pour Stimuler l’Esprit",
+      "skillBuilding": "Activités pour Développer les Compétences",
+      "safeContent": "Contenu Sécurisé et Adapté aux Enfants"
+    },
+    "construction": {
+      "title": "En Construction",
+      "description": "Nous construisons une collection incroyable de jeux pour enfants ! Revenez bientôt pour découvrir des jeux amusants, éducatifs et passionnants qui rendront l’apprentissage agréable ! ✨"
+    },
+    "buttons": {
+      "comingSoon": "Bientôt Disponible !"
+    }
+  },
+  "kidLanding": {
+    "seo": {
+      "siteName": "Oliviuus Kids",
+      "defaultTitle": "Contenus Amusants et Sécurisés pour Enfants",
+      "defaultDescription": "Regarde des dessins animés, des programmes éducatifs et des aventures amusantes adaptés aux enfants.",
+      "keywords": "enfants, dessins animés, éducatif, famille, sécurisé, streaming, vidéos"
+    },
+    "sections": {
+      "featured": {
+        "title": "Programmes en Vedette",
+        "subtitle": "Les choix populaires pour enfants"
+      },
+      "educational": {
+        "title": "Apprendre en S'Amusant",
+        "subtitle": "Contenu éducatif et divertissant"
+      },
+      "fun": {
+        "title": "Amusement & Jeux",
+        "subtitle": "Aventures divertissantes"
+      },
+      "recent": {
+        "title": "Nouveautés",
+        "subtitle": "Contenu ajouté récemment"
+      }
+    },
+    "actions": {
+      "play": "Lire",
+      "stop": "Arrêter",
+      "trailer": "Bande-annonce",
+      "mute": "Muet",
+      "unmute": "Activer le son",
+      "addToList": "Ajouter à Ma Liste",
+      "removeFromList": "Retirer de Ma Liste",
+      "myList": "Ma Liste",
+      "inList": "Dans la Liste",
+      "like": "Aimer",
+      "unlike": "Ne plus aimer",
+      "liked": "Aimé",
+      "details": "Détails",
+      "tryAgain": "Réessayer",
+      "scrollLeft": "Faire défiler {{section}} à gauche",
+      "scrollRight": "Faire défiler {{section}} à droite"
+    },
+    "badges": {
+      "learning": "Éducatif",
+      "approved": "Approuvé"
+    },
+    "ratings": {
+      "all": "Tous Âges",
+      "G": "Tous Âges",
+      "TV-Y": "Enfants",
+      "TV-Y7": "Enfants 7+",
+      "TV-G": "Tous Âges",
+      "PG": "Avec Contrôle Parental",
+      "7+": "Dès 7 ans",
+      "8+": "Dès 8 ans",
+      "9+": "Dès 9 ans",
+      "10+": "Dès 10 ans",
+      "11+": "Dès 11 ans",
+      "12+": "Dès 12 ans",
+      "default": "Adapté aux Enfants"
+    },
+    "errors": {
+      "contentLoad": "Un problème est survenu lors du chargement du contenu. Veuillez réessayer bientôt.",
+      "somethingWentWrong": "Une erreur s’est produite",
+      "error": "Erreur",
+      "noContent": "Aucun contenu disponible",
+      "checkBackLater": "Revenez plus tard pour découvrir les nouveautés."
+    }
+  },
+"termsOfService": {
+  "title": "Conditions d'utilisation",
+  "lastUpdated": "Dernière mise à jour",
+  "welcome": "Bienvenue sur Oliviuus, une plateforme de streaming dédiée à offrir du divertissement au Rwanda et au-delà. Ces Conditions d'utilisation (\"Conditions\") régissent votre accès et votre utilisation de la plateforme Oliviuus, y compris notre site web, applications mobiles, services de streaming et toutes les fonctionnalités associées (collectivement, le \"Service\").",
+  "agreementNotice": "En créant un compte, en vous abonnant ou en utilisant le Service, vous acceptez ces Conditions. Si vous n'êtes pas d'accord, vous ne pouvez pas utiliser Oliviuus.",
+  
+  "sections": {
+    "eligibility": {
+      "title": "Éligibilité",
+      "description": "Pour utiliser Oliviuus :",
+      "points": [
+        "Vous devez avoir au moins 13 ans.",
+        "Si vous avez moins de 18 ans, vous devez obtenir le consentement d'un parent ou tuteur.",
+        "Vous devez fournir des informations exactes pour votre compte.",
+        "Nous pouvons suspendre ou résilier les comptes qui violent ces exigences."
+      ]
+    },
+    "accountRegistration": {
+      "title": "Enregistrement du compte",
+      "description": "Lors de la création d'un compte :",
+      "points1": [
+        "Vous devez fournir des informations exactes et complètes.",
+        "Vous êtes responsable de la sécurité de vos identifiants de connexion.",
+        "Vous devez nous informer immédiatement de toute activité non autorisée."
+      ],
+      "separator": "Vous ne pouvez pas :",
+      "points2": [
+        "Créer plusieurs comptes pour abuser des essais gratuits.",
+        "Partager votre mot de passe avec des personnes extérieures à votre foyer.",
+        "Utiliser ou accéder au compte de quelqu'un d'autre sans autorisation."
+      ]
+    },
+    "freeTrial": {
+      "title": "Essai gratuit",
+      "description": "Oliviuus peut offrir un essai gratuit unique par utilisateur et méthode de paiement.",
+      "duringTrial": "Pendant l'essai gratuit :",
+      "points": [
+        "Vous ne serez pas facturé.",
+        "Vous pouvez annuler à tout moment avant la fin de l'essai pour éviter des frais."
+      ],
+      "warning": "Tenter d'exploiter ou de contourner le système d'essai gratuit est interdit."
+    },
+    "subscriptionsPayments": {
+      "title": "Abonnements & Paiements",
+      "description": "En vous abonnant :",
+      "points": [
+        "Vous autorisez Oliviuus à débiter votre méthode de paiement sélectionnée (par ex., Mobile Money, carte).",
+        "Les frais d'abonnement sont facturés mensuellement sauf indication contraire.",
+        "Tous les paiements sont non remboursables sauf exigence légale.",
+        "Nous pouvons modifier les prix, mais nous vous informerons à l'avance."
+      ]
+    },
+    "contentUsageRules": {
+      "title": "Contenu & Règles d'utilisation",
+      "description": "Oliviuus vous accorde une licence limitée, non transférable et non exclusive pour accéder à notre contenu à des fins personnelles et non commerciales.",
+      "notAllowed": "Vous acceptez de ne pas :",
+      "points": [
+        "Télécharger, copier, enregistrer l'écran ou redistribuer le contenu sans permission.",
+        "Utiliser le Service pour des projections publiques sans autorisation.",
+        "Contourner les restrictions géographiques ou de sécurité.",
+        "Utiliser des bots, scripts ou outils automatisés pour accéder au Service."
+      ],
+      "deviceLimit": "Nous pouvons limiter le nombre d'appareils pouvant streamer simultanément."
+    },
+    "intellectualProperty": {
+      "title": "Propriété intellectuelle",
+      "description": "Tout le contenu Oliviuus (films, séries, design UI, assets de marque, logos, logiciels) est protégé par le droit d'auteur et autres lois sur la propriété intellectuelle.",
+      "notAllowed": "Vous ne pouvez pas :",
+      "points": [
+        "Modifier ou reproduire nos assets.",
+        "Créer des œuvres dérivées sans permission.",
+        "Utiliser le nom de la marque Oliviuus sans approbation écrite."
+      ]
+    },
+    "thirdPartyIntegrations": {
+      "title": "Intégrations tierces",
+      "description": "Oliviuus peut collaborer avec des partenaires tiers (analyse, processeurs de paiement, cloud).",
+      "notResponsible": "Nous ne sommes pas responsables de :",
+      "points": [
+        "Leurs contenus,",
+        "Leurs politiques, ou",
+        "Les erreurs causées par leurs systèmes."
+      ]
+    },
+    "termination": {
+      "title": "Résiliation",
+      "description": "Nous pouvons suspendre ou résilier votre compte si :",
+      "points": [
+        "Vous violez ces Conditions,",
+        "Vous vous engagez dans des activités illégales ou nuisibles,",
+        "Vous abusez du Service ou du système de paiement."
+      ],
+      "userRight": "Vous pouvez également supprimer votre compte à tout moment."
+    },
+    "serviceAvailability": {
+      "title": "Disponibilité du Service",
+      "description": "Nous nous efforçons de fournir un service ininterrompu, mais :",
+      "points": [
+        "Des interruptions, maintenances ou erreurs peuvent survenir.",
+        "Nous ne garantissons pas une disponibilité de 100%.",
+        "Certain contenu peut être ajouté ou retiré sans préavis."
+      ]
+    },
+    "disclaimer": {
+      "title": "Avertissement",
+      "description": "Oliviuus est fourni \"tel quel\" et \"selon disponibilité\".",
+      "notGuarantee": "Nous ne garantissons pas :",
+      "points": [
+        "Que le Service répondra à vos attentes,",
+        "Qu'il n'y aura pas d'interruptions ou erreurs,",
+        "Que tout le contenu restera toujours disponible."
+      ]
+    },
+    "limitationOfLiability": {
+      "title": "Limitation de responsabilité",
+      "description": "Dans la limite maximale permise par la loi :",
+      "points": [
+        "Oliviuus n'est pas responsable des dommages indirects, accessoires ou spéciaux.",
+        "Notre responsabilité totale ne dépassera pas le montant que vous avez payé pour le Service au cours des 3 derniers mois."
+      ]
+    },
+    "changesToTerms": {
+      "title": "Modifications des Conditions",
+      "description": "Nous pouvons mettre à jour ces Conditions de temps en temps.",
+      "continuation": "Continuer à utiliser Oliviuus après les mises à jour signifie que vous acceptez les Conditions révisées."
+    },
+    "contactInformation": {
+      "title": "Informations de contact",
+      "description": "Si vous avez des questions sur ces Conditions :",
+      "email": "oliviuusteam@gmail.com",
+      "location": "Musanze, Rwanda"
+    }
+  },
+  
+  "footer": "Ces Conditions d'utilisation sont en vigueur à partir du {{date}}. En utilisant Oliviuus, vous reconnaissez avoir lu, compris et accepté d'être lié par ces Conditions.",
+  
+  "seo": {
+    "title": "Conditions d'utilisation Oliviuus | Règles et politiques de la plateforme de streaming",
+    "description": "Lisez les Conditions d'utilisation d'Oliviuus. Découvrez les règles de notre plateforme de streaming, les politiques d'abonnement, les directives d'utilisation du contenu et les accords pour les utilisateurs au Rwanda et à l'international.",
+    "keywords": "conditions d'utilisation Oliviuus, règles plateforme streaming, politiques abonnement, directives utilisation contenu, accord utilisateur, service streaming Rwanda, conditions plateforme divertissement"
+  }
+}
+,
+  "privacyPolicy": {
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière Mise à Jour",
+    "introduction": "Oliviuus (\"nous\") s'engage à protéger votre vie privée. Cette politique de confidentialité explique comment nous collectons, utilisons, stockons et protégeons vos informations personnelles.",
+    "sections": {
+      "informationWeCollect": {
+        "title": "Informations que Nous Collectons",
+        "subsections": {
+          "informationYouProvide": {
+            "title": "A. Informations que vous fournissez",
+            "points": [
+              "Nom complet",
+              "Adresse email",
+              "Mot de passe",
+              "Méthode de paiement (Mobile Money ou carte)",
+              "Préférences du profil",
+              "Messages de feedback ou support client"
+            ],
+            "note": "Nous ne stockons pas vos informations complètes de paiement—seulement les données nécessaires à la transaction."
+          },
+          "informationCollectedAutomatically": {
+            "title": "B. Informations collectées automatiquement",
+            "points": [
+              "Adresse IP",
+              "Informations sur l'appareil (modèle, OS, navigateur)",
+              "Horodatages de connexion",
+              "Historique de visionnage",
+              "Interactions d'utilisation",
+              "Paramètres de langue et thème"
+            ]
+          },
+          "cookiesTracking": {
+            "title": "C. Cookies & Suivi",
+            "description": "Nous utilisons des cookies pour :",
+            "points": [
+              "Maintenir votre session connectée,",
+              "Personnaliser les recommandations,",
+              "Améliorer la performance de la plateforme."
+            ]
+          }
+        }
+      },
+      "howWeUseYourInformation": {
+        "title": "Comment Nous Utilisons Vos Informations",
+        "description": "Nous utilisons vos données pour :",
+        "points": [
+          "Créer et gérer votre compte",
+          "Fournir du contenu en streaming",
+          "Personnaliser votre expérience",
+          "Traiter les paiements et vérifier les essais",
+          "Prévenir la fraude ou les abus",
+          "Fournir un support client",
+          "Améliorer la qualité de la plateforme"
+        ],
+        "importantNote": "Nous ne vendons jamais vos données personnelles."
+      },
+      "sharingYourInformation": {
+        "title": "Partage de Vos Informations",
+        "subsections": {
+          "serviceProviders": {
+            "title": "A. Fournisseurs de services",
+            "points": [
+              "Processeurs de paiement",
+              "Fournisseurs de stockage cloud",
+              "Outils d'analyse",
+              "Systèmes de notification et email"
+            ]
+          },
+          "legalRequirements": {
+            "title": "B. Exigences légales",
+            "description": "Si requis par :",
+            "points": [
+              "Autorités légales",
+              "Ordonnances judiciaires",
+              "Autorités de régulation"
+            ],
+            "note": "Nous partagerons uniquement ce qui est légalement nécessaire."
+          }
+        }
+      },
+      "dataStorageSecurity": {
+        "title": "Stockage & Sécurité des Données",
+        "description": "Nous utilisons :",
+        "points": [
+          "Stockage chiffré,",
+          "Serveurs sécurisés,",
+          "Contrôle d'accès,",
+          "Audits de sécurité réguliers."
+        ],
+        "warning": "Cependant, aucun système n'est 100% sécurisé.",
+        "recommendation": "Nous vous recommandons d'utiliser un mot de passe fort."
+      },
+      "yourRights": {
+        "title": "Vos Droits",
+        "description": "Vous pouvez :",
+        "points": [
+          "Accéder à vos informations",
+          "Mettre à jour votre profil",
+          "Demander la suppression de votre compte",
+          "Demander une copie de vos données",
+          "Modifier la langue ou les préférences de confidentialité"
+        ],
+        "requestTitle": "Pour les demandes :",
+        "email": "oliviuusteam@gmail.com"
+      },
+      "dataRetention": {
+        "title": "Conservation des Données",
+        "description": "Nous conservons :",
+        "points": [
+          "Les données de compte jusqu'à la suppression du compte",
+          "Les données de transaction selon les exigences légales",
+          "Les journaux de visionnage pour la précision des recommandations"
+        ]
+      },
+      "childrensPrivacy": {
+        "title": "Confidentialité des Enfants",
+        "description1": "Oliviuus ne collecte pas sciemment de données d'enfants de moins de 13 ans.",
+        "description2": "Si vous pensez qu'un enfant a fourni des données, contactez-nous pour les supprimer."
+      },
+      "changesToPolicy": {
+        "title": "Modifications de Cette Politique",
+        "description": "Nous pouvons mettre à jour cette politique de temps à autre.",
+        "notification": "Nous vous informerons des changements majeurs."
+      },
+      "contactInformation": {
+        "title": "Informations de Contact",
+        "email": "oliviuusteam@gmail.com",
+        "location": "Musanze, Rwanda"
+      }
+    },
+    "footer": {
+      "consent": "En utilisant Oliviuus, vous consentez à la collecte et à l'utilisation de vos informations comme décrit dans cette Politique de Confidentialité. Si vous avez des préoccupations concernant votre vie privée, contactez-nous.",
+      "effectiveDate": "Cette politique de confidentialité est effective à partir du {{date}}."
+    },
+    "seo": {
+      "title": "Politique de Confidentialité Oliviuus | Protection des Données & Confidentialité Utilisateur",
+      "description": "Lisez la Politique de Confidentialité Oliviuus. Découvrez comment nous protégeons vos données, quelles informations nous collectons, comment nous les utilisons et vos droits en matière de vie privée sur notre plateforme de streaming.",
+      "keywords": "politique de confidentialité Oliviuus, protection des données, vie privée utilisateur, collecte de données plateforme, conformité GDPR, confidentialité Rwanda, sécurité des informations personnelles"
+    }
+  },
+  "helpCenter": {
+    "title": "Centre d'Aide",
+    "subtitle": "Trouvez des réponses aux questions fréquentes ou obtenez une assistance personnalisée de notre équipe",
+    "search": {
+      "placeholder": "De quoi avez-vous besoin d'aide ? Tapez votre question...",
+      "button": "Rechercher",
+      "popularTags": [
+        "Réinitialisation du mot de passe",
+        "Problèmes de paiement",
+        "Problèmes de streaming",
+        "Application ne fonctionne pas",
+        "Sécurité du compte"
+      ],
+      "clear": "Effacer la recherche",
+      "noResults": {
+        "title": "Aucun résultat exact trouvé pour \"{{query}}\"",
+        "description": "Essayez d'autres mots-clés ou parcourez nos catégories d'aide ci-dessous",
+        "clear": "Effacer la recherche",
+        "contact": "Contacter le support"
+      }
+    },
+    "results": {
+      "title": "Résultats de la recherche",
+      "found": "{{count}} résultat{{s}} trouvé{{s}} pour \"{{query}}\"",
+      "viewInCategory": "Voir dans la catégorie →",
+      "defaultAnswer": "Veuillez consulter la catégorie d’aide spécifique pour obtenir des informations détaillées sur ce sujet."
+    },
+    "categories": {
+      "title": "Parcourir les catégories d'aide",
+      "questions": "{{count}} questions",
+      "account": {
+        "title": "Compte & Connexion",
+        "icon": "👤",
+        "questions": [
+          {
+            "question": "Comment créer un compte",
+            "answer": "Cliquez sur 'Sign In' sur notre page d'accueil. Entrez votre email, créez un mot de passe sécurisé et complétez le processus de vérification. Vous recevrez un email de confirmation pour activer votre compte Oliviuus."
+          },
+          {
+            "question": "Comment réinitialiser votre mot de passe",
+            "answer": "Allez sur la page de connexion et cliquez sur 'Mot de passe oublié'. Entrez votre adresse email enregistrée, nous vous enverrons un lien sécurisé pour réinitialiser votre mot de passe. Pour des raisons de sécurité, le lien expire après 24 heures."
+          },
+          {
+            "question": "Comment vérifier votre email",
+            "answer": "Vérifiez votre boîte de réception pour un email de vérification d'Oliviuus. Cliquez sur le lien de vérification pour confirmer votre compte. Si vous ne voyez pas l'email, vérifiez votre dossier spam ou courrier indésirable."
+          },
+          {
+            "question": "Comment modifier les informations de votre compte",
+            "answer": "Accédez au menu de votre profil et sélectionnez 'Paramètres du compte'. Vous pouvez y mettre à jour vos informations personnelles, email, mot de passe et préférences de communication en toute sécurité."
+          }
+        ]
+      },
+      "payment": {
+        "title": "Paiement & Abonnements",
+        "icon": "💳",
+        "questions": [
+          {
+            "question": "Méthodes de paiement acceptées",
+            "answer": "Oliviuus accepte Mobile Money (MTN, Airtel), Visa, MasterCard et les méthodes locales au Rwanda. Toutes les transactions sont traitées via des passerelles sécurisées et cryptées."
+          },
+          {
+            "question": "Comment fonctionnent les essais promotionnels",
+            "answer": "Oliviuus propose parfois des périodes d'essai promotionnelles lors d'événements spéciaux ou campagnes. Ces essais sont annoncés sur notre site et nos réseaux sociaux. Les abonnements réguliers sont facturés mensuellement."
+          },
+          {
+            "question": "Comment mettre à jour votre méthode de paiement",
+            "answer": "Dans les paramètres du compte, allez dans 'Facturation & Paiements'. Cliquez sur 'Mettre à jour le mode de paiement' pour entrer de nouvelles informations. Votre abonnement continue sans interruption."
+          },
+          {
+            "question": "Comment annuler ou reprendre votre abonnement",
+            "answer": "Pour annuler : allez dans 'Gestion des abonnements' et choisissez 'Annuler l'abonnement'. Pour reprendre : visitez la page d'abonnement et sélectionnez 'Réactiver l'abonnement'. Les changements prennent effet à la fin du cycle de facturation en cours."
+          }
+        ]
+      },
+      "watching": {
+        "title": "Regarder sur Oliviuus",
+        "icon": "🎬",
+        "questions": [
+          {
+            "question": "Appareils et plateformes supportés",
+            "answer": "Streaming sur : navigateurs web (Chrome, Safari, Firefox, Edge), apps mobiles iOS/Android, Smart TVs (Android TV, Samsung Tizen), consoles de jeux et tablettes. Vitesse internet recommandée : 5 Mbps HD, 25 Mbps 4K."
+          },
+          {
+            "question": "Pourquoi ma vidéo met en tampon ou est de mauvaise qualité",
+            "answer": "Le buffering indique généralement un problème réseau. Recommandations : 1) Tester la vitesse internet 2) Redémarrer modem/router 3) Réduire la qualité 4) Fermer les apps utilisant beaucoup de bande passante 5) Connexion filaire si possible."
+          },
+          {
+            "question": "Comment télécharger du contenu pour le visionnage hors ligne",
+            "answer": "Cherchez l'icône de téléchargement (↓) sur les titres supportés. Les téléchargements sont disponibles uniquement dans l'application mobile. Le contenu expire après 48 heures selon les accords de licence."
+          },
+          {
+            "question": "Résoudre les problèmes de lecture ou audio",
+            "answer": "Étapes : 1) Actualiser l'application 2) Vérifier la sortie audio 3) Mettre à jour navigateur/app 4) Vider cache & cookies 5) Tester sur un autre appareil/navigateur 6) Vérifier l'état du service."
+          }
+        ]
+      },
+      "technical": {
+        "title": "Support Technique",
+        "icon": "🔧",
+        "questions": [
+          {
+            "question": "L'application plante ou se fige",
+            "answer": "Résolution : 1) Mettre à jour l'app 2) Forcer l'arrêt et redémarrer 3) Vider cache/data 4) Réinstaller 5) Vérifier stockage 6) Vérifier compatibilité"
+          },
+          {
+            "question": "Le site ou l'app ne charge pas correctement",
+            "answer": "Checklist : 1) Vérifier internet 2) Compatibilité navigateur 3) Désactiver extensions/ad-blockers 4) Vider cache 5) Mode incognito 6) status.oliviuus.com"
+          },
+          {
+            "question": "Vider cache & cookies",
+            "answer": "Browser : Paramètres → Confidentialité & Sécurité → Effacer les données. Mobile : Paramètres → Apps → Oliviuus → Stockage → Vider cache. Résout de nombreux problèmes de chargement."
+          },
+          {
+            "question": "Maintenir votre app à jour",
+            "answer": "iOS : App Store → Profil → Mises à jour. Android : Google Play → Mes Apps → Mises à jour. Activez les mises à jour automatiques."
+          }
+        ]
+      },
+      "security": {
+        "title": "Sécurité",
+        "icon": "🔒",
+        "questions": [
+          {
+            "question": "Protéger la sécurité de votre compte",
+            "answer": "Bonnes pratiques : mot de passe fort, 2FA, ne partagez jamais vos identifiants, déconnectez-vous sur les appareils partagés, surveillez l'activité du compte, attention au phishing."
+          },
+          {
+            "question": "Comment Oliviuus sécurise vos données",
+            "answer": "Sécurité entreprise : chiffrement de bout en bout, cloud sécurisé, audits réguliers, conformité GDPR/DPA, paiement tokenisé. Vos informations de paiement ne sont jamais stockées sur nos serveurs."
+          },
+          {
+            "question": "Signaler des problèmes de sécurité",
+            "answer": "Contactez immédiatement security@oliviuus.com avec détails, timestamps et appareil. Notre équipe enquêtera et vous aidera."
+          },
+          {
+            "question": "Contrôles de confidentialité et gestion des données",
+            "answer": "Accédez aux paramètres du compte pour gérer : historique, recommandations personnalisées, partage de données, permissions de téléchargement, communications. Vous pouvez demander export ou suppression des données."
+          }
+        ]
+      },
+      "support": {
+        "title": "Assistance Directe",
+        "subtitle": "Obtenez une aide personnalisée",
+        "description": "Vous ne trouvez pas ce dont vous avez besoin ? Notre équipe est prête à vous aider.",
+        "email": "Support par Email",
+        "directMessage": "Message Direct"
+      }
+    },
+    "contact": {
+      "title": "Contacter le support",
+      "directMessage": {
+        "title": "Support par Message Direct",
+        "subtitle": "Obtenez une assistance personnalisée de notre équipe",
+        "close": "Fermer",
+        "description": "Remplissez le formulaire ci-dessous, notre équipe vous répondra sous 24 heures."
+      },
+      "email": {
+        "title": "Support Email",
+        "response": "Réponse sous 24h"
+      },
+      "phone": {
+        "title": "Support Téléphonique",
+        "description": "Assistance directe"
+      },
+      "hours": {
+        "title": "Heures de Support",
+        "days": "Lundi - Dimanche"
+      },
+      "buttons": {
+        "sendEmail": "Envoyer Email",
+        "callNow": "Appeler Maintenant",
+        "directMessage": "Message Direct"
+      },
+      "responseTime": "Notre équipe s'engage à vous fournir la meilleure assistance. Temps moyen de réponse : 2-4 heures pendant les heures ouvrables."
+    },
+    "seo": {
+      "title": "Centre d'Aide Oliviuus | Support Client & FAQ",
+      "description": "Obtenez de l'aide sur le service Oliviuus. Trouvez des réponses aux FAQ, guides de dépannage, support de compte, aide au paiement et informations de contact. Disponible en anglais, français et kinyarwanda.",
+      "keywords": "centre d'aide Oliviuus, support streaming, dépannage compte, aide paiement, support technique Rwanda, service client, FAQ, contact Oliviuus"
     }
   }
 }

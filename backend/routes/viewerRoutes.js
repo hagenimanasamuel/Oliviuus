@@ -11,7 +11,7 @@ const {
   getUserContentPreferences,
   getBatchUserPreferences,
   getUserWatchlist,
-  extractDeviceInfo
+extractDeviceInfo
 } = require("../controllers/viewerController");
 const authMiddleware = require("../middlewares/authMiddleware");
 

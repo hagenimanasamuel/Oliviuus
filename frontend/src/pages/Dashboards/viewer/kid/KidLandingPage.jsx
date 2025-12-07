@@ -1,7 +1,8 @@
-// src/pages/Dashboards/kid/KidLandingPage.jsx
+// src/pages/Dashboards/kid/KidLandingPage.jsx - UPDATED VERSION
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { useTranslation } from "react-i18next";
 import {
   Play,
   Plus,
@@ -15,24 +16,25 @@ import {
   Volume2,
   VolumeX,
   Sparkles,
-  TrendingUp,
-  Clock as ClockIcon,
   Heart,
   Check,
   Loader2,
   BookOpen,
   GamepadIcon,
-  Music,
-  Star
+  Star,
+  Shield,
+  GraduationCap
 } from "lucide-react";
 import api from "../../../../api/axios";
 import userPreferencesApi from "../../../../api/userPreferencesApi";
 import ContentCard from "../../../../components/layout/dashboard/viewer/kid/content/ContentCard";
 import { useContentDetail } from '../../../../hooks/useContentDetail';
 import ContentDetailPage from '../ContentDetailPage';
+import KidLandingPageContents from './KidLandingPageContents';
 
 export default function KidLandingPage({ kidProfile }) {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation(); // Initialize translation hook
   
   const {
     detailModal,
@@ -49,7 +51,7 @@ export default function KidLandingPage({ kidProfile }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isTrailerPlaying, setIsTrailerPlaying] = useState(false);
-  const [isTrailerMuted, setIsTrailerMuted] = useState(true); // Muted by default for kids
+  const [isTrailerMuted, setIsTrailerMuted] = useState(false);
   const [isHeroInView, setIsHeroInView] = useState(true);
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [heroPreferences, setHeroPreferences] = useState({
@@ -64,29 +66,29 @@ export default function KidLandingPage({ kidProfile }) {
 
   const videoRef = useRef(null);
   const heroSectionRef = useRef(null);
-  const contentSectionRef = useRef(null);
-  const sectionRefs = useRef({});
   const contentFetchedRef = useRef(false);
 
-  // SEO Meta Data for kids
+  // SEO Meta Data for kids - Using translations
   const getSeoMetadata = () => {
-    const siteName = "Oliviuus Kids";
-    const defaultTitle = "Fun & Safe Kids Content";
-    const defaultDescription = "Watch kid-friendly cartoons, educational shows, and fun adventures. Safe, age-appropriate content for children.";
+    const siteName = t("kidLanding.seo.siteName", "Oliviuus Kids");
+    const defaultTitle = t("kidLanding.seo.defaultTitle", "Fun & Safe Kids Content");
+    const defaultDescription = t("kidLanding.seo.defaultDescription", "Watch kid-friendly cartoons, educational shows, and fun adventures. Safe, age-appropriate content for children.");
     
     if (heroContent) {
       return {
         title: `${heroContent.title} | ${siteName}`,
         description: heroContent.short_description || heroContent.description || defaultDescription,
         image: heroContent.media_assets?.[0]?.url,
-        canonical: window.location.href
+        canonical: window.location.href,
+        language: i18n.language
       };
     }
 
     return {
       title: defaultTitle,
       description: defaultDescription,
-      canonical: window.location.href
+      canonical: window.location.href,
+      language: i18n.language
     };
   };
 
@@ -100,7 +102,6 @@ export default function KidLandingPage({ kidProfile }) {
       setError(null);
       contentFetchedRef.current = true;
 
-      // Use kid-specific API endpoint
       const response = await api.get('/kid/landing-content');
       const data = response.data.data;
 
@@ -125,12 +126,12 @@ export default function KidLandingPage({ kidProfile }) {
 
     } catch (err) {
       console.error('Kid content loading error:', err);
-      setError('We encountered an issue loading content. Please try again shortly.');
+      setError(t('kidLanding.errors.contentLoad', 'We encountered an issue loading content. Please try again shortly.'));
       contentFetchedRef.current = false;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   // Fetch hero content preferences when hero content is loaded
   useEffect(() => {
@@ -205,7 +206,7 @@ export default function KidLandingPage({ kidProfile }) {
     return () => observer.disconnect();
   }, [isTrailerPlaying]);
 
-  // Auto-play trailer when hero content loads (muted for kids)
+  // Auto-play trailer when hero content loads
   useEffect(() => {
     if (heroContent?.trailer) {
       const timer = setTimeout(() => {
@@ -216,15 +217,14 @@ export default function KidLandingPage({ kidProfile }) {
     }
   }, [heroContent]);
 
-  // Start trailer playback (always muted for kids)
+  // Start trailer playback
   const startTrailerPlayback = async () => {
     if (!heroContent?.trailer || !videoRef.current) return;
 
     try {
       videoRef.current.currentTime = 0;
-      videoRef.current.muted = true; // Always muted for kids
-      setIsTrailerMuted(true);
       setIsTrailerPlaying(true);
+      videoRef.current.muted = isTrailerMuted;
 
       await new Promise(resolve => setTimeout(resolve, 50));
       await videoRef.current.play();
@@ -266,9 +266,27 @@ export default function KidLandingPage({ kidProfile }) {
     }
   };
 
+  const toggleMute = (e) => {
+    e.stopPropagation();
+
+    if (!videoRef.current) return;
+
+    const newMutedState = !videoRef.current.muted;
+    videoRef.current.muted = newMutedState;
+    videoRef.current.volume = newMutedState ? 0 : 1;
+    setIsTrailerMuted(newMutedState);
+  };
+
+  // Sync muted state
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isTrailerMuted;
+      videoRef.current.volume = isTrailerMuted ? 0 : 1;
+    }
+  }, [isTrailerMuted]);
+
   // Enhanced handlePlayContent with zoom animation
   const handlePlayContent = useCallback((content) => {
-    // Stop trailer if playing
     if (isTrailerPlaying) {
       setIsTrailerPlaying(false);
       if (videoRef.current) {
@@ -277,43 +295,33 @@ export default function KidLandingPage({ kidProfile }) {
       }
     }
     
-    // Start redirect animation
     setRedirecting(true);
     
-    // Wait for animation to complete before navigating
     setTimeout(() => {
       if (content?.id) {
-        navigate(`/kid/watch/${content.id}`);
+        navigate(`/watch/${content.id}`);
       }
     }, 500);
   }, [navigate, isTrailerPlaying]);
 
-  const scrollSection = useCallback((sectionKey, direction) => {
-    const container = sectionRefs.current[sectionKey];
-    if (container) {
-      const scrollAmount = container.clientWidth * 0.8;
-      const newScrollPos = direction === 'right'
-        ? container.scrollLeft + scrollAmount
-        : container.scrollLeft - scrollAmount;
-
-      container.scrollTo({
-        left: newScrollPos,
-        behavior: 'smooth'
-      });
-    }
-  }, []);
-
   const getAgeRating = (content) => {
     const rating = content.age_rating || "G";
     const ratingMap = {
-      'G': 'All Ages',
-      'TV-Y': 'Kids',
-      'TV-Y7': 'Kids 7+',
-      'PG': 'Parental Guidance',
-      'TV-PG': 'Parental Guidance'
+      'all': t('kidLanding.ratings.all', 'All Ages'),
+      'G': t('kidLanding.ratings.G', 'All Ages'),
+      'TV-Y': t('kidLanding.ratings.TV-Y', 'Kids'),
+      'TV-Y7': t('kidLanding.ratings.TV-Y7', 'Kids 7+'),
+      'TV-G': t('kidLanding.ratings.TV-G', 'All Ages'),
+      'PG': t('kidLanding.ratings.PG', 'Parental Guidance'),
+      '7+': t('kidLanding.ratings.7+', 'Age 7+'),
+      '8+': t('kidLanding.ratings.8+', 'Age 8+'),
+      '9+': t('kidLanding.ratings.9+', 'Age 9+'),
+      '10+': t('kidLanding.ratings.10+', 'Age 10+'),
+      '11+': t('kidLanding.ratings.11+', 'Age 11+'),
+      '12+': t('kidLanding.ratings.12+', 'Age 12+')
     };
 
-    return ratingMap[rating] || rating;
+    return ratingMap[rating] || t('kidLanding.ratings.default', 'Kid Safe');
   };
 
   const handleAddToLibrary = useCallback(async (content, e) => {
@@ -322,6 +330,11 @@ export default function KidLandingPage({ kidProfile }) {
     if (!content?.id) return;
 
     try {
+      setHeroPreferences(prev => ({
+        ...prev,
+        loading: { ...prev.loading, watchlist: true }
+      }));
+
       const action = heroPreferences.isInList ? 'remove' : 'add';
       const response = await userPreferencesApi.toggleWatchlist(content.id, action);
 
@@ -329,11 +342,16 @@ export default function KidLandingPage({ kidProfile }) {
         const newInListState = !heroPreferences.isInList;
         setHeroPreferences(prev => ({
           ...prev,
-          isInList: newInListState
+          isInList: newInListState,
+          loading: { ...prev.loading, watchlist: false }
         }));
       }
     } catch (error) {
       console.error('Error updating watchlist:', error);
+      setHeroPreferences(prev => ({
+        ...prev,
+        loading: { ...prev.loading, watchlist: false }
+      }));
     }
   }, [heroPreferences.isInList]);
 
@@ -343,6 +361,11 @@ export default function KidLandingPage({ kidProfile }) {
     if (!content?.id) return;
 
     try {
+      setHeroPreferences(prev => ({
+        ...prev,
+        loading: { ...prev.loading, like: true }
+      }));
+
       const action = heroPreferences.isLiked ? 'unlike' : 'like';
       const response = await userPreferencesApi.toggleLike(content.id, action);
 
@@ -350,21 +373,22 @@ export default function KidLandingPage({ kidProfile }) {
         const newLikedState = !heroPreferences.isLiked;
         setHeroPreferences(prev => ({
           ...prev,
-          isLiked: newLikedState
+          isLiked: newLikedState,
+          loading: { ...prev.loading, like: false }
         }));
       }
     } catch (error) {
       console.error('Error updating like:', error);
+      setHeroPreferences(prev => ({
+        ...prev,
+        loading: { ...prev.loading, like: false }
+      }));
     }
   }, [heroPreferences.isLiked]);
 
   const handleMoreInfo = useCallback((content, cardRect) => {
     openDetailModal(content, cardRect);
   }, [openDetailModal]);
-
-  const handleExploreMore = useCallback((section) => {
-    console.log('Explore more:', section);
-  }, []);
 
   // Structured Data for SEO
   const getStructuredData = () => {
@@ -384,7 +408,8 @@ export default function KidLandingPage({ kidProfile }) {
         "@type": "PeopleAudience",
         "suggestedMinAge": 3,
         "suggestedMaxAge": 12
-      }
+      },
+      "inLanguage": i18n.language
     };
 
     return JSON.stringify(structuredData);
@@ -424,196 +449,14 @@ export default function KidLandingPage({ kidProfile }) {
     </div>
   );
 
-  const ContentCardSkeleton = () => (
-    <div className="w-40 h-28 sm:w-48 sm:h-32 md:w-56 md:h-40 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 animate-pulse">
-      <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-600"></div>
-    </div>
-  );
-
-  const ContentRowSkeleton = () => (
-    <section className="relative mb-8 sm:mb-12">
-      <div className="flex items-center justify-between mb-4 sm:mb-6 px-4 sm:px-6">
-        <div>
-          <div className="h-6 sm:h-8 bg-gray-700 rounded w-32 sm:w-48 mb-2 animate-pulse"></div>
-          <div className="h-3 sm:h-4 bg-gray-700 rounded w-24 sm:w-32 animate-pulse"></div>
-        </div>
-      </div>
-      <div className="flex gap-3 sm:gap-4 overflow-x-auto px-4 sm:px-6 py-2">
-        {[...Array(6)].map((_, index) => (
-          <ContentCardSkeleton key={index} />
-        ))}
-      </div>
-    </section>
-  );
-
-  // ContentRow component for kids
-  const ContentRow = React.memo(({
-    title,
-    subtitle,
-    items,
-    sectionKey,
-    icon: Icon,
-    showExplore = true,
-    onPlay,
-    onAddToList,
-    onMoreInfo,
-    onExploreMore
-  }) => {
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(false);
-    const containerRef = useRef(null);
-
-    const handleScrollLeft = useCallback(() => {
-      const container = containerRef.current;
-      if (container) {
-        const scrollAmount = container.clientWidth * 0.8;
-        const newScrollPos = container.scrollLeft - scrollAmount;
-        container.scrollTo({ left: newScrollPos, behavior: 'smooth' });
-      }
-    }, []);
-
-    const handleScrollRight = useCallback(() => {
-      const container = containerRef.current;
-      if (container) {
-        const scrollAmount = container.clientWidth * 0.8;
-        const newScrollPos = container.scrollLeft + scrollAmount;
-        container.scrollTo({ left: newScrollPos, behavior: 'smooth' });
-      }
-    }, []);
-
-    const handleSectionExplore = useCallback(() => {
-      onExploreMore?.(sectionKey);
-    }, [sectionKey, onExploreMore]);
-
-    useEffect(() => {
-      const container = containerRef.current;
-      if (container) {
-        const updateScrollState = () => {
-          setCanScrollLeft(container.scrollLeft > 0);
-          setCanScrollRight(
-            container.scrollLeft < (container.scrollWidth - container.clientWidth - 10)
-          );
-        };
-
-        updateScrollState();
-        container.addEventListener('scroll', updateScrollState);
-        window.addEventListener('resize', updateScrollState);
-
-        return () => {
-          container.removeEventListener('scroll', updateScrollState);
-          window.removeEventListener('resize', updateScrollState);
-        };
-      }
-    }, []);
-
-    const hasMoreContent = items.length >= 5;
-
-    return (
-      <section className="relative mb-8 sm:mb-12">
-        <div className="flex items-center justify-between mb-4 sm:mb-6 px-4 sm:px-6">
-          <div className="flex items-center gap-2 sm:gap-3">
-            {Icon && (
-              <div className="p-1 sm:p-2 bg-gradient-to-br from-[#BC8BBC] to-[#9A679A] rounded-lg">
-                <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </div>
-            )}
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-white">{title}</h2>
-              {subtitle && <p className="text-gray-400 text-xs sm:text-sm mt-1">{subtitle}</p>}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Scroll buttons - hidden on mobile, visible on sm and up */}
-            <div className="hidden sm:flex items-center gap-1">
-              <button
-                onClick={handleScrollLeft}
-                disabled={!canScrollLeft}
-                className={`p-2 rounded-full transition-all ${canScrollLeft
-                  ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                  : 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                  }`}
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={handleScrollRight}
-                disabled={!canScrollRight}
-                className={`p-2 rounded-full transition-all ${canScrollRight
-                  ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                  : 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                  }`}
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Explore More Button */}
-            {showExplore && hasMoreContent && (
-              <button
-                onClick={handleSectionExplore}
-                className="hidden sm:flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all duration-200 text-sm"
-              >
-                View All
-                <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="relative">
-          {/* Mobile scroll indicators */}
-          <div className="sm:hidden flex justify-center gap-2 mb-3 px-4">
-            <div className="text-xs text-gray-500">
-              Swipe to browse →
-            </div>
-          </div>
-
-          <div
-            ref={containerRef}
-            className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide px-4 sm:px-6 scroll-smooth py-2"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
-          >
-            {items.map((content) => (
-              <div 
-                key={content.id} 
-                className="flex-shrink-0"
-              >
-                <ContentCard
-                  content={content}
-                  size="medium"
-                  onPlay={onPlay}
-                  onAddToList={onAddToList}
-                  onMoreInfo={onMoreInfo}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  });
-
-  ContentRow.displayName = 'ContentRow';
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900">
         <Helmet>
-          <title>Oliviuus Kids - Fun & Safe Kids Content</title>
-          <meta name="description" content="Watch kid-friendly cartoons, educational shows, and fun adventures. Safe, age-appropriate content for children." />
+          <title>{seoMetadata.title}</title>
+          <meta name="description" content={seoMetadata.description} />
         </Helmet>
         <HeroSkeleton />
-        <div className="relative z-30 bg-gray-900">
-          <div className="space-y-8 sm:space-y-12 py-8 sm:py-12">
-            <ContentRowSkeleton />
-            <ContentRowSkeleton />
-            <ContentRowSkeleton />
-          </div>
-        </div>
       </div>
     );
   }
@@ -622,19 +465,21 @@ export default function KidLandingPage({ kidProfile }) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
         <Helmet>
-          <title>Error - Oliviuus Kids</title>
+          <title>{t('kidLanding.errors.error', 'Error')} - {t('kidLanding.seo.siteName', 'Oliviuus Kids')}</title>
         </Helmet>
         <div className="text-center max-w-md w-full">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <X className="w-8 h-8 sm:w-10 sm:h-10 text-red-400" />
           </div>
-          <h3 className="text-white text-lg sm:text-xl font-semibold mb-2">Something went wrong</h3>
+          <h3 className="text-white text-lg sm:text-xl font-semibold mb-2">
+            {t('kidLanding.errors.somethingWentWrong', 'Something went wrong')}
+          </h3>
           <p className="text-gray-400 text-sm sm:text-base mb-6">{error}</p>
           <button
             onClick={fetchKidContentData}
             className="bg-[#BC8BBC] hover:bg-[#a56ba5] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base"
           >
-            Try Again
+            {t('kidLanding.actions.tryAgain', 'Try Again')}
           </button>
         </div>
       </div>
@@ -645,14 +490,19 @@ export default function KidLandingPage({ kidProfile }) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
         <Helmet>
-          <title>Oliviuus Kids - Fun & Safe Kids Content</title>
+          <title>{seoMetadata.title}</title>
+          <meta name="description" content={seoMetadata.description} />
         </Helmet>
         <div className="text-center">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <Film className="w-8 h-8 sm:w-10 sm:h-10 text-gray-500" />
           </div>
-          <h3 className="text-white text-lg sm:text-xl font-semibold mb-2">No content available</h3>
-          <p className="text-gray-400 text-sm sm:text-base">Check back later for new additions.</p>
+          <h3 className="text-white text-lg sm:text-xl font-semibold mb-2">
+            {t('kidLanding.errors.noContent', 'No content available')}
+          </h3>
+          <p className="text-gray-400 text-sm sm:text-base">
+            {t('kidLanding.errors.checkBackLater', 'Check back later for new additions.')}
+          </p>
         </div>
       </div>
     );
@@ -672,7 +522,7 @@ export default function KidLandingPage({ kidProfile }) {
         <meta property="og:type" content="website" />
         <meta property="og:url" content={seoMetadata.canonical} />
         {seoMetadata.image && <meta property="og:image" content={seoMetadata.image} />}
-        <meta property="og:site_name" content="Oliviuus Kids" />
+        <meta property="og:site_name" content={t('kidLanding.seo.siteName', 'Oliviuus Kids')} />
         
         {/* Structured Data */}
         {heroContent && (
@@ -718,7 +568,7 @@ export default function KidLandingPage({ kidProfile }) {
                   ref={videoRef}
                   className="w-full h-full object-cover min-w-full min-h-full"
                   src={heroContent.trailer.url}
-                  muted={true} // Always muted for kids
+                  muted={isTrailerMuted}
                   onEnded={handleTrailerEnd}
                   onError={handleTrailerError}
                   playsInline
@@ -753,15 +603,45 @@ export default function KidLandingPage({ kidProfile }) {
                     </span>
                   </div>
 
-                  <div className="px-2 sm:px-3 py-1 bg-black/50 text-white text-xs sm:text-sm rounded-full border border-gray-600 backdrop-blur-sm font-medium">
-                    {getAgeRating(heroContent)}
+                  <div className="flex items-center gap-1 sm:gap-2 bg-[#BC8BBC]/80 text-white px-2 sm:px-3 py-1 rounded-full backdrop-blur-sm text-xs sm:text-sm">
+                    <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="font-medium">
+                      {getAgeRating(heroContent)}
+                    </span>
                   </div>
 
-                  {heroContent.trailer && isTrailerPlaying && (
-                    <div className="flex items-center gap-1 sm:gap-2 bg-black/50 text-white px-2 sm:px-3 py-1 rounded-full border border-gray-600 backdrop-blur-sm text-xs sm:text-sm">
-                      <VolumeX className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span className="font-medium">Sound Off</span>
+                  {/* Educational Badge */}
+                  {heroContent.is_educational && (
+                    <div className="flex items-center gap-1 sm:gap-2 bg-green-500/80 text-white px-2 sm:px-3 py-1 rounded-full backdrop-blur-sm text-xs sm:text-sm">
+                      <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="font-medium">
+                        {t('kidLanding.badges.learning', 'Learning')}
+                      </span>
                     </div>
+                  )}
+
+                  {/* Mute/Unmute button */}
+                  {heroContent.trailer && isTrailerPlaying && (
+                    <button
+                      onClick={toggleMute}
+                      className="flex items-center gap-1 sm:gap-2 bg-black/50 hover:bg-black/70 text-white px-2 sm:px-3 py-1 rounded-full border border-gray-600 backdrop-blur-sm transition-all duration-200 text-xs sm:text-sm"
+                      title={isTrailerMuted ? 
+                        t('kidLanding.actions.unmute', 'Unmute') : 
+                        t('kidLanding.actions.mute', 'Mute')
+                      }
+                    >
+                      {isTrailerMuted ? (
+                        <VolumeX className="w-3 h-3 sm:w-4 sm:h-4" />
+                      ) : (
+                        <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                      )}
+                      <span className="font-medium">
+                        {isTrailerMuted ? 
+                          t('kidLanding.actions.unmute', 'Unmute') : 
+                          t('kidLanding.actions.mute', 'Mute')
+                        }
+                      </span>
+                    </button>
                   )}
                 </div>
 
@@ -770,68 +650,102 @@ export default function KidLandingPage({ kidProfile }) {
                 </p>
 
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                  {/* Play button */}
                   <button
                     onClick={() => handlePlayContent(heroContent)}
-                    className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 transform hover:scale-105"
+                    className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 transform hover:scale-105 group relative"
                   >
                     <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
-                    Play
+                    {t('kidLanding.actions.play', 'Play')}
                   </button>
 
                   {heroContent.trailer && (
                     <button
                       onClick={toggleTrailer}
-                      className="flex items-center gap-2 bg-gray-600/90 hover:bg-gray-500/90 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 border border-gray-500 backdrop-blur-sm transform hover:scale-105"
+                      className="flex items-center gap-2 bg-gray-600/90 hover:bg-gray-500/90 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 border border-gray-500 backdrop-blur-sm transform hover:scale-105 group relative"
                     >
                       <Play className="w-3 h-3 sm:w-4 sm:h-4" />
-                      {isTrailerPlaying ? 'Stop' : 'Trailer'}
+                      {isTrailerPlaying ? 
+                        t('kidLanding.actions.stop', 'Stop') : 
+                        t('kidLanding.actions.trailer', 'Trailer')
+                      }
                     </button>
                   )}
 
+                  {/* My List Button */}
                   <button
                     onClick={(e) => handleAddToLibrary(heroContent, e)}
-                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 border backdrop-blur-sm transform hover:scale-105 ${
+                    className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg font-bold transition-all duration-300 border backdrop-blur-sm transform hover:scale-110 group relative ${
                       heroPreferences.isInList
-                        ? 'bg-[#BC8BBC] hover:bg-[#a56ba5] text-white border-[#BC8BBC]'
-                        : 'bg-gray-600/90 hover:bg-gray-500/90 text-white border-gray-500'
-                    }`}
+                        ? 'bg-[#BC8BBC] hover:bg-[#a56ba5] text-white border-[#BC8BBC] shadow-lg shadow-[#BC8BBC]/30'
+                        : 'bg-gray-600/90 hover:bg-gray-500/90 text-white border-gray-500 hover:shadow-lg hover:shadow-white/20'
+                    } ${heroPreferences.loading.watchlist ? 'animate-pulse' : 'hover:animate-bounce'}`}
+                    title={heroPreferences.isInList ? 
+                      t('kidLanding.actions.removeFromList', 'Remove from My List') : 
+                      t('kidLanding.actions.addToList', 'Add to My List')
+                    }
                   >
                     {heroPreferences.loading.watchlist ? (
-                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                      <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                     ) : heroPreferences.isInList ? (
-                      <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5 transition-all duration-300 transform group-hover:scale-125" />
                     ) : (
-                      <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <Plus className="w-4 h-4 sm:w-5 sm:h-5 transition-all duration-300 transform group-hover:rotate-90 group-hover:scale-110" />
                     )}
-                    <span className="hidden sm:inline">
-                      {heroPreferences.isInList ? 'In List' : 'My List'}
+                    
+                    {/* Hover Tooltip */}
+                    <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                      {heroPreferences.isInList ? 
+                        t('kidLanding.actions.inList', 'In List') : 
+                        t('kidLanding.actions.myList', 'My List')
+                      }
                     </span>
                   </button>
 
+                  {/* Like Button */}
                   <button
                     onClick={(e) => handleLikeContent(heroContent, e)}
-                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 border backdrop-blur-sm transform hover:scale-105 ${
+                    className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg font-bold transition-all duration-300 border backdrop-blur-sm transform hover:scale-110 group relative ${
                       heroPreferences.isLiked
-                        ? 'bg-red-500 hover:bg-red-600 text-white border-red-500'
-                        : 'bg-gray-600/90 hover:bg-gray-500/90 text-white border-gray-500'
-                    }`}
+                        ? 'bg-red-500 hover:bg-red-600 text-white border-red-500 shadow-lg shadow-red-500/30 animate-pulse'
+                        : 'bg-gray-600/90 hover:bg-gray-500/90 text-white border-gray-500 hover:shadow-lg hover:shadow-red-500/20'
+                    } ${heroPreferences.loading.like ? 'animate-pulse' : 'hover:animate-bounce'}`}
+                    title={heroPreferences.isLiked ? 
+                      t('kidLanding.actions.unlike', 'Unlike') : 
+                      t('kidLanding.actions.like', 'Like')
+                    }
                   >
                     {heroPreferences.loading.like ? (
-                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                      <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                     ) : (
-                      <Heart className={`w-3 h-3 sm:w-4 sm:h-4 ${heroPreferences.isLiked ? 'fill-current' : ''}`} />
+                      <Heart className={`w-4 h-4 sm:w-5 sm:h-5 transition-all duration-300 transform ${
+                        heroPreferences.isLiked 
+                          ? 'fill-current scale-110 group-hover:scale-125' 
+                          : 'group-hover:scale-110 group-hover:text-red-400'
+                      }`} />
                     )}
-                    <span className="hidden sm:inline">
-                      {heroPreferences.isLiked ? 'Liked' : 'Like'}
+                    
+                    {/* Hover Tooltip */}
+                    <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                      {heroPreferences.isLiked ? 
+                        t('kidLanding.actions.liked', 'Liked') : 
+                        t('kidLanding.actions.like', 'Like')
+                      }
                     </span>
                   </button>
 
+                  {/* Details Button */}
                   <button
                     onClick={(e) => handleMoreInfo(heroContent, e)}
-                    className="flex items-center gap-2 bg-gray-600/90 hover:bg-gray-500/90 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-all duration-200 border border-gray-500 backdrop-blur-sm transform hover:scale-105"
+                    className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gray-600/90 hover:bg-gray-500/90 text-white rounded-lg font-bold transition-all duration-300 border border-gray-500 backdrop-blur-sm transform hover:scale-110 hover:animate-bounce group relative"
+                    title={t('kidLanding.actions.details', 'Details')}
                   >
-                    <Info className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="hidden sm:inline">Details</span>
+                    <Info className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:rotate-12" />
+                    
+                    {/* Hover Tooltip */}
+                    <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                      {t('kidLanding.actions.details', 'Details')}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -840,73 +754,16 @@ export default function KidLandingPage({ kidProfile }) {
         )}
       </div>
 
-      {/* Content Sections with Zoom Animation */}
-      <div 
-        ref={contentSectionRef}
-        className={`relative z-30 bg-gradient-to-b from-gray-900 to-gray-950 transition-all duration-500 ${redirecting ? 'scale-90 opacity-0' : 'scale-100 opacity-100'}`}
-      >
-        <div className="space-y-8 sm:space-y-16 py-8 sm:py-16">
-          {featuredContent.length > 0 && (
-            <ContentRow
-              title="Featured Shows"
-              subtitle="Popular picks for kids"
-              items={featuredContent}
-              sectionKey="featured"
-              icon={Star}
-              showExplore={featuredContent.length >= 5}
-              onPlay={handlePlayContent}
-              onAddToList={handleAddToLibrary}
-              onMoreInfo={handleMoreInfo}
-              onExploreMore={handleExploreMore}
-            />
-          )}
-
-          {educationalContent.length > 0 && (
-            <ContentRow
-              title="Learning Fun"
-              subtitle="Educational and fun content"
-              items={educationalContent}
-              sectionKey="educational"
-              icon={BookOpen}
-              showExplore={educationalContent.length >= 5}
-              onPlay={handlePlayContent}
-              onAddToList={handleAddToLibrary}
-              onMoreInfo={handleMoreInfo}
-              onExploreMore={handleExploreMore}
-            />
-          )}
-
-          {funContent.length > 0 && (
-            <ContentRow
-              title="Fun & Games"
-              subtitle="Entertaining adventures"
-              items={funContent}
-              sectionKey="fun"
-              icon={GamepadIcon}
-              showExplore={funContent.length >= 5}
-              onPlay={handlePlayContent}
-              onAddToList={handleAddToLibrary}
-              onMoreInfo={handleMoreInfo}
-              onExploreMore={handleExploreMore}
-            />
-          )}
-
-          {recentContent.length > 0 && (
-            <ContentRow
-              title="New Arrivals"
-              subtitle="Fresh content just added"
-              items={recentContent}
-              sectionKey="recent"
-              icon={Sparkles}
-              showExplore={recentContent.length >= 5}
-              onPlay={handlePlayContent}
-              onAddToList={handleAddToLibrary}
-              onMoreInfo={handleMoreInfo}
-              onExploreMore={handleExploreMore}
-            />
-          )}
-        </div>
-      </div>
+      {/* Content Sections using KidLandingPageContents */}
+      <KidLandingPageContents
+        featuredContent={featuredContent}
+        educationalContent={educationalContent}
+        funContent={funContent}
+        recentContent={recentContent}
+        onPlay={handlePlayContent} 
+        onMoreInfo={handleMoreInfo}
+        redirecting={redirecting}
+      />
     </div>
   );
 }

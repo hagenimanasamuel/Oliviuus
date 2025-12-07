@@ -111,6 +111,12 @@
       "profiles": "Familia / Profaili",
       "parental": "Udhibiti wa Wazazi",
       "family_invitations": "Mialiko ya Familia"
+    },
+    "parental": {
+      "pinModal": {
+        "title": "Thibitisha PIN ili kufikia udhibiti wa wazazi",
+        "description": "Ingiza PIN ya familia ili kufikia mipangilio ya udhibiti wa wazazi"
+      }
     }
   },
   "accountInfo": {
@@ -1718,7 +1724,10 @@
     "invalidTime": "Muda si sahihi",
     "unknownEmail": "Barua pepe haijulikani",
     "noEmail": "Hakuna barua pepe",
-    "noDate": "Hakuna tarehe"
+    "noDate": "Hakuna tarehe",
+    "highScore": "Alama ya Juu (>30%)",
+    "topTrending": "Zinazotrend Sana",
+    "home": "Nyumbani"
   },
   "parentalControls": {
     "title": "Udhibiti wa Wazazi",
@@ -2186,6 +2195,817 @@
           "answer": "Tunakishirikiana na studio za ndani, kufadhili miradi, na kuhakikisha malipo bora kwao."
         }
       }
+    }
+  },
+  "kidDashboard": {
+    "navigation": {
+      "home": "Nyumbani",
+      "music": "Muziki",
+      "play": "Cheza",
+      "learn": "Jifunze",
+      "favorites": "Vipendwa"
+    },
+    "buttons": {
+      "logout": "Toka",
+      "exit": "Ondoka",
+      "checkingPin": "Inakaguliwa..."
+    },
+    "tooltips": {
+      "logout": "Toka kwenye akaunti yako",
+      "exitWithPin": "Ondoka kwenye mode ya watoto (PIN inahitajika)",
+      "exitNoPin": "Ondoka kwenye mode ya watoto (hakuna PIN imewekwa)",
+      "checkingPin": "Inakagua hali ya PIN...",
+      "enterFullscreen": "Nenda kwenye Skrini Nzima",
+      "exitFullscreen": "Toka kwenye Skrini Nzima",
+      "toggleNavigation": "Badili Mwelekeo",
+      "navigateTo": "Nenda kwa {{destination}}"
+    },
+    "greeting": "Habari, {{name}}!",
+    "defaultName": "Rafiki",
+    "status": {
+      "familyFun": "Furaha ya Familia! 🎉",
+      "letsPlay": "Tucheze! 🎮"
+    },
+    "pinModal": {
+      "title": "Thibitisha PIN kuondoka kwenye Mode ya Watoto",
+      "description": "Ingiza PIN ya familia kuondoka kwenye mode ya watoto na kurudi kwenye dashibodi ya mzazi"
+    }
+  },
+  "pinModal": {
+    "defaultTitle": "Uthibitisho wa PIN Unahitajika",
+    "defaultDescription": "Ingiza PIN ya familia ili kuendelea",
+    "labels": {
+      "enterPin": "Ingiza PIN ya familia",
+      "digits": "tarakimu"
+    },
+    "placeholders": {
+      "enterPin": "Ingiza PIN ya tarakimu 4"
+    },
+    "buttons": {
+      "close": "Funga modal",
+      "hidePin": "Ficha PIN",
+      "showPin": "Onyesha PIN",
+      "cancel": "Ghairi",
+      "verify": "Thibitisha",
+      "verifying": "Inathibitisha..."
+    },
+    "errors": {
+      "emptyPin": "Tafadhali ingiza PIN yako",
+      "invalidLength": "PIN lazima iwe tarakimu 4 tu",
+      "invalidPin": "PIN sio sahihi. Jaribu tena."
+    },
+    "success": {
+      "verified": "PIN imethibitishwa kikamilifu!"
+    },
+    "securityNote": "PIN hii inalinda mipangilio ya familia na udhibiti wa wazazi"
+  },
+  "songsMusic": {
+    "seo": {
+      "title": "Nyimbo & Muziki - Oliviuus Kids",
+      "description": "Nyimbo za kufurahisha, nyimbo za watoto, video za muziki na maudhui ya densi kwa watoto. Imba, cheza na ufurahie safari ya muziki!"
+    },
+    "header": {
+      "title": "NYIMBO & MUZIKI",
+      "subtitle": "Imba & Cheza • Tuje Tuimbe na Tucheze! 🎵",
+      "popular": "Makundi Maarufu ya Muziki 🔥"
+    },
+    "search": {
+      "placeholder": "🔍 Tafuta nyimbo, muziki, video za densi, nyimbo za watoto..."
+    },
+    "buttons": {
+      "gridView": "Muonekano wa Gridi",
+      "listView": "Muonekano wa Orodha",
+      "filters": "Vichujio",
+      "clearAll": "Futa yote",
+      "clearAllFilters": "Futa Vichujio Vyote ✨",
+      "tryAgain": "Jaribu Tena 🔄",
+      "playNow": "Cheza Sasa ▶️",
+      "details": "Maelezo ℹ️"
+    },
+    "activeFilters": "Vichujio vinavyotumika",
+    "filterPanel": {
+      "title": "Chuja Maudhui ya Muziki 🎯",
+      "sortBy": "Panga Kwa 📊",
+      "musicTypes": "Aina za Muziki 🎶",
+      "musicStyles": "Mitindo ya Muziki 🎨",
+      "contentType": "Aina ya Maudhui 📺",
+      "clearAllFilters": "Futa vichujio vyote 🗑️",
+      "cancel": "Ghairi",
+      "applyFilters": "Tumia Vichujio ✨"
+    },
+    "errors": {
+      "title": "Lo! Tatizo limetokea 😢",
+      "loading": "Lo! Tumeshindwa kupakua nyimbo na muziki. Jaribu tena! 🎵"
+    },
+    "noContent": {
+      "title": "Hakuna maudhui ya muziki yaliyopatikana 🎵",
+      "description": "Jaribu kubadilisha vichujio au tafuta aina tofauti za muziki."
+    },
+    "badges": {
+      "topMusic": "Muziki Bora! 🎵",
+      "greatMusic": "Muziki Mzuri! 🎶",
+      "musicFun": "Muziki wa Kufurahisha! 🎤",
+      "awesomeSong": "Wimbo Mkali! 🎧"
+    },
+    "metadata": {
+      "durationNA": "Hakuna",
+      "durationNAFull": "Muda: Hakuna",
+      "musicVideo": "Video ya Muziki 🎵",
+      "noDescription": "Hakuna maelezo yanayopatikana"
+    },
+    "pagination": {
+      "previous": "Kabla",
+      "next": "Ifuatayo"
+    }
+  },
+  "learning": {
+    "seo": {
+      "title": "Eneo la Kujifunza - Oliviuus Kids",
+      "description": "Maudhui ya kufurahisha na ya kielimu kwa watoto. Jifunze sayansi, historia, mazingira, hesabu, sanaa, muziki na zaidi kupitia video za kuvutia."
+    },
+    "header": {
+      "title": "ENEO LA KUJIFUNZA",
+      "subtitle": "Gundua & Jifunze • Mahali Ambapo Udadisi Unakutana na Furaha! 🎈"
+    },
+    "search": {
+      "placeholder": "🔍 Tafuta video za kujifunza (sayansi, hesabu, historia, sanaa...)"
+    },
+    "buttons": {
+      "gridView": "Muonekano wa Gridi",
+      "listView": "Muonekano wa Orodha",
+      "filters": "Vichujio",
+      "clearAll": "Futa yote",
+      "clearAllFilters": "Futa Vichujio Vyote ✨",
+      "tryAgain": "Jaribu Tena 🔄",
+      "watch": "Tazama ▶️",
+      "watchNow": "Tazama Sasa ▶️",
+      "details": "Maelezo ℹ️"
+    },
+    "activeFilters": "Vichujio vinavyotumika",
+    "filterPanel": {
+      "title": "Chuja Maudhui ya Kujifunza 🎯",
+      "sortBy": "Panga Kwa 📊",
+      "ageGroup": "Kikundi cha Umri 👶",
+      "subjects": "Mada 📚",
+      "learningStyles": "Mitindo ya Kujifunza 🎨",
+      "contentType": "Aina ya Maudhui 📺",
+      "clearAllFilters": "Futa vichujio vyote 🗑️",
+      "cancel": "Ghairi",
+      "applyFilters": "Tumia Vichujio ✨"
+    },
+    "errors": {
+      "title": "Lo! Tatizo limetokea 😢",
+      "loading": "Lo! Tumeshindwa kupakua maudhui ya kujifunza. Jaribu tena! 🎈"
+    },
+    "noContent": {
+      "title": "Hakuna maudhui ya kujifunza yaliyopatikana 🧐",
+      "description": "Jaribu kubadilisha vichujio au tafuta kitu kingine."
+    },
+    "badges": {
+      "superSmart": "Mwenye Akili Sana! 🎓",
+      "learningTime": "Wakati wa Kujifunza! 📚",
+      "funLearning": "Kujifunza kwa Furaha! 🎈",
+      "awesomeContent": "Maudhui Mazuri Sana! ✨"
+    },
+    "metadata": {
+      "durationNA": "Hakuna",
+      "durationNAFull": "Muda: Hakuna",
+      "kidSafe": "Salama kwa Watoto 🛡️",
+      "educational": "Kielimu 📚",
+      "noDescription": "Hakuna maelezo yanayopatikana"
+    },
+    "pagination": {
+      "previous": "Kabla",
+      "next": "Ifuatayo"
+    },
+    "ageGroups": {
+      "preschool": "Watoto wa Awali 👶",
+      "earlyElementary": "Shule ya Msingi (Awali) 🧒",
+      "upperElementary": "Shule ya Msingi (Juu) 👦",
+      "middleSchool": "Shule ya Kati 🎓"
+    }
+  },
+  "favorites": {
+    "seo": {
+      "title": "Vipendwa Vyangu - Oliviuus Kids",
+      "description": "Video zako unazozipenda na orodha ya kutazama baadaye. Pata maudhui yote unayoyapenda kwa urahisi!"
+    },
+    "header": {
+      "title": "VIPENDWA VYANGU",
+      "subtitle": "Vipendwa Vyangu • Video zote unazopenda! ❤️"
+    },
+    "tabs": {
+      "all": "Vyote",
+      "liked": "Vilivyopendwa",
+      "watchLater": "Tazama Baadaye"
+    },
+    "search": {
+      "placeholder": "🔍 Tafuta vipendwa..."
+    },
+    "buttons": {
+      "gridView": "Mwonekano wa Gridi",
+      "listView": "Mwonekano wa Orodha",
+      "clearFilters": "Futa vichujio",
+      "tryAgain": "Jaribu Tena 🔄",
+      "watch": "Tazama ▶️",
+      "clearSearch": "Futa Utafutaji ✨",
+      "browseVideos": "Vinjari Video 🎈",
+      "remove": "Ondoa"
+    },
+    "activeFilters": "Inaonyesha",
+    "badges": {
+      "liked": "Imependwa ❤️",
+      "watchLater": "Tazama Baadaye ⏰"
+    },
+    "results": {
+      "videosFound": "video zimepatikana",
+      "searchFor": "kwa \"{{query}}\""
+    },
+    "errors": {
+      "title": "Lo! Tatizo limetokea 😢",
+      "loading": "Lo! Tumeshindwa kupakia vipendwa vyako. Jaribu tena! 🎈"
+    },
+    "emptyStates": {
+      "noMatches": "Hakuna matokeo 🧐",
+      "noLikedVideos": "Hakuna video ulizopenda bado ❤️",
+      "noWatchLater": "Orodha yako ya kutazama baadaye ipo tupu ⏰",
+      "noFavorites": "Hakuna vipendwa bado ✨",
+      "tryDifferentSearch": "Jaribu neno jingine la utafutaji",
+      "likeSomeVideos": "Penda video ili zionekane hapa!",
+      "addToWatchLater": "Ongeza video za kutazama baadaye ili zionekane hapa!",
+      "startLiking": "Anza kupenda video au kuongeza za kutazama baadaye!"
+    },
+    "metadata": {
+      "durationNA": "Hakuna",
+      "durationNAFull": "Hakuna",
+      "kidSafe": "Salama kwa Watoto 🛡️",
+      "noDescription": "Hakuna maelezo yanayopatikana"
+    },
+    "pagination": {
+      "previous": "Kabla",
+      "next": "Ifuatayo"
+    },
+    "tooltips": {
+      "removeFromLiked": "Ondoa kwenye zilizopendwa",
+      "addToLiked": "Ongeza kwenye zilizopendwa",
+      "removeFromWatchLater": "Ondoa kwenye za kutazama baadaye",
+      "addToWatchLater": "Ongeza kwenye za kutazama baadaye",
+      "removeFromList": "Ondoa kwenye orodha"
+    }
+  },
+  "games": {
+    "seo": {
+      "title": "Michezo ya Watoto - Inakuja Hivi Karibuni",
+      "description": "Michezo ya kufurahisha na ya kujifunza kwa watoto itapatikana hivi karibuni!"
+    },
+    "header": {
+      "title": "Eneo la Michezo",
+      "subtitle": "Michezo ya Kufurahisha Inakuja Hivi Karibuni! 🎮",
+      "description": "Tunafanya kazi kuwaletea michezo bora, salama, ya watoto, inayoburudisha na ya kielimu. Endelea kufuatilia kwa masasisho ya kusisimua!"
+    },
+    "features": {
+      "title": "Nini Kinakuja?",
+      "funEducational": "Michezo ya Kufurahisha na ya Kielimu",
+      "puzzles": "Vichangamoto vya Kufikirisha",
+      "skillBuilding": "Shughuli za Kukuza Ujuzi",
+      "safeContent": "Maudhui Salama na Yanaofaa Watoto"
+    },
+    "construction": {
+      "title": "Katikati ya Ujenzi",
+      "description": "Tunajenga mkusanyiko mzuri wa michezo ya watoto! Rudi hivi karibuni kuona michezo ya kufurahisha, ya kielimu, na ya kusisimua ambayo itafanya kujifunza kuwa raha! ✨"
+    },
+    "buttons": {
+      "comingSoon": "Inakuja Hivi Karibuni!"
+    }
+  },
+  "kidLanding": {
+    "seo": {
+      "siteName": "Oliviuus Kids",
+      "defaultTitle": "Maudhui ya Kufurahisha na Salama kwa Watoto",
+      "defaultDescription": "Tazama katuni, vipindi vya elimu, na hadithi za kufurahisha zilizo salama kwa watoto.",
+      "keywords": "watoto, katuni, elimu, familia, salama, video"
+    },
+    "sections": {
+      "featured": {
+        "title": "Vipindi Vilivyoangaziwa",
+        "subtitle": "Vipendwa vya watoto"
+      },
+      "educational": {
+        "title": "Kujifunza Kufurahisha",
+        "subtitle": "Maudhui ya kielimu na ya kushangaza"
+      },
+      "fun": {
+        "title": "Burudani & Michezo",
+        "subtitle": "Hadithi na matukio ya kuburudisha"
+      },
+      "recent": {
+        "title": "Vipya",
+        "subtitle": "Maudhui mapya yaliyoongezwa"
+      }
+    },
+    "actions": {
+      "play": "Cheza",
+      "stop": "Simamisha",
+      "trailer": "Kionjo",
+      "mute": "Zima sauti",
+      "unmute": "Rudisha sauti",
+      "addToList": "Ongeza kwenye Orodha Yangu",
+      "removeFromList": "Ondoa kwenye Orodha Yangu",
+      "myList": "Orodha Yangu",
+      "inList": "Ipo kwenye orodha",
+      "like": "Penda",
+      "unlike": "Usipende",
+      "liked": "Imependwa",
+      "details": "Maelezo",
+      "tryAgain": "Jaribu Tena",
+      "scrollLeft": "Sogeza {{section}} kushoto",
+      "scrollRight": "Sogeza {{section}} kulia"
+    },
+    "badges": {
+      "learning": "Elimu",
+      "approved": "Imeidhinishwa"
+    },
+    "ratings": {
+      "all": "Rika Zote",
+      "G": "Rika Zote",
+      "TV-Y": "Watoto",
+      "TV-Y7": "Watoto 7+",
+      "TV-G": "Rika Zote",
+      "PG": "Uangalizi wa Wazazi",
+      "7+": "Miaka 7+",
+      "8+": "Miaka 8+",
+      "9+": "Miaka 9+",
+      "10+": "Miaka 10+",
+      "11+": "Miaka 11+",
+      "12+": "Miaka 12+",
+      "default": "Salama kwa Watoto"
+    },
+    "errors": {
+      "contentLoad": "Kumetokea tatizo wakati wa kupakia maudhui. Tafadhali jaribu tena baadaye.",
+      "somethingWentWrong": "Kuna tatizo limetokea",
+      "error": "Hitilafu",
+      "noContent": "Hakuna maudhui yaliyopo",
+      "checkBackLater": "Rudi tena baadaye kwa maudhui mapya."
+    }
+  },
+  "termsOfService": {
+    "title": "Masharti ya Huduma",
+    "lastUpdated": "Imesasishwa Mwisho",
+    "welcome": "Karibu kwenye Oliviuus, jukwaa la streaming linalolenga kutoa burudani kwa watazamaji wa Rwanda na nje yake. Masharti haya ya Huduma (\"Masharti\") yanaongoza matumizi yako ya Oliviuus, ikiwa ni pamoja na tovuti yetu, apps za simu, huduma za streaming na vipengele vyote vinavyohusiana (pamoja, \"Huduma\").",
+    "agreementNotice": "Kwa kuunda akaunti, kujiandikisha, au kutumia Huduma, unakubali Masharti haya. Ikiwa hukubaliani, huwezi kutumia Oliviuus.",
+    "sections": {
+      "eligibility": {
+        "title": "Ustahiki",
+        "description": "Ili kutumia Oliviuus:",
+        "points": [
+          "Lazima uwe na umri wa angalau miaka 13.",
+          "Kama uko chini ya miaka 18, lazima uwe na idhini ya mzazi au mlezi.",
+          "Lazima utoe taarifa sahihi za akaunti.",
+          "Tunaweza kusimamisha au kufuta akaunti zinazokiuka masharti haya."
+        ]
+      },
+      "accountRegistration": {
+        "title": "Usajili wa Akaunti",
+        "description": "Wakati wa kuunda akaunti:",
+        "points1": [
+          "Lazima utoe taarifa kamili na sahihi.",
+          "Una jukumu la kulinda usalama wa maelezo yako ya kuingia.",
+          "Lazima utujulishe mara moja kuhusu shughuli zisizoidhinishwa."
+        ],
+        "separator": "Huwezi:",
+        "points2": [
+          "Kuunda akaunti nyingi ili kudanganya mfumo wa majaribio ya bure.",
+          "Kushiriki nenosiri lako na wengine nje ya kaya yako.",
+          "Kutumia au kuingia kwenye akaunti ya mtu mwingine bila idhini."
+        ]
+      },
+      "freeTrial": {
+        "title": "Jaribio la Bure",
+        "description": "Oliviuus inaweza kutoa jaribio la bure mara moja kwa kila mtumiaji na njia ya malipo.",
+        "duringTrial": "Wakati wa jaribio la bure:",
+        "points": [
+          "Hutatozwa malipo.",
+          "Unaweza kufuta wakati wowote kabla ya jaribio kumalizika ili kuepuka malipo."
+        ],
+        "warning": "Jaribio la kudanganya au kuizusha mfumo wa majaribio ya bure haliruhusiwi."
+      },
+      "subscriptionsPayments": {
+        "title": "Usajili & Malipo",
+        "description": "Kwa kujiandikisha:",
+        "points": [
+          "Unaruhusu Oliviuus kutoza njia yako ya malipo iliyochaguliwa (mfano: Mobile Money, kadi).",
+          "Ada za usajili hulipwa kila mwezi isipokuwa kama imeelezwa vinginevyo.",
+          "Malipo yote hayarudishwi isipokuwa sheria inavyotakiwa.",
+          "Tunaweza kubadilisha bei, lakini tutakuarifu mapema."
+        ]
+      },
+      "contentUsageRules": {
+        "title": "Maudhui & Kanuni za Matumizi",
+        "description": "Oliviuus inakupa leseni ya muda, isiyoweza kuhamishwa, na isiyo ya kipekee ya kufikia maudhui kwa matumizi ya kibinafsi na yasiyo ya kibiashara.",
+        "notAllowed": "Unakubali kutafanya:",
+        "points": [
+          "Kupakua, kunakili, kurekodi skrini, au kusambaza maudhui bila ruhusa.",
+          "Kutumia Huduma kwa maonesho ya umma bila idhini.",
+          "Kupita mipaka ya kijiografia au usalama.",
+          "Kutumia bots, scripts, au zana za kiotomatiki kufikia Huduma."
+        ],
+        "deviceLimit": "Tunaweza kuweka kikomo cha idadi ya vifaa vinavyoweza ku-stream wakati mmoja."
+      },
+      "intellectualProperty": {
+        "title": "Haki za Kiakili",
+        "description": "Maudhui yote ya Oliviuus (filamu, mfululizo, UI, alama za chapa, logo, programu) yanalindwa na hakimiliki na sheria nyingine za hakimiliki.",
+        "notAllowed": "Huwezi:",
+        "points": [
+          "Kurekebisha au kuzalisha tena mali zetu.",
+          "Kuumba kazi za kirai bila idhini.",
+          "Kutumia jina la chapa ya Oliviuus bila idhini ya maandishi."
+        ]
+      },
+      "thirdPartyIntegrations": {
+        "title": "Ushirikiano na Watu Wengine",
+        "description": "Oliviuus inaweza kushirikiana na wadau wa tatu (uchambuzi, malipo, hosting ya cloud).",
+        "notResponsible": "Sisi hatuwajibiki kwa:",
+        "points": [
+          "Maudhui yao,",
+          "Sera zao, au",
+          "Makosa yanayosababishwa na mifumo yao."
+        ]
+      },
+      "termination": {
+        "title": "Kufutwa",
+        "description": "Tunaweza kusimamisha au kufuta akaunti yako ikiwa:",
+        "points": [
+          "Unaikiuka Masharti haya,",
+          "Unashiriki katika shughuli haramu au hatari,",
+          "Unatenda mabaya kwenye Huduma au mfumo wa malipo."
+        ],
+        "userRight": "Unaweza pia kufuta akaunti yako wakati wowote."
+      },
+      "serviceAvailability": {
+        "title": "Upatikanaji wa Huduma",
+        "description": "Tunajitahidi kutoa huduma isiyokoma, lakini:",
+        "points": [
+          "Kunaweza kuwa na downtime, matengenezo, au makosa.",
+          "Hatuwezi kuhakikisha upatikanaji wa 100%.",
+          "Maudhui fulani yanaweza kuongezwa au kuondolewa bila arifa."
+        ]
+      },
+      "disclaimer": {
+        "title": "Taarifa ya Kukanusha",
+        "description": "Oliviuus inatolewa \"kama ilivyo\" na \"kama inavyopatikana\".",
+        "notGuarantee": "Hatuwezi kuhakikisha:",
+        "points": [
+          "Huduma itakidhi matarajio yako,",
+          "Hakutakuwa na usumbufu au makosa,",
+          "Maudhui yote yataendelea kupatikana kila wakati."
+        ]
+      },
+      "limitationOfLiability": {
+        "title": "Ukiukaji wa Uwajibikaji",
+        "description": "Kulingana na kiwango cha juu kinachoruhusiwa na sheria:",
+        "points": [
+          "Oliviuus haijajibiki kwa madhara yasiyo ya moja kwa moja, ya ajali, au maalum.",
+          "Jumla ya uwajibikaji wetu haitazidi kiasi ulicholipa kwa Huduma katika miezi 3 iliyopita."
+        ]
+      },
+      "changesToTerms": {
+        "title": "Mabadiliko ya Masharti",
+        "description": "Tunaweza kusasisha Masharti haya mara kwa mara.",
+        "continuation": "Kuendelea kutumia Oliviuus baada ya sasisho kunamaanisha unakubali Masharti yaliyorekebishwa."
+      },
+      "contactInformation": {
+        "title": "Maelezo ya Mawasiliano",
+        "description": "Kama una maswali kuhusu Masharti haya:",
+        "email": "oliviuusteam@gmail.com",
+        "location": "Musanze, Rwanda"
+      }
+    },
+    "footer": "Masharti haya ya Huduma yanaanza kutumika kuanzia {{date}}. Kwa kutumia Oliviuus, unathibitisha kuwa umesoma, umeelewa, na unakubali kufuatwa na Masharti haya.",
+    "seo": {
+      "title": "Masharti ya Huduma ya Oliviuus | Kanuni & Sera za Jukwaa la Streaming",
+      "description": "Soma Masharti ya Huduma ya Oliviuus. Jifunze kuhusu kanuni za jukwaa letu la streaming, sera za usajili, miongozo ya matumizi ya maudhui, na makubaliano ya watumiaji kwa watazamaji wa Rwanda na kimataifa.",
+      "keywords": "masharti ya huduma Oliviuus, kanuni jukwaa streaming, sera za usajili, miongozo ya matumizi ya maudhui, makubaliano ya mtumiaji, huduma streaming Rwanda, masharti jukwaa burudani"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Sera ya Faragha",
+    "lastUpdated": "Imesasishwa Mwisho",
+    "introduction": "Oliviuus (\"sisi\" au \"yetu\") imejitolea kulinda faragha yako. Sera hii ya Faragha inaelezea jinsi tunavyokusanya, kutumia, kuhifadhi, na kulinda taarifa zako binafsi.",
+    "sections": {
+      "informationWeCollect": {
+        "title": "Taarifa Tunazokusanya",
+        "subsections": {
+          "informationYouProvide": {
+            "title": "A. Taarifa unazotoa",
+            "points": [
+              "Jina kamili",
+              "Barua pepe",
+              "Nenosiri",
+              "Njia ya malipo (Mobile Money au kadi)",
+              "Mapendeleo ya wasifu",
+              "Maoni au ujumbe wa msaada kwa wateja"
+            ],
+            "note": "Hatuhifadhi taarifa zako zote za malipo—tunahifadhi tu data muhimu ya muamala."
+          },
+          "informationCollectedAutomatically": {
+            "title": "B. Taarifa zinazokusanywa moja kwa moja",
+            "points": [
+              "Anwani ya IP",
+              "Taarifa za kifaa (mfano, OS, kivinjari)",
+              "Muda wa kuingia",
+              "Historia ya kuangalia",
+              "Mwingiliano wa matumizi",
+              "Mipangilio ya lugha na mandhari"
+            ]
+          },
+          "cookiesTracking": {
+            "title": "C. Cookies & Ufuatiliaji",
+            "description": "Tunatumia cookies ili:",
+            "points": [
+              "Kuhifadhi session yako ukiwa umeingia,",
+              "Kubinafsisha mapendekezo,",
+              "Kuboreshaji utendaji wa jukwaa."
+            ]
+          }
+        }
+      },
+      "howWeUseYourInformation": {
+        "title": "Jinsi Tunavyotumia Taarifa Zako",
+        "description": "Tunatumia data yako ili:",
+        "points": [
+          "Kuunda na kusimamia akaunti yako",
+          "Kutoa maudhui ya utiririshaji",
+          "Kubinafsisha uzoefu wako",
+          "Kushughulikia malipo na kuthibitisha majaribio",
+          "Kuzuia udanganyifu au matumizi mabaya",
+          "Kutoa msaada kwa wateja",
+          "Kuboresha ubora wa jukwaa"
+        ],
+        "importantNote": "Hatuziuza data zako binafsi."
+      },
+      "sharingYourInformation": {
+        "title": "Kushiriki Taarifa Zako",
+        "subsections": {
+          "serviceProviders": {
+            "title": "A. Watoa Huduma",
+            "points": [
+              "Wachakataji wa malipo",
+              "Watoa hifadhi ya cloud",
+              "Zana za uchambuzi",
+              "Mifumo ya barua pepe na taarifa"
+            ]
+          },
+          "legalRequirements": {
+            "title": "B. Mahitaji ya Kisheria",
+            "description": "Iwapo inahitajika na:",
+            "points": [
+              "Mamlaka za sheria",
+              "Amri za mahakama",
+              "Mamlaka za udhibiti"
+            ],
+            "note": "Tutashiriki tu kinachohitajika kisheria."
+          }
+        }
+      },
+      "dataStorageSecurity": {
+        "title": "Uhifadhi & Usalama wa Data",
+        "description": "Tunatumia:",
+        "points": [
+          "Uhifadhi uliosimbwa (encrypted),",
+          "Server salama,",
+          "Udhibiti wa ufikiaji,",
+          "Ukaguzi wa usalama mara kwa mara."
+        ],
+        "warning": "Hata hivyo, hakuna mfumo ulio salama 100%.",
+        "recommendation": "Tunashauri kutumia nenosiri thabiti."
+      },
+      "yourRights": {
+        "title": "Haki Zako",
+        "description": "Unaweza:",
+        "points": [
+          "Kupata taarifa zako",
+          "Kuhariri wasifu wako",
+          "Kusaba kufutwa kwa akaunti",
+          "Kusaba nakala ya data zako",
+          "Kubadilisha lugha au mapendeleo ya faragha"
+        ],
+        "requestTitle": "Kwa maombi:",
+        "email": "oliviuusteam@gmail.com"
+      },
+      "dataRetention": {
+        "title": "Uhifadhi wa Data",
+        "description": "Tunahifadhi:",
+        "points": [
+          "Data ya akaunti hadi uifute",
+          "Data za muamala kama inavyohitajika kisheria",
+          "Rekodi za kuangalia kwa usahihi wa mapendekezo"
+        ]
+      },
+      "childrensPrivacy": {
+        "title": "Faragha ya Watoto",
+        "description1": "Oliviuus haikusanyi data kutoka kwa watoto chini ya miaka 13 kwa makusudi.",
+        "description2": "Kama unadhani mtoto ametoa data, wasiliana nasi ili kuiondoa."
+      },
+      "changesToPolicy": {
+        "title": "Mabadiliko ya Sera Hii",
+        "description": "Tunaweza kusasisha sera hii mara kwa mara.",
+        "notification": "Tutakuarifu kuhusu mabadiliko makubwa."
+      },
+      "contactInformation": {
+        "title": "Taarifa za Mawasiliano",
+        "email": "oliviuusteam@gmail.com",
+        "location": "Musanze, Rwanda"
+      }
+    },
+    "footer": {
+      "consent": "Kwa kutumia Oliviuus, unakubali ukusanyaji na matumizi ya taarifa zako kama inavyofafanuliwa katika Sera hii ya Faragha. Ikiwa una wasiwasi kuhusu faragha yako, tafadhali wasiliana nasi.",
+      "effectiveDate": "Sera hii ya Faragha inatekelezwa kuanzia {{date}}."
+    },
+    "seo": {
+      "title": "Sera ya Faragha ya Oliviuus | Ulinzi wa Data & Faragha ya Mtumiaji",
+      "description": "Soma Sera ya Faragha ya Oliviuus. Jifunze jinsi tunavyolinda data zako, ni taarifa gani tunazokusanya, jinsi tunavyotumia, na haki zako za faragha kwenye jukwaa letu la utiririshaji.",
+      "keywords": "sera ya faragha Oliviuus, ulinzi wa data, faragha ya mtumiaji, ukusanyaji data jukwaa, GDPR, faragha Rwanda, usalama wa taarifa binafsi"
+    }
+  },
+  "helpCenter": {
+    "title": "Kituo cha Msaada",
+    "subtitle": "Pata majibu ya maswali yanayoulizwa mara kwa mara au upate msaada maalum kutoka kwa timu yetu",
+    "search": {
+      "placeholder": "Unahitaji msaada wa nini? Andika swali lako...",
+      "button": "Tafuta",
+      "popularTags": [
+        "Kuweka upya Neno la Siri",
+        "Matatizo ya Malipo",
+        "Matatizo ya Streaming",
+        "App Haifanyi Kazi",
+        "Usalama wa Akaunti"
+      ],
+      "clear": "Futa utafutaji",
+      "noResults": {
+        "title": "Hakuna matokeo kamili yaliyopatikana kwa \"{{query}}\"",
+        "description": "Jaribu kutumia maneno tofauti au angalia sehemu zetu za msaada hapa chini",
+        "clear": "Futa utafutaji",
+        "contact": "Wasiliana na Msaada"
+      }
+    },
+    "results": {
+      "title": "Matokeo ya Utafutaji",
+      "found": "Matokeo {{count}} yamepatikana kwa \"{{query}}\"",
+      "viewInCategory": "Tazama kwenye kategoria →",
+      "defaultAnswer": "Tafadhali tazama kundi maalum la msaada kwa maelezo zaidi kuhusu mada hii."
+    },
+    "categories": {
+      "title": "Angalia Sehemu za Msaada",
+      "questions": "{{count}} maswali",
+      "account": {
+        "title": "Akaunti & Kuingia",
+        "icon": "👤",
+        "questions": [
+          {
+            "question": "Jinsi ya kuunda akaunti",
+            "answer": "Bonyeza 'Sign In' kwenye ukurasa wetu wa nyumbani. Weka barua pepe yako, tengeneza neno la siri salama, na maliza mchakato wa uthibitisho. Utapokea barua pepe ya kuthibitisha ili kuamsha akaunti yako ya Oliviuus."
+          },
+          {
+            "question": "Jinsi ya kuweka upya neno la siri",
+            "answer": "Nenda kwenye ukurasa wa kuingia na bonyeza 'Forgot Password'. Weka barua pepe yako iliyosajiliwa, tutatuma kiungo salama cha kuweka upya neno la siri. Kwa usalama, kiungo kinakwisha baada ya masaa 24."
+          },
+          {
+            "question": "Jinsi ya kuthibitisha barua pepe yako",
+            "answer": "Angalia sanduku la barua pepe yako kwa ujumbe wa uthibitisho kutoka Oliviuus. Bonyeza kiungo kuthibitisha ili kuthibitisha akaunti yako. Ikiwa huoni barua pepe, angalia folda ya spam au junk."
+          },
+          {
+            "question": "Jinsi ya kubadilisha maelezo ya akaunti",
+            "answer": "Ingiza kwenye menyu ya profaili na chagua 'Account Settings'. Huko unaweza kusasisha taarifa zako binafsi, barua pepe, neno la siri, na vipaumbele vya mawasiliano kwa usalama."
+          }
+        ]
+      },
+      "payment": {
+        "title": "Malipo & Usajili",
+        "icon": "💳",
+        "questions": [
+          {
+            "question": "Njia za malipo zinazokubaliwa",
+            "answer": "Oliviuus inakubali Mobile Money (MTN, Airtel), Visa, MasterCard, na njia za malipo za ndani za Rwanda. Miamala yote inashughulikiwa kupitia milango salama iliyofichwa (encrypted)."
+          },
+          {
+            "question": "Jinsi jaribio la promo linavyofanya kazi",
+            "answer": "Oliviuus mara nyingine hutoa kipindi cha jaribio la promo wakati wa matukio maalum au kampeni. Jaribio hizi zinatangazwa kwenye wavuti na mitandao ya kijamii. Mpango wa kawaida wa usajili unatozwa kila mwezi."
+          },
+          {
+            "question": "Jinsi ya kusasisha njia ya malipo",
+            "answer": "Katika 'Billing & Payments' kwenye mipangilio ya akaunti, bonyeza 'Update Payment Method' ili kuingiza taarifa mpya. Usajili wako utaendelea bila kusitishwa."
+          },
+          {
+            "question": "Jinsi ya kufuta au kuanza tena usajili",
+            "answer": "Kufuta: Nenda 'Subscription Management' na chagua 'Cancel Subscription'. Kuanzisha tena: Tembelea ukurasa wa usajili na chagua 'Reactivate Subscription'. Mabadiliko huchukua nguvu mwishoni mwa mzunguko wa malipo."
+          }
+        ]
+      },
+      "watching": {
+        "title": "Kutazama kwenye Oliviuus",
+        "icon": "🎬",
+        "questions": [
+          {
+            "question": "Vifaa na majukwaa yanayounga mkono",
+            "answer": "Streaming kwenye: vivinjari vya wavuti (Chrome, Safari, Firefox, Edge), apps za iOS/Android, Smart TVs (Android TV, Samsung Tizen), consoles, na tablets. Kasi ya mtandao inayopendekezwa: 5 Mbps HD, 25 Mbps 4K."
+          },
+          {
+            "question": "Kwa nini video yangu ina buffering au quality duni",
+            "answer": "Buffering mara nyingi inaashiria tatizo la mtandao. Mapendekezo: 1) Jaribu kasi ya intaneti 2) Anzisha upya modem/router 3) Punguza quality 4) Funga apps zinazoingiza data nyingi 5) Tumia connection ya wired ikiwa inawezekana."
+          },
+          {
+            "question": "Jinsi ya kupakua content kwa offline viewing",
+            "answer": "Tafuta icon ya download (↓) kwenye title zinazounga mkono. Inapatikana tu kwenye mobile app. Content inaisha baada ya masaa 48 kutokana na makubaliano ya leseni."
+          },
+          {
+            "question": "Kutatua playback au matatizo ya audio",
+            "answer": "Hatua: 1) Refresh app 2) Angalia audio output 3) Update browser/app 4) Futa cache & cookies 5) Jaribu kwenye kifaa/kivinjari kingine 6) Angalia status ya huduma."
+          }
+        ]
+      },
+      "technical": {
+        "title": "Msaada wa Kiufundi",
+        "icon": "🔧",
+        "questions": [
+          {
+            "question": "App inapita au kuganda",
+            "answer": "Utaratibu: 1) Update app 2) Force quit & restart 3) Futa cache/data 4) Reinstall 5) Angalia storage 6) Angalia compatibility"
+          },
+          {
+            "question": "Tovuti au app haiendi vizuri",
+            "answer": "Angalia: 1) Muunganisho wa intaneti 2) Browser compatibility 3) Zima extensions/ad-blockers 4) Futa cache 5) Mode incognito 6) status.oliviuus.com"
+          },
+          {
+            "question": "Futa cache & cookies",
+            "answer": "Browser: Settings → Privacy & Security → Clear Data. Mobile: Device Settings → Apps → Oliviuus → Storage → Clear Cache. Hii inatatua matatizo mengi ya upakiaji."
+          },
+          {
+            "question": "Kusalia na app iliyo updated",
+            "answer": "iOS: App Store → Profile → Updates. Android: Google Play → My Apps → Updates. Washa automatic updates."
+          }
+        ]
+      },
+      "security": {
+        "title": "Usalama",
+        "icon": "🔒",
+        "questions": [
+          {
+            "question": "Kulinda usalama wa akaunti yako",
+            "answer": "Best practices: tumia password imara, 2FA, usishiriki login, logout kwenye devices za pamoja, angalia activity ya akaunti, kuwa makini na phishing."
+          },
+          {
+            "question": "Jinsi Oliviuus inalinda data yako",
+            "answer": "Tuna usalama wa kiwango cha biashara: encryption, cloud secure, audits, GDPR/DPA, tokenized payments. Maelezo ya malipo hayahifadhiwi kwenye server zetu."
+          },
+          {
+            "question": "Kuripoti matatizo ya usalama",
+            "answer": "Wasiliana mara moja na security@oliviuus.com ukiweke timestamps, device info na maelezo. Timu yetu itachunguza na kusaidia."
+          },
+          {
+            "question": "Udhibiti wa faragha na usimamizi wa data",
+            "answer": "Tembelea Account Settings kudhibiti: history, recommendations, sharing, download permissions, communications. Unaweza kuomba data export au account deletion."
+          }
+        ]
+      },
+      "support": {
+        "title": "Msaada wa Moja kwa Moja",
+        "subtitle": "Pata msaada maalum",
+        "description": "Hupati unachohitaji? Timu yetu iko tayari kusaidia.",
+        "email": "Msaada kwa Email",
+        "directMessage": "Ujumbe wa Moja kwa Moja"
+      }
+    },
+    "contact": {
+      "title": "Wasiliana na Msaada",
+      "directMessage": {
+        "title": "Msaada kwa Ujumbe Moja kwa Moja",
+        "subtitle": "Pata msaada maalum kutoka kwa timu yetu",
+        "close": "Funga",
+        "description": "Jaza fomu hapa chini, timu yetu itajibu ndani ya masaa 24."
+      },
+      "email": {
+        "title": "Msaada kwa Email",
+        "response": "Jibu ndani ya masaa 24"
+      },
+      "phone": {
+        "title": "Msaada kwa Simu",
+        "description": "Msaada wa moja kwa moja"
+      },
+      "hours": {
+        "title": "Saa za Msaada",
+        "days": "Jumatatu - Jumapili"
+      },
+      "buttons": {
+        "sendEmail": "Tuma Email",
+        "callNow": "Piga Sasa",
+        "directMessage": "Ujumbe Moja kwa Moja"
+      },
+      "responseTime": "Timu yetu imejitolea kukupa msaada bora. Wakati wa kawaida wa majibu: 2-4 saa wakati wa saa za kazi."
+    },
+    "seo": {
+      "title": "Kituo cha Msaada Oliviuus | Msaada kwa Wateja & Maswali",
+      "description": "Pata msaada kwa huduma ya Oliviuus. Pata majibu ya FAQ, mwongozo wa troubleshooting, msaada wa akaunti, msaada wa malipo, na mawasiliano. Inapatikana kwa Kiingereza, Kifaransa, na Kinyarwanda.",
+      "keywords": "kituo cha msaada Oliviuus, msaada wa streaming, troubleshooting akaunti, msaada wa malipo, msaada wa kiufundi Rwanda, huduma kwa wateja, FAQ, wasiliana na Oliviuus"
     }
   }
 }

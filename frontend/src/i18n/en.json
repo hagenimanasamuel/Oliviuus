@@ -112,6 +112,12 @@
       "profiles": "Family / Profiles",
       "parental": "Parental Controls",
       "family_invitations": "Family Invitations"
+    },
+    "parental": {
+      "pinModal": {
+        "title": "Verify PIN to Access Parental Controls",
+        "description": "Enter your family PIN to access parental controls settings"
+      }
     }
   },
   "accountInfo": {
@@ -1720,7 +1726,10 @@
     "invalidTime": "Invalid time",
     "unknownEmail": "Unknown Email",
     "noEmail": "No email",
-    "noDate": "No date"
+    "noDate": "No date",
+    "highScore": "High Score (>30%)",
+    "topTrending": "Top Trending",
+    "home": "Home"
   },
   "parentalControls": {
     "title": "Parental Controls",
@@ -2188,6 +2197,817 @@
           "answer": "We partner directly with Rwandan production houses, provide better distribution channels, offer funding opportunities, and ensure fair compensation. Our platform is designed to elevate local talent and bring Rwandan stories to global audiences."
         }
       }
+    }
+  },
+  "kidDashboard": {
+    "navigation": {
+      "home": "Home",
+      "music": "Music",
+      "play": "Play",
+      "learn": "Learn",
+      "favorites": "Favorites"
+    },
+    "buttons": {
+      "logout": "Logout",
+      "exit": "Exit",
+      "checkingPin": "Checking..."
+    },
+    "tooltips": {
+      "logout": "Logout from your account",
+      "exitWithPin": "Exit kid mode (requires PIN)",
+      "exitNoPin": "Exit kid mode (no PIN set)",
+      "checkingPin": "Checking PIN status...",
+      "enterFullscreen": "Enter Fullscreen",
+      "exitFullscreen": "Exit Fullscreen",
+      "toggleNavigation": "Toggle Navigation",
+      "navigateTo": "Go to {{destination}}"
+    },
+    "greeting": "Hi, {{name}}!",
+    "defaultName": "Friend",
+    "status": {
+      "familyFun": "Family Fun! 🎉",
+      "letsPlay": "Let's play! 🎮"
+    },
+    "pinModal": {
+      "title": "Verify PIN to Exit Kid Mode",
+      "description": "Enter your family PIN to exit kid mode and return to parent dashboard"
+    }
+  },
+  "pinModal": {
+    "defaultTitle": "PIN Verification Required",
+    "defaultDescription": "Enter your family PIN to continue",
+    "labels": {
+      "enterPin": "Enter Family PIN",
+      "digits": "digits"
+    },
+    "placeholders": {
+      "enterPin": "Enter 4-digit PIN"
+    },
+    "buttons": {
+      "close": "Close modal",
+      "hidePin": "Hide PIN",
+      "showPin": "Show PIN",
+      "cancel": "Cancel",
+      "verify": "Verify",
+      "verifying": "Verifying..."
+    },
+    "errors": {
+      "emptyPin": "Please enter your PIN",
+      "invalidLength": "PIN must be exactly 4 digits",
+      "invalidPin": "Invalid PIN. Please try again."
+    },
+    "success": {
+      "verified": "PIN verified successfully!"
+    },
+    "securityNote": "This PIN protects your family settings and parental controls"
+  },
+  "songsMusic": {
+    "seo": {
+      "title": "Songs & Music - Oliviuus Kids",
+      "description": "Fun songs, nursery rhymes, music videos and dancing content for kids. Sing, dance and enjoy musical adventures!"
+    },
+    "header": {
+      "title": "SONGS & MUSIC",
+      "subtitle": "Sing & Dance • Let's Sing and Dance! 🎵",
+      "popular": "Popular Music Categories 🔥"
+    },
+    "search": {
+      "placeholder": "🔍 Search songs, music, dance videos, nursery rhymes..."
+    },
+    "buttons": {
+      "gridView": "Grid View",
+      "listView": "List View",
+      "filters": "Filters",
+      "clearAll": "Clear all",
+      "clearAllFilters": "Clear All Filters ✨",
+      "tryAgain": "Try Again 🔄",
+      "playNow": "Play Now ▶️",
+      "details": "Details ℹ️"
+    },
+    "activeFilters": "Active filters",
+    "filterPanel": {
+      "title": "Filter Music Content 🎯",
+      "sortBy": "Sort By 📊",
+      "musicTypes": "Music Types 🎶",
+      "musicStyles": "Music Styles 🎨",
+      "contentType": "Content Type 📺",
+      "clearAllFilters": "Clear all filters 🗑️",
+      "cancel": "Cancel",
+      "applyFilters": "Apply Filters ✨"
+    },
+    "errors": {
+      "title": "Oops! Something went wrong 😢",
+      "loading": "Oops! We had trouble loading songs and music. Try again! 🎵"
+    },
+    "noContent": {
+      "title": "No music content found 🎵",
+      "description": "Try adjusting your filters or search for different music types."
+    },
+    "badges": {
+      "topMusic": "Top Music! 🎵",
+      "greatMusic": "Great Music! 🎶",
+      "musicFun": "Music Fun! 🎤",
+      "awesomeSong": "Awesome Song! 🎧"
+    },
+    "metadata": {
+      "durationNA": "N/A",
+      "durationNAFull": "Duration: N/A",
+      "musicVideo": "Music Video 🎵",
+      "noDescription": "No description available"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "learning": {
+    "seo": {
+      "title": "Learning Zone - Oliviuus Kids",
+      "description": "Fun and educational content for kids. Learn about science, history, nature, mathematics, art, music and more through engaging videos."
+    },
+    "header": {
+      "title": "LEARNING ZONE",
+      "subtitle": "Explore & Learn • Where Curiosity Meets Fun! 🎈"
+    },
+    "search": {
+      "placeholder": "🔍 Search learning videos (science, math, history, art...)"
+    },
+    "buttons": {
+      "gridView": "Grid View",
+      "listView": "List View",
+      "filters": "Filters",
+      "clearAll": "Clear all",
+      "clearAllFilters": "Clear All Filters ✨",
+      "tryAgain": "Try Again 🔄",
+      "watch": "Watch ▶️",
+      "watchNow": "Watch Now ▶️",
+      "details": "Details ℹ️"
+    },
+    "activeFilters": "Active filters",
+    "filterPanel": {
+      "title": "Filter Learning Content 🎯",
+      "sortBy": "Sort By 📊",
+      "ageGroup": "Age Group 👶",
+      "subjects": "Subjects 📚",
+      "learningStyles": "Learning Styles 🎨",
+      "contentType": "Content Type 📺",
+      "clearAllFilters": "Clear all filters 🗑️",
+      "cancel": "Cancel",
+      "applyFilters": "Apply Filters ✨"
+    },
+    "errors": {
+      "title": "Oops! Something went wrong 😢",
+      "loading": "Oops! We had trouble loading learning content. Try again! 🎈"
+    },
+    "noContent": {
+      "title": "No learning content found 🧐",
+      "description": "Try adjusting your filters or search for something else."
+    },
+    "badges": {
+      "superSmart": "Super Smart! 🎓",
+      "learningTime": "Learning Time! 📚",
+      "funLearning": "Fun Learning! 🎈",
+      "awesomeContent": "Awesome Content! ✨"
+    },
+    "metadata": {
+      "durationNA": "N/A",
+      "durationNAFull": "Duration: N/A",
+      "kidSafe": "Kid Safe 🛡️",
+      "educational": "Educational 📚",
+      "noDescription": "No description available"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "ageGroups": {
+      "preschool": "Preschool 👶",
+      "earlyElementary": "Early Elementary 🧒",
+      "upperElementary": "Upper Elementary 👦",
+      "middleSchool": "Middle School 🎓"
+    }
+  },
+  "favorites": {
+    "seo": {
+      "title": "My Favorites - Oliviuus Kids",
+      "description": "Your favorite learning videos and watch later list. Access all the content you love in one place!"
+    },
+    "header": {
+      "title": "MY FAVORITES",
+      "subtitle": "My Favorites • All the videos you love! ❤️"
+    },
+    "tabs": {
+      "all": "All",
+      "liked": "Liked",
+      "watchLater": "Watch Later"
+    },
+    "search": {
+      "placeholder": "🔍 Search favorites..."
+    },
+    "buttons": {
+      "gridView": "Grid View",
+      "listView": "List View",
+      "clearFilters": "Clear filters",
+      "tryAgain": "Try Again 🔄",
+      "watch": "Watch ▶️",
+      "clearSearch": "Clear Search ✨",
+      "browseVideos": "Browse Videos 🎈",
+      "remove": "Remove"
+    },
+    "activeFilters": "Showing",
+    "badges": {
+      "liked": "Liked ❤️",
+      "watchLater": "Watch Later ⏰"
+    },
+    "results": {
+      "videosFound": "videos found",
+      "searchFor": "for \"{{query}}\""
+    },
+    "errors": {
+      "title": "Oops! Something went wrong 😢",
+      "loading": "Oops! We had trouble loading your favorites. Try again! 🎈"
+    },
+    "emptyStates": {
+      "noMatches": "No matches found 🧐",
+      "noLikedVideos": "No liked videos yet ❤️",
+      "noWatchLater": "Your watch later is empty ⏰",
+      "noFavorites": "No favorites yet ✨",
+      "tryDifferentSearch": "Try a different search term",
+      "likeSomeVideos": "Like some videos to see them here!",
+      "addToWatchLater": "Add videos to watch later to see them here!",
+      "startLiking": "Start liking videos or adding them to watch later!"
+    },
+    "metadata": {
+      "durationNA": "N/A",
+      "durationNAFull": "N/A",
+      "kidSafe": "Kid Safe 🛡️",
+      "noDescription": "No description available"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "tooltips": {
+      "removeFromLiked": "Remove from liked",
+      "addToLiked": "Add to liked",
+      "removeFromWatchLater": "Remove from watch later",
+      "addToWatchLater": "Add to watch later",
+      "removeFromList": "Remove from list"
+    }
+  },
+  "games": {
+    "seo": {
+      "title": "Kids Games - Coming Soon",
+      "description": "Fun and educational games for kids will be available soon!"
+    },
+    "header": {
+      "title": "Games Zone",
+      "subtitle": "Fun Games Will Be Here Soon! 🎮",
+      "description": "We're working on bringing you amazing, kid-friendly games that are both fun and educational. Stay tuned for exciting updates!"
+    },
+    "features": {
+      "title": "What's Coming?",
+      "funEducational": "Fun Educational Games",
+      "puzzles": "Brain-Teasing Puzzles",
+      "skillBuilding": "Skill-Building Activities",
+      "safeContent": "Safe & Kid-Friendly Content"
+    },
+    "construction": {
+      "title": "Under Construction",
+      "description": "We're building an amazing collection of games for kids! Check back soon for fun, educational, and exciting games that will make learning fun! ✨"
+    },
+    "buttons": {
+      "comingSoon": "Coming Soon!"
+    }
+  },
+  "kidLanding": {
+    "seo": {
+      "siteName": "Oliviuus Kids",
+      "defaultTitle": "Fun & Safe Kids Content",
+      "defaultDescription": "Watch kid-friendly cartoons, educational shows, and fun adventures. Safe, age-appropriate content for children.",
+      "keywords": "kids, children, cartoons, educational, family, safe, streaming, videos"
+    },
+    "sections": {
+      "featured": {
+        "title": "Featured Shows",
+        "subtitle": "Popular picks for kids"
+      },
+      "educational": {
+        "title": "Learning Fun",
+        "subtitle": "Educational and fun content"
+      },
+      "fun": {
+        "title": "Fun & Games",
+        "subtitle": "Entertaining adventures"
+      },
+      "recent": {
+        "title": "New Arrivals",
+        "subtitle": "Fresh content just added"
+      }
+    },
+    "actions": {
+      "play": "Play",
+      "stop": "Stop",
+      "trailer": "Trailer",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "addToList": "Add to My List",
+      "removeFromList": "Remove from My List",
+      "myList": "My List",
+      "inList": "In List",
+      "like": "Like",
+      "unlike": "Unlike",
+      "liked": "Liked",
+      "details": "Details",
+      "tryAgain": "Try Again",
+      "scrollLeft": "Scroll {{section}} left",
+      "scrollRight": "Scroll {{section}} right"
+    },
+    "badges": {
+      "learning": "Learning",
+      "approved": "Approved"
+    },
+    "ratings": {
+      "all": "All Ages",
+      "G": "All Ages",
+      "TV-Y": "Kids",
+      "TV-Y7": "Kids 7+",
+      "TV-G": "All Ages",
+      "PG": "Parental Guidance",
+      "7+": "Age 7+",
+      "8+": "Age 8+",
+      "9+": "Age 9+",
+      "10+": "Age 10+",
+      "11+": "Age 11+",
+      "12+": "Age 12+",
+      "default": "Kid Safe"
+    },
+    "errors": {
+      "contentLoad": "We encountered an issue loading content. Please try again shortly.",
+      "somethingWentWrong": "Something went wrong",
+      "error": "Error",
+      "noContent": "No content available",
+      "checkBackLater": "Check back later for new additions."
+    }
+  },
+  "termsOfService": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last Updated",
+    "welcome": "Welcome to Oliviuus, a streaming platform dedicated to delivering entertainment to audiences in Rwanda and beyond. These Terms of Service (\"Terms\") govern your access to and use of the Oliviuus platform, including our website, mobile apps, streaming services, and all related features (collectively, the \"Service\").",
+    "agreementNotice": "By creating an account, subscribing, or using the Service, you agree to these Terms. If you do not agree, you may not use Oliviuus.",
+    "sections": {
+      "eligibility": {
+        "title": "Eligibility",
+        "description": "To use Oliviuus:",
+        "points": [
+          "You must be at least 13 years old.",
+          "If under 18, you must have parental or guardian consent to use the Service.",
+          "You must provide accurate account information.",
+          "We may suspend or terminate accounts that violate these requirements."
+        ]
+      },
+      "accountRegistration": {
+        "title": "Account Registration",
+        "description": "When creating an account:",
+        "points1": [
+          "You must provide accurate and complete information.",
+          "You are responsible for keeping your login details secure.",
+          "You must immediately notify us of any unauthorized activity."
+        ],
+        "separator": "You may not:",
+        "points2": [
+          "Create multiple accounts to abuse free trials.",
+          "Share your password with others outside your household.",
+          "Use or access somebody else's account without permission."
+        ]
+      },
+      "freeTrial": {
+        "title": "Free Trial",
+        "description": "Oliviuus may offer a one-time free trial per user and payment method.",
+        "duringTrial": "During the free trial:",
+        "points": [
+          "You will not be charged.",
+          "You may cancel anytime before the trial ends to avoid charges."
+        ],
+        "warning": "Attempting to exploit or bypass the free-trial system is prohibited."
+      },
+      "subscriptionsPayments": {
+        "title": "Subscriptions & Payments",
+        "description": "By subscribing:",
+        "points": [
+          "You authorize Oliviuus to charge your selected payment method (e.g., Mobile Money, card).",
+          "Subscription fees are billed monthly unless otherwise specified.",
+          "All payments are non-refundable unless required by law.",
+          "We may change pricing, but will notify you in advance."
+        ]
+      },
+      "contentUsageRules": {
+        "title": "Content & Usage Rules",
+        "description": "Oliviuus grants you a limited, non-transferable, non-exclusive license to access our content for personal, non-commercial use.",
+        "notAllowed": "You agree not to:",
+        "points": [
+          "Download, copy, screen-record, or redistribute content without permission.",
+          "Use the Service for public screenings without authorization.",
+          "Bypass geographic or security restrictions.",
+          "Use bots, scripts, or automated tools to access the Service."
+        ],
+        "deviceLimit": "We may limit the number of devices that can stream simultaneously."
+      },
+      "intellectualProperty": {
+        "title": "Intellectual Property",
+        "description": "All Oliviuus content (movies, series, UI design, brand assets, logos, software) is protected by copyright and other intellectual property laws.",
+        "notAllowed": "You may not:",
+        "points": [
+          "Modify or reproduce our assets.",
+          "Create derivative works without permission.",
+          "Use the Oliviuus brand name without written approval."
+        ]
+      },
+      "thirdPartyIntegrations": {
+        "title": "Third-Party Integrations",
+        "description": "Oliviuus may work with third-party partners (analytics, payment processors, cloud hosting).",
+        "notResponsible": "We are not responsible for:",
+        "points": [
+          "Their content,",
+          "Their policies, or",
+          "Errors caused by their systems."
+        ]
+      },
+      "termination": {
+        "title": "Termination",
+        "description": "We may suspend or terminate your account if:",
+        "points": [
+          "You violate these Terms,",
+          "Engage in illegal or harmful activities,",
+          "Abuse the Service or payment system."
+        ],
+        "userRight": "You may also delete your account at any time."
+      },
+      "serviceAvailability": {
+        "title": "Service Availability",
+        "description": "We strive to provide uninterrupted service, but:",
+        "points": [
+          "Downtime, maintenance, or errors may occur.",
+          "We do not guarantee 100% uptime.",
+          "Certain content may be added or removed without notice."
+        ]
+      },
+      "disclaimer": {
+        "title": "Disclaimer",
+        "description": "Oliviuus is provided \"as is\" and \"as available.\"",
+        "notGuarantee": "We do not guarantee:",
+        "points": [
+          "That the Service will meet your expectations,",
+          "That there will be no interruptions or errors,",
+          "That all content will always remain available."
+        ]
+      },
+      "limitationOfLiability": {
+        "title": "Limitation of Liability",
+        "description": "To the maximum extent permitted by law:",
+        "points": [
+          "Oliviuus is not liable for indirect, incidental, or special damages.",
+          "Our total liability will not exceed the amount you paid for the Service in the last 3 months."
+        ]
+      },
+      "changesToTerms": {
+        "title": "Changes to These Terms",
+        "description": "We may update these Terms from time to time.",
+        "continuation": "Continued use of Oliviuus after updates means you accept the revised Terms."
+      },
+      "contactInformation": {
+        "title": "Contact Information",
+        "description": "If you have questions about these Terms:",
+        "email": "oliviuusteam@gmail.com",
+        "location": "Musanze, Rwanda"
+      }
+    },
+    "footer": "These Terms of Service are effective as of {{date}}. By using Oliviuus, you acknowledge that you have read, understood, and agree to be bound by these Terms.",
+    "seo": {
+      "title": "Oliviuus Terms of Service | Streaming Platform Rules & Policies",
+      "description": "Read Oliviuus Terms of Service. Learn about our streaming platform rules, subscription policies, content usage guidelines, and user agreements for Rwanda and international viewers.",
+      "keywords": "Oliviuus terms of service, streaming platform rules, subscription policies, content usage guidelines, user agreement, Rwanda streaming service, entertainment platform terms"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last Updated",
+    "introduction": "Oliviuus (\"we,\" \"us,\" or \"our\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your personal information.",
+    "sections": {
+      "informationWeCollect": {
+        "title": "Information We Collect",
+        "subsections": {
+          "informationYouProvide": {
+            "title": "A. Information you provide",
+            "points": [
+              "Full name",
+              "Email address",
+              "Password",
+              "Payment method (Mobile Money or card)",
+              "Profile preferences",
+              "Feedback or customer support messages"
+            ],
+            "note": "We do not store your full payment credentials—only necessary transaction data."
+          },
+          "informationCollectedAutomatically": {
+            "title": "B. Information collected automatically",
+            "points": [
+              "IP address",
+              "Device information (model, OS, browser)",
+              "Login timestamps",
+              "Viewing history",
+              "Usage interactions",
+              "Language and theme settings"
+            ]
+          },
+          "cookiesTracking": {
+            "title": "C. Cookies & Tracking",
+            "description": "We use cookies to:",
+            "points": [
+              "Maintain your logged-in session,",
+              "Personalize recommendations,",
+              "Improve platform performance."
+            ]
+          }
+        }
+      },
+      "howWeUseYourInformation": {
+        "title": "How We Use Your Information",
+        "description": "We use your data to:",
+        "points": [
+          "Create and manage your account",
+          "Deliver streaming content",
+          "Personalize your experience",
+          "Process payments and verify trials",
+          "Prevent fraud or abuse",
+          "Provide customer support",
+          "Improve platform quality"
+        ],
+        "importantNote": "We never sell your personal data."
+      },
+      "sharingYourInformation": {
+        "title": "Sharing Your Information",
+        "subsections": {
+          "serviceProviders": {
+            "title": "A. Service providers",
+            "points": [
+              "Payment processors",
+              "Cloud storage providers",
+              "Analytics tools",
+              "Email and notification systems"
+            ]
+          },
+          "legalRequirements": {
+            "title": "B. Legal requirements",
+            "description": "If required by:",
+            "points": [
+              "Law enforcement",
+              "Court orders",
+              "Regulatory authorities"
+            ],
+            "note": "We will only share what is legally necessary."
+          }
+        }
+      },
+      "dataStorageSecurity": {
+        "title": "Data Storage & Security",
+        "description": "We use:",
+        "points": [
+          "Encrypted storage,",
+          "Secure servers,",
+          "Access control,",
+          "Regular security audits."
+        ],
+        "warning": "However, no system is 100% secure.",
+        "recommendation": "We encourage you to use a strong password."
+      },
+      "yourRights": {
+        "title": "Your Rights",
+        "description": "You may:",
+        "points": [
+          "Access your information",
+          "Update your profile",
+          "Request account deletion",
+          "Request a copy of your data",
+          "Change language or privacy preferences"
+        ],
+        "requestTitle": "For requests:",
+        "email": "oliviuusteam@gmail.com"
+      },
+      "dataRetention": {
+        "title": "Data Retention",
+        "description": "We keep:",
+        "points": [
+          "Account data until you delete your account,",
+          "Transaction data as required by law,",
+          "Viewing logs for recommendation accuracy."
+        ]
+      },
+      "childrensPrivacy": {
+        "title": "Children's Privacy",
+        "description1": "Oliviuus does not knowingly collect data from children under 13.",
+        "description2": "If you believe a child has provided data, contact us to remove it."
+      },
+      "changesToPolicy": {
+        "title": "Changes to This Policy",
+        "description": "We may update this Policy from time to time.",
+        "notification": "We will notify you of major changes."
+      },
+      "contactInformation": {
+        "title": "Contact Information",
+        "email": "oliviuusteam@gmail.com",
+        "location": "Musanze, Rwanda"
+      }
+    },
+    "footer": {
+      "consent": "By using Oliviuus, you consent to the collection and use of your information as described in this Privacy Policy. If you have any concerns about your privacy, please contact us.",
+      "effectiveDate": "This Privacy Policy is effective as of {{date}}."
+    },
+    "seo": {
+      "title": "Oliviuus Privacy Policy | Data Protection & User Privacy",
+      "description": "Read Oliviuus Privacy Policy. Learn how we protect your data, what information we collect, how we use it, and your privacy rights on our streaming platform.",
+      "keywords": "Oliviuus privacy policy, data protection, user privacy, streaming platform data collection, GDPR compliance, Rwanda data privacy, personal information security"
+    }
+  },
+  "helpCenter": {
+    "title": "Help Center",
+    "subtitle": "Find answers to common questions or get personalized support from our team",
+    "search": {
+      "placeholder": "What do you need help with? Type your question...",
+      "button": "Search",
+      "popularTags": [
+        "Password Reset",
+        "Payment Issues",
+        "Streaming Problems",
+        "App Not Working",
+        "Account Security"
+      ],
+      "clear": "Clear search",
+      "noResults": {
+        "title": "No exact matches found for \"{{query}}\"",
+        "description": "Try using different keywords or browse our help categories below",
+        "clear": "Clear Search",
+        "contact": "Contact Support"
+      }
+    },
+    "results": {
+      "title": "Search Results",
+      "found": "Found {{count}} result{{s}} for \"{{query}}\"",
+      "viewInCategory": "View in category →",
+      "defaultAnswer": "Please refer to the specific help category for detailed information about this topic."
+    },
+    "categories": {
+      "title": "Browse Help Categories",
+      "questions": "{{count}} questions",
+      "account": {
+        "title": "Account & Login",
+        "icon": "👤",
+        "questions": [
+          {
+            "question": "How to create an account",
+            "answer": "Click the 'Sign In' button on our homepage. Enter your email, create a secure password, and complete the verification process. You'll receive a confirmation email to activate your Oliviuus account."
+          },
+          {
+            "question": "How to reset your password",
+            "answer": "Navigate to the login page and click 'Forgot Password'. Enter your registered email address, and we'll send you a secure password reset link. For security reasons, the link expires after 24 hours."
+          },
+          {
+            "question": "How to verify your email",
+            "answer": "Check your email inbox for a verification message from Oliviuus. Click the verification link to confirm your account. If you don't see the email, please check your spam or junk folder."
+          },
+          {
+            "question": "How to change your account details",
+            "answer": "Access your profile menu and select 'Account Settings'. From there, you can update your personal information, email address, password, and communication preferences securely."
+          }
+        ]
+      },
+      "payment": {
+        "title": "Payment & Subscriptions",
+        "icon": "💳",
+        "questions": [
+          {
+            "question": "Accepted payment methods",
+            "answer": "Oliviuus accepts Mobile Money (MTN, Airtel), Visa, MasterCard, and local Rwandan payment methods. All transactions are processed through secure, encrypted payment gateways for your protection."
+          },
+          {
+            "question": "How promotional trials work",
+            "answer": "Oliviuus occasionally offers promotional trial periods during special events or campaigns. These trials are announced on our website and social media channels. Regular subscription plans are billed monthly with transparent pricing."
+          },
+          {
+            "question": "How to update your payment method",
+            "answer": "In your account settings, navigate to 'Billing & Payments'. Click 'Update Payment Method' to securely enter new payment details. Your subscription will continue uninterrupted with the updated payment information."
+          },
+          {
+            "question": "How to cancel or resume your subscription",
+            "answer": "To cancel: Go to 'Subscription Management' in your account settings and select 'Cancel Subscription'. To resume: Visit the subscription page and choose 'Reactivate Subscription'. Changes take effect at the end of your current billing cycle."
+          }
+        ]
+      },
+      "watching": {
+        "title": "Watching on Oliviuus",
+        "icon": "🎬",
+        "questions": [
+          {
+            "question": "Supported devices & platforms",
+            "answer": "Stream on: Web browsers (Chrome, Safari, Firefox, Edge), iOS/Android mobile apps, Smart TVs (Android TV, Samsung Tizen), gaming consoles, and tablets. Recommended internet speed: 5 Mbps for HD, 25 Mbps for 4K streaming."
+          },
+          {
+            "question": "Why is my video buffering or quality poor?",
+            "answer": "Buffering typically indicates network issues. Recommendations: 1) Test internet speed (speedtest.net) 2) Restart modem/router 3) Lower stream quality in settings 4) Close bandwidth-intensive apps 5) Use wired connection if possible."
+          },
+          {
+            "question": "How to download content for offline viewing",
+            "answer": "Look for the download icon (↓) on supported titles. Downloads are available exclusively in the mobile app for offline viewing. Content expires after 48 hours due to licensing agreements and requires periodic reconnection."
+          },
+          {
+            "question": "Fixing playback or audio issues",
+            "answer": "Troubleshooting steps: 1) Refresh the application 2) Verify audio output selection 3) Update browser/app to latest version 4) Clear cache and cookies 5) Test on alternative device/browser 6) Check for service status updates."
+          }
+        ]
+      },
+      "technical": {
+        "title": "Technical Support",
+        "icon": "🔧",
+        "questions": [
+          {
+            "question": "App crashing or freezing",
+            "answer": "Resolution steps: 1) Update to latest app version 2) Force quit and restart app 3) Clear app cache/data 4) Reinstall application 5) Ensure sufficient device storage 6) Check device compatibility requirements."
+          },
+          {
+            "question": "Website or app not loading properly",
+            "answer": "Diagnostic checklist: 1) Verify internet connectivity 2) Check browser compatibility 3) Disable browser extensions/ad-blockers 4) Clear browser cache 5) Test in incognito/private mode 6) Visit status.oliviuus.com for service updates."
+          },
+          {
+            "question": "Clearing cache & cookies",
+            "answer": "Browser: Settings → Privacy & Security → Clear Browsing Data. Mobile App: Device Settings → Apps → Oliviuus → Storage → Clear Cache. This resolves many loading issues while preserving your account data."
+          },
+          {
+            "question": "Keeping your app updated",
+            "answer": "iOS: App Store → Profile → Available Updates. Android: Google Play Store → My Apps → Updates. Enable automatic updates for seamless access to new features, performance improvements, and security patches."
+          }
+        ]
+      },
+      "security": {
+        "title": "Safety & Security",
+        "icon": "🔒",
+        "questions": [
+          {
+            "question": "Protecting your account security",
+            "answer": "Best practices: Use strong, unique passwords; enable two-factor authentication; never share login credentials; log out from shared devices; monitor account activity regularly; and be cautious of phishing attempts."
+          },
+          {
+            "question": "How Oliviuus secures your data",
+            "answer": "We implement enterprise-grade security: end-to-end encryption, secure cloud infrastructure, regular security audits, GDPR/DPA compliance, and tokenized payment processing. Your payment details are never stored on our servers."
+          },
+          {
+            "question": "Reporting security concerns",
+            "answer": "Immediately contact security@oliviuus.com with details of any suspicious activity. Include relevant timestamps, device information, and description. Our security team will investigate and assist with account protection."
+          },
+          {
+            "question": "Privacy controls and data management",
+            "answer": "Access Account Settings to manage: viewing history, personalized recommendations, data sharing preferences, download permissions, and communication settings. You can also request data export or account deletion."
+          }
+        ]
+      },
+      "support": {
+        "title": "Direct Support",
+        "subtitle": "Get personalized assistance",
+        "description": "Can't find what you need? Our support team is ready to help.",
+        "email": "Email Support",
+        "directMessage": "Direct Message"
+      }
+    },
+    "contact": {
+      "title": "Contact Support",
+      "directMessage": {
+        "title": "Direct Message Support",
+        "subtitle": "Get personalized assistance from our expert team",
+        "close": "Close",
+        "description": "Complete the form below and our support team will respond within 24 hours."
+      },
+      "email": {
+        "title": "Email Support",
+        "response": "24-hour response"
+      },
+      "phone": {
+        "title": "Phone Support",
+        "description": "Direct assistance"
+      },
+      "hours": {
+        "title": "Support Hours",
+        "days": "Monday - Sunday"
+      },
+      "buttons": {
+        "sendEmail": "Send Email",
+        "callNow": "Call Now",
+        "directMessage": "Direct Message"
+      },
+      "responseTime": "Our support team is committed to providing you with the best assistance. Average response time is 2-4 hours during business hours."
+    },
+    "seo": {
+      "title": "Oliviuus Help Center | Customer Support & FAQs",
+      "description": "Get help with Oliviuus streaming service. Find answers to FAQs, troubleshooting guides, account support, payment help, and contact information. Available in English, French, and Kinyarwanda.",
+      "keywords": "Oliviuus help center, streaming support, account troubleshooting, payment help, technical support Rwanda, customer service, FAQ, contact Oliviuus"
     }
   }
 }

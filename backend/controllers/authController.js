@@ -142,11 +142,12 @@ const saveUserInfo = async (req, res) => {
 
     await query(
       `INSERT INTO user_session 
-       (user_id, session_token, device_name, device_type, ip_address, user_agent, token_expires)
-       VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))`,
+   (user_id, session_token, device_name, device_type, ip_address, 
+    user_agent, token_expires, session_mode, active_kid_profile_id)
+   VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), NULL, NULL)`,
       [
         userId,
-        token, // 🔑 use the same JWT as cookie
+        token,
         device_name || "Unknown",
         device_type || "desktop",
         ip_address,
@@ -435,8 +436,9 @@ const loginUser = async (req, res) => {
     // 5️⃣ Record session in user_session table
     await query(
       `INSERT INTO user_session 
-       (user_id, session_token, device_name, device_type, ip_address, user_agent, token_expires)
-       VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))`,
+   (user_id, session_token, device_name, device_type, ip_address, 
+    user_agent, token_expires, session_mode, active_kid_profile_id)
+   VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), NULL, NULL)`,
       [
         user.id,
         token,

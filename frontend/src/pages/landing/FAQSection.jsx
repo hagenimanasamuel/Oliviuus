@@ -12,7 +12,7 @@ const FAQSection = () => {
   const [showContact, setShowContact] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [contactInfo, setContactInfo] = useState({
-    email: "support@oliviuus.com",
+    email: "oliviuusteam@gmail.com",
     phone: "+250 788 880 266"
   });
   const [loadingContactInfo, setLoadingContactInfo] = useState(true);
