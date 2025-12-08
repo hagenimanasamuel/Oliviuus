@@ -2031,6 +2031,83 @@ const createFamilyPinSecurityTable = async () => {
   }
 };
 
+const createFeedbackTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS feedback (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      
+      -- User Information
+      user_id INT DEFAULT NULL,
+      user_email VARCHAR(255) NOT NULL,
+      user_name VARCHAR(150) NOT NULL,
+      
+      -- Feedback Content
+      category ENUM(
+        'FEATURE_REQUEST',
+        'BUG_REPORT', 
+        'STREAMING_ISSUE',
+        'CONTENT_SUGGESTION',
+        'ACCOUNT_ISSUE',
+        'PAYMENT_ISSUE',
+        'WEBSITE_APP_FEEDBACK',
+        'CUSTOMER_SERVICE',
+        'GENERAL_FEEDBACK',
+        'LIKE_DISLIKE'
+      ) NOT NULL DEFAULT 'GENERAL_FEEDBACK',
+      
+      -- Feedback Type (for simple like/dislike or detailed)
+      feedback_type ENUM('LIKE', 'DISLIKE', 'DETAILED') NOT NULL DEFAULT 'DETAILED',
+      
+      -- Rating (1-5 stars, NULL allowed for simple feedback)
+      rating TINYINT DEFAULT NULL,
+      
+      -- Message (NULL for simple like/dislike, TEXT for detailed)
+      message TEXT DEFAULT NULL,
+      
+      -- Platform Information
+      platform ENUM('WEB', 'ANDROID', 'IOS', 'SMART_TV', 'TABLET', 'DESKTOP_APP') NOT NULL DEFAULT 'WEB',
+      
+      -- Contact Permission
+      allow_contact BOOLEAN DEFAULT FALSE,
+      
+      -- Status
+      status ENUM('NEW', 'REVIEWED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED') NOT NULL DEFAULT 'NEW',
+      
+      -- Metadata
+      ip_address VARCHAR(45) DEFAULT NULL,
+      user_agent TEXT DEFAULT NULL,
+      
+      -- Timestamps
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      
+      -- Indexes
+      INDEX idx_feedback_user_id (user_id),
+      INDEX idx_feedback_user_email (user_email),
+      INDEX idx_feedback_category (category),
+      INDEX idx_feedback_status (status),
+      INDEX idx_feedback_feedback_type (feedback_type),
+      INDEX idx_feedback_created_at (created_at),
+      
+      -- Foreign Key
+      CONSTRAINT fk_feedback_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE SET NULL
+    );
+  `;
+  
+  try {
+    await query(sql);
+    console.log("✅ feedback table is ready");
+  } catch (err) {
+    console.error("❌ Error creating feedback table:", err);
+  }
+};
+
+module.exports = {
+  createFeedbackTable
+};
+
 
 
 module.exports = {
@@ -2057,4 +2134,5 @@ module.exports = {
   createKidsTables,
   createFamilyMembersTable,
   createFamilyPinSecurityTable,
+  createFeedbackTable,
 };

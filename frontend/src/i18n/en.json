@@ -2,6 +2,7 @@
   "footer": {
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
+    "about": "About Us",
     "help": "Help Center",
     "feedback": "Feedback",
     "rights": "All rights reserved."
@@ -932,6 +933,10 @@
       "exclusiveContent": "Exclusive {{category}}",
       "mediaContent": "Media Content"
     },
+    "emailInput": {
+      "title": "Ready to watch?",
+      "description": "Enter your email to create or restart your membership."
+    },
     "share": {
       "title": "Share this content",
       "shareText": "Check out \"{{title}}\"",
@@ -979,7 +984,9 @@
       "close": "Close",
       "exploreMore": "Explore More",
       "openFloatingTrailer": "Open Floating Trailer",
-      "goToHomepage": "Go to Homepage"
+      "goToHomepage": "Go to Homepage",
+      "startNow": "Start Now",
+      "startMembership": "Start Membership"
     },
     "sections": {
       "synopsis": "Synopsis",
@@ -1255,9 +1262,11 @@
       "signOut": "Sign Out",
       "companyName": "Oliviuus Ltd",
       "footer": {
-        "privacy": "Privacy",
-        "terms": "Terms",
-        "help": "Help"
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "about": "About Us",
+        "help": "Help Center",
+        "feedback": "Feedback"
       }
     }
   },
@@ -3008,6 +3017,340 @@
       "title": "Oliviuus Help Center | Customer Support & FAQs",
       "description": "Get help with Oliviuus streaming service. Find answers to FAQs, troubleshooting guides, account support, payment help, and contact information. Available in English, French, and Kinyarwanda.",
       "keywords": "Oliviuus help center, streaming support, account troubleshooting, payment help, technical support Rwanda, customer service, FAQ, contact Oliviuus"
+    }
+  },
+  "feedbackPage": {
+    "title": "Share Your Feedback",
+    "subtitle": "Your insights help us improve Oliviuus and create a better streaming experience for everyone",
+    "chooseType": "Choose Feedback Type",
+    "selected": "Selected",
+    "feedbackTypes": {
+      "LIKE": "Simple Like",
+      "DISLIKE": "Simple Dislike",
+      "DETAILED": "Detailed Feedback"
+    },
+    "feedbackTypeDescriptions": {
+      "LIKE": "Just tell us what you like!",
+      "DISLIKE": "Let us know what needs improvement",
+      "DETAILED": "Share detailed thoughts and suggestions"
+    },
+    "formTitles": {
+      "LIKE": "Share What You Like",
+      "DISLIKE": "Share What You Dislike",
+      "DETAILED": "Submit Your Feedback"
+    },
+    "formFields": {
+      "name": {
+        "label": "Your Name",
+        "placeholder": "Enter your full name"
+      },
+      "email": {
+        "label": "Email Address",
+        "placeholder": "your.email@example.com"
+      },
+      "category": {
+        "label": "Category",
+        "placeholder": "Select a category",
+        "hint": "Choose the category that best describes your feedback"
+      },
+      "rating": {
+        "label": "Overall Rating (Optional)",
+        "hint": "Click to rate (optional)"
+      },
+      "message": {
+        "label": "Your Feedback",
+        "placeholder": "Please provide detailed feedback about your experience, suggestions for improvement, or any issues you've encountered...",
+        "hint": "Please be specific and include details that will help us understand and address your feedback",
+        "characters": "characters"
+      }
+    },
+    "categories": [
+      {
+        "value": "FEATURE_REQUEST",
+        "label": "Feature Request"
+      },
+      {
+        "value": "BUG_REPORT",
+        "label": "Bug Report"
+      },
+      {
+        "value": "STREAMING_ISSUE",
+        "label": "Streaming Issues"
+      },
+      {
+        "value": "CONTENT_SUGGESTION",
+        "label": "Content Suggestions"
+      },
+      {
+        "value": "ACCOUNT_ISSUE",
+        "label": "Account Problems"
+      },
+      {
+        "value": "PAYMENT_ISSUE",
+        "label": "Payment Issues"
+      },
+      {
+        "value": "WEBSITE_APP_FEEDBACK",
+        "label": "Website/App Feedback"
+      },
+      {
+        "value": "CUSTOMER_SERVICE",
+        "label": "Customer Service"
+      },
+      {
+        "value": "GENERAL_FEEDBACK",
+        "label": "General Feedback"
+      }
+    ],
+    "ratings": {
+      "0": "Not rated",
+      "1": "Very Poor",
+      "2": "Poor",
+      "3": "Average",
+      "4": "Good",
+      "5": "Excellent"
+    },
+    "simpleFeedbackMessage": "Simple {{type}} feedback - no additional details needed",
+    "validation": {
+      "nameRequired": "Name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "categoryRequired": "Category is required for detailed feedback",
+      "messageRequired": "Message is required for detailed feedback",
+      "messageMinLength": "Please provide more details (at least 10 characters)",
+      "messageMaxLength": "Message is too long (maximum 2000 characters)",
+      "simpleFeedbackNoMessage": "Simple feedback (LIKE/DISLIKE) should not include a message",
+      "fixErrors": "Please fix the errors in the form"
+    },
+    "submitting": "Submitting...",
+    "submitButtons": {
+      "like": "Submit Like",
+      "dislike": "Submit Dislike",
+      "detailed": "Submit Feedback"
+    },
+    "success": {
+      "title": "Thank You for Your Feedback!",
+      "like": "Thank you for the positive feedback! We're glad you're enjoying Oliviuus.",
+      "dislike": "Thank you for your honest feedback. We'll use this to improve.",
+      "detailed": "Your feedback has been submitted successfully. Our team will review it carefully."
+    },
+    "error": {
+      "title": "Submission Failed"
+    },
+    "submission": {
+      "failed": "Failed to submit feedback",
+      "error": "Failed to submit feedback. Please try again."
+    },
+    "requiredFields": "Required fields",
+    "contactMethods": {
+      "title": "Other Ways to Reach Us",
+      "email": {
+        "title": "Email Feedback",
+        "subject": "Oliviuus Feedback",
+        "description": "Send us an email with your feedback",
+        "button": "Open Email"
+      },
+      "phone": {
+        "title": "Phone Support",
+        "description": "Call us to share feedback directly",
+        "button": "Call Now"
+      },
+      "location": {
+        "title": "Our Location",
+        "address": "Musanze, Rwanda",
+        "description": "Based in Rwanda, serving audiences worldwide"
+      }
+    },
+    "process": {
+      "title": "What Happens After You Submit?",
+      "description": "We appreciate every piece of feedback we receive. While we can't respond to every submission individually, we read them all and use them to guide our development priorities.",
+      "steps": [
+        {
+          "title": "Review",
+          "description": "Our team reviews every submission"
+        },
+        {
+          "title": "Categorize",
+          "description": "Feedback is categorized and prioritized"
+        },
+        {
+          "title": "Plan",
+          "description": "We incorporate insights into our roadmap"
+        },
+        {
+          "title": "Implement",
+          "description": "Features and fixes are developed based on feedback"
+        }
+      ]
+    },
+    "seo": {
+      "title": "Oliviuus Feedback | Share Your Experience & Suggestions",
+      "description": "Share feedback about Oliviuus streaming service. Submit bug reports, feature requests, content suggestions, and rate your experience. Help us improve our platform.",
+      "keywords": "Oliviuus feedback, streaming service feedback, bug report, feature request, content suggestions, user feedback, improve Oliviuus, customer feedback"
+    }
+  },
+  "aboutPage": {
+    "breadcrumb": "About Us",
+    "hero": {
+      "title": "Our",
+      "highlight": "Story",
+      "subtitle": "A Rwandan dream built on passion, resilience, and the belief that our stories deserve a global stage."
+    },
+    "stats": [
+      {
+        "number": "10K+",
+        "label": "Active Users",
+        "icon": "Users"
+      },
+      {
+        "number": "10+",
+        "label": "Movies & Series",
+        "icon": "Film"
+      },
+      {
+        "number": "10+",
+        "label": "Local Partners",
+        "icon": "Globe"
+      },
+      {
+        "number": "24/7",
+        "label": "Dedicated Support",
+        "icon": "Award"
+      }
+    ],
+    "story": {
+      "title": "The Story of",
+      "highlight": "Oliviuus",
+      "scrollHint": "Scroll horizontally to journey through our story",
+      "scrollIndicator": "← Scroll horizontally →",
+      "chapter": "Chapter",
+      "goToChapter": "Go to chapter"
+    },
+    "storyChapters": [
+      {
+        "id": 1,
+        "title": "A Dream Rooted in Rwanda",
+        "subtitle": "The Beginning of a Vision",
+        "emoji": "💭",
+        "content": "Oliviuus began as a dream shaped by passion, loss, resilience, and the belief that Rwandan stories deserve a global stage.",
+        "background": "from-[#BC8BBC]/10 to-purple-600/10",
+        "color": "text-[#BC8BBC]",
+        "highlight": "A dream rooted in Rwanda"
+      },
+      {
+        "id": 2,
+        "title": "Olivier's Passion",
+        "subtitle": "The Inspiration",
+        "emoji": "👨‍🎬",
+        "content": "The idea was first envisioned by HAGENIMANA Samuel, who grew up seeing his brother, MANISHIMWE Olivier, deeply passionate about movies. Olivier loved acting, directing, writing, and everything related to cinema.",
+        "background": "from-purple-600/10 to-blue-500/10",
+        "color": "text-purple-400",
+        "highlight": "Olivier's passion for cinema"
+      },
+      {
+        "id": 3,
+        "title": "The Rwandan Reality",
+        "subtitle": "Challenges Faced",
+        "emoji": "💔",
+        "content": "Like many talented Rwandan creators, Olivier faced limited opportunities, poor promotion, weak distribution, and a system that rarely gave young filmmakers a real chance to shine.",
+        "background": "from-blue-500/10 to-cyan-500/10",
+        "color": "text-blue-400",
+        "highlight": "Limited opportunities for creators"
+      },
+      {
+        "id": 4,
+        "title": "The Spark of an Idea",
+        "subtitle": "Turning Reflection into Revolution",
+        "emoji": "✨",
+        "content": "Samuel watched all of this closely — every sacrifice, every attempt. Years later, he reflected on his brother's dreams and asked: What if there was a platform designed to distribute, promote, and professionally stream Rwandan movies?",
+        "background": "from-cyan-500/10 to-emerald-500/10",
+        "color": "text-cyan-400",
+        "highlight": "A revolutionary idea"
+      },
+      {
+        "id": 5,
+        "title": "Building the Team",
+        "subtitle": "The Foundation",
+        "emoji": "🤝",
+        "content": "Samuel met HIRWA MAZIMPAKA Chris, a creative mind who deeply understood filmmaking. Together, they explored how technology and storytelling could merge into something impactful for Rwandan cinema.",
+        "background": "from-emerald-500/10 to-yellow-500/10",
+        "color": "text-emerald-400",
+        "highlight": "Partnership and collaboration"
+      },
+      {
+        "id": 6,
+        "title": "The Name Oliviuus",
+        "subtitle": "A Tribute",
+        "emoji": "🏷️",
+        "content": "The name 'Oliviuus' came naturally — inspired by Olivier, whose passion planted the first seed of the vision. Samuel transformed his brother's name into something modern, cinematic, and globally appealing.",
+        "background": "from-yellow-500/10 to-orange-500/10",
+        "color": "text-yellow-400",
+        "highlight": "Oliviuus: A tribute to Olivier"
+      },
+      {
+        "id": 7,
+        "title": "The Mission",
+        "subtitle": "2024-2025 Vision",
+        "emoji": "🎯",
+        "content": "Empower Rwandan filmmakers. Give creators a fair and professional distribution channel. Promote local stories with world-class technology. Bring Rwandan cinema to audiences everywhere.",
+        "background": "from-orange-500/10 to-red-500/10",
+        "color": "text-orange-400",
+        "highlight": "Empowering Rwandan filmmakers"
+      },
+      {
+        "id": 8,
+        "title": "Oliviuus Today",
+        "subtitle": "The Journey Continues",
+        "emoji": "🚀",
+        "content": "Today, Oliviuus stands as a pioneering Rwandan streaming platform, blending culture, innovation, and technology. A platform built with purpose, honoring the creators who came before and shaping opportunities for the generations to come.",
+        "background": "from-red-500/10 to-pink-500/10",
+        "color": "text-red-400",
+        "highlight": "A pioneering platform for Rwanda"
+      }
+    ],
+    "foundersSection": {
+      "title": "The",
+      "highlight": "Visionaries",
+      "subtitle": "Meet the passionate founders who turned a dream into Rwanda's premier streaming platform"
+    },
+    "founders": [
+      {
+        "name": "HAGENIMANA Samuel",
+        "role": "Founder & Chairman",
+        "emoji": "👑",
+        "description": "Visionary behind Oliviuus, turning personal reflection into platform revolution"
+      },
+      {
+        "name": "MANISHIMWE Olivier",
+        "role": "Co-Founder & CEO",
+        "emoji": "🎬",
+        "description": "Cinema enthusiast whose passion inspired the platform's name and mission"
+      },
+      {
+        "name": "HIRWA MAZIMPAKA Chris",
+        "role": "Co-Founder & Head of Content",
+        "emoji": "✍️",
+        "description": "Creative director shaping Rwandan stories for global audiences"
+      }
+    ],
+    "quoteSection": {
+      "emoji": "🌟",
+      "quote": "\"Oliviuus exists because dreams should not fade. Stories should not be lost. And talent deserves a home where it can be seen.\"",
+      "promise": "This is our promise to Rwandan filmmakers and audiences worldwide."
+    },
+    "cta": {
+      "title": "Join the Rwandan Cinema Revolution",
+      "subtitle": "Experience streaming built with purpose, passion, and pride in Rwandan storytelling.",
+      "buttons": {
+        "startNow": "Start Now",
+        "exploreCinema": "Explore Rwandan Cinema"
+      }
+    },
+    "seo": {
+      "title": "About Oliviuus | Our Story, Founders & Rwandan Cinema Mission",
+      "description": "Discover the story of Oliviuus - a Rwandan streaming platform built on passion, resilience, and dedication to showcasing African stories. Learn about our founders, mission, and vision for Rwandan cinema.",
+      "keywords": "Oliviuus about, Rwandan streaming platform, African cinema, Rwanda movie platform, Oliviuus founders, Rwandan storytelling, African entertainment, Rwanda digital platform"
     }
   }
 }

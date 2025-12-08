@@ -2,6 +2,7 @@
   "footer": {
     "terms": "Masharti ya Huduma",
     "privacy": "Sera ya Faragha",
+    "about": "Kuhusu Sisi",
     "help": "Kituo cha Msaada",
     "feedback": "Maoni",
     "rights": "Haki zote zimehifadhiwa."
@@ -930,6 +931,10 @@
       "exclusiveContent": "Maudhui ya Kipekee ya {{category}}",
       "mediaContent": "Maudhui ya Media"
     },
+    "emailInput": {
+      "title": "Uko tayari kutazama?",
+      "description": "Weka barua pepe yako ili kuunda au kuanzisha upya uanachama wako."
+    },
     "actions": {
       "goHome": "Rudi Nyumbani",
       "play": "Cheza",
@@ -960,7 +965,9 @@
       "close": "Funga",
       "exploreMore": "Gundua Zaidi",
       "openFloatingTrailer": "Fungua Trela Inayoelea",
-      "goToHomepage": "Nenda kwenye Ukurasa wa Nyumbani"
+      "goToHomepage": "Nenda kwenye Ukurasa wa Nyumbani",
+      "startNow": "Anza Sasa",
+      "startMembership": "Anza Uanachama"
     },
     "share": {
       "title": "Shiriki maudhui haya",
@@ -1253,9 +1260,11 @@
       "signOut": "Toka",
       "companyName": "Oliviuus Ltd",
       "footer": {
-        "privacy": "Faragha",
-        "terms": "Masharti",
-        "help": "Msaada"
+        "privacy": "Sera ya Faragha",
+        "terms": "Masharti ya Huduma",
+        "about": "Kuhusu Sisi",
+        "help": "Kituo cha Msaada",
+        "feedback": "Maoni"
       }
     }
   },
@@ -3006,6 +3015,340 @@
       "title": "Kituo cha Msaada Oliviuus | Msaada kwa Wateja & Maswali",
       "description": "Pata msaada kwa huduma ya Oliviuus. Pata majibu ya FAQ, mwongozo wa troubleshooting, msaada wa akaunti, msaada wa malipo, na mawasiliano. Inapatikana kwa Kiingereza, Kifaransa, na Kinyarwanda.",
       "keywords": "kituo cha msaada Oliviuus, msaada wa streaming, troubleshooting akaunti, msaada wa malipo, msaada wa kiufundi Rwanda, huduma kwa wateja, FAQ, wasiliana na Oliviuus"
+    }
+  },
+  "feedbackPage": {
+    "title": "Shiriki Maoni Yako",
+    "subtitle": "Maoni yako yanatusaidia kuboresha Oliviuus na kuunda uzoefu bora wa kutazama kwa kila mtu",
+    "chooseType": "Chagua Aina ya Maoni",
+    "selected": "Imeteuliwa",
+    "feedbackTypes": {
+      "LIKE": "Napenda Tu",
+      "DISLIKE": "Sipendi Tu",
+      "DETAILED": "Maoni ya Kina"
+    },
+    "feedbackTypeDescriptions": {
+      "LIKE": "Tueleze tu kile unachokipenda!",
+      "DISLIKE": "Tueleze kile kinachohitaji kuboreshwa",
+      "DETAILED": "Toa mawazo na mapendekezo ya kina"
+    },
+    "formTitles": {
+      "LIKE": "Shiriki Unachokipenda",
+      "DISLIKE": "Shiriki Unachokikosa",
+      "DETAILED": "Wasilisha Maoni Yako"
+    },
+    "formFields": {
+      "name": {
+        "label": "Jina Lako",
+        "placeholder": "Ingiza jina lako kamili"
+      },
+      "email": {
+        "label": "Barua Pepe",
+        "placeholder": "your.email@example.com"
+      },
+      "category": {
+        "label": "Kategoria",
+        "placeholder": "Chagua kategoria",
+        "hint": "Chagua kategoria inayolingana na maoni yako"
+      },
+      "rating": {
+        "label": "Ukadiriaji wa Jumla (Hiari)",
+        "hint": "Bofya kutoa ukadiriaji (hiari)"
+      },
+      "message": {
+        "label": "Maoni Yako",
+        "placeholder": "Tafadhali toa maoni ya kina kuhusu uzoefu wako, mapendekezo, au matatizo uliyokutana nayo...",
+        "hint": "Tafadhali kuwa mahususi ili kutusaidia kuelewa vizuri maoni yako",
+        "characters": "herufi"
+      }
+    },
+    "categories": [
+      {
+        "value": "FEATURE_REQUEST",
+        "label": "Ombi la Kipengele Kipya"
+      },
+      {
+        "value": "BUG_REPORT",
+        "label": "Ripoti ya Hitilafu"
+      },
+      {
+        "value": "STREAMING_ISSUE",
+        "label": "Matatizo ya Uchezaji (Streaming)"
+      },
+      {
+        "value": "CONTENT_SUGGESTION",
+        "label": "Mapendekezo ya Maudhui"
+      },
+      {
+        "value": "ACCOUNT_ISSUE",
+        "label": "Matatizo ya Akaunti"
+      },
+      {
+        "value": "PAYMENT_ISSUE",
+        "label": "Matatizo ya Malipo"
+      },
+      {
+        "value": "WEBSITE_APP_FEEDBACK",
+        "label": "Maoni Kuhusu Tovuti/App"
+      },
+      {
+        "value": "CUSTOMER_SERVICE",
+        "label": "Huduma kwa Wateja"
+      },
+      {
+        "value": "GENERAL_FEEDBACK",
+        "label": "Maoni ya Jumla"
+      }
+    ],
+    "ratings": {
+      "0": "Hakuna ukadiriaji",
+      "1": "Mbaya Sana",
+      "2": "Mbaya",
+      "3": "Wastani",
+      "4": "Nzuri",
+      "5": "Nzuri Sana"
+    },
+    "simpleFeedbackMessage": "Maoni rahisi {{type}} - hakuna maelezo ya ziada yanayohitajika",
+    "validation": {
+      "nameRequired": "Jina linahitajika",
+      "nameMinLength": "Jina lazima liwe na angalau herufi 2",
+      "emailRequired": "Barua pepe inahitajika",
+      "emailInvalid": "Tafadhali ingiza barua pepe halali",
+      "categoryRequired": "Kategoria inahitajika kwa maoni ya kina",
+      "messageRequired": "Ujumbe unahitajika kwa maoni ya kina",
+      "messageMinLength": "Tafadhali toa maelezo zaidi (angalau herufi 10)",
+      "messageMaxLength": "Ujumbe mrefu sana (zikomo herufi 2000)",
+      "simpleFeedbackNoMessage": "Maoni rahisi (LIKE/DISLIKE) hayapaswi kuwa na ujumbe",
+      "fixErrors": "Tafadhali rekebisha makosa kwenye fomu"
+    },
+    "submitting": "Inatuma...",
+    "submitButtons": {
+      "like": "Wasilisha Napenda",
+      "dislike": "Wasilisha Sipendi",
+      "detailed": "Wasilisha Maoni"
+    },
+    "success": {
+      "title": "Asante kwa Maoni Yako!",
+      "like": "Asante kwa maoni mazuri! Tunafurahi kuwa unafurahia Oliviuus.",
+      "dislike": "Asante kwa uwazi wako. Tutatumia haya kuboresha huduma.",
+      "detailed": "Maoni yako yametumwa kikamilifu. Timu yetu yatalichambua kwa makini."
+    },
+    "error": {
+      "title": "Imeshindwa Kutuma"
+    },
+    "submission": {
+      "failed": "Imeshindwa kutuma maoni",
+      "error": "Tumeshindwa kutuma maoni. Tafadhali jaribu tena."
+    },
+    "requiredFields": "Sehemu zinazohitajika",
+    "contactMethods": {
+      "title": "Njia Nyingine za Kutufikia",
+      "email": {
+        "title": "Maoni kwa Barua Pepe",
+        "subject": "Maoni ya Oliviuus",
+        "description": "Tuma barua pepe ukitoa maoni yako",
+        "button": "Fungua Barua Pepe"
+      },
+      "phone": {
+        "title": "Msaada wa Simu",
+        "description": "Piga simu utoe maoni moja kwa moja",
+        "button": "Piga Sasa"
+      },
+      "location": {
+        "title": "Mahali Tulipo",
+        "address": "Musanze, Rwanda",
+        "description": "Tupo Rwanda, tunahudumia watazamaji duniani kote"
+      }
+    },
+    "process": {
+      "title": "Nini Hutokea Baada ya Kutuma?",
+      "description": "Tunathamini kila maoni tunayopokea. Hata kama hatuwezi kujibu kila mtu mmoja mmoja, tunayasoma yote na kuyatumia kuboresha huduma.",
+      "steps": [
+        {
+          "title": "Mapitio",
+          "description": "Timu yetu hupitia kila maoni"
+        },
+        {
+          "title": "Kuweka Kundi",
+          "description": "Maoni huwekwa kwenye makundi na kupewa kipaumbele"
+        },
+        {
+          "title": "Mipango",
+          "description": "Taarifa hutumiwa kupanga maendeleo yajayo"
+        },
+        {
+          "title": "Utekelezaji",
+          "description": "Vipengele na marekebisho hutengenezwa kulingana na maoni"
+        }
+      ]
+    },
+    "seo": {
+      "title": "Maoni ya Oliviuus | Shiriki Uzoefu na Mapendekezo Yako",
+      "description": "Toa maoni kuhusu huduma ya Oliviuus. Ripoti hitilafu, omba vipengele vipya, toa mapendekezo ya maudhui na kadhalika.",
+      "keywords": "maoni Oliviuus, ripoti ya hitilafu, ombi la kipengele, mapendekezo ya maudhui, kuboresha Oliviuus"
+    }
+  },
+  "aboutPage": {
+    "breadcrumb": "Kuhusu Sisi",
+    "hero": {
+      "title": "Hadithi Yetu",
+      "highlight": "Simulizi",
+      "subtitle": "Ndoto ya Rwanda iliyojengwa kwa shauku, uvumilivu, na imani kwamba hadithi zetu zinastahili kuonyeshwa duniani."
+    },
+    "stats": [
+      {
+        "number": "10K+",
+        "label": "Watumiaji Wanaofanya Kazi",
+        "icon": "Users"
+      },
+      {
+        "number": "10+",
+        "label": "Filamu & Mfululizo",
+        "icon": "Film"
+      },
+      {
+        "number": "10+",
+        "label": "Washirika wa Ndani",
+        "icon": "Globe"
+      },
+      {
+        "number": "24/7",
+        "label": "Msaada Maalum",
+        "icon": "Award"
+      }
+    ],
+    "story": {
+      "title": "Hadithi ya",
+      "highlight": "Oliviuus",
+      "scrollHint": "Sogeza kwa usawa ili kufahamu hadithi yetu",
+      "scrollIndicator": "← Sogeza kwa usawa →",
+      "chapter": "Sura",
+      "goToChapter": "Nenda kwenye sura"
+    },
+    "storyChapters": [
+      {
+        "id": 1,
+        "title": "Ndoto Iliyosimama Rwanda",
+        "subtitle": "Mwanzoni mwa Maono",
+        "emoji": "💭",
+        "content": "Oliviuus ilianza kama ndoto iliyoundwa kwa shauku, kupoteza, uvumilivu, na imani kwamba hadithi za Rwanda zinastahili kuonyeshwa duniani.",
+        "background": "from-[#BC8BBC]/10 to-purple-600/10",
+        "color": "text-[#BC8BBC]",
+        "highlight": "Ndoto iliyosimama Rwanda"
+      },
+      {
+        "id": 2,
+        "title": "Shauku ya Olivier",
+        "subtitle": "Mchocheo",
+        "emoji": "👨‍🎬",
+        "content": "Wazo hili lilidhaniwa kwanza na HAGENIMANA Samuel, aliyelelewa akiangalia ndugu yake, MANISHIMWE Olivier, akiwa na shauku kubwa kwa filamu. Olivier alipenda kucheza, kuongoza, kuandika na kila kitu kinachohusiana na sinema.",
+        "background": "from-purple-600/10 to-blue-500/10",
+        "color": "text-purple-400",
+        "highlight": "Shauku ya Olivier kwa sinema"
+      },
+      {
+        "id": 3,
+        "title": "Uhalisia wa Rwanda",
+        "subtitle": "Changamoto Zilizokabiliwa",
+        "emoji": "💔",
+        "content": "Kama wasanii wengi wenye kipaji wa Rwanda, Olivier alikumbana na fursa chache, utangazaji mdogo, usambazaji duni, na mfumo usioipa wapenzi wa filamu nafasi ya kuonyesha vipaji vyake.",
+        "background": "from-blue-500/10 to-cyan-500/10",
+        "color": "text-blue-400",
+        "highlight": "Fursa chache kwa wasanii"
+      },
+      {
+        "id": 4,
+        "title": "Cheche ya Wazo",
+        "subtitle": "Kubadilisha Tafakari kuwa Mapinduzi",
+        "emoji": "✨",
+        "content": "Samuel alifuatilia yote kwa makini — kila kujitolea, kila jaribio. Baada ya miaka, alitafakari ndoto za ndugu yake na kujiuliza: Je, kunaweza kuwa na jukwaa lililoundwa kusambaza, kutangaza, na ku-stream filamu za Rwanda kwa kitaalamu?",
+        "background": "from-cyan-500/10 to-emerald-500/10",
+        "color": "text-cyan-400",
+        "highlight": "Wazo la mapinduzi"
+      },
+      {
+        "id": 5,
+        "title": "Kujenga Timu",
+        "subtitle": "Msingi",
+        "emoji": "🤝",
+        "content": "Samuel alikutana na HIRWA MAZIMPAKA Chris, muelewa wa sanaa aliyefahamu sana utengenezaji wa filamu. Pamoja, walichunguza jinsi teknolojia na storytelling zinavyoweza kuunganishwa ili kusaidia sinema ya Rwanda.",
+        "background": "from-emerald-500/10 to-yellow-500/10",
+        "color": "text-emerald-400",
+        "highlight": "Ushirikiano na mshikamano"
+      },
+      {
+        "id": 6,
+        "title": "Jina Oliviuus",
+        "subtitle": "Heshima",
+        "emoji": "🏷️",
+        "content": "Jina 'Oliviuus' lilitokea kwa asili — likiathiriwa na Olivier, ambaye shauku yake ilipanda mbegu ya kwanza ya maono. Samuel alibadilisha jina la ndugu yake kuwa kitu cha kisasa, cha sinema, na kinachovutia duniani.",
+        "background": "from-yellow-500/10 to-orange-500/10",
+        "color": "text-yellow-400",
+        "highlight": "Oliviuus: Heshima kwa Olivier"
+      },
+      {
+        "id": 7,
+        "title": "Dhamira",
+        "subtitle": "Maono 2024-2025",
+        "emoji": "🎯",
+        "content": "Kuwezesha watengenezaji wa filamu wa Rwanda. Kutoa njia ya usambazaji yenye haki na ya kitaalamu. Kuhimiza hadithi za kienyeji kwa teknolojia ya daraja la juu. Kuleta sinema ya Rwanda kwa watazamaji kote.",
+        "background": "from-orange-500/10 to-red-500/10",
+        "color": "text-orange-400",
+        "highlight": "Kuwezesha watengenezaji wa filamu wa Rwanda"
+      },
+      {
+        "id": 8,
+        "title": "Oliviuus Leo",
+        "subtitle": "Safari Inaendelea",
+        "emoji": "🚀",
+        "content": "Leo, Oliviuus ni jukwaa la kwanza la sinema ya Rwanda linalojumuisha utamaduni, ubunifu, na teknolojia. Jukwaa lililojengwa kwa madhumuni, kuheshimu watengenezaji wa zamani na kuunda fursa kwa vizazi vijavyo.",
+        "background": "from-red-500/10 to-pink-500/10",
+        "color": "text-red-400",
+        "highlight": "Jukwaa la kwanza kwa Rwanda"
+      }
+    ],
+    "foundersSection": {
+      "title": "Wanao",
+      "highlight": "Kuona mbali",
+      "subtitle": "Kutana na waanzilishi wenye shauku waliobadilisha ndoto kuwa jukwaa kuu la sinema ya Rwanda"
+    },
+    "founders": [
+      {
+        "name": "HAGENIMANA Samuel",
+        "role": "Mwanzilishi & Mwenyekiti",
+        "emoji": "👑",
+        "description": "Mtu wa ndoto nyuma ya Oliviuus, akibadilisha tafakari binafsi kuwa mapinduzi ya jukwaa"
+      },
+      {
+        "name": "MANISHIMWE Olivier",
+        "role": "Mshirikishi Mwanzilishi & CEO",
+        "emoji": "🎬",
+        "description": "Mpenzi wa sinema ambaye shauku yake ilisababisha jina na dhamira ya jukwaa"
+      },
+      {
+        "name": "HIRWA MAZIMPAKA Chris",
+        "role": "Mshirikishi Mwanzilishi & Kichunguzi wa Maudhui",
+        "emoji": "✍️",
+        "description": "Mkurugenzi wa ubunifu anayekuza hadithi za Rwanda kwa watazamaji wa kimataifa"
+      }
+    ],
+    "quoteSection": {
+      "emoji": "🌟",
+      "quote": "\"Oliviuus ipo kwa sababu ndoto hazipaswi kufifia. Hadithi hazipaswi kupotea. Vipaji vinastahili mahali panapoonekana.\"",
+      "promise": "Huu ni ahadi yetu kwa watengenezaji wa filamu wa Rwanda na watazamaji duniani."
+    },
+    "cta": {
+      "title": "Jiunge na Mapinduzi ya Sinema ya Rwanda",
+      "subtitle": "Pata uzoefu wa streaming uliotengenezwa kwa shauku, madhumuni, na fahari katika uandikaji wa hadithi wa Rwanda.",
+      "buttons": {
+        "startNow": "Anza Sasa",
+        "exploreCinema": "Chunguza Sinema ya Rwanda"
+      }
+    },
+    "seo": {
+      "title": "Kuhusu Oliviuus | Hadithi Yetu, Waanzilishi & Dhamira ya Sinema ya Rwanda",
+      "description": "Gundua hadithi ya Oliviuus - jukwaa la streaming la Rwanda lililojengwa kwa shauku, uvumilivu, na kujitolea kuonyesha hadithi za Afrika. Jifunze kuhusu waanzilishi wetu, dhamira, na maono ya sinema ya Rwanda.",
+      "keywords": "Oliviuus kuhusu, jukwaa la streaming Rwanda, sinema ya Afrika, jukwaa la filamu Rwanda, waanzilishi wa Oliviuus, uandishi wa hadithi Rwanda, burudani ya Afrika, jukwaa la kidijitali Rwanda"
     }
   }
 }

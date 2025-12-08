@@ -2,6 +2,7 @@
   "footer": {
     "terms": "Amategeko",
     "privacy": "Politiki y’Ubuzima bwite",
+    "about": "Ibyerekeye Twebwe",
     "help": "Ubufasha",
     "feedback": "Icyifuzo & Igitekezo",
     "rights": "Uburenganzira bwose burabitswe."
@@ -930,6 +931,10 @@
       "exclusiveContent": "Ibirimo Byihariye bya {{category}}",
       "mediaContent": "Ibikubiyemo by’Amashusho"
     },
+    "emailInput": {
+      "title": "Witeguye kureba?",
+      "description": "Injiza imeyili yawe kugira ngo utangire"
+    },
     "share": {
       "title": "Sangiza iyi filime/serie",
       "shareText": "Reba \"{{title}}\"",
@@ -977,7 +982,9 @@
       "close": "Funga",
       "exploreMore": "Shakisha Ibindi",
       "openFloatingTrailer": "Fungura Trailer",
-      "goToHomepage": "Jya Ahabanza"
+      "goToHomepage": "Jya Ahabanza",
+      "startNow": "Tangira Ubu",
+      "startMembership": "Tangira Ubunyamuryango"
     },
     "sections": {
       "synopsis": "Incamake",
@@ -1253,9 +1260,11 @@
       "signOut": "Sohoka",
       "companyName": "Oliviuus Ltd",
       "footer": {
-        "privacy": "Ibanga",
-        "terms": "Amabwiriza",
-        "help": "Ubufasha"
+        "privacy": "Politiki y’Ubuzima bwite",
+        "terms": "Amategeko & Amabwiriza",
+        "about": "Ibyerekeye Twebwe",
+        "help": "Ubufasha",
+        "feedback": "Igitekerezo"
       }
     }
   },
@@ -3016,6 +3025,340 @@
       "title": "Ikigo cy'Ubufasha Oliviuus | Customer Support & FAQs",
       "description": "Fata ubufasha kuri Oliviuus streaming. Shaka ibisubizo by'ibibazo, guides, account, payment, technical support. Biboneka mu Cyongereza, Igifaransa, n'Ikinyarwanda.",
       "keywords": "Oliviuus help center, streaming support, account troubleshooting, payment help, technical support Rwanda, customer service, FAQ, contact Oliviuus"
+    }
+  },
+  "feedbackPage": {
+    "title": "Sangiza Ibitekerezo byawe",
+    "subtitle": "Ibitekerezo byawe bidufasha kunoza Oliviuus no guha buri wese uburambe bwiza bwo kureba filime",
+    "chooseType": "Hitamo Ubwoko bw'Igitekerezo",
+    "selected": "Byatoranyijwe",
+    "feedbackTypes": {
+      "LIKE": "Gukunda Gusa",
+      "DISLIKE": "Kudakunda Gusa",
+      "DETAILED": "Igitekerezo Kirambuye"
+    },
+    "feedbackTypeDescriptions": {
+      "LIKE": "Tubwire gusa icyo wakunze!",
+      "DISLIKE": "Tubwire ibyo utekereza ko bikwiye kunozwa",
+      "DETAILED": "Sangiza ibitekerezo n’amasomo arambuye"
+    },
+    "formTitles": {
+      "LIKE": "Sangiza Ibyo Wakunze",
+      "DISLIKE": "Sangiza Ibyo Utakunze",
+      "DETAILED": "Tanga Igitekerezo cyawe"
+    },
+    "formFields": {
+      "name": {
+        "label": "Amazina Yawe",
+        "placeholder": "Andika amazina yawe yose"
+      },
+      "email": {
+        "label": "Aderesi Email",
+        "placeholder": "your.email@example.com"
+      },
+      "category": {
+        "label": "Icyiciro",
+        "placeholder": "Hitamo icyiciro",
+        "hint": "Hitamo icyiciro kibereye igitekerezo cyawe"
+      },
+      "rating": {
+        "label": "Isuzuma Rusange (Si ngombwa)",
+        "hint": "Kanda utange amanota (si ngombwa)"
+      },
+      "message": {
+        "label": "Igitekerezo cyawe",
+        "placeholder": "Tanga igitekerezo kirambuye ku burambe bwawe, inama zo kunoza serivisi, cyangwa ibibazo wahuye nabyo...",
+        "hint": "Ba wumvikana kandi utange ibisobanuro bizadufasha gusobanukirwa neza ikibazo cyawe",
+        "characters": "inyuguti"
+      }
+    },
+    "categories": [
+      {
+        "value": "FEATURE_REQUEST",
+        "label": "Gusaba Ibiranga Bishya"
+      },
+      {
+        "value": "BUG_REPORT",
+        "label": "Raporo y'Ikosa"
+      },
+      {
+        "value": "STREAMING_ISSUE",
+        "label": "Ibibazo bya Streaming"
+      },
+      {
+        "value": "CONTENT_SUGGESTION",
+        "label": "Inama ku Byerekeye Ibirimo"
+      },
+      {
+        "value": "ACCOUNT_ISSUE",
+        "label": "Ibibazo by'Akaunti"
+      },
+      {
+        "value": "PAYMENT_ISSUE",
+        "label": "Ibibazo by'Ubwishyu"
+      },
+      {
+        "value": "WEBSITE_APP_FEEDBACK",
+        "label": "Icyo Utekereza ku Mbuga/App"
+      },
+      {
+        "value": "CUSTOMER_SERVICE",
+        "label": "Serivisi ku Bakiriya"
+      },
+      {
+        "value": "GENERAL_FEEDBACK",
+        "label": "Ibitekerezo Rusange"
+      }
+    ],
+    "ratings": {
+      "0": "Nta manota",
+      "1": "Mabi cyane",
+      "2": "Mabi",
+      "3": "A hagati",
+      "4": "Meza",
+      "5": "Meza cyane"
+    },
+    "simpleFeedbackMessage": "Igitekerezo cyoroshye cya {{type}} - nta bisobanuro byiyongera bikenewe",
+    "validation": {
+      "nameRequired": "Amazina arakenewe",
+      "nameMinLength": "Amazina agomba kugira nibura inyuguti 2",
+      "emailRequired": "Email irakenewe",
+      "emailInvalid": "Andika email yemewe",
+      "categoryRequired": "Icyiciro kirakenewe ku gitekerezo kirambuye",
+      "messageRequired": "Ubutumwa burakenewe ku gitekerezo kirambuye",
+      "messageMinLength": "Tanga ibisobanuro bihagije (byibura inyuguti 10)",
+      "messageMaxLength": "Ubutumwa burebire cyane (ubushobozi ntarengwa ni inyuguti 2000)",
+      "simpleFeedbackNoMessage": "Igitekerezo cyoroshye (GUKUNDA/KUTAKUNDA) ntikigomba kugira ubutumwa",
+      "fixErrors": "Nyamuneka banza ukosore amakosa ari ku ifishi"
+    },
+    "submitting": "Twirindiriye...",
+    "submitButtons": {
+      "like": "Tanga Gukunda",
+      "dislike": "Tanga Kudakunda",
+      "detailed": "Tanga Igitekerezo"
+    },
+    "success": {
+      "title": "Murakoze ku Gitekerezo cyawe!",
+      "like": "Murakoze ku bitekerezo byiza! Twishimiye ko wishimira Oliviuus.",
+      "dislike": "Murakoze kubwizanya. Tuzabikoresha mu kunoza serivisi.",
+      "detailed": "Igitekerezo cyawe cyakiriwe neza. Itsinda ryacu rizacyiga neza."
+    },
+    "error": {
+      "title": "Kohereza Byanze"
+    },
+    "submission": {
+      "failed": "Ntibyashobotse kohereza igitekerezo",
+      "error": "Habaye ikibazo mu kohereza igitekerezo. Ongera ugerageze."
+    },
+    "requiredFields": "Ibice bisabwa",
+    "contactMethods": {
+      "title": "Uburyo Ubundi Watugeraho",
+      "email": {
+        "title": "Kohereza Igitekerezo kuri Email",
+        "subject": "Igitekerezo kuri Oliviuus",
+        "description": "Twandikire email utanga igitekerezo cyawe",
+        "button": "Fungura Email"
+      },
+      "phone": {
+        "title": "Ubufasha kuri Telefone",
+        "description": "Duhamagarira utugezeho igitekerezo",
+        "button": "Hamagara Ubu"
+      },
+      "location": {
+        "title": "Aho Dukorera",
+        "address": "Musanze, Rwanda",
+        "description": "Dukorera muri Rwanda, tugakorera abantu bo hirya no hino ku isi"
+      }
+    },
+    "process": {
+      "title": "Ibyikurikira Nyuma yo Gutanga Igitekerezo",
+      "description": "Dushima buri gitekerezo cyose duhabwa. Nubwo tutabasha gusubiza buri wese, ibitekerezo byose turabisoma kandi tugakoresha ibyo bitanga mu igenamigambi ryacu.",
+      "steps": [
+        {
+          "title": "Kusuzuma",
+          "description": "Itsinda ryacu risuzuma buri gitekerezo cyose"
+        },
+        {
+          "title": "Gushyira mu byiciro",
+          "description": "Ibitekerezo bishyirwa mu byiciro no guhabwa uburemere"
+        },
+        {
+          "title": "Gutanga imigambi",
+          "description": "Ibisobanuro bikubiyemo bikoreshwa mu igenamigambi"
+        },
+        {
+          "title": "Gushyira mu bikorwa",
+          "description": "Ibiranga n'ibikosorwa bitegurwa hashingiwe ku bitekerezo"
+        }
+      ]
+    },
+    "seo": {
+      "title": "Ibitekerezo kuri Oliviuus | Sangiza Ibitekerezo bwawe n'Inama",
+      "description": "Tanga ibitekerezo kuri serivisi ya Oliviuus. Shyiraho raporo z'ibibazo, ibisabwa bishya, inama ku birimo, n'uburambe bwawe. Dufashe kunoza urubuga.",
+      "keywords": "Oliviuus feedback, Ibitekerezo kuri Oliviuus, ibitekerezo by'abakoresha, raporo y'ikosa, icyifuzo gishya, inama z'ibirimo, kunoza Oliviuus"
+    }
+  },
+  "aboutPage": {
+    "breadcrumb": "Ibyerekeye Twebwe",
+    "hero": {
+      "title": "Inkomoko yacu",
+      "highlight": "(Oliviuus)",
+      "subtitle": "ikinamico n'imyidagaduro bishobora guhindura buri kintu"
+    },
+    "stats": [
+      {
+        "number": "10K+",
+        "label": "Abakoresha bariho",
+        "icon": "Users"
+      },
+      {
+        "number": "10+",
+        "label": "Filime na Series",
+        "icon": "Film"
+      },
+      {
+        "number": "10+",
+        "label": "Abafatanyabikorwa",
+        "icon": "Globe"
+      },
+      {
+        "number": "24/7",
+        "label": "Inkunga/Ubufasha",
+        "icon": "Award"
+      }
+    ],
+    "story": {
+      "title": "Inkuru ya",
+      "highlight": "Oliviuus",
+      "scrollHint": "sunika(scroll) ugana ibumoso kugira ngo umenye inkuru yacu",
+      "scrollIndicator": "← Srola ugana ibumoso →",
+      "chapter": "Igice",
+      "goToChapter": "Jya ku gice"
+    },
+    "storyChapters": [
+      {
+        "id": 1,
+        "title": "Inzozi Zishingiye mu Rwanda",
+        "subtitle": "Itangiriro ry’icyerekezo",
+        "emoji": "💭",
+        "content": "Oliviuus yatangijwe nk’inzozi zishingiye ku kwitanga, kubura, kwihangana, n’ukwizera ko inkuru z’Abanyarwanda zikwiye kugaragara ku rwego rw’isi.",
+        "background": "from-[#BC8BBC]/10 to-purple-600/10",
+        "color": "text-[#BC8BBC]",
+        "highlight": "Inzozi zishingiye mu Rwanda"
+      },
+      {
+        "id": 2,
+        "title": "Urukundo rwa Olivier",
+        "subtitle": "Impamvu y’ihumure",
+        "emoji": "👨‍🎬",
+        "content": "Igitekerezo cyabayeho bwa mbere na HAGENIMANA Samuel, wakuze abona ko mukuru we, MANISHIMWE Olivier, akunda cyane filime. Olivier yakundaga kwiyerekana, kuyobora, kwandika no gukora byose bijyanye na sinema.",
+        "background": "from-purple-600/10 to-blue-500/10",
+        "color": "text-purple-400",
+        "highlight": "Urukundo rwa Olivier kuri sinema"
+      },
+      {
+        "id": 3,
+        "title": "Ukuri",
+        "subtitle": "Ibibazo byahuye na",
+        "emoji": "💔",
+        "content": "Nk’uko abantu benshi  bafite impano babibona, Olivier yahuye n’amahirwe make, kwamamaza gake, gukwirakwiza bike, n’uburyo budaha amahirwe abashya bo muri sinema(filime).",
+        "background": "from-blue-500/10 to-cyan-500/10",
+        "color": "text-blue-400",
+        "highlight": "Amahirwe make ku bahanzi"
+      },
+      {
+        "id": 4,
+        "title": "Igitekerezo",
+        "subtitle": "Guhindura ibitekerezo mu guhanga",
+        "emoji": "✨",
+        "content": "Samuel yitegereje byose — buri gihombo, buri kigeragezo. Hashize imyaka, yatekereje ku nzozi za mukuru we maze abaza: Ese hashobora kubaho urubuga rwashyiriweho gukwirakwiza, kwamamaza, no gutanga filime z’Abanyarwanda mu buryo bw’umwuga?",
+        "background": "from-cyan-500/10 to-emerald-500/10",
+        "color": "text-cyan-400",
+        "highlight": "Igitekerezo cyahinduye ibintu"
+      },
+      {
+        "id": 5,
+        "title": "Kubaka Ikipe",
+        "subtitle": "Inkingi y’ibanze",
+        "emoji": "🤝",
+        "content": "Samuel yahuye na HIRWA MAZIMPAKA Chris, ufite ubuhanga mu gukora filime. Hamwe, basuzumye uburyo ikoranabuhanga n’inkuru bishobora guhurira kugira ngo bifashe sinema y’u Rwanda.",
+        "background": "from-emerald-500/10 to-yellow-500/10",
+        "color": "text-emerald-400",
+        "highlight": "Ubufatanye n’Imikoranire"
+      },
+      {
+        "id": 6,
+        "title": "Izina Oliviuus",
+        "subtitle": "Icyubahiro",
+        "emoji": "🏷️",
+        "content": "Izina 'Oliviuus' ryaje ku buryo karemano — ryashingiye kuri mukuru we Olivier, urukundo rwe rwatangije inzozi. Samuel yahinduye izina rye rikaba rigezweho, ry’umwuga, kandi ryemewe ku isi hose.",
+        "background": "from-yellow-500/10 to-orange-500/10",
+        "color": "text-yellow-400",
+        "highlight": "Oliviuus: Icyubahiro kuri Olivier"
+      },
+      {
+        "id": 7,
+        "title": "Intego",
+        "subtitle": "Icyerekezo 2024-2025",
+        "emoji": "🎯",
+        "content": "Gushyigikira abahanzi b’Abanyarwanda. Gutanga amahirwe y’ubucuruzi n’imikoranire y’umwuga. Gushyira inkuru ku rwego rw’isi. Kwerekana sinema y’u Rwanda ku bantu bose.",
+        "background": "from-orange-500/10 to-red-500/10",
+        "color": "text-orange-400",
+        "highlight": "Gushyigikira abahanzi b’Abanyarwanda"
+      },
+      {
+        "id": 8,
+        "title": "Oliviuus Uyu munsi",
+        "subtitle": "Urugendo rurakomeza",
+        "emoji": "🚀",
+        "content": "Uyu munsi, Oliviuus ihagaze nk’urubuga rwa sinema mu Rwanda, ihuriza hamwe umuco, udushya, n’ikoranabuhanga. Urubuga rwubatswe ku ntego, rwubahisha abahanzi bigeze mbere kandi rutegura amahirwe ku bazaza.",
+        "background": "from-red-500/10 to-pink-500/10",
+        "color": "text-red-400",
+        "highlight": "Urubuga rwa sinema mu Rwanda"
+      }
+    ],
+    "foundersSection": {
+      "title": "Abahanga",
+      "highlight": "Bashinze",
+      "subtitle": "Menya abashinze urubuga rwa sinema mu Rwanda, bakunda cyane ibyo bakora"
+    },
+    "founders": [
+      {
+        "name": "HAGENIMANA Samuel",
+        "role": "Umuyobozi Mukuru& Perezida",
+        "emoji": "👑",
+        "description": "Umunyabitekerezo wa Oliviuus, uhindura ibitekerezo by’umuntu ku gitekerezo cy’urubuga"
+      },
+      {
+        "name": "MANISHIMWE Olivier",
+        "role": "Umuyobozi & Co-Founder",
+        "emoji": "🎬",
+        "description": "Umunyamwuga wa sinema wakomeje gutera igitekerezo n’izina ry’urubuga"
+      },
+      {
+        "name": "HIRWA MAZIMPAKA Chris",
+        "role": "Umuyobozi w’Ibikorwa",
+        "emoji": "✍️",
+        "description": "Umuyobozi w’ubuhanzi utezimbere inkuru z’Abanyarwanda ku rwego rw’isi"
+      }
+    ],
+    "quoteSection": {
+      "emoji": "🌟",
+      "quote": "\"Oliviuus ibaho kuko inzozi ntizikwiriye gusaza. Inkuru ntizikwiriye kubura. Impano zikwiriye aho zishobora kugaragara.\"",
+      "promise": "Iri ni isezerano ryacu ku bahanzi b’Abanyarwanda no ku bakunzi b’inkuru ku isi hose."
+    },
+    "cta": {
+      "title": "Jya mu mpinduramatwara ya Sinema y’u Rwanda",
+      "subtitle": "Gerageza kureba sinema yubakiye ku ntego, urukundo, n’ishema mu nkuru z’u Rwanda.",
+      "buttons": {
+        "startNow": "Tangirira Ubu",
+        "exploreCinema": "Sura Sinema y’u Rwanda"
+      }
+    },
+    "seo": {
+      "title": "Ibyerekeye Oliviuus | Inkuru yacu, Abashinze & Intego za Sinema y’u Rwanda",
+      "description": "Menya inkuru ya Oliviuus - urubuga rwa sinema y’u Rwanda rwubakiye ku kwitanga, kwihangana, no kwerekana inkuru z’Afurika. Menya abashinze, intego n’icyerekezo cya sinema y’u Rwanda.",
+      "keywords": "Oliviuus ibyerekeye, urubuga rwa sinema y’u Rwanda, sinema ya Afurika, platform ya filime mu Rwanda, abashinze Oliviuus, inkuru z’u Rwanda, imyidagaduro ya Afurika, platform ya digitale Rwanda"
     }
   }
 }

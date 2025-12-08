@@ -55,11 +55,12 @@ import TermsOfService from "../pages/landing/Legal&Help/TermsOfService.jsx";
 import PrivacyPolicy from "../pages/landing/Legal&Help/PrivacyPolicy.jsx";
 import HelpCenter from "../pages/landing/Legal&Help/HelpCenter.jsx";
 import FeedbackPage from "../pages/landing/Legal&Help/FeedbackPage.jsx";
+import About from "../pages/landing/Legal&Help/About.jsx";
 
 export default function AppRoutes() {
   const { user, loading: authLoading, isKidMode } = useAuth();
   const { currentSubscription, loading: subLoading } = useSubscription();
-  
+
   const [showContent, setShowContent] = useState(false);
   const [cachedContent, setCachedContent] = useState(null);
 
@@ -67,7 +68,7 @@ export default function AppRoutes() {
   useEffect(() => {
     // Immediate render - don't wait
     setShowContent(true);
-    
+
     // Only show minimal loader if it's taking too long
     const timeout = setTimeout(() => {
       // If still loading after 100ms, we'll show something
@@ -83,27 +84,27 @@ export default function AppRoutes() {
       if (!user) {
         return <LandingPage />;
       }
-      
+
       // Admin users go to dashboard
       if (user.role === "admin") {
         return <Dashboard />;
       }
-      
+
       // Viewer users in kid mode go to dashboard
       if (isKidMode) {
         return <Dashboard />;
       }
-      
+
       // Viewer users WITHOUT subscription can access landing page
       if (user.role === "viewer" && !currentSubscription) {
         return <LandingPage />;
       }
-      
+
       // Viewer users WITH subscription go to dashboard
       if (user.role === "viewer" && currentSubscription) {
         return <Dashboard />;
       }
-      
+
       // Fallback to landing page
       return <LandingPage />;
     };
@@ -171,13 +172,13 @@ export default function AppRoutes() {
   return (
     <Routes>
       {/* Root route - Show cached content immediately */}
-      <Route 
-        path="/" 
+      <Route
+        path="/"
         element={
           <KidProtectedRoute>
             {cachedContent || <div className="h-screen bg-black" />}
           </KidProtectedRoute>
-        } 
+        }
       />
 
       {/* Auth route - Immediate render */}
@@ -280,45 +281,46 @@ export default function AppRoutes() {
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/help" element={<HelpCenter />} />
       <Route path="/feedback" element={<FeedbackPage />} />
-      
+      <Route path="/about" element={<About />} />
+
       {/* Watch and Content routes - Render immediately */}
-      <Route 
-        path="/watch/:id" 
+      <Route
+        path="/watch/:id"
         element={
           <ProtectedWatchRoute element={<WatchPage />} />
-        } 
+        }
       />
-      <Route 
-        path="/title/:id" 
+      <Route
+        path="/title/:id"
         element={
-          <ProtectedWatchRoute element={<ContentDetailPage />} />
-        } 
+          <ContentDetailPage />
+        }
       />
 
       {/* Sample routes - Render immediately */}
-      <Route 
-        path="/sample/security" 
+      <Route
+        path="/sample/security"
         element={
           <KidProtectedRoute>
             <SecurityGridPresentation />
           </KidProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/sample/oliviuus" 
+      <Route
+        path="/sample/oliviuus"
         element={
           <KidProtectedRoute>
             <OliviuusInvestorPitch />
           </KidProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/sample/game" 
+      <Route
+        path="/sample/game"
         element={
           <KidProtectedRoute>
             <UmukinoWoKwiruka />
           </KidProtectedRoute>
-        } 
+        }
       />
 
       {/* Catch-all - Render immediately */}

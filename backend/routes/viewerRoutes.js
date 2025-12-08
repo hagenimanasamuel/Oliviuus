@@ -19,9 +19,9 @@ const router = express.Router();
 
 // Public routes (no auth required)
 router.get("/content", getAllViewerContent);
+router.get("/content/:contentId", getViewerContentById);
 
 // Protected routes (auth required) - Apply security to content by ID
-router.get("/content/:contentId", authMiddleware, extractDeviceInfo, getViewerContentById);
 router.post("/content/:contentId/view", authMiddleware, extractDeviceInfo, trackContentView);
 
 // Other protected routes

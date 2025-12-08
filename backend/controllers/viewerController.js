@@ -20,7 +20,7 @@ const securityConfig = {
 // In-memory cache with timestamp tracking
 const contentCache = new Map();
 
-// ADDED: Trending algorithm configuration
+// Trending algorithm configuration for intelligent content recommendations
 const TRENDING_CONFIG = {
   weights: {
     viewCount: 0.35,
@@ -29,29 +29,26 @@ const TRENDING_CONFIG = {
     likeRatio: 0.10,
     ratingScore: 0.05,
   },
-
   timeWindows: {
-    recentViews: 7,
-    engagement: 30,
+    recentViews: 7,     // Days for recent views calculation
+    engagement: 30,     // Days for engagement calculation
   },
-
   thresholds: {
     minViews: 1,
     minRecentViews: 0,
     minCompletionRate: 0,
   },
-
   queryLimits: {
     initialFetch: 50,
     maxResults: 20,
   }
 };
 
-// ADDED: Trending cache
+// Trending cache for performance optimization
 const trendingCache = new Map();
-const TRENDING_CACHE_DURATION = 10 * 60 * 1000;
+const TRENDING_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
-// ADDED: Cache cleanup every hour
+// Cache cleanup every hour to prevent memory leaks
 setInterval(() => {
   const now = Date.now();
   for (const [key, value] of trendingCache.entries()) {
@@ -61,18 +58,55 @@ setInterval(() => {
   }
 }, 60 * 60 * 1000);
 
-// Helper function to generate cache keys
+// Kid content configuration - defines what is considered kid-friendly
+const KID_CONTENT_CONFIG = {
+  // Age ratings allowed for kids (in order of strictness)
+  allowedAgeRatings: ['G', 'PG', '7+', '13+'],
+
+  // Categories considered kid-friendly
+  kidFriendlyCategories: ['Family', 'Animation', 'Cartoons', 'Educational'],
+
+  // Genres considered kid-friendly
+  kidFriendlyGenres: ['Family', 'Animation', 'Children'],
+
+  // Categories that are ALWAYS restricted for kids
+  restrictedCategories: ['Horror', 'Thriller', 'Crime', 'War', 'Adult'],
+
+  // Genres that are ALWAYS restricted for kids
+  restrictedGenres: ['Horror', 'Thriller', 'Crime', 'War', 'Adult'],
+
+  // Age ratings that are NEVER allowed for kids
+  restrictedAgeRatings: ['R', 'NC-17', '18+', 'A'],
+
+  // Content types that may be restricted
+  restrictedContentTypes: ['documentary'] // Some documentaries may have mature content
+};
+
+/**
+ * Generates a unique cache key for different content types
+ * @param {string} type - Cache type (landing, contentList, singleContent)
+ * @param {string} identifier - Additional identifier (user ID, content ID, etc.)
+ * @returns {string} Unique cache key
+ */
 const generateCacheKey = (type, identifier = '') => {
   return `${type}:${identifier}`;
 };
 
-// Helper function to check if cache is stale
+/**
+ * Checks if a cache entry is stale based on its duration
+ * @param {Object} cacheEntry - The cached data with timestamp
+ * @param {number} cacheDuration - Duration in milliseconds
+ * @returns {boolean} True if cache is stale
+ */
 const isCacheStale = (cacheEntry, cacheDuration) => {
   if (!cacheEntry || !cacheEntry.timestamp) return true;
   return Date.now() - cacheEntry.timestamp > cacheDuration;
 };
 
-// Helper function to clear related cache entries
+/**
+ * Clears related cache entries when content is updated
+ * @param {string|null} contentId - Specific content ID to clear (optional)
+ */
 const clearRelatedCache = (contentId = null) => {
   const keysToDelete = [];
 
@@ -85,10 +119,13 @@ const clearRelatedCache = (contentId = null) => {
   }
 
   keysToDelete.forEach(key => contentCache.delete(key));
-  console.log(`Cleared ${keysToDelete.length} cache entries`);
 };
 
-// ADDED: Universal trending score calculation
+/**
+ * Calculates trending score for content based on multiple factors
+ * @param {Object} content - Content object with metrics
+ * @returns {number} Trending score between 0.1 and 1
+ */
 const calculateTrendingScore = (content) => {
   try {
     let score = 0;
@@ -121,7 +158,7 @@ const calculateTrendingScore = (content) => {
       score += 0.3;
     }
 
-    // Time decay
+    // Time decay - older content gets lower scores
     const contentAgeDays = Math.max(1, Math.floor((new Date() - new Date(content.release_date || content.created_at)) / (1000 * 60 * 60 * 24)));
     const timeDecay = calculateTimeDecay(contentAgeDays);
 
@@ -130,12 +167,16 @@ const calculateTrendingScore = (content) => {
     return Math.max(0.1, Math.min(1, finalScore));
 
   } catch (error) {
-    console.error('Error calculating trending score for content:', content.id, error);
+    console.error('Error calculating trending score:', error);
     return 0.1;
   }
 };
 
-// ADDED: Time decay calculation
+/**
+ * Calculates time decay factor for content age
+ * @param {number} ageInDays - Age of content in days
+ * @returns {number} Decay factor between 0.6 and 1.0
+ */
 const calculateTimeDecay = (ageInDays) => {
   if (ageInDays <= 7) return 1.0;
   if (ageInDays <= 30) return 0.9;
@@ -144,47 +185,56 @@ const calculateTimeDecay = (ageInDays) => {
   return 0.6;
 };
 
-// ADDED: Main trending content fetch
-const getUniversalTrendingContent = async (limit = 12) => {
+/**
+ * Fetches trending content with kid content filtering
+ * @param {number} limit - Number of results to return
+ * @param {boolean} excludeKidContent - Whether to exclude kid content
+ * @returns {Promise<Array>} Array of trending content
+ */
+const getUniversalTrendingContent = async (limit = 12, excludeKidContent = true) => {
   try {
+    let whereClause = `
+      WHERE c.status = 'published' 
+        AND c.visibility = 'public'
+        AND c.content_type IN ('movie', 'series')
+    `;
+
+    if (excludeKidContent) {
+      whereClause += `
+        AND NOT EXISTS (
+          SELECT 1 FROM content_categories cc
+          INNER JOIN categories cat ON cc.category_id = cat.id
+          WHERE cc.content_id = c.id 
+            AND cat.slug IN ('family', 'animation', 'cartoons', 'educational')
+            AND cat.name IN ('Family', 'Animation', 'Cartoons', 'Educational')
+        )
+      `;
+    }
+
     const sql = `
       SELECT 
         c.*,
-        
-        -- Core metrics
         c.view_count as total_views,
         c.like_count,
         c.share_count,
         c.average_rating,
         c.rating_count,
-        
-        -- Recent views (last 7 days)
         COALESCE((
           SELECT COUNT(*) 
           FROM content_view_history cvh
           WHERE cvh.content_id = c.id 
             AND cvh.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         ), 0) as recent_views_7d,
-        
-        -- Average completion rate
         COALESCE((
           SELECT AVG(percentage_watched) 
           FROM content_view_history cvh
           WHERE cvh.content_id = c.id
         ), 0) as avg_completion_rate,
-        
-        -- Manual trending flag
         (c.trending = TRUE OR c.trending = 1) as is_trending,
-        
-        -- Genres
         GROUP_CONCAT(DISTINCT g.name) as genre_names,
         GROUP_CONCAT(DISTINCT g.id) as genre_ids,
-        
-        -- Categories
         GROUP_CONCAT(DISTINCT cat.name) as category_names,
         GROUP_CONCAT(DISTINCT cat.id) as category_ids,
-        
-        -- Primary image
         (
           SELECT CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path)
           FROM media_assets ma 
@@ -194,8 +244,6 @@ const getUniversalTrendingContent = async (limit = 12) => {
           ORDER BY ma.is_primary DESC, ma.created_at DESC
           LIMIT 1
         ) as primary_image_url,
-        
-        -- Content age
         DATEDIFF(NOW(), COALESCE(c.release_date, c.created_at)) as content_age_days
         
       FROM contents c
@@ -204,9 +252,7 @@ const getUniversalTrendingContent = async (limit = 12) => {
       LEFT JOIN content_categories cc ON c.id = cc.content_id
       LEFT JOIN categories cat ON cc.category_id = cat.id
       
-      WHERE c.status = 'published' 
-        AND c.visibility = 'public'
-        AND c.content_type IN ('movie', 'series')
+      ${whereClause}
         
       GROUP BY c.id
       HAVING total_views >= 0
@@ -227,7 +273,6 @@ const getUniversalTrendingContent = async (limit = 12) => {
       return [];
     }
 
-    // Calculate trending scores for ALL content
     const scoredContent = results.map(content => {
       const trendingScore = calculateTrendingScore(content);
       return {
@@ -237,10 +282,8 @@ const getUniversalTrendingContent = async (limit = 12) => {
       };
     });
 
-    // Sort by trending score (descending)
     scoredContent.sort((a, b) => b.trending_score - a.trending_score);
 
-    // Return limited results
     return scoredContent.slice(0, limit).map((content, index) => ({
       ...content,
       trending_rank: index + 1,
@@ -255,22 +298,23 @@ const getUniversalTrendingContent = async (limit = 12) => {
     }));
 
   } catch (error) {
-    console.error('❌ Error in getUniversalTrendingContent:', error);
+    console.error('Error fetching trending content:', error);
     throw new Error('Failed to fetch trending content');
   }
 };
 
-// ✅ UPDATED: Better kid detection function
+/**
+ * Determines if a user is an actual kid profile vs family member with kid dashboard
+ * @param {Object} req - Express request object
+ * @returns {Object} Kid status information
+ */
 const isActualKidProfile = (req) => {
   // Family members with kid dashboard are NOT actual kid profiles
-  // They have their own user account and should use regular user tables
-  
-  // Check if user is a family member with kid dashboard
   if (req.user?.is_family_member && req.user?.dashboard_type === 'kid') {
     return {
-      isKid: false,  // ← THIS IS THE FIX! They are NOT actual kid profiles
+      isKid: false,
       userId: req.user.id,
-      type: 'family_member_kid_dashboard'  // Special type for tracking
+      type: 'family_member_kid_dashboard'
     };
   }
 
@@ -284,7 +328,7 @@ const isActualKidProfile = (req) => {
     };
   }
 
-  // Option 2: Check if user is flagged as kid in their user record
+  // Check if user is flagged as kid in their user record
   if (req.user && req.user.role === 'kid') {
     return {
       isKid: true,
@@ -302,85 +346,213 @@ const isActualKidProfile = (req) => {
   };
 };
 
-// Enhanced security checks with proper device counting
+/**
+ * Checks if content is kid-friendly based on age ratings, categories, and genres
+ * @param {Object} content - Content object to check
+ * @returns {boolean} True if content is kid-friendly
+ */
+const isKidFriendlyContent = (content) => {
+  // Check if content has restricted age ratings
+  if (content.age_rating && KID_CONTENT_CONFIG.restrictedAgeRatings.includes(content.age_rating)) {
+    return false;
+  }
+
+  // Check if content has allowed age ratings
+  if (content.age_rating && KID_CONTENT_CONFIG.allowedAgeRatings.includes(content.age_rating)) {
+    return true;
+  }
+
+  // Check categories for kid-friendly categories
+  if (content.categories && content.categories.some(cat =>
+    KID_CONTENT_CONFIG.kidFriendlyCategories.includes(cat.name)
+  )) {
+    return true;
+  }
+
+  // Check genres for kid-friendly genres
+  if (content.genres && content.genres.some(genre =>
+    KID_CONTENT_CONFIG.kidFriendlyGenres.includes(genre.name)
+  )) {
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * Checks if content is restricted for kids based on strict criteria
+ * @param {Object} content - Content object to check
+ * @returns {Object} Restriction check result with reason
+ */
+const isContentRestrictedForKids = (content) => {
+  // Check restricted age ratings
+  if (content.age_rating && KID_CONTENT_CONFIG.restrictedAgeRatings.includes(content.age_rating)) {
+    return {
+      restricted: true,
+      reason: `Content has restricted age rating: ${content.age_rating}`,
+      restrictionType: 'age_rating'
+    };
+  }
+
+  // Check restricted categories
+  if (content.categories && content.categories.some(cat =>
+    KID_CONTENT_CONFIG.restrictedCategories.includes(cat.name)
+  )) {
+    const restrictedCat = content.categories.find(cat =>
+      KID_CONTENT_CONFIG.restrictedCategories.includes(cat.name)
+    );
+    return {
+      restricted: true,
+      reason: `Content has restricted category: ${restrictedCat.name}`,
+      restrictionType: 'category'
+    };
+  }
+
+  // Check restricted genres
+  if (content.genres && content.genres.some(genre =>
+    KID_CONTENT_CONFIG.restrictedGenres.includes(genre.name)
+  )) {
+    const restrictedGenre = content.genres.find(genre =>
+      KID_CONTENT_CONFIG.restrictedGenres.includes(genre.name)
+    );
+    return {
+      restricted: true,
+      reason: `Content has restricted genre: ${restrictedGenre.name}`,
+      restrictionType: 'genre'
+    };
+  }
+
+  // Check content warnings for mature themes
+  if (content.content_warnings && content.content_warnings.some(warning =>
+    warning.severity === 'strong' ||
+    warning.warning_type.toLowerCase().includes('violence') ||
+    warning.warning_type.toLowerCase().includes('sexual') ||
+    warning.warning_type.toLowerCase().includes('drug') ||
+    warning.warning_type.toLowerCase().includes('language')
+  )) {
+    return {
+      restricted: true,
+      reason: 'Content contains mature themes or strong content warnings',
+      restrictionType: 'content_warnings'
+    };
+  }
+
+  return {
+    restricted: false,
+    reason: 'Content is appropriate for viewing',
+    restrictionType: 'none'
+  };
+};
+
+/**
+ * Validates if a kid profile can access specific content
+ * @param {Object} kidProfile - Kid profile object
+ * @param {Object} content - Content object to check
+ * @returns {Object} Access validation result
+ */
+const validateKidContentAccess = (kidProfile, content) => {
+  const restrictionCheck = isContentRestrictedForKids(content);
+
+  if (restrictionCheck.restricted) {
+    return {
+      allowed: false,
+      ...restrictionCheck
+    };
+  }
+
+  // Check kid's age rating limit
+  if (kidProfile.max_content_age_rating) {
+    const allowedRatings = KID_CONTENT_CONFIG.allowedAgeRatings;
+    const kidMaxIndex = allowedRatings.indexOf(kidProfile.max_content_age_rating);
+    const contentIndex = allowedRatings.indexOf(content.age_rating);
+
+    if (kidMaxIndex !== -1 && contentIndex !== -1 && contentIndex > kidMaxIndex) {
+      return {
+        allowed: false,
+        reason: `Content age rating (${content.age_rating}) exceeds your allowed maximum (${kidProfile.max_content_age_rating})`,
+        restrictionType: 'age_limit'
+      };
+    }
+  }
+
+  return {
+    allowed: true,
+    reason: 'Content is appropriate for this kid profile',
+    restrictionType: 'none'
+  };
+};
+
+// Security checks module for subscription and device validation
 const securityChecks = {
-  // Validate user subscription
+  /**
+   * Validates user subscription (personal or family shared)
+   * @param {number} userId - User ID to validate
+   * @returns {Promise<Object>} Subscription details
+   */
   validateSubscription: async (userId) => {
     try {
-      // First, check if user has their own active subscription
       const userSubscription = await query(`
-      SELECT 
-        us.*,
-        s.name as plan_name,
-        s.max_sessions as max_devices,
-        s.video_quality as max_quality,
-        s.max_sessions as concurrent_streams,
-        s.offline_downloads as download_enabled,
-        s.type as subscription_type,
-        s.supported_platforms
-      FROM user_subscriptions us
-      LEFT JOIN subscriptions s ON us.subscription_id = s.id
-      WHERE us.user_id = ? 
-        AND us.status = 'active'
-        AND (us.end_date IS NULL OR us.end_date > NOW())
-      ORDER BY us.created_at DESC
-      LIMIT 1
-    `, [userId]);
+        SELECT 
+          us.*,
+          s.name as plan_name,
+          s.max_sessions as max_devices,
+          s.video_quality as max_quality,
+          s.max_sessions as concurrent_streams,
+          s.offline_downloads as download_enabled,
+          s.type as subscription_type,
+          s.supported_platforms
+        FROM user_subscriptions us
+        LEFT JOIN subscriptions s ON us.subscription_id = s.id
+        WHERE us.user_id = ? 
+          AND us.status = 'active'
+          AND (us.end_date IS NULL OR us.end_date > NOW())
+        ORDER BY us.created_at DESC
+        LIMIT 1
+      `, [userId]);
 
-      // If user has their own active subscription, use it
       if (userSubscription.length > 0) {
         const sub = userSubscription[0];
-
-        // Check if subscription is valid
         if (sub.status !== 'active') {
           throw new Error('Subscription is not active');
         }
-
-        // Check if subscription has expired
         if (sub.end_date && new Date(sub.end_date) < new Date()) {
           throw new Error('Subscription has expired');
         }
-
-        console.log('✅ User has personal subscription:', sub.plan_name);
         return sub;
       }
 
-      // If no personal subscription, check if user is part of a family with active Family Plan
-      console.log('🔍 Checking family sharing for user:', userId);
       const familyAccess = await query(`
-      SELECT 
-        fm.*,
-        us.id as owner_subscription_id,
-        us.status as owner_subscription_status,
-        us.start_date as owner_subscription_start,
-        us.end_date as owner_subscription_end,
-        s.name as owner_plan_name,
-        s.type as owner_plan_type,
-        s.max_sessions as owner_max_devices,
-        s.video_quality as owner_max_quality,
-        s.max_sessions as owner_concurrent_streams,
-        s.offline_downloads as owner_download_enabled,
-        s.supported_platforms as owner_supported_platforms
-      FROM family_members fm
-      INNER JOIN user_subscriptions us ON fm.family_owner_id = us.user_id
-      INNER JOIN subscriptions s ON us.subscription_id = s.id
-      WHERE fm.user_id = ?
-        AND fm.invitation_status = 'accepted'
-        AND fm.is_active = TRUE
-        AND fm.is_suspended = FALSE
-        AND us.status = 'active'
-        AND (us.end_date IS NULL OR us.end_date > NOW())
-        AND s.type = 'family'  -- Only Family Plan can share
-      ORDER BY us.created_at DESC
-      LIMIT 1
-    `, [userId]);
+        SELECT 
+          fm.*,
+          us.id as owner_subscription_id,
+          us.status as owner_subscription_status,
+          us.start_date as owner_subscription_start,
+          us.end_date as owner_subscription_end,
+          s.name as owner_plan_name,
+          s.type as owner_plan_type,
+          s.max_sessions as owner_max_devices,
+          s.video_quality as owner_max_quality,
+          s.max_sessions as owner_concurrent_streams,
+          s.offline_downloads as owner_download_enabled,
+          s.supported_platforms as owner_supported_platforms
+        FROM family_members fm
+        INNER JOIN user_subscriptions us ON fm.family_owner_id = us.user_id
+        INNER JOIN subscriptions s ON us.subscription_id = s.id
+        WHERE fm.user_id = ?
+          AND fm.invitation_status = 'accepted'
+          AND fm.is_active = TRUE
+          AND fm.is_suspended = FALSE
+          AND us.status = 'active'
+          AND (us.end_date IS NULL OR us.end_date > NOW())
+          AND s.type = 'family'
+        ORDER BY us.created_at DESC
+        LIMIT 1
+      `, [userId]);
 
       if (familyAccess.length > 0) {
         const family = familyAccess[0];
-
-        // Check if family member is within access hours
         const now = new Date();
-        const currentTime = now.toTimeString().split(' ')[0]; // HH:MM:SS
+        const currentTime = now.toTimeString().split(' ')[0];
 
         // Check sleep time restrictions
         if (family.enforce_sleep_time && family.sleep_time_start && family.sleep_time_end) {
@@ -401,18 +573,14 @@ const securityChecks = {
           if (family.suspended_until && new Date(family.suspended_until) > now) {
             throw new Error(`Your family access is suspended until ${new Date(family.suspended_until).toLocaleString()}. Reason: ${family.suspension_reason || 'Not specified'}`);
           } else {
-            // Suspension period has ended, reactivate
             await query(`
-            UPDATE family_members 
-            SET is_suspended = FALSE, suspended_until = NULL, suspension_reason = NULL
-            WHERE id = ?
-          `, [family.id]);
+              UPDATE family_members 
+              SET is_suspended = FALSE, suspended_until = NULL, suspension_reason = NULL
+              WHERE id = ?
+            `, [family.id]);
           }
         }
 
-        console.log('✅ User accessing via family sharing. Owner plan:', family.owner_plan_name);
-
-        // Return family owner's subscription details
         return {
           id: family.owner_subscription_id,
           user_id: family.family_owner_id,
@@ -427,14 +595,13 @@ const securityChecks = {
           download_enabled: family.owner_download_enabled,
           subscription_type: family.owner_plan_type,
           supported_platforms: family.owner_supported_platforms,
-          is_family_shared: true, // Flag to indicate this is family access
+          is_family_shared: true,
           family_member_id: family.id,
           member_role: family.member_role,
           dashboard_type: family.dashboard_type
         };
       }
 
-      // No personal subscription and no family access
       throw new Error('No active subscription found');
 
     } catch (error) {
@@ -443,19 +610,22 @@ const securityChecks = {
     }
   },
 
-  // Check device limits - FIXED LOGIC: Only deny when active sessions > max devices
+  /**
+   * Checks device limits for user
+   * @param {number} userId - User ID
+   * @param {string} deviceId - Device identifier
+   * @param {string} deviceType - Type of device
+   * @returns {Promise<Object>} Device check result
+   */
   checkDeviceLimits: async (userId, deviceId, deviceType) => {
     try {
-      // Validate device type
       if (!securityConfig.allowedDeviceTypes.includes(deviceType)) {
         throw new Error(`Device type '${deviceType}' is not supported`);
       }
 
-      // Get subscription (could be personal or family)
       const subscription = await securityChecks.validateSubscription(userId);
       const maxDevices = subscription.max_devices;
 
-      // Check if device type is allowed for this subscription
       if (subscription.supported_platforms) {
         const supportedPlatforms = JSON.parse(subscription.supported_platforms);
         if (!supportedPlatforms.includes(deviceType)) {
@@ -469,45 +639,36 @@ const securityChecks = {
         }
       }
 
-      // For family members, we need to count devices across the entire family
       let activeSessions;
       if (subscription.is_family_shared) {
-        // Count active sessions for all family members under this owner
         activeSessions = await query(`
-        SELECT us.id, us.device_id, us.device_type, us.last_activity
-        FROM user_session us
-        INNER JOIN family_members fm ON us.user_id = fm.user_id
-        WHERE fm.family_owner_id = ?
-          AND fm.invitation_status = 'accepted'
-          AND fm.is_active = TRUE
-          AND us.is_active = TRUE
-        ORDER BY us.last_activity DESC
-      `, [subscription.user_id]); // Use family owner's ID
+          SELECT us.id, us.device_id, us.device_type, us.last_activity
+          FROM user_session us
+          INNER JOIN family_members fm ON us.user_id = fm.user_id
+          WHERE fm.family_owner_id = ?
+            AND fm.invitation_status = 'accepted'
+            AND fm.is_active = TRUE
+            AND us.is_active = TRUE
+          ORDER BY us.last_activity DESC
+        `, [subscription.user_id]);
       } else {
-        // Personal subscription - count only user's sessions
         activeSessions = await query(`
-        SELECT id, device_id, device_type, last_activity
-        FROM user_session 
-        WHERE user_id = ? 
-          AND is_active = TRUE
-        ORDER BY last_activity DESC
-      `, [userId]);
+          SELECT id, device_id, device_type, last_activity
+          FROM user_session 
+          WHERE user_id = ? 
+            AND is_active = TRUE
+          ORDER BY last_activity DESC
+        `, [userId]);
       }
 
-      console.log('🔍 DEBUG - Active sessions count:', activeSessions.length);
-      console.log('🔍 DEBUG - Subscription type:', subscription.is_family_shared ? 'Family Shared' : 'Personal');
-      console.log('🔍 DEBUG - Max devices:', maxDevices);
-
-      // Check if device is already in active sessions
       const existingSession = activeSessions.find(session => session.device_id === deviceId);
 
       if (existingSession) {
-        // Update last active timestamp for existing session
         await query(`
-        UPDATE user_session 
-        SET last_activity = NOW()
-        WHERE id = ?
-      `, [existingSession.id]);
+          UPDATE user_session 
+          SET last_activity = NOW()
+          WHERE id = ?
+        `, [existingSession.id]);
 
         return {
           withinLimit: true,
@@ -518,12 +679,10 @@ const securityChecks = {
         };
       }
 
-      // Handle 0 max devices case
       if (maxDevices === 0) {
         throw new Error(`Your current plan does not allow any active sessions. Please upgrade your plan to watch content.`);
       }
 
-      // Allow when AT or BELOW limit, deny only when EXCEEDING
       if (activeSessions.length <= maxDevices) {
         return {
           withinLimit: true,
@@ -533,7 +692,6 @@ const securityChecks = {
           isFamilyShared: subscription.is_family_shared || false
         };
       } else {
-        // User has exceeded device limit - DENY access
         const message = subscription.is_family_shared
           ? `Your family has ${activeSessions.length} active sessions out of ${maxDevices} allowed. Please ask family members to sign out from other devices to continue watching.`
           : `You have ${activeSessions.length} active sessions out of ${maxDevices} allowed. Please sign out from other devices to continue watching.`;
@@ -546,13 +704,17 @@ const securityChecks = {
     }
   },
 
-  // Check concurrent streams - FIXED LOGIC
+  /**
+   * Checks concurrent streams for user
+   * @param {number} userId - User ID
+   * @param {string} contentId - Content ID
+   * @returns {Promise<Object>} Stream check result
+   */
   checkConcurrentStreams: async (userId, contentId) => {
     try {
       const subscription = await securityChecks.validateSubscription(userId);
       const maxStreams = subscription.concurrent_streams || securityConfig.maxConcurrentStreams;
 
-      // Count active streams in last 30 minutes
       const activeStreams = await query(`
         SELECT COUNT(*) as active_count
         FROM content_watch_sessions 
@@ -562,7 +724,6 @@ const securityChecks = {
 
       const currentStreams = activeStreams[0]?.active_count || 0;
 
-      // Allow if current streams are LESS THAN max streams
       if (currentStreams < maxStreams) {
         return {
           withinLimit: true,
@@ -578,7 +739,12 @@ const securityChecks = {
     }
   },
 
-  // Validate content access rights - ADDED MISSING FUNCTION
+  /**
+   * Validates content access rights
+   * @param {number} userId - User ID
+   * @param {string} contentId - Content ID
+   * @returns {Promise<Object>} Content access validation
+   */
   validateContentAccess: async (userId, contentId) => {
     try {
       const [content] = await query(`
@@ -600,7 +766,6 @@ const securityChecks = {
         throw new Error('Content not found or not accessible');
       }
 
-      // Check content rights dates
       if (content.start_date && new Date(content.start_date) > new Date()) {
         throw new Error('Content is not yet available');
       }
@@ -609,7 +774,6 @@ const securityChecks = {
         throw new Error('Content access has expired');
       }
 
-      // Check geographic restrictions
       if (securityConfig.geoCheckEnabled) {
         const geoCheck = await securityChecks.checkGeoRestrictions(userId, content);
         if (!geoCheck.allowed) {
@@ -624,10 +788,14 @@ const securityChecks = {
     }
   },
 
-  // Check geographic restrictions - ADDED MISSING FUNCTION
+  /**
+   * Checks geographic restrictions for content
+   * @param {number} userId - User ID
+   * @param {Object} content - Content object
+   * @returns {Promise<Object>} Geo restriction check
+   */
   checkGeoRestrictions: async (userId, content) => {
     try {
-      // Get user's location from session
       const [userSession] = await query(`
         SELECT location 
         FROM user_session 
@@ -639,11 +807,9 @@ const securityChecks = {
       const userLocation = userSession?.location;
 
       if (!userLocation) {
-        // If no location data, allow access
         return { allowed: true, reason: 'No location data' };
       }
 
-      // Check blocked countries
       if (content.blocked_countries) {
         const blockedCountries = JSON.parse(content.blocked_countries);
         if (blockedCountries.includes(userLocation)) {
@@ -651,7 +817,6 @@ const securityChecks = {
         }
       }
 
-      // Check allowed regions
       if (content.allowed_regions) {
         const allowedRegions = JSON.parse(content.allowed_regions);
         if (allowedRegions.length > 0 && !allowedRegions.includes(userLocation)) {
@@ -662,12 +827,17 @@ const securityChecks = {
       return { allowed: true, reason: 'Region allowed' };
     } catch (error) {
       console.error('Geo restriction check error:', error);
-      // Allow access if geo check fails
       return { allowed: true, reason: 'Geo check failed' };
     }
   },
 
-  // Log security event - ADDED MISSING FUNCTION
+  /**
+   * Logs security events for auditing
+   * @param {number} userId - User ID
+   * @param {string} action - Security action
+   * @param {string} status - Action status
+   * @param {Object} details - Additional details
+   */
   logSecurityEvent: async (userId, action, status, details = {}) => {
     try {
       await query(`
@@ -679,7 +849,11 @@ const securityChecks = {
     }
   },
 
-  // Enhanced security wrapper with better error messages
+  /**
+   * Enhanced security wrapper for content streaming
+   * @param {Function} contentHandler - Original content handler
+   * @returns {Function} Secured content handler
+   */
   secureContentStream: (contentHandler) => {
     return async (req, res) => {
       try {
@@ -688,23 +862,28 @@ const securityChecks = {
         const deviceId = req.headers['x-device-id'] || req.deviceInfo?.id || `web_${userId}`;
         const deviceType = req.headers['x-device-type'] || req.deviceInfo?.type || 'web';
 
-        console.log(`🔒 Security check for user ${userId}, content ${contentId}, device ${deviceId} (${deviceType})`);
-
-        // 1. Validate user subscription (includes family sharing)
+        // Validate user subscription
         const subscription = await securityChecks.validateSubscription(userId);
-        console.log('✅ Subscription valid:', subscription.plan_name, subscription.is_family_shared ? '(Family Shared)' : '(Personal)');
 
-        // 2. Check device limits with proper counting
+        // Check device limits
         const deviceCheck = await securityChecks.checkDeviceLimits(userId, deviceId, deviceType);
-        console.log('✅ Device check passed:', deviceCheck);
 
-        // 3. Validate content access
+        // Validate content access
         const contentAccess = await securityChecks.validateContentAccess(userId, contentId);
-        console.log('✅ Content access granted for:', contentAccess.content.title);
 
-        // 4. Check concurrent streams
+        // Check concurrent streams
         const streamCheck = await securityChecks.checkConcurrentStreams(userId, contentId);
-        console.log('✅ Stream check passed:', `${streamCheck.currentStreams}/${streamCheck.maxStreams} streams`);
+
+        // Check kid content restrictions if user is in kid mode
+        const kidCheck = isActualKidProfile(req);
+        if (kidCheck.isKid) {
+          const kidProfile = req.activeKidProfile;
+          const accessValidation = validateKidContentAccess(kidProfile, contentAccess.content);
+
+          if (!accessValidation.allowed) {
+            throw new Error(`Content restricted for kids: ${accessValidation.reason}`);
+          }
+        }
 
         // Log successful security check
         await securityChecks.logSecurityEvent(userId, 'content_access', 'success', {
@@ -714,7 +893,8 @@ const securityChecks = {
           ipAddress: req.ip,
           deviceInfo: req.deviceInfo,
           subscription: subscription.plan_name,
-          isFamilyShared: subscription.is_family_shared || false
+          isFamilyShared: subscription.is_family_shared || false,
+          isKidMode: kidCheck.isKid
         });
 
         // Store security context in request
@@ -728,19 +908,15 @@ const securityChecks = {
           contentAccess,
           streamCheck,
           securityPassed: true,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          isKidMode: kidCheck.isKid
         };
 
-        // Proceed with original content handler
         return await contentHandler(req, res);
 
       } catch (error) {
-        console.error('🔒 Security check failed:', error.message);
-
-        // Enhanced error mapping with specific codes and messages
         let errorCode = 'ACCESS_DENIED';
         let userMessage = error.message;
-        let additionalInfo = null;
         let isFamilyShared = false;
 
         if (error.message.includes('No active subscription')) {
@@ -749,26 +925,23 @@ const securityChecks = {
         } else if (error.message.includes('active sessions out of')) {
           errorCode = 'DEVICE_LIMIT_REACHED';
           isFamilyShared = error.message.includes('family');
-          // Keep the exact message with numbers
         } else if (error.message.includes('active streams out of')) {
           errorCode = 'STREAM_LIMIT_REACHED';
           isFamilyShared = error.message.includes('family');
-          // Keep the exact message with numbers
         } else if (error.message.includes('only supports watching on')) {
           errorCode = 'PLAN_RESTRICTION';
-          // Keep the exact device restriction message
         } else if (error.message.includes('Content not available in your region')) {
           errorCode = 'GEO_RESTRICTED';
           userMessage = 'This content is not available in your region.';
         } else if (error.message.includes('Access restricted during sleep hours') || error.message.includes('Access restricted outside allowed hours')) {
           errorCode = 'TIME_RESTRICTION';
-          userMessage = error.message;
         } else if (error.message.includes('family access is suspended') || error.message.includes('family access has been restricted')) {
           errorCode = 'FAMILY_ACCESS_RESTRICTED';
-          userMessage = error.message;
         } else if (error.message.includes('Your current plan does not allow any active sessions')) {
           errorCode = 'PLAN_RESTRICTION';
-          userMessage = error.message;
+        } else if (error.message.includes('Content restricted for kids')) {
+          errorCode = 'KID_CONTENT_RESTRICTED';
+          userMessage = 'This content is not available for kids. Please switch to parent mode to access this content.';
         }
 
         // Log failed security check
@@ -788,7 +961,6 @@ const securityChecks = {
           error: userMessage,
           details: error.message,
           code: errorCode,
-          additionalInfo: additionalInfo,
           isFamilyShared: isFamilyShared,
           timestamp: new Date().toISOString()
         });
@@ -797,12 +969,16 @@ const securityChecks = {
   }
 };
 
-// Enhanced device info extraction
+/**
+ * Extracts device information from request headers
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
 const extractDeviceInfo = (req, res, next) => {
   const userAgent = req.headers['user-agent'] || '';
   let deviceType = 'web';
 
-  // Enhanced device detection
   if (/mobile|android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase())) {
     deviceType = 'mobile';
   } else if (/tablet|ipad|playbook|silk/i.test(userAgent.toLowerCase())) {
@@ -825,7 +1001,6 @@ const extractDeviceInfo = (req, res, next) => {
     }
   };
 
-  // Extract geo location from headers if available
   req.geoLocation = {
     country: req.headers['x-country-code'] || req.headers['cf-ipcountry'],
     region: req.headers['x-region'],
@@ -835,19 +1010,25 @@ const extractDeviceInfo = (req, res, next) => {
   next();
 };
 
-// ADDED: Get trending movies API endpoint
+/**
+ * API endpoint for trending movies with kid content filtering
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getTrendingMovies = async (req, res) => {
   try {
     const {
       limit = 12,
       refresh = false,
-      min_score = 0.01
+      min_score = 0.01,
+      include_kid_content = false
     } = req.query;
 
     const validatedLimit = Math.min(Math.max(parseInt(limit), 1), TRENDING_CONFIG.queryLimits.maxResults);
     const validatedMinScore = Math.min(Math.max(parseFloat(min_score), 0), 1);
+    const includeKidContent = include_kid_content === 'true';
 
-    const cacheKey = `trending:${validatedLimit}:${validatedMinScore}`;
+    const cacheKey = `trending:${validatedLimit}:${validatedMinScore}:${includeKidContent}`;
     const cachedData = trendingCache.get(cacheKey);
 
     if (!refresh && cachedData && (Date.now() - cachedData.timestamp < TRENDING_CACHE_DURATION)) {
@@ -856,18 +1037,17 @@ const getTrendingMovies = async (req, res) => {
         data: cachedData.data,
         cached: true,
         timestamp: cachedData.timestamp,
-        algorithm: 'universal'
+        algorithm: 'universal',
+        kid_content_included: includeKidContent
       });
     }
 
-    const trendingContent = await getUniversalTrendingContent(validatedLimit);
+    const trendingContent = await getUniversalTrendingContent(validatedLimit, !includeKidContent);
 
-    // Filter by minimum score
     const filteredContent = trendingContent.filter(content =>
       content.trending_score >= validatedMinScore
     );
 
-    // Cache the results
     trendingCache.set(cacheKey, {
       data: filteredContent,
       timestamp: Date.now()
@@ -879,11 +1059,12 @@ const getTrendingMovies = async (req, res) => {
       cached: false,
       timestamp: Date.now(),
       algorithm: 'universal',
-      count: filteredContent.length
+      count: filteredContent.length,
+      kid_content_included: includeKidContent
     });
 
   } catch (error) {
-    console.error('❌ Error fetching trending movies:', error);
+    console.error('Error fetching trending movies:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch trending content',
@@ -892,7 +1073,11 @@ const getTrendingMovies = async (req, res) => {
   }
 };
 
-// ADDED: Get trending insights
+/**
+ * API endpoint for trending insights and statistics
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getTrendingInsights = async (req, res) => {
   try {
     const insights = await query(`
@@ -913,7 +1098,7 @@ const getTrendingInsights = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error fetching trending insights:', error);
+    console.error('Error fetching trending insights:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch trending insights'
@@ -921,7 +1106,11 @@ const getTrendingInsights = async (req, res) => {
   }
 };
 
-// ADDED: Trending health check
+/**
+ * API endpoint for trending system health check
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getTrendingHealth = async (req, res) => {
   try {
     const dbTest = await query("SELECT 1 as test");
@@ -937,7 +1126,7 @@ const getTrendingHealth = async (req, res) => {
       algorithm: "universal"
     });
   } catch (error) {
-    console.error('❌ Health check error:', error);
+    console.error('Health check error:', error);
     res.status(503).json({
       success: false,
       status: "unhealthy",
@@ -946,17 +1135,108 @@ const getTrendingHealth = async (req, res) => {
   }
 };
 
-// Get viewer landing page content - ENHANCED WITH TRENDING ALGORITHM
+/**
+ * Helper function to get trailer for content
+ * @param {string} contentId - Content ID
+ * @returns {Promise<Object|null>} Trailer object or null
+ */
+const getTrailerForContent = async (contentId) => {
+  try {
+    const trailers = await query(`
+      SELECT 
+        ma.*,
+        CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path) as url
+      FROM media_assets ma 
+      WHERE ma.content_id = ? 
+        AND ma.asset_type = 'trailer'
+        AND ma.upload_status = 'completed'
+      ORDER BY ma.is_primary DESC, ma.created_at DESC
+      LIMIT 1
+    `, [process.env.R2_PUBLIC_URL_ID, contentId]);
+
+    return trailers[0] || null;
+  } catch (error) {
+    console.error('Error fetching trailer:', error);
+    return null;
+  }
+};
+
+/**
+ * Helper function to get content with trailer and kid content filtering
+ * @param {string} sqlQuery - SQL query template
+ * @param {Array} params - Query parameters
+ * @param {boolean} excludeKidContent - Whether to exclude kid content
+ * @returns {Promise<Array>} Array of content with trailers
+ */
+const getContentWithTrailer = async (sqlQuery, params = [], excludeKidContent = true) => {
+  try {
+    let modifiedSql = sqlQuery;
+    if (excludeKidContent) {
+      modifiedSql = modifiedSql.replace(
+        'GROUP BY c.id',
+        `AND NOT EXISTS (
+          SELECT 1 FROM content_categories cc
+          INNER JOIN categories cat ON cc.category_id = cat.id
+          WHERE cc.content_id = c.id 
+            AND cat.slug IN ('family', 'animation', 'cartoons', 'educational')
+            AND cat.name IN ('Family', 'Animation', 'Cartoons', 'Educational')
+        )
+        GROUP BY c.id`
+      );
+    }
+
+    const content = await query(modifiedSql, params);
+
+    if (content.length > 0) {
+      for (let item of content) {
+        item.trailer = await getTrailerForContent(item.id);
+
+        const castCount = await query(`
+          SELECT COUNT(*) as count 
+          FROM content_people 
+          WHERE content_id = ? AND role_type = 'actor'
+        `, [item.id]);
+        item.cast_count = castCount[0]?.count || 0;
+
+        if (item.genre_names) {
+          item.genres = item.genre_names.split(',').map((name, index) => ({
+            id: item.genre_ids ? item.genre_ids.split(',')[index] : index,
+            name: name.trim()
+          }));
+        } else {
+          item.genres = [];
+        }
+
+        if (item.category_names) {
+          item.categories = item.category_names.split(',').map((name, index) => ({
+            id: item.category_ids ? item.category_ids.split(',')[index] : index,
+            name: name.trim()
+          }));
+        } else {
+          item.categories = [];
+        }
+      }
+    }
+    return content;
+  } catch (error) {
+    console.error('Error fetching content with trailer:', error);
+    return [];
+  }
+};
+
+/**
+ * API endpoint for viewer landing page content
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getViewerLandingContent = async (req, res) => {
   try {
     const userId = req.user?.id;
     const cacheKey = generateCacheKey('landing', userId || 'public');
     const cacheEntry = contentCache.get(cacheKey);
-
     const forceRefresh = req.query.refresh === 'true';
 
     if (!forceRefresh && cacheEntry && !isCacheStale(cacheEntry, cacheConfig.landingContent)) {
-      console.log('Serving landing content from cache');
       return res.json({
         success: true,
         data: cacheEntry.data,
@@ -965,81 +1245,11 @@ const getViewerLandingContent = async (req, res) => {
       });
     }
 
-    console.log('Fetching fresh landing content from database');
-
-    // Helper function to get trailer for a single content item
-    const getTrailerForContent = async (contentId) => {
-      try {
-        const trailers = await query(`
-          SELECT 
-            ma.*,
-            CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path) as url
-          FROM media_assets ma 
-          WHERE ma.content_id = ? 
-            AND ma.asset_type = 'trailer'
-            AND ma.upload_status = 'completed'
-          ORDER BY ma.is_primary DESC, ma.created_at DESC
-          LIMIT 1
-        `, [process.env.R2_PUBLIC_URL_ID, contentId]);
-
-        return trailers[0] || null;
-      } catch (error) {
-        console.error('Error fetching trailer for content:', contentId, error);
-        return null;
-      }
-    };
-
-    // Helper function to get content with trailer
-    const getContentWithTrailer = async (sqlQuery, params = []) => {
-      try {
-        const content = await query(sqlQuery, params);
-
-        if (content.length > 0) {
-          for (let item of content) {
-            // Get trailer
-            item.trailer = await getTrailerForContent(item.id);
-
-            // Get cast count for frontend display
-            const castCount = await query(`
-          SELECT COUNT(*) as count 
-          FROM content_people 
-          WHERE content_id = ? AND role_type = 'actor'
-        `, [item.id]);
-            item.cast_count = castCount[0]?.count || 0;
-
-            // Process genres and categories properly
-            if (item.genre_names) {
-              item.genres = item.genre_names.split(',').map((name, index) => ({
-                id: item.genre_ids ? item.genre_ids.split(',')[index] : index,
-                name: name.trim()
-              }));
-            } else {
-              item.genres = [];
-            }
-
-            if (item.category_names) {
-              item.categories = item.category_names.split(',').map((name, index) => ({
-                id: item.category_ids ? item.category_ids.split(',')[index] : index,
-                name: name.trim()
-              }));
-            } else {
-              item.categories = [];
-            }
-          }
-        }
-        return content;
-      } catch (error) {
-        console.error('Error in getContentWithTrailer:', error);
-        return [];
-      }
-    };
-
     let heroContent = [];
     let heroContentId = null;
 
-    // Try: Featured AND Trending content (highest priority)
+    // Try featured AND trending content (highest priority)
     if (heroContent.length === 0) {
-      console.log('Trying featured + trending content for hero...');
       heroContent = await getContentWithTrailer(`
         SELECT 
           c.*,
@@ -1070,15 +1280,11 @@ const getViewerLandingContent = async (req, res) => {
           AND c.visibility = 'public'
           AND (c.featured = TRUE OR c.featured = 1)
           AND (c.trending = TRUE OR c.trending = 1)
-        GROUP BY c.id
-        ORDER BY RAND()
-        LIMIT 1
-      `, [process.env.R2_PUBLIC_URL_ID]);
+        `, [process.env.R2_PUBLIC_URL_ID], true);
     }
 
     // Fallback: Featured content only
     if (heroContent.length === 0) {
-      console.log('Trying featured content for hero...');
       heroContent = await getContentWithTrailer(`
         SELECT 
           c.*,
@@ -1108,16 +1314,12 @@ const getViewerLandingContent = async (req, res) => {
         WHERE c.status = 'published' 
           AND c.visibility = 'public'
           AND (c.featured = TRUE OR c.featured = 1)
-        GROUP BY c.id
-        ORDER BY RAND()
-        LIMIT 1
-      `, [process.env.R2_PUBLIC_URL_ID]);
+        `, [process.env.R2_PUBLIC_URL_ID], true);
     }
 
     // Fallback: Use trending algorithm for hero
     if (heroContent.length === 0) {
-      console.log('Using trending algorithm for hero...');
-      const trendingContent = await getUniversalTrendingContent(1);
+      const trendingContent = await getUniversalTrendingContent(1, true);
       if (trendingContent.length > 0) {
         const trendingHero = trendingContent[0];
         heroContent = await getContentWithTrailer(`
@@ -1147,14 +1349,12 @@ const getViewerLandingContent = async (req, res) => {
           LEFT JOIN content_categories cc ON c.id = cc.content_id
           LEFT JOIN categories cat ON cc.category_id = cat.id
           WHERE c.id = ?
-          GROUP BY c.id
-        `, [process.env.R2_PUBLIC_URL_ID, trendingHero.id]);
+          `, [process.env.R2_PUBLIC_URL_ID, trendingHero.id], true);
       }
     }
 
     // Fallback: Trending content
     if (heroContent.length === 0) {
-      console.log('Trying trending content for hero...');
       heroContent = await getContentWithTrailer(`
         SELECT 
           c.*,
@@ -1186,15 +1386,11 @@ const getViewerLandingContent = async (req, res) => {
         WHERE c.status = 'published' 
           AND c.visibility = 'public'
           AND (c.trending = TRUE OR c.trending = 1 OR c.view_count > 50)
-        GROUP BY c.id
-        ORDER BY RAND()
-        LIMIT 1
-      `, [process.env.R2_PUBLIC_URL_ID]);
+        `, [process.env.R2_PUBLIC_URL_ID], true);
     }
 
     // Fallback: Recent content
     if (heroContent.length === 0) {
-      console.log('Trying recent content for hero...');
       heroContent = await getContentWithTrailer(`
         SELECT 
           c.*,
@@ -1224,15 +1420,11 @@ const getViewerLandingContent = async (req, res) => {
         WHERE c.status = 'published' 
           AND c.visibility = 'public'
           AND c.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-        GROUP BY c.id
-        ORDER BY RAND()
-        LIMIT 1
-      `, [process.env.R2_PUBLIC_URL_ID]);
+        `, [process.env.R2_PUBLIC_URL_ID], true);
     }
 
     // Final fallback: Any published content
     if (heroContent.length === 0) {
-      console.log('Trying any published content for hero...');
       heroContent = await getContentWithTrailer(`
         SELECT 
           c.*,
@@ -1261,32 +1453,41 @@ const getViewerLandingContent = async (req, res) => {
         LEFT JOIN categories cat ON cc.category_id = cat.id
         WHERE c.status = 'published' 
           AND c.visibility = 'public'
-        GROUP BY c.id
-        ORDER BY RAND()
-        LIMIT 1
-      `, [process.env.R2_PUBLIC_URL_ID]);
+        `, [process.env.R2_PUBLIC_URL_ID], true);
     }
 
     heroContentId = heroContent[0]?.id || null;
 
-    // Get other content sections with trailers
-    const getSectionContent = async (sqlQuery, params = []) => {
+    const getSectionContent = async (sqlQuery, params = [], excludeKidContent = true) => {
       try {
-        const content = await query(sqlQuery, params);
+        let modifiedSql = sqlQuery;
+        if (excludeKidContent) {
+          modifiedSql = modifiedSql.replace(
+            'GROUP BY c.id',
+            `AND NOT EXISTS (
+              SELECT 1 FROM content_categories cc
+              INNER JOIN categories cat ON cc.category_id = cat.id
+              WHERE cc.content_id = c.id 
+                AND cat.slug IN ('family', 'animation', 'cartoons', 'educational')
+                AND cat.name IN ('Family', 'Animation', 'Cartoons', 'Educational')
+            )
+            GROUP BY c.id`
+          );
+        }
 
-        // Get trailers for all content in this section
+        const content = await query(modifiedSql, params);
+
         for (let item of content) {
           item.trailer = await getTrailerForContent(item.id);
         }
 
         return content;
       } catch (error) {
-        console.error('Error in getSectionContent:', error);
+        console.error('Error fetching section content:', error);
         return [];
       }
     };
 
-    // Get featured content (excluding hero if found)
     let featuredContent;
     if (heroContentId) {
       featuredContent = await getSectionContent(`
@@ -1319,10 +1520,7 @@ const getViewerLandingContent = async (req, res) => {
           AND c.visibility = 'public'
           AND (c.featured = TRUE OR c.featured = 1)
           AND c.id != ?
-        GROUP BY c.id
-        ORDER BY c.featured_order DESC, c.view_count DESC
-        LIMIT 5
-      `, [process.env.R2_PUBLIC_URL_ID, heroContentId]);
+        `, [process.env.R2_PUBLIC_URL_ID, heroContentId], true);
     } else {
       featuredContent = await getSectionContent(`
         SELECT 
@@ -1353,16 +1551,11 @@ const getViewerLandingContent = async (req, res) => {
         WHERE c.status = 'published' 
           AND c.visibility = 'public'
           AND (c.featured = TRUE OR c.featured = 1)
-        GROUP BY c.id
-        ORDER BY c.featured_order DESC, c.view_count DESC
-        LIMIT 5
-      `, [process.env.R2_PUBLIC_URL_ID]);
+        `, [process.env.R2_PUBLIC_URL_ID], true);
     }
 
-    // Get trending content using the trending algorithm
-    const trendingContent = await getUniversalTrendingContent(12);
+    const trendingContent = await getUniversalTrendingContent(12, true);
 
-    // Get recently added content
     const recentContent = await getSectionContent(`
       SELECT 
         c.*,
@@ -1391,20 +1584,8 @@ const getViewerLandingContent = async (req, res) => {
       LEFT JOIN categories cat ON cc.category_id = cat.id
       WHERE c.status = 'published' 
         AND c.visibility = 'public'
-      GROUP BY c.id
-      ORDER BY c.created_at DESC
-      LIMIT 16
-    `, [process.env.R2_PUBLIC_URL_ID]);
+      `, [process.env.R2_PUBLIC_URL_ID], true);
 
-    console.log('Content Stats with Trailers:', {
-      hero: heroContent.length,
-      featured: featuredContent.length,
-      trending: trendingContent.length,
-      recent: recentContent.length,
-      timestamp: new Date().toISOString()
-    });
-
-    // Process content data
     const processContent = (contentArray) => {
       return contentArray.map(content => {
         let imageUrl = content.primary_image_url;
@@ -1412,9 +1593,8 @@ const getViewerLandingContent = async (req, res) => {
           imageUrl = '/api/placeholder/300/450';
         }
 
-        const processedContent = {
+        return {
           ...content,
-          // Ensure genres and categories are properly structured
           genres: content.genres || (content.genre_names ? content.genre_names.split(',').map((name, index) => ({
             id: content.genre_ids ? content.genre_ids.split(',')[index] : index,
             name: name.trim()
@@ -1430,37 +1610,38 @@ const getViewerLandingContent = async (req, res) => {
             is_primary: 1,
             upload_status: 'completed'
           }] : [],
-          // Explicitly include the trailer
           trailer: content.trailer || null,
           last_updated: content.updated_at || content.created_at,
-          // Additional fields for frontend
-          cast_count: content.cast_count || 0
+          cast_count: content.cast_count || 0,
+          is_kid_friendly: isKidFriendlyContent(content),
+          kid_access_restricted: isContentRestrictedForKids(content).restricted
         };
-
-        return processedContent;
       });
     };
 
     const processedHero = processContent(heroContent)[0] || null;
     const processedFeatured = processContent(featuredContent);
-    const processedTrending = trendingContent; // Already processed by trending algorithm
+    const processedTrending = trendingContent.map(content => ({
+      ...content,
+      is_kid_friendly: isKidFriendlyContent(content),
+      kid_access_restricted: isContentRestrictedForKids(content).restricted
+    }));
     const processedRecent = processContent(recentContent);
-
-    // DEBUG: Final check before sending response
-    console.log('🔍 DEBUG Final Response - Hero ID:', processedHero?.id);
-    console.log('🔍 DEBUG Final Response - Hero trailer exists:', !!processedHero?.trailer);
-    console.log('🔍 DEBUG Final Response - Hero trailer URL:', processedHero?.trailer?.url);
-    console.log('🔍 DEBUG Final Response - Hero trailer data:', processedHero?.trailer);
 
     const responseData = {
       hero: processedHero,
       featured: processedFeatured,
       trending: processedTrending,
       recent: processedRecent,
-      last_updated: new Date().toISOString()
+      last_updated: new Date().toISOString(),
+      kid_content_filter: {
+        applied: true,
+        message: 'Kid content is filtered out by default. Use include_kid_content=true parameter to include.',
+        kid_friendly_count: processedTrending.filter(c => c.is_kid_friendly).length,
+        restricted_count: processedTrending.filter(c => c.kid_access_restricted).length
+      }
     };
 
-    // Update cache
     contentCache.set(cacheKey, {
       data: responseData,
       timestamp: Date.now()
@@ -1470,11 +1651,12 @@ const getViewerLandingContent = async (req, res) => {
       success: true,
       data: responseData,
       cached: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      kid_content_filtered: true
     });
 
   } catch (error) {
-    console.error('Error fetching viewer landing content:', error);
+    console.error('Error fetching landing content:', error);
     res.status(500).json({
       error: 'Unable to load content at this time',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -1482,26 +1664,76 @@ const getViewerLandingContent = async (req, res) => {
   }
 };
 
-// Get all published content for viewer
+/**
+ * API endpoint for all viewer content with filtering
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getAllViewerContent = async (req, res) => {
   try {
-    const { page = 1, limit = 50, refresh } = req.query;
+    const {
+      page = 1,
+      limit = 50,
+      refresh,
+      include_kid_content = false,
+      category,
+      genre
+    } = req.query;
+
     const offset = (page - 1) * limit;
-    const cacheKey = generateCacheKey('contentList', `page_${page}_limit_${limit}`);
+    const includeKidContent = include_kid_content === 'true';
+
+    const cacheKey = generateCacheKey('contentList', `page_${page}_limit_${limit}_kid_${includeKidContent}_cat_${category || 'none'}_genre_${genre || 'none'}`);
     const cacheEntry = contentCache.get(cacheKey);
 
-    // Force refresh or check cache staleness
     if (!refresh && cacheEntry && !isCacheStale(cacheEntry, cacheConfig.contentList)) {
-      console.log('Serving content list from cache');
       return res.json({
         success: true,
         data: cacheEntry.data,
         cached: true,
-        timestamp: cacheEntry.timestamp
+        timestamp: cacheEntry.timestamp,
+        kid_content_included: includeKidContent
       });
     }
 
-    console.log('Fetching fresh content list from database');
+    let whereClause = `
+      WHERE c.status = 'published' 
+        AND c.visibility = 'public'
+    `;
+
+    if (!includeKidContent) {
+      whereClause += `
+        AND NOT EXISTS (
+          SELECT 1 FROM content_categories cc
+          INNER JOIN categories cat ON cc.category_id = cat.id
+          WHERE cc.content_id = c.id 
+            AND cat.slug IN ('family', 'animation', 'cartoons', 'educational')
+            AND cat.name IN ('Family', 'Animation', 'Cartoons', 'Educational')
+        )
+      `;
+    }
+
+    if (category) {
+      whereClause += `
+        AND EXISTS (
+          SELECT 1 FROM content_categories cc
+          INNER JOIN categories cat ON cc.category_id = cat.id
+          WHERE cc.content_id = c.id 
+            AND (cat.slug = ? OR cat.name = ?)
+        )
+      `;
+    }
+
+    if (genre) {
+      whereClause += `
+        AND EXISTS (
+          SELECT 1 FROM content_genres cg
+          INNER JOIN genres g ON cg.genre_id = g.id
+          WHERE cg.content_id = c.id 
+            AND (g.slug = ? OR g.name = ?)
+        )
+      `;
+    }
 
     const contents = await query(`
       SELECT 
@@ -1530,21 +1762,63 @@ const getAllViewerContent = async (req, res) => {
       LEFT JOIN genres g ON cg.genre_id = g.id
       LEFT JOIN content_categories cc ON c.id = cc.content_id
       LEFT JOIN categories cat ON cc.category_id = cat.id
-      WHERE c.status = 'published' 
-        AND c.visibility = 'public'
+      ${whereClause}
       GROUP BY c.id
       ORDER BY content_recency DESC, c.created_at DESC
       LIMIT ? OFFSET ?
-    `, [process.env.R2_PUBLIC_URL_ID, parseInt(limit), parseInt(offset)]);
+    `, [
+      process.env.R2_PUBLIC_URL_ID,
+      ...(category ? [category, category] : []),
+      ...(genre ? [genre, genre] : []),
+      parseInt(limit),
+      parseInt(offset)
+    ]);
 
-    // Get total count for pagination
+    let countWhereClause = `WHERE status = 'published' AND visibility = 'public'`;
+
+    if (!includeKidContent) {
+      countWhereClause += `
+        AND NOT EXISTS (
+          SELECT 1 FROM content_categories cc
+          INNER JOIN categories cat ON cc.category_id = cat.id
+          WHERE cc.content_id = contents.id 
+            AND cat.slug IN ('family', 'animation', 'cartoons', 'educational')
+            AND cat.name IN ('Family', 'Animation', 'Cartoons', 'Educational')
+        )
+      `;
+    }
+
+    if (category) {
+      countWhereClause += `
+        AND EXISTS (
+          SELECT 1 FROM content_categories cc
+          INNER JOIN categories cat ON cc.category_id = cat.id
+          WHERE cc.content_id = contents.id 
+            AND (cat.slug = ? OR cat.name = ?)
+        )
+      `;
+    }
+
+    if (genre) {
+      countWhereClause += `
+        AND EXISTS (
+          SELECT 1 FROM content_genres cg
+          INNER JOIN genres g ON cg.genre_id = g.id
+          WHERE cg.content_id = contents.id 
+            AND (g.slug = ? OR g.name = ?)
+        )
+      `;
+    }
+
     const countResult = await query(`
       SELECT COUNT(*) as total 
       FROM contents 
-      WHERE status = 'published' AND visibility = 'public'
-    `);
+      ${countWhereClause}
+    `, [
+      ...(category ? [category, category] : []),
+      ...(genre ? [genre, genre] : [])
+    ]);
 
-    // Process content data
     const processedContents = contents.map(content => {
       let imageUrl = content.primary_image_url;
       if (!imageUrl || imageUrl.includes('null')) {
@@ -1568,7 +1842,9 @@ const getAllViewerContent = async (req, res) => {
           is_primary: 1,
           upload_status: 'completed'
         }] : [],
-        last_updated: content.updated_at || content.created_at
+        last_updated: content.updated_at || content.created_at,
+        is_kid_friendly: isKidFriendlyContent(content),
+        kid_access_restricted: isContentRestrictedForKids(content).restricted
       };
     });
 
@@ -1580,10 +1856,16 @@ const getAllViewerContent = async (req, res) => {
         total: countResult[0].total,
         pages: Math.ceil(countResult[0].total / limit)
       },
-      last_updated: new Date().toISOString()
+      last_updated: new Date().toISOString(),
+      filters: {
+        kid_content_included: includeKidContent,
+        category: category || null,
+        genre: genre || null,
+        kid_friendly_count: processedContents.filter(c => c.is_kid_friendly).length,
+        restricted_count: processedContents.filter(c => c.kid_access_restricted).length
+      }
     };
 
-    // Update cache
     contentCache.set(cacheKey, {
       data: responseData,
       timestamp: Date.now()
@@ -1593,7 +1875,8 @@ const getAllViewerContent = async (req, res) => {
       success: true,
       data: responseData,
       cached: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      kid_content_included: includeKidContent
     });
 
   } catch (error) {
@@ -1605,27 +1888,34 @@ const getAllViewerContent = async (req, res) => {
   }
 };
 
-// Get single content for viewer - SECURED VERSION
-const getViewerContentById = securityChecks.secureContentStream(async (req, res) => {
+/**
+ * API endpoint for single content by ID with security and kid restrictions
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getViewerContentById = async (req, res) => {
   try {
     const { contentId } = req.params;
-    const cacheKey = generateCacheKey('singleContent', contentId);
+
+    // Check if user is authenticated (req.user is set by authMiddleware)
+    const isAuthenticated = req.user && req.user.id;
+    const userId = isAuthenticated ? req.user.id : null;
+
+    const cacheKey = generateCacheKey('singleContent', contentId, userId);
     const cacheEntry = contentCache.get(cacheKey);
     const forceRefresh = req.query.refresh === 'true';
 
     if (!forceRefresh && cacheEntry && !isCacheStale(cacheEntry, cacheConfig.singleContent)) {
-      console.log('Serving single content from cache');
       return res.json({
         success: true,
         data: cacheEntry.data,
         cached: true,
-        timestamp: cacheEntry.timestamp
+        timestamp: cacheEntry.timestamp,
+        is_authenticated: isAuthenticated
       });
     }
 
-    console.log('Fetching fresh single content from database');
-
-    // Get main content with latest metrics
+    // Get basic content data (always public)
     const contentRows = await query(`
       SELECT 
         c.*,
@@ -1653,13 +1943,14 @@ const getViewerContentById = securityChecks.secureContentStream(async (req, res)
 
     if (contentRows.length === 0) {
       return res.status(404).json({
+        success: false,
         error: 'Content not found'
       });
     }
 
     const content = contentRows[0];
 
-    // Get fresh genres with proper structure
+    // Get genres (public)
     const genres = await query(`
       SELECT g.* 
       FROM content_genres cg 
@@ -1669,7 +1960,7 @@ const getViewerContentById = securityChecks.secureContentStream(async (req, res)
     `, [contentId]);
     content.genres = genres;
 
-    // Get fresh categories with proper structure
+    // Get categories (public)
     const categories = await query(`
       SELECT cat.* 
       FROM content_categories cc 
@@ -1679,7 +1970,7 @@ const getViewerContentById = securityChecks.secureContentStream(async (req, res)
     `, [contentId]);
     content.categories = categories;
 
-    // Get ALL media assets including trailers, posters, thumbnails, etc.
+    // Get media assets (FIXED: removed visibility column)
     const mediaAssets = await query(`
       SELECT 
         ma.*,
@@ -1687,20 +1978,19 @@ const getViewerContentById = securityChecks.secureContentStream(async (req, res)
       FROM media_assets ma 
       WHERE ma.content_id = ? 
         AND ma.upload_status = 'completed'
+        -- visibility column doesn't exist, use content.visibility instead
       ORDER BY 
         ma.is_primary DESC,
-        FIELD(ma.asset_type, 'mainVideo', 'trailer', 'poster', 'thumbnail', 'behind_scenes', 'screenshot', 'teaser', 'key_art'),
+        FIELD(ma.asset_type, 'poster', 'thumbnail', 'trailer', 'mainVideo'),
         ma.season_number,
         ma.episode_number,
         ma.created_at DESC
     `, [process.env.R2_PUBLIC_URL_ID, contentId]);
     content.media_assets = mediaAssets;
 
-    // Get specific trailer asset (for easy access)
     const trailerAsset = mediaAssets.find(asset => asset.asset_type === 'trailer');
     content.trailer = trailerAsset || null;
 
-    // Get primary image (poster or thumbnail)
     const primaryImage = mediaAssets.find(asset =>
       asset.is_primary && (asset.asset_type === 'poster' || asset.asset_type === 'thumbnail')
     ) || mediaAssets.find(asset =>
@@ -1708,156 +1998,139 @@ const getViewerContentById = securityChecks.secureContentStream(async (req, res)
     );
     content.primary_image_url = primaryImage?.url || null;
 
-    // Get content warnings
-    const warnings = await query(`
-      SELECT * FROM content_warnings 
-      WHERE content_id = ?
-      ORDER BY severity DESC, warning_type ASC
-    `, [contentId]);
-    content.content_warnings = warnings;
+    // Get content warnings (if table exists)
+    try {
+      const warnings = await query(`
+        SELECT * FROM content_warnings 
+        WHERE content_id = ?
+        ORDER BY severity DESC, warning_type ASC
+      `, [contentId]);
+      content.content_warnings = warnings;
+    } catch (error) {
+      content.content_warnings = [];
+    }
 
-    // FIXED: Escape reserved keyword 'default'
-    const languages = await query(`
-      SELECT 
-        cs.*,
-        cs.language_code as code,
-        cs.is_default as \`default\`
-      FROM content_subtitles cs 
-      WHERE cs.content_id = ?
-      ORDER BY cs.is_default DESC, cs.language_code ASC
-    `, [contentId]);
-    content.available_languages = languages;
+    // Get languages (if table exists)
+    try {
+      const languages = await query(`
+        SELECT 
+          cs.*,
+          cs.language_code as code,
+          cs.is_default as \`default\`
+        FROM content_subtitles cs 
+        WHERE cs.content_id = ?
+        ORDER BY cs.is_default DESC, cs.language_code ASC
+      `, [contentId]);
+      content.available_languages = languages;
+    } catch (error) {
+      content.available_languages = [];
+    }
 
-    // Get cast and crew with people details
-    const castCrew = await query(`
-      SELECT 
-        cp.*,
-        p.full_name,
-        p.display_name,
-        p.primary_role,
-        p.profile_image_url,
-        p.bio,
-        p.date_of_birth,
-        p.nationality,
-        p.gender
-      FROM content_people cp
-      JOIN people p ON cp.person_id = p.id
-      WHERE cp.content_id = ?
-      ORDER BY 
-        cp.billing_order ASC,
-        FIELD(cp.role_type, 'director', 'producer', 'writer', 'actor', 'cinematographer', 'composer', 'editor', 'crew'),
-        cp.character_name IS NULL,
-        cp.character_name ASC
-    `, [contentId]);
-    content.cast_crew = castCrew;
+    // Get cast and crew
+    try {
+      const castCrew = await query(`
+        SELECT 
+          cp.*,
+          p.full_name,
+          p.display_name,
+          p.primary_role,
+          p.profile_image_url
+        FROM content_people cp
+        JOIN people p ON cp.person_id = p.id
+        WHERE cp.content_id = ?
+        ORDER BY 
+          cp.billing_order ASC,
+          FIELD(cp.role_type, 'director', 'producer', 'writer', 'actor'),
+          cp.character_name IS NULL,
+          cp.character_name ASC
+        LIMIT 20
+      `, [contentId]);
+      content.cast_crew = castCrew;
+      content.cast = castCrew.filter(person => person.role_type === 'actor');
+      content.crew = castCrew.filter(person => person.role_type !== 'actor');
+    } catch (error) {
+      content.cast_crew = [];
+      content.cast = [];
+      content.crew = [];
+    }
 
-    // Separate cast from crew for easier frontend usage
-    content.cast = castCrew.filter(person => person.role_type === 'actor');
-    content.crew = castCrew.filter(person => person.role_type !== 'actor');
+    // Get ratings stats
+    try {
+      const ratingStats = await query(`
+        SELECT 
+          AVG(rating) as current_rating,
+          COUNT(*) as current_rating_count
+        FROM content_ratings 
+        WHERE content_id = ?
+      `, [contentId]);
 
-    // Get real-time ratings stats with reviews
-    const ratingStats = await query(`
-      SELECT 
-        AVG(rating) as current_rating,
-        COUNT(*) as current_rating_count,
-        COUNT(CASE WHEN review_text IS NOT NULL AND review_text != '' THEN 1 END) as review_count
-      FROM content_ratings 
-      WHERE content_id = ?
-    `, [contentId]);
+      content.current_rating = parseFloat(ratingStats[0].current_rating || 0).toFixed(2);
+      content.current_rating_count = ratingStats[0].current_rating_count || 0;
+    } catch (error) {
+      content.current_rating = "0.00";
+      content.current_rating_count = 0;
+    }
 
-    content.current_rating = parseFloat(ratingStats[0].current_rating || 0).toFixed(2);
-    content.current_rating_count = ratingStats[0].current_rating_count || 0;
-    content.review_count = ratingStats[0].review_count || 0;
-
-    // FIXED: For series content, create seasons structure from media assets
+    // Handle series content
     if (content.content_type === 'series') {
-      console.log('🔍 Processing series content - creating seasons structure');
-
-      // Get unique seasons from media assets
       const seasonNumbers = [...new Set(mediaAssets
         .filter(asset => asset.season_number !== null && asset.season_number !== undefined)
         .map(asset => asset.season_number)
       )].sort((a, b) => a - b);
 
-      console.log('🔍 Found season numbers:', seasonNumbers);
-
       const seasons = [];
 
       for (const seasonNumber of seasonNumbers) {
-        // Get season poster from media assets
         const seasonPoster = mediaAssets.find(asset =>
           asset.season_number === seasonNumber &&
-          asset.asset_type === 'season_poster'
+          (asset.asset_type === 'season_poster' || asset.asset_type === 'poster')
         );
 
-        // Get episodes for this season from media assets
-        const episodeNumbers = [...new Set(mediaAssets
-          .filter(asset =>
-            asset.season_number === seasonNumber &&
-            asset.episode_number !== null &&
-            asset.episode_number !== undefined
-          )
+        // Find all episodes for this season (using episode_number field)
+        const episodeAssets = mediaAssets.filter(asset =>
+          asset.season_number === seasonNumber &&
+          asset.episode_number !== null &&
+          asset.episode_number !== undefined
+        );
+
+        // Get unique episode numbers
+        const episodeNumbers = [...new Set(episodeAssets
           .map(asset => asset.episode_number)
         )].sort((a, b) => a - b);
-
-        console.log(`🔍 Season ${seasonNumber} - episodes:`, episodeNumbers);
 
         const episodes = [];
 
         for (const episodeNumber of episodeNumbers) {
-          // Get episode thumbnail
-          const episodeThumbnail = mediaAssets.find(asset =>
-            asset.season_number === seasonNumber &&
+          // Find episode-specific assets
+          const episodeVideo = episodeAssets.find(asset =>
+            asset.episode_number === episodeNumber &&
+            (asset.asset_type === 'episodeVideo' || asset.asset_type === 'mainVideo')
+          );
+
+          const episodeThumbnail = episodeAssets.find(asset =>
             asset.episode_number === episodeNumber &&
             asset.asset_type === 'episodeThumbnail'
           );
 
-          // Get episode video asset to extract episode title and description
-          const episodeVideoAsset = mediaAssets.find(asset =>
-            asset.season_number === seasonNumber &&
-            asset.episode_number === episodeNumber &&
-            asset.asset_type === 'episodeVideo'
-          );
-
-          // Get episode trailer
-          const episodeTrailer = mediaAssets.find(asset =>
-            asset.season_number === seasonNumber &&
+          const episodeTrailer = episodeAssets.find(asset =>
             asset.episode_number === episodeNumber &&
             asset.asset_type === 'episodeTrailer'
           );
 
-          // Get episode media assets count
-          const episodeMediaAssetsCount = mediaAssets.filter(asset =>
-            asset.season_number === seasonNumber &&
-            asset.episode_number === episodeNumber
-          ).length;
-
-          // Smart title selection with proper conditioning
-          let episodeTitle = null;
-          if (episodeVideoAsset?.episode_title) {
-            episodeTitle = episodeVideoAsset.episode_title;
-          } else if (episodeVideoAsset?.asset_title) {
-            episodeTitle = episodeVideoAsset.asset_title;
-          }
-
-          // Smart description selection with proper conditioning
-          let episodeDescription = null;
-          if (episodeVideoAsset?.episode_description) {
-            episodeDescription = episodeVideoAsset.episode_description;
-          } else if (episodeVideoAsset?.asset_description) {
-            episodeDescription = episodeVideoAsset.asset_description;
-          }
+          // Get any asset for this episode to extract episode metadata
+          const anyEpisodeAsset = episodeAssets.find(asset => asset.episode_number === episodeNumber);
 
           episodes.push({
             id: `season-${seasonNumber}-episode-${episodeNumber}`,
             episode_number: episodeNumber,
-            title: episodeTitle, // Will be null if no data found
-            description: episodeDescription, // Will be null if no data found
-            duration_minutes: episodeVideoAsset?.duration_seconds ? Math.floor(episodeVideoAsset.duration_seconds / 60) : null,
-            release_date: null,
-            media_assets_count: episodeMediaAssetsCount,
+            title: anyEpisodeAsset?.episode_title || `Episode ${episodeNumber}`,
+            description: anyEpisodeAsset?.episode_description || null,
+            duration_minutes: episodeVideo?.duration_seconds ? Math.floor(episodeVideo.duration_seconds / 60) : null,
+            release_date: anyEpisodeAsset?.created_at || null,
             episode_thumbnail_url: episodeThumbnail?.url || null,
-            has_trailer: !!episodeTrailer
+            episode_video_url: episodeVideo?.url || null,
+            has_trailer: !!episodeTrailer,
+            episode_trailer_url: episodeTrailer?.url || null
           });
         }
 
@@ -1867,89 +2140,115 @@ const getViewerContentById = securityChecks.secureContentStream(async (req, res)
           title: `Season ${seasonNumber}`,
           description: null,
           release_date: null,
-          actual_episode_count: episodes.length,
-          episode_count: episodes.length,
           season_poster_url: seasonPoster?.url || null,
-          episodes: episodes
+          episode_count: episodes.length,
+          episodes: isAuthenticated ? episodes : episodes.slice(0, 3) // Show more episodes for authenticated users
         });
       }
 
       content.seasons = seasons;
-      console.log('🔍 Created seasons structure:', seasons);
     } else {
-      // For non-series content, ensure seasons is an empty array
       content.seasons = [];
-      console.log('🔍 Non-series content - setting empty seasons array');
     }
 
-    // Get similar content based on genres
-    const similarContent = await query(`
-      SELECT 
-        c.id,
-        c.title,
-        c.content_type,
-        c.duration_minutes,
-        c.release_date,
-        c.average_rating,
-        (
-          SELECT CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path)
-          FROM media_assets ma 
-          WHERE ma.content_id = c.id 
-            AND ma.asset_type IN ('thumbnail', 'poster')
-            AND (ma.is_primary = 1 OR ma.is_primary IS NULL)
-            AND ma.upload_status = 'completed'
-          ORDER BY ma.is_primary DESC, ma.created_at DESC
+    // Get similar content
+    try {
+      const similarContent = await query(`
+        SELECT 
+          c.id,
+          c.title,
+          c.content_type,
+          c.duration_minutes,
+          c.release_date,
+          c.average_rating,
+          c.age_rating,
+          (
+            SELECT CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path)
+            FROM media_assets ma 
+            WHERE ma.content_id = c.id 
+              AND ma.asset_type IN ('thumbnail', 'poster')
+              AND ma.upload_status = 'completed'
+            ORDER BY ma.is_primary DESC, ma.created_at DESC
+            LIMIT 1
+          ) as primary_image_url
+        FROM contents c
+        JOIN content_genres cg ON c.id = cg.content_id
+        WHERE cg.genre_id IN (
+          SELECT genre_id FROM content_genres WHERE content_id = ?
+        )
+        AND c.id != ?
+        AND c.status = 'published'
+        AND c.visibility = 'public'
+        GROUP BY c.id
+        ORDER BY COUNT(cg.genre_id) DESC
+        LIMIT 6
+      `, [process.env.R2_PUBLIC_URL_ID, contentId, contentId]);
+
+      content.similar_content = similarContent;
+    } catch (error) {
+      content.similar_content = [];
+    }
+
+    // USER-SPECIFIC DATA (only for authenticated users)
+    if (isAuthenticated) {
+      try {
+        // Get user rating
+        const userRating = await query(`
+          SELECT rating, review_text 
+          FROM content_ratings 
+          WHERE content_id = ? AND user_id = ?
+        `, [contentId, userId]);
+
+        if (userRating.length > 0) {
+          content.user_rating = userRating[0].rating;
+          content.user_review = userRating[0].review_text;
+        }
+
+        // Check if in watchlist
+        const watchlistCheck = await query(`
+          SELECT 1 FROM user_watchlist 
+          WHERE content_id = ? AND user_id = ?
+        `, [contentId, userId]);
+        content.in_watchlist = watchlistCheck.length > 0;
+
+        // Check if liked
+        const likeCheck = await query(`
+          SELECT 1 FROM user_likes 
+          WHERE content_id = ? AND user_id = ?
+        `, [contentId, userId]);
+        content.is_liked = likeCheck.length > 0;
+
+        // Get watch history
+        const watchHistory = await query(`
+          SELECT 
+            percentage_watched,
+            watch_duration_seconds,
+            last_watched_at
+          FROM content_view_history 
+          WHERE content_id = ? AND user_id = ?
+          ORDER BY last_watched_at DESC
           LIMIT 1
-        ) as primary_image_url
-      FROM contents c
-      JOIN content_genres cg ON c.id = cg.content_id
-      WHERE cg.genre_id IN (
-        SELECT genre_id FROM content_genres WHERE content_id = ?
-      )
-      AND c.id != ?
-      AND c.status = 'published'
-      AND c.visibility = 'public'
-      GROUP BY c.id
-      ORDER BY COUNT(cg.genre_id) DESC, c.view_count DESC
-      LIMIT 6
-    `, [process.env.R2_PUBLIC_URL_ID, contentId, contentId]);
-    content.similar_content = similarContent;
+        `, [contentId, userId]);
 
-    // Get content statistics
-    const contentStats = await query(`
-      SELECT 
-        COUNT(DISTINCT cvh.user_id) as unique_viewers,
-        AVG(cvh.percentage_watched) as avg_completion_rate,
-        SUM(cvh.watch_duration_seconds) as total_watch_time_seconds
-      FROM content_view_history cvh
-      WHERE cvh.content_id = ?
-    `, [contentId]);
-    content.stats = contentStats[0] || {};
+        if (watchHistory.length > 0) {
+          content.watch_history = {
+            percentage_watched: watchHistory[0].percentage_watched,
+            watch_duration_seconds: watchHistory[0].watch_duration_seconds,
+            last_watched_at: watchHistory[0].last_watched_at
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching user-specific data:', error.message);
+      }
+    }
 
-    // Get awards and nominations for this content
-    const awards = await query(`
-      SELECT 
-        pa.*,
-        p.full_name as person_name,
-        p.display_name as person_display_name
-      FROM person_awards pa
-      LEFT JOIN people p ON pa.person_id = p.id
-      WHERE pa.content_id = ?
-      ORDER BY pa.award_year DESC, pa.result DESC
-    `, [contentId]);
-    content.awards = awards;
-
-    // Add security context to response
-    content.security_context = {
-      can_stream: true,
-      subscription_tier: req.securityContext.subscription.plan_name,
-      max_quality: req.securityContext.subscription.max_quality,
-      download_enabled: req.securityContext.subscription.download_enabled,
-      device_type: req.securityContext.deviceType,
-      security_checked: true
+    // Add context info
+    content.context = {
+      is_authenticated: isAuthenticated,
+      can_access: isAuthenticated || content.visibility === 'public',
+      requires_subscription: !isAuthenticated,
+      last_updated: new Date().toISOString()
     };
-
-    content.last_updated = new Date().toISOString();
 
     // Update cache
     contentCache.set(cacheKey, {
@@ -1957,80 +2256,59 @@ const getViewerContentById = securityChecks.secureContentStream(async (req, res)
       timestamp: Date.now()
     });
 
-    console.log('✅ Enhanced content data fetched successfully for ID:', contentId);
-    console.log('📊 Content stats:', {
-      media_assets: content.media_assets?.length || 0,
-      cast_crew: content.cast_crew?.length || 0,
-      genres: content.genres?.length || 0,
-      categories: content.categories?.length || 0,
-      seasons: content.seasons?.length || 0,
-      similar_content: content.similar_content?.length || 0,
-      languages: content.available_languages?.length || 0,
-      content_type: content.content_type
-    });
-
     res.json({
       success: true,
       data: content,
       cached: false,
       timestamp: Date.now(),
-      security: {
-        checked: true,
-        passed: true,
-        subscription: req.securityContext.subscription.plan_name
-      }
+      is_authenticated: isAuthenticated,
+      requires_subscription: !isAuthenticated
     });
 
   } catch (error) {
     console.error('Error fetching content by ID:', error);
     res.status(500).json({
+      success: false,
       error: 'Unable to load content',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
-});
+};
 
-// ✅ UPDATED: Track content view - Separates kid vs regular user tracking
+/**
+ * API endpoint to track content views with kid profile support
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const trackContentView = securityChecks.secureContentStream(async (req, res) => {
   try {
     const { contentId } = req.params;
     const userId = req.user.id;
     const { watch_duration_seconds = 0, percentage_watched = 0, device_type = 'web' } = req.body;
 
-    // Determine if user is an actual kid profile
     const kidCheck = isActualKidProfile(req);
-
-    // Use security context from the middleware
     const securityContext = req.securityContext;
 
     if (kidCheck.isKid) {
-      // ✅ Insert into kids_viewing_history for ACTUAL kid profiles only
       await query(`
         INSERT INTO kids_viewing_history 
         (kid_profile_id, content_id, watch_duration_seconds, percentage_watched, device_type, session_id)
         VALUES (?, ?, ?, ?, ?, ?)
       `, [kidCheck.kidProfileId, contentId, watch_duration_seconds, percentage_watched, device_type, `kid_secure_${Date.now()}`]);
-
-      console.log('✅ Tracked view for KID profile:', kidCheck.kidProfileId);
     } else {
-      // ✅ Insert into content_view_history for REGULAR users (even family members with kid dashboard)
       await query(`
         INSERT INTO content_view_history 
         (content_id, user_id, watch_duration_seconds, percentage_watched, device_type, session_id)
         VALUES (?, ?, ?, ?, ?, ?)
       `, [contentId, userId, watch_duration_seconds, percentage_watched, device_type, `secure_${Date.now()}`]);
 
-      // ✅ Update content view count for REGULAR users only
       await query(`
         UPDATE contents 
         SET view_count = view_count + 1
         WHERE id = ?
       `, [contentId]);
-
-      console.log('✅ Tracked view for REGULAR user:', userId);
     }
 
-    // Clear related cache entries to ensure fresh data
     clearRelatedCache(contentId);
 
     res.json({
@@ -2053,7 +2331,11 @@ const trackContentView = securityChecks.secureContentStream(async (req, res) => 
   }
 });
 
-// Rate content
+/**
+ * API endpoint to rate content
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const rateContent = async (req, res) => {
   try {
     const { contentId } = req.params;
@@ -2066,7 +2348,6 @@ const rateContent = async (req, res) => {
       });
     }
 
-    // Verify content exists and is accessible
     const content = await query(`
       SELECT id FROM contents 
       WHERE id = ? 
@@ -2080,21 +2361,18 @@ const rateContent = async (req, res) => {
       });
     }
 
-    // Check if user already rated this content
     const existingRating = await query(`
       SELECT id FROM content_ratings 
       WHERE content_id = ? AND user_id = ?
     `, [contentId, userId]);
 
     if (existingRating.length > 0) {
-      // Update existing rating
       await query(`
         UPDATE content_ratings 
         SET rating = ?, review_title = ?, review_text = ?, updated_at = CURRENT_TIMESTAMP
         WHERE content_id = ? AND user_id = ?
       `, [rating, review_title, review_text, contentId, userId]);
     } else {
-      // Insert new rating
       await query(`
         INSERT INTO content_ratings 
         (content_id, user_id, rating, review_title, review_text)
@@ -2102,7 +2380,6 @@ const rateContent = async (req, res) => {
       `, [contentId, userId, rating, review_title, review_text]);
     }
 
-    // Recalculate average rating
     const ratingStats = await query(`
       SELECT 
         AVG(rating) as avg_rating,
@@ -2121,7 +2398,6 @@ const rateContent = async (req, res) => {
       contentId
     ]);
 
-    // Clear related cache entries
     clearRelatedCache(contentId);
 
     res.json({
@@ -2138,7 +2414,11 @@ const rateContent = async (req, res) => {
   }
 };
 
-// Get user's watch history
+/**
+ * API endpoint to get user's watch history
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getWatchHistory = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -2151,6 +2431,7 @@ const getWatchHistory = async (req, res) => {
         c.title,
         c.content_type,
         c.duration_minutes,
+        c.age_rating,
         (
           SELECT CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path)
           FROM media_assets ma 
@@ -2174,10 +2455,16 @@ const getWatchHistory = async (req, res) => {
       WHERE user_id = ?
     `, [userId]);
 
+    const processedHistory = history.map(item => ({
+      ...item,
+      is_kid_friendly: isKidFriendlyContent(item),
+      kid_access_restricted: isContentRestrictedForKids(item).restricted
+    }));
+
     res.json({
       success: true,
       data: {
-        history,
+        history: processedHistory,
         pagination: {
           page: parseInt(page),
           limit: parseInt(limit),
@@ -2195,16 +2482,17 @@ const getWatchHistory = async (req, res) => {
   }
 };
 
-// ✅ UPDATED: Add/Remove from watchlist - Fixed for family members with kid dashboard
+/**
+ * API endpoint to toggle watchlist items
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const toggleWatchlist = async (req, res) => {
   try {
     const { contentId, action } = req.body;
     const userId = req.user.id;
 
-    // Determine if user is an actual kid profile
     const kidCheck = isActualKidProfile(req);
-
-    console.log('🔍 toggleWatchlist - kidCheck:', kidCheck);
 
     if (!contentId) {
       return res.status(400).json({
@@ -2213,7 +2501,6 @@ const toggleWatchlist = async (req, res) => {
       });
     }
 
-    // Verify content exists
     const content = await query(`
       SELECT id FROM contents 
       WHERE id = ? AND status = 'published' AND visibility = 'public'
@@ -2226,9 +2513,25 @@ const toggleWatchlist = async (req, res) => {
       });
     }
 
-    // FAMILY MEMBERS WITH KID DASHBOARD USE REGULAR USER TABLES
+    // Check kid content restrictions if adding to watchlist
+    if (action === 'add' && kidCheck.isKid) {
+      const contentDetails = await query(`
+        SELECT * FROM contents WHERE id = ?
+      `, [contentId]);
+
+      if (contentDetails.length > 0) {
+        const restrictionCheck = isContentRestrictedForKids(contentDetails[0]);
+        if (restrictionCheck.restricted) {
+          return res.status(403).json({
+            success: false,
+            error: `Cannot add to watchlist: ${restrictionCheck.reason}`,
+            code: 'KID_CONTENT_RESTRICTED'
+          });
+        }
+      }
+    }
+
     if (kidCheck.isKid && kidCheck.type === 'kid_profile') {
-      // ACTUAL KID PROFILES use kids_watchlist
       if (action === 'add') {
         await query(`
           INSERT IGNORE INTO kids_watchlist (kid_profile_id, content_id, added_at)
@@ -2241,7 +2544,6 @@ const toggleWatchlist = async (req, res) => {
         `, [kidCheck.kidProfileId, contentId]);
       }
     } else {
-      // REGULAR USERS and FAMILY MEMBERS WITH KID DASHBOARD use user_watchlist
       if (action === 'add') {
         await query(`
           INSERT IGNORE INTO user_watchlist (user_id, content_id, added_at)
@@ -2272,16 +2574,17 @@ const toggleWatchlist = async (req, res) => {
   }
 };
 
-// ✅ UPDATED: Like/Unlike content - Fixed for family members with kid dashboard
+/**
+ * API endpoint to toggle content likes
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const toggleLike = async (req, res) => {
   try {
     const { contentId, action } = req.body;
     const userId = req.user.id;
 
-    // Determine if user is an actual kid profile
     const kidCheck = isActualKidProfile(req);
-
-    console.log('🔍 toggleLike - kidCheck:', kidCheck);
 
     if (!contentId) {
       return res.status(400).json({
@@ -2290,7 +2593,6 @@ const toggleLike = async (req, res) => {
       });
     }
 
-    // Verify content exists
     const content = await query(`
       SELECT id FROM contents 
       WHERE id = ? AND status = 'published' AND visibility = 'public'
@@ -2303,9 +2605,25 @@ const toggleLike = async (req, res) => {
       });
     }
 
-    // FAMILY MEMBERS WITH KID DASHBOARD USE REGULAR USER TABLES
+    // Check kid content restrictions if liking content
+    if (action === 'like' && kidCheck.isKid) {
+      const contentDetails = await query(`
+        SELECT * FROM contents WHERE id = ?
+      `, [contentId]);
+
+      if (contentDetails.length > 0) {
+        const restrictionCheck = isContentRestrictedForKids(contentDetails[0]);
+        if (restrictionCheck.restricted) {
+          return res.status(403).json({
+            success: false,
+            error: `Cannot like content: ${restrictionCheck.reason}`,
+            code: 'KID_CONTENT_RESTRICTED'
+          });
+        }
+      }
+    }
+
     if (kidCheck.isKid && kidCheck.type === 'kid_profile') {
-      // ACTUAL KID PROFILES use kids_ratings_feedback
       if (action === 'like') {
         await query(`
           INSERT INTO kids_ratings_feedback (kid_profile_id, content_id, reaction)
@@ -2320,7 +2638,6 @@ const toggleLike = async (req, res) => {
         `, [kidCheck.kidProfileId, contentId]);
       }
     } else {
-      // REGULAR USERS and FAMILY MEMBERS WITH KID DASHBOARD use user_likes
       if (action === 'like') {
         await query(`
           INSERT INTO user_likes (user_id, content_id, liked_at)
@@ -2328,7 +2645,6 @@ const toggleLike = async (req, res) => {
           ON DUPLICATE KEY UPDATE liked_at = CURRENT_TIMESTAMP, is_active = TRUE, unliked_at = NULL
         `, [userId, contentId]);
 
-        // Update content like count for regular users
         await query(`
           UPDATE contents 
           SET like_count = like_count + 1 
@@ -2341,7 +2657,6 @@ const toggleLike = async (req, res) => {
           WHERE user_id = ? AND content_id = ? AND is_active = TRUE
         `, [userId, contentId]);
 
-        // Update content like count for regular users
         await query(`
           UPDATE contents 
           SET like_count = GREATEST(0, like_count - 1) 
@@ -2367,34 +2682,34 @@ const toggleLike = async (req, res) => {
   }
 };
 
-// ✅ UPDATED: Get user preferences for specific content - Checks both tables
+/**
+ * API endpoint to get user content preferences
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getUserContentPreferences = async (req, res) => {
   try {
     const { contentId } = req.params;
     const userId = req.user.id;
 
-    // Determine if user is an actual kid profile
     const kidCheck = isActualKidProfile(req);
 
     let watchlist = null;
     let like = null;
 
     if (kidCheck.isKid) {
-      // ✅ Check kids_watchlist for ACTUAL kid profiles
       [watchlist] = await query(`
         SELECT 1 as in_list 
         FROM kids_watchlist 
         WHERE kid_profile_id = ? AND content_id = ?
       `, [kidCheck.kidProfileId, contentId]);
 
-      // ✅ Check kids_ratings_feedback for likes (kid profiles)
       [like] = await query(`
         SELECT 1 as is_liked 
         FROM kids_ratings_feedback 
         WHERE kid_profile_id = ? AND content_id = ? AND reaction IN ('like', 'love')
       `, [kidCheck.kidProfileId, contentId]);
     } else {
-      // ✅ Check regular user tables for REGULAR users
       [watchlist] = await query(`
         SELECT 1 as in_list 
         FROM user_watchlist 
@@ -2427,13 +2742,16 @@ const getUserContentPreferences = async (req, res) => {
   }
 };
 
-// Batch get user preferences for multiple contents
+/**
+ * API endpoint to get batch user preferences
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getBatchUserPreferences = async (req, res) => {
   try {
     const { contentIds } = req.body;
     const userId = req.user.id;
 
-    // Determine if user is an actual kid profile
     const kidCheck = isActualKidProfile(req);
 
     if (!Array.isArray(contentIds) || contentIds.length === 0) {
@@ -2443,14 +2761,12 @@ const getBatchUserPreferences = async (req, res) => {
       });
     }
 
-    // Get placeholders for SQL query
     const placeholders = contentIds.map(() => '?').join(',');
 
     let watchlistResults = [];
     let likeResults = [];
 
     if (kidCheck.isKid) {
-      // ✅ Get from kids tables for ACTUAL kid profiles
       watchlistResults = await query(`
         SELECT content_id 
         FROM kids_watchlist 
@@ -2463,7 +2779,6 @@ const getBatchUserPreferences = async (req, res) => {
         WHERE kid_profile_id = ? AND content_id IN (${placeholders}) AND reaction IN ('like', 'love')
       `, [kidCheck.kidProfileId, ...contentIds]);
     } else {
-      // ✅ Get from regular user tables for REGULAR users
       watchlistResults = await query(`
         SELECT content_id 
         FROM user_watchlist 
@@ -2504,18 +2819,20 @@ const getBatchUserPreferences = async (req, res) => {
   }
 };
 
-// ✅ UPDATED: Get User watchlist - Separates kid vs regular user
+/**
+ * API endpoint to get user watchlist
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getUserWatchlist = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Determine if user is an actual kid profile
     const kidCheck = isActualKidProfile(req);
 
     let watchlist = [];
 
     if (kidCheck.isKid) {
-      // ✅ Get from kids_watchlist for ACTUAL kid profiles only
       watchlist = await query(`
         SELECT 
           kw.*,
@@ -2544,10 +2861,7 @@ const getUserWatchlist = async (req, res) => {
         WHERE kw.kid_profile_id = ?
         ORDER BY kw.added_at DESC
       `, [process.env.R2_PUBLIC_URL_ID, kidCheck.kidProfileId]);
-
-      console.log('✅ Fetching KID watchlist for profile:', kidCheck.kidProfileId);
     } else {
-      // ✅ Get from user_watchlist for REGULAR users (even family members with kid dashboard)
       watchlist = await query(`
         SELECT 
           uw.*,
@@ -2576,11 +2890,8 @@ const getUserWatchlist = async (req, res) => {
         WHERE uw.user_id = ?
         ORDER BY uw.added_at DESC
       `, [process.env.R2_PUBLIC_URL_ID, userId]);
-
-      console.log('✅ Fetching REGULAR user watchlist for user:', userId);
     }
 
-    // Process the data to match your frontend structure
     const processedWatchlist = watchlist.map(item => ({
       id: item.id,
       added_at: item.added_at,
@@ -2600,7 +2911,9 @@ const getUserWatchlist = async (req, res) => {
           url: item.primary_image_url,
           is_primary: 1,
           upload_status: 'completed'
-        }] : []
+        }] : [],
+        is_kid_friendly: isKidFriendlyContent(item),
+        kid_access_restricted: isContentRestrictedForKids(item).restricted
       }
     }));
 
@@ -2609,7 +2922,9 @@ const getUserWatchlist = async (req, res) => {
       data: processedWatchlist,
       count: processedWatchlist.length,
       userType: kidCheck.isKid ? 'kid_profile' : 'regular_user',
-      kidProfileId: kidCheck.isKid ? kidCheck.kidProfileId : null
+      kidProfileId: kidCheck.isKid ? kidCheck.kidProfileId : null,
+      kid_friendly_count: processedWatchlist.filter(item => item.content.is_kid_friendly).length,
+      restricted_count: processedWatchlist.filter(item => item.content.kid_access_restricted).length
     });
 
   } catch (error) {
@@ -2617,6 +2932,210 @@ const getUserWatchlist = async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Unable to fetch watchlist'
+    });
+  }
+};
+
+/**
+ * API endpoint specifically for kid-friendly content
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getKidFriendlyContent = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      age_rating = null
+    } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    let whereClause = `
+      WHERE c.status = 'published' 
+        AND c.visibility = 'public'
+        AND (
+          c.age_rating IN ('G', 'PG', '7+', '13+')
+          OR
+          EXISTS (
+            SELECT 1 FROM content_categories cc
+            INNER JOIN categories cat ON cc.category_id = cat.id
+            WHERE cc.content_id = c.id 
+              AND cat.slug IN ('family', 'animation', 'cartoons', 'educational')
+              AND cat.name IN ('Family', 'Animation', 'Cartoons', 'Educational')
+          )
+          OR
+          EXISTS (
+            SELECT 1 FROM content_genres cg
+            INNER JOIN genres g ON cg.genre_id = g.id
+            WHERE cg.content_id = c.id 
+              AND g.name IN ('Family', 'Animation', 'Children')
+          )
+        )
+        -- Explicitly exclude restricted content
+        AND NOT (
+          c.age_rating IN ('R', 'NC-17', '18+', 'A')
+          OR EXISTS (
+            SELECT 1 FROM content_categories cc
+            INNER JOIN categories cat ON cc.category_id = cat.id
+            WHERE cc.content_id = c.id 
+              AND cat.name IN ('Horror', 'Thriller', 'Crime', 'War', 'Adult')
+          )
+          OR EXISTS (
+            SELECT 1 FROM content_genres cg
+            INNER JOIN genres g ON cg.genre_id = g.id
+            WHERE cg.content_id = c.id 
+              AND g.name IN ('Horror', 'Thriller', 'Crime', 'War', 'Adult')
+          )
+        )
+    `;
+
+    if (age_rating) {
+      whereClause += ` AND c.age_rating = ?`;
+    }
+
+    const contents = await query(`
+      SELECT 
+        c.*,
+        cr.license_type,
+        cr.downloadable,
+        cr.shareable,
+        GROUP_CONCAT(DISTINCT g.name) as genre_names,
+        GROUP_CONCAT(DISTINCT g.id) as genre_ids,
+        GROUP_CONCAT(DISTINCT cat.name) as category_names,
+        GROUP_CONCAT(DISTINCT cat.id) as category_ids,
+        (
+          SELECT CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path)
+          FROM media_assets ma 
+          WHERE ma.content_id = c.id 
+            AND ma.asset_type IN ('thumbnail', 'poster')
+            AND (ma.is_primary = 1 OR ma.is_primary IS NULL)
+            AND ma.upload_status = 'completed'
+            ORDER BY ma.is_primary DESC, ma.created_at DESC
+            LIMIT 1
+        ) as primary_image_url
+      FROM contents c
+      LEFT JOIN content_rights cr ON c.id = cr.content_id
+      LEFT JOIN content_genres cg ON c.id = cg.content_id
+      LEFT JOIN genres g ON cg.genre_id = g.id
+      LEFT JOIN content_categories cc ON c.id = cc.content_id
+      LEFT JOIN categories cat ON cc.category_id = cat.id
+      ${whereClause}
+      GROUP BY c.id
+      ORDER BY c.view_count DESC, c.created_at DESC
+      LIMIT ? OFFSET ?
+    `, [
+      process.env.R2_PUBLIC_URL_ID,
+      ...(age_rating ? [age_rating] : []),
+      parseInt(limit),
+      parseInt(offset)
+    ]);
+
+    let countWhereClause = `
+      WHERE status = 'published' 
+        AND visibility = 'public'
+        AND (
+          age_rating IN ('G', 'PG', '7+', '13+')
+          OR EXISTS (
+            SELECT 1 FROM content_categories cc
+            INNER JOIN categories cat ON cc.category_id = cat.id
+            WHERE cc.content_id = contents.id 
+              AND cat.slug IN ('family', 'animation', 'cartoons', 'educational')
+              AND cat.name IN ('Family', 'Animation', 'Cartoons', 'Educational')
+          )
+          OR EXISTS (
+            SELECT 1 FROM content_genres cg
+            INNER JOIN genres g ON cg.genre_id = g.id
+            WHERE cg.content_id = contents.id 
+              AND g.name IN ('Family', 'Animation', 'Children')
+          )
+        )
+        AND NOT (
+          age_rating IN ('R', 'NC-17', '18+', 'A')
+          OR EXISTS (
+            SELECT 1 FROM content_categories cc
+            INNER JOIN categories cat ON cc.category_id = cat.id
+            WHERE cc.content_id = contents.id 
+              AND cat.name IN ('Horror', 'Thriller', 'Crime', 'War', 'Adult')
+          )
+          OR EXISTS (
+            SELECT 1 FROM content_genres cg
+            INNER JOIN genres g ON cg.genre_id = g.id
+            WHERE cg.content_id = contents.id 
+              AND g.name IN ('Horror', 'Thriller', 'Crime', 'War', 'Adult')
+          )
+        )
+    `;
+
+    if (age_rating) {
+      countWhereClause += ` AND age_rating = ?`;
+    }
+
+    const countResult = await query(`
+      SELECT COUNT(*) as total 
+      FROM contents 
+      ${countWhereClause}
+    `, age_rating ? [age_rating] : []);
+
+    const processedContents = contents.map(content => {
+      let imageUrl = content.primary_image_url;
+      if (!imageUrl || imageUrl.includes('null')) {
+        imageUrl = '/api/placeholder/300/450';
+      }
+
+      return {
+        ...content,
+        genres: content.genre_names ? content.genre_names.split(',').map((name, index) => ({
+          id: content.genre_ids ? content.genre_ids.split(',')[index] : index,
+          name: name.trim()
+        })) : [],
+        categories: content.category_names ? content.category_names.split(',').map((name, index) => ({
+          id: content.category_ids ? content.category_ids.split(',')[index] : index,
+          name: name.trim()
+        })) : [],
+        media_assets: imageUrl ? [{
+          asset_type: 'thumbnail',
+          file_path: imageUrl.replace(`https://pub-${process.env.R2_PUBLIC_URL_ID}.r2.dev/`, ''),
+          url: imageUrl,
+          is_primary: 1,
+          upload_status: 'completed'
+        }] : [],
+        last_updated: content.updated_at || content.created_at,
+        is_kid_friendly: true,
+        kid_access_restricted: false,
+        kid_safe: true
+      };
+    });
+
+    const responseData = {
+      contents: processedContents,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: countResult[0].total,
+        pages: Math.ceil(countResult[0].total / limit)
+      },
+      last_updated: new Date().toISOString(),
+      filters: {
+        age_rating: age_rating || 'all',
+        content_type: 'kid_friendly',
+        safety_level: 'guaranteed_kid_safe'
+      }
+    };
+
+    res.json({
+      success: true,
+      data: responseData,
+      cached: false,
+      timestamp: Date.now(),
+      message: 'Kid-friendly content retrieved successfully'
+    });
+
+  } catch (error) {
+    console.error('Error fetching kid-friendly content:', error);
+    res.status(500).json({
+      error: 'Unable to load kid-friendly content',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -2635,12 +3154,15 @@ module.exports = {
   getUserWatchlist,
   extractDeviceInfo,
   securityChecks,
-  // TRENDING FUNCTIONS
   getTrendingMovies,
   getTrendingInsights,
   getTrendingHealth,
   calculateTrendingScore,
   TRENDING_CONFIG,
-  //Helper function for determining kid status
-  isActualKidProfile
+  isActualKidProfile,
+  isKidFriendlyContent,
+  isContentRestrictedForKids,
+  validateKidContentAccess,
+  getKidFriendlyContent,
+  KID_CONTENT_CONFIG
 };

@@ -1,12 +1,15 @@
-// src/pages/Dashboards/viewer/content/ContentDetailPage.jsx
+// src/pages/Dashboards/viewer/ContentDetailPage.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
-import PageNavigation from "./ontentDetailModal/PageNavigation.jsx";
+import PageNavigation from "./ontentDetailModal/PageNavigation";
 import HeroSection from "./ontentDetailModal/HeroSection";
 import TabNavigation from "./ontentDetailModal/TabNavigation";
 import TabContent from "./ontentDetailModal/TabContent";
+import TrendingSection from "../../../../../pages/landing/TrendingSection";
+import { useAuth } from "../../../../../context/AuthContext";
+import api from "../../../../../api/axios";
 
 const ContentDetailPage = ({
   content,
@@ -17,9 +20,11 @@ const ContentDetailPage = ({
   const location = useLocation();
   const { id } = useParams();
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
 
   const [contentData, setContentData] = useState(content);
   const [similarContent, setSimilarContent] = useState([]);
+  const [trendingContent, setTrendingContent] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [borderGlow, setBorderGlow] = useState(false);
@@ -57,178 +62,137 @@ const ContentDetailPage = ({
 
   const seoMetadata = getSeoMetadata();
 
-  // Structured Data for SEO
-  const getStructuredData = () => {
-    if (!contentData) return null;
-
-    const structuredData = {
-      "@context": "https://schema.org",
-      "@type": seoMetadata.contentType || "VideoObject",
-      "name": contentData.title,
-      "description": contentData.short_description || contentData.description,
-      "thumbnailUrl": seoMetadata.image,
-      "uploadDate": contentData.release_date,
-      "duration": contentData.duration_minutes ? `PT${contentData.duration_minutes}M` : undefined,
-      "contentRating": contentData.age_rating,
-      "genre": contentData.genres?.map(genre => genre.name)?.join(", "),
-      "actor": contentData.cast?.map(actor => actor.full_name || actor.display_name)?.join(", "),
-      "director": contentData.directors?.map(director => director.name)?.join(", "),
-      "inLanguage": i18n.language,
-      "potentialAction": {
-        "@type": "WatchAction",
-        "target": window.location.href
+  // FIXED: Fetch trending content with proper error handling
+  const fetchTrendingContent = async () => {
+    try {
+      // Try to fetch trending content from API
+      const response = await api.get('/viewer/content/trending', {
+        params: { limit: 12 }
+      });
+      
+      if (response.data.success) {
+        setTrendingContent(response.data.data.contents || []);
       }
-    };
-
-    return JSON.stringify(structuredData);
+    } catch (error) {
+      // Log the error but don't crash the app
+      console.log('Trending content not available, using fallback');
+      
+      // Fallback to empty array or mock data
+      setTrendingContent([]);
+      
+      // Optionally, you could set some mock trending data here
+      // setTrendingContent(getMockTrendingContent());
+    }
   };
 
   // Fetch detailed content data
-  const fetchContentDetails = async (contentId) => {
-    if (!contentId) return;
-    
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/viewer/content/${contentId}?refresh=true`);
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setContentData(result.data);
-          fetchSimilarContent(result.data);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching content details:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Fetch similar content
-const fetchSimilarContent = async (content) => {
-  if (!content) return;
-
+const fetchContentDetails = async (contentId) => {
+  if (!contentId) return;
+  
+  setIsLoading(true);
   try {
-    const strategies = [];
+    const response = await api.get(`/viewer/content/${contentId}`);
     
-    if (content.genres && content.genres.length > 0) {
-      const genreIds = content.genres.map(g => g.id).join(',');
-      strategies.push(`genres=${genreIds}`);
-    }
-    
-    if (content.categories && content.categories.length > 0) {
-      const categoryIds = content.categories.map(c => c.id).join(',');
-      strategies.push(`categories=${categoryIds}`);
-    }
-    
-    strategies.push(`type=${content.content_type}`);
-    
-    for (let strategy of strategies) {
-      try {
-        const response = await fetch(`/api/viewer/content?${strategy}&limit=8`);
-        
-        // Check if response is OK
-        if (response.ok) {
-          const contentType = response.headers.get('content-type');
-          // Only parse as JSON if it's actually JSON
-          if (contentType && contentType.includes('application/json')) {
-            const result = await response.json();
-            if (result.success && result.data.contents && result.data.contents.length > 0) {
-              const filtered = result.data.contents
-                .filter(item => item && item.id !== content.id)
-                .slice(0, 6);
-              
-              if (filtered.length > 0) {
-                setSimilarContent(filtered);
-                return;
-              }
-            }
-          } else {
-            console.warn('Response is not JSON for strategy:', strategy);
-            // Skip to next strategy if response is not JSON
-            continue;
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching similar content for strategy:', strategy, error);
-        // Continue to next strategy on error
-        continue;
-      }
-    }
-    
-    // Fallback - with proper error handling
-    try {
-      const recentResponse = await fetch('/api/viewer/content?limit=6');
+    if (response.data.success) {
+      const contentData = response.data.data;
       
-      if (recentResponse.ok) {
-        const contentType = recentResponse.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const result = await recentResponse.json();
-          if (result.success && result.data.contents) {
-            const filtered = result.data.contents
-              .filter(item => item && item.id !== content.id)
-              .slice(0, 6);
-            setSimilarContent(filtered);
-          }
-        } else {
-          console.warn('Fallback response is not JSON');
-          setSimilarContent([]);
-        }
-      } else {
-        console.warn('Fallback request failed with status:', recentResponse.status);
-        setSimilarContent([]);
-      }
-    } catch (fallbackError) {
-      console.error('Error in fallback content fetch:', fallbackError);
-      setSimilarContent([]);
+      // Check if user is authenticated based on response
+      const isAuthenticated = response.data.is_authenticated;
+      
+      // You can use this to conditionally show/hide certain UI elements
+      console.log('User authenticated:', isAuthenticated);
+      
+      setContentData(contentData);
+      fetchSimilarContent(contentData);
+    } else {
+      console.error('Failed to fetch content:', response.data.error);
     }
   } catch (error) {
-    console.error('Error in fetchSimilarContent:', error);
-    setSimilarContent([]);
+    console.error('Error fetching content details:', error);
+    
+    // The error should be 404 now, not 401
+    if (error.response?.status === 404) {
+      // Handle content not found
+    }
+  } finally {
+    setIsLoading(false);
   }
 };
 
-// Also update the useEffect that calls fetchSimilarContent to prevent infinite loops:
-useEffect(() => {
-  if (id && (!content || Object.keys(content).length < 10)) {
-    fetchContentDetails(id);
-  } else if (content && content.id) {
-    setContentData(content);
-    // Only fetch similar content if we don't already have it
-    if (similarContent.length === 0) {
-      fetchSimilarContent(content);
-    }
-  }
-}, [id, content]);
+  // Fetch similar content with proper error handling
+  const fetchSimilarContent = async (content) => {
+    if (!content) return;
 
-// Add a cleanup function to prevent state updates on unmounted component
-useEffect(() => {
-  let isMounted = true;
-  
-  return () => {
-    isMounted = false;
+    try {
+      const strategies = [];
+      
+      if (content.genres && content.genres.length > 0) {
+        const genreIds = content.genres.map(g => g.id).join(',');
+        strategies.push(`genres=${genreIds}`);
+      }
+      
+      if (content.categories && content.categories.length > 0) {
+        const categoryIds = content.categories.map(c => c.id).join(',');
+        strategies.push(`categories=${categoryIds}`);
+      }
+      
+      strategies.push(`type=${content.content_type}`);
+      
+      for (let strategy of strategies) {
+        try {
+          const response = await api.get(`/viewer/content`, {
+            params: { 
+              [strategy.split('=')[0]]: strategy.split('=')[1],
+              limit: 8 
+            }
+          });
+          
+          if (response.data.success && response.data.data.contents && response.data.data.contents.length > 0) {
+            const filtered = response.data.data.contents
+              .filter(item => item && item.id !== content.id)
+              .slice(0, 6);
+            
+            if (filtered.length > 0) {
+              setSimilarContent(filtered);
+              return;
+            }
+          }
+        } catch (error) {
+          continue;
+        }
+      }
+      
+      // Fallback - recent content
+      try {
+        const response = await api.get('/viewer/content', { params: { limit: 6 } });
+        if (response.data.success && response.data.data.contents) {
+          const filtered = response.data.data.contents
+            .filter(item => item && item.id !== content.id)
+            .slice(0, 6);
+          setSimilarContent(filtered);
+        }
+      } catch (fallbackError) {
+        setSimilarContent([]);
+      }
+    } catch (error) {
+      setSimilarContent([]);
+    }
   };
-}, []);
 
   // SMART: Enhanced navigation logic
   const handleSmartGoBack = () => {
     const navigationState = window.history.state;
     
-    // Check if we came from within our app
     if (navigationState?.usr?.modal || navigationState?.usr?.previousPath) {
-      // User came via modal or internal navigation - go back
       navigate(-1);
     } else if (previousPathRef.current && previousPathRef.current !== location.pathname) {
-      // User navigated within our app - go to previous path
       navigate(previousPathRef.current, { 
         replace: true,
         state: { restoreScroll: true }
       });
     } else if (window.history.length > 1 && !cameFromExternalRef.current) {
-      // We have browser history and didn't come from external
       navigate(-1);
     } else {
-      // User came via direct link or external source - go to homepage
       navigate('/', { replace: true });
     }
   };
@@ -240,16 +204,13 @@ useEffect(() => {
   // Track navigation origin
   useEffect(() => {
     if (id) {
-      // Check if user came from external source
       const referrer = document.referrer;
       const isExternal = !referrer.includes(window.location.origin);
       cameFromExternalRef.current = isExternal;
 
-      // Store previous path from location state or use current referrer logic
       if (location.state?.previousPath) {
         previousPathRef.current = location.state.previousPath;
       } else if (window.history.length > 1 && !isExternal) {
-        // We have internal history
         previousPathRef.current = document.referrer;
       } else {
         previousPathRef.current = '/';
@@ -264,7 +225,7 @@ useEffect(() => {
     }
   }, [location.pathname, contentData?.id]);
 
-  // Initialize content data
+  // Initialize content data and fetch trending
   useEffect(() => {
     if (id && (!content || Object.keys(content).length < 10)) {
       fetchContentDetails(id);
@@ -272,6 +233,9 @@ useEffect(() => {
       setContentData(content);
       fetchSimilarContent(content);
     }
+    
+    // Fetch trending content
+    fetchTrendingContent();
   }, [id, content]);
 
   // Border glow effect
@@ -432,14 +396,23 @@ useEffect(() => {
         {/* Structured Data */}
         {contentData && (
           <script type="application/ld+json">
-            {getStructuredData()}
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": seoMetadata.contentType || "VideoObject",
+              "name": contentData.title,
+              "description": contentData.short_description || contentData.description,
+              "thumbnailUrl": seoMetadata.image,
+              "uploadDate": contentData.release_date,
+              "duration": contentData.duration_minutes ? `PT${contentData.duration_minutes}M` : undefined,
+              "contentRating": contentData.age_rating,
+              "genre": contentData.genres?.map(genre => genre.name)?.join(", "),
+              "inLanguage": i18n.language
+            })}
           </script>
         )}
       </Helmet>
 
       <div className="min-h-screen bg-gray-900">
-        {/* FloatingTrailer removed from here */}
-        
         <div 
           ref={scrollContainerRef}
           className="w-full h-full bg-gray-900 overflow-y-auto custom-scrollbar"
@@ -481,6 +454,17 @@ useEffect(() => {
                 contentData={contentData}
                 similarContent={similarContent}
               />
+
+              {/* Trending Section - Always shown at the bottom */}
+              <div className="mt-16 pt-8 border-t border-gray-700/50">
+                <TrendingSection 
+                  content={trendingContent}
+                  title={user ? t('contentdetail.trending.title', 'Trending Now') : t('contentdetail.trending.titleGuest', 'Popular on Oliviuus')}
+                  subtitle={user ? t('contentdetail.trending.subtitle', 'What others are watching') : t('contentdetail.trending.subtitleGuest', 'Start your free trial to watch')}
+                  maxItems={12}
+                  showViewAll={false}
+                />
+              </div>
             </div>
           </div>
         </div>

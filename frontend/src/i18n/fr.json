@@ -2,6 +2,7 @@
   "footer": {
     "terms": "Conditions d'utilisation",
     "privacy": "Politique de confidentialité",
+    "about": "À Propos de Nous",
     "help": "Centre d'aide",
     "feedback": "Retour d'information",
     "rights": "Tous droits réservés."
@@ -930,6 +931,10 @@
       "exclusiveContent": "Contenu Exclusif {{category}}",
       "mediaContent": "Contenu Média"
     },
+    "emailInput": {
+      "title": "Prêt à regarder ?",
+      "description": "Entrez votre adresse e-mail pour créer ou réactiver votre abonnement."
+    },
     "actions": {
       "goHome": "Accueil",
       "play": "Lire",
@@ -960,7 +965,9 @@
       "close": "Fermer",
       "exploreMore": "Explorer Plus",
       "openFloatingTrailer": "Ouvrir la bande-annonce flottante",
-      "goToHomepage": "Aller à la page d'accueil"
+      "goToHomepage": "Aller à la page d'accueil",
+      "startNow": "Commencer Maintenant",
+      "startMembership": "Commencer l’Abonnement"
     },
     "share": {
       "title": "Partager ce contenu",
@@ -1253,9 +1260,11 @@
       "signOut": "Se Déconnecter",
       "companyName": "Oliviuus Ltd",
       "footer": {
-        "privacy": "Confidentialité",
-        "terms": "Conditions",
-        "help": "Aide"
+        "privacy": "Politique de confidentialité",
+        "terms": "Conditions d'utilisation",
+        "about": "À propos de nous",
+        "help": "Centre d'aide",
+        "feedback": "Retour d'information"
       }
     }
   },
@@ -2548,149 +2557,145 @@
       "checkBackLater": "Revenez plus tard pour découvrir les nouveautés."
     }
   },
-"termsOfService": {
-  "title": "Conditions d'utilisation",
-  "lastUpdated": "Dernière mise à jour",
-  "welcome": "Bienvenue sur Oliviuus, une plateforme de streaming dédiée à offrir du divertissement au Rwanda et au-delà. Ces Conditions d'utilisation (\"Conditions\") régissent votre accès et votre utilisation de la plateforme Oliviuus, y compris notre site web, applications mobiles, services de streaming et toutes les fonctionnalités associées (collectivement, le \"Service\").",
-  "agreementNotice": "En créant un compte, en vous abonnant ou en utilisant le Service, vous acceptez ces Conditions. Si vous n'êtes pas d'accord, vous ne pouvez pas utiliser Oliviuus.",
-  
-  "sections": {
-    "eligibility": {
-      "title": "Éligibilité",
-      "description": "Pour utiliser Oliviuus :",
-      "points": [
-        "Vous devez avoir au moins 13 ans.",
-        "Si vous avez moins de 18 ans, vous devez obtenir le consentement d'un parent ou tuteur.",
-        "Vous devez fournir des informations exactes pour votre compte.",
-        "Nous pouvons suspendre ou résilier les comptes qui violent ces exigences."
-      ]
+  "termsOfService": {
+    "title": "Conditions d'utilisation",
+    "lastUpdated": "Dernière mise à jour",
+    "welcome": "Bienvenue sur Oliviuus, une plateforme de streaming dédiée à offrir du divertissement au Rwanda et au-delà. Ces Conditions d'utilisation (\"Conditions\") régissent votre accès et votre utilisation de la plateforme Oliviuus, y compris notre site web, applications mobiles, services de streaming et toutes les fonctionnalités associées (collectivement, le \"Service\").",
+    "agreementNotice": "En créant un compte, en vous abonnant ou en utilisant le Service, vous acceptez ces Conditions. Si vous n'êtes pas d'accord, vous ne pouvez pas utiliser Oliviuus.",
+    "sections": {
+      "eligibility": {
+        "title": "Éligibilité",
+        "description": "Pour utiliser Oliviuus :",
+        "points": [
+          "Vous devez avoir au moins 13 ans.",
+          "Si vous avez moins de 18 ans, vous devez obtenir le consentement d'un parent ou tuteur.",
+          "Vous devez fournir des informations exactes pour votre compte.",
+          "Nous pouvons suspendre ou résilier les comptes qui violent ces exigences."
+        ]
+      },
+      "accountRegistration": {
+        "title": "Enregistrement du compte",
+        "description": "Lors de la création d'un compte :",
+        "points1": [
+          "Vous devez fournir des informations exactes et complètes.",
+          "Vous êtes responsable de la sécurité de vos identifiants de connexion.",
+          "Vous devez nous informer immédiatement de toute activité non autorisée."
+        ],
+        "separator": "Vous ne pouvez pas :",
+        "points2": [
+          "Créer plusieurs comptes pour abuser des essais gratuits.",
+          "Partager votre mot de passe avec des personnes extérieures à votre foyer.",
+          "Utiliser ou accéder au compte de quelqu'un d'autre sans autorisation."
+        ]
+      },
+      "freeTrial": {
+        "title": "Essai gratuit",
+        "description": "Oliviuus peut offrir un essai gratuit unique par utilisateur et méthode de paiement.",
+        "duringTrial": "Pendant l'essai gratuit :",
+        "points": [
+          "Vous ne serez pas facturé.",
+          "Vous pouvez annuler à tout moment avant la fin de l'essai pour éviter des frais."
+        ],
+        "warning": "Tenter d'exploiter ou de contourner le système d'essai gratuit est interdit."
+      },
+      "subscriptionsPayments": {
+        "title": "Abonnements & Paiements",
+        "description": "En vous abonnant :",
+        "points": [
+          "Vous autorisez Oliviuus à débiter votre méthode de paiement sélectionnée (par ex., Mobile Money, carte).",
+          "Les frais d'abonnement sont facturés mensuellement sauf indication contraire.",
+          "Tous les paiements sont non remboursables sauf exigence légale.",
+          "Nous pouvons modifier les prix, mais nous vous informerons à l'avance."
+        ]
+      },
+      "contentUsageRules": {
+        "title": "Contenu & Règles d'utilisation",
+        "description": "Oliviuus vous accorde une licence limitée, non transférable et non exclusive pour accéder à notre contenu à des fins personnelles et non commerciales.",
+        "notAllowed": "Vous acceptez de ne pas :",
+        "points": [
+          "Télécharger, copier, enregistrer l'écran ou redistribuer le contenu sans permission.",
+          "Utiliser le Service pour des projections publiques sans autorisation.",
+          "Contourner les restrictions géographiques ou de sécurité.",
+          "Utiliser des bots, scripts ou outils automatisés pour accéder au Service."
+        ],
+        "deviceLimit": "Nous pouvons limiter le nombre d'appareils pouvant streamer simultanément."
+      },
+      "intellectualProperty": {
+        "title": "Propriété intellectuelle",
+        "description": "Tout le contenu Oliviuus (films, séries, design UI, assets de marque, logos, logiciels) est protégé par le droit d'auteur et autres lois sur la propriété intellectuelle.",
+        "notAllowed": "Vous ne pouvez pas :",
+        "points": [
+          "Modifier ou reproduire nos assets.",
+          "Créer des œuvres dérivées sans permission.",
+          "Utiliser le nom de la marque Oliviuus sans approbation écrite."
+        ]
+      },
+      "thirdPartyIntegrations": {
+        "title": "Intégrations tierces",
+        "description": "Oliviuus peut collaborer avec des partenaires tiers (analyse, processeurs de paiement, cloud).",
+        "notResponsible": "Nous ne sommes pas responsables de :",
+        "points": [
+          "Leurs contenus,",
+          "Leurs politiques, ou",
+          "Les erreurs causées par leurs systèmes."
+        ]
+      },
+      "termination": {
+        "title": "Résiliation",
+        "description": "Nous pouvons suspendre ou résilier votre compte si :",
+        "points": [
+          "Vous violez ces Conditions,",
+          "Vous vous engagez dans des activités illégales ou nuisibles,",
+          "Vous abusez du Service ou du système de paiement."
+        ],
+        "userRight": "Vous pouvez également supprimer votre compte à tout moment."
+      },
+      "serviceAvailability": {
+        "title": "Disponibilité du Service",
+        "description": "Nous nous efforçons de fournir un service ininterrompu, mais :",
+        "points": [
+          "Des interruptions, maintenances ou erreurs peuvent survenir.",
+          "Nous ne garantissons pas une disponibilité de 100%.",
+          "Certain contenu peut être ajouté ou retiré sans préavis."
+        ]
+      },
+      "disclaimer": {
+        "title": "Avertissement",
+        "description": "Oliviuus est fourni \"tel quel\" et \"selon disponibilité\".",
+        "notGuarantee": "Nous ne garantissons pas :",
+        "points": [
+          "Que le Service répondra à vos attentes,",
+          "Qu'il n'y aura pas d'interruptions ou erreurs,",
+          "Que tout le contenu restera toujours disponible."
+        ]
+      },
+      "limitationOfLiability": {
+        "title": "Limitation de responsabilité",
+        "description": "Dans la limite maximale permise par la loi :",
+        "points": [
+          "Oliviuus n'est pas responsable des dommages indirects, accessoires ou spéciaux.",
+          "Notre responsabilité totale ne dépassera pas le montant que vous avez payé pour le Service au cours des 3 derniers mois."
+        ]
+      },
+      "changesToTerms": {
+        "title": "Modifications des Conditions",
+        "description": "Nous pouvons mettre à jour ces Conditions de temps en temps.",
+        "continuation": "Continuer à utiliser Oliviuus après les mises à jour signifie que vous acceptez les Conditions révisées."
+      },
+      "contactInformation": {
+        "title": "Informations de contact",
+        "description": "Si vous avez des questions sur ces Conditions :",
+        "email": "oliviuusteam@gmail.com",
+        "location": "Musanze, Rwanda"
+      }
     },
-    "accountRegistration": {
-      "title": "Enregistrement du compte",
-      "description": "Lors de la création d'un compte :",
-      "points1": [
-        "Vous devez fournir des informations exactes et complètes.",
-        "Vous êtes responsable de la sécurité de vos identifiants de connexion.",
-        "Vous devez nous informer immédiatement de toute activité non autorisée."
-      ],
-      "separator": "Vous ne pouvez pas :",
-      "points2": [
-        "Créer plusieurs comptes pour abuser des essais gratuits.",
-        "Partager votre mot de passe avec des personnes extérieures à votre foyer.",
-        "Utiliser ou accéder au compte de quelqu'un d'autre sans autorisation."
-      ]
-    },
-    "freeTrial": {
-      "title": "Essai gratuit",
-      "description": "Oliviuus peut offrir un essai gratuit unique par utilisateur et méthode de paiement.",
-      "duringTrial": "Pendant l'essai gratuit :",
-      "points": [
-        "Vous ne serez pas facturé.",
-        "Vous pouvez annuler à tout moment avant la fin de l'essai pour éviter des frais."
-      ],
-      "warning": "Tenter d'exploiter ou de contourner le système d'essai gratuit est interdit."
-    },
-    "subscriptionsPayments": {
-      "title": "Abonnements & Paiements",
-      "description": "En vous abonnant :",
-      "points": [
-        "Vous autorisez Oliviuus à débiter votre méthode de paiement sélectionnée (par ex., Mobile Money, carte).",
-        "Les frais d'abonnement sont facturés mensuellement sauf indication contraire.",
-        "Tous les paiements sont non remboursables sauf exigence légale.",
-        "Nous pouvons modifier les prix, mais nous vous informerons à l'avance."
-      ]
-    },
-    "contentUsageRules": {
-      "title": "Contenu & Règles d'utilisation",
-      "description": "Oliviuus vous accorde une licence limitée, non transférable et non exclusive pour accéder à notre contenu à des fins personnelles et non commerciales.",
-      "notAllowed": "Vous acceptez de ne pas :",
-      "points": [
-        "Télécharger, copier, enregistrer l'écran ou redistribuer le contenu sans permission.",
-        "Utiliser le Service pour des projections publiques sans autorisation.",
-        "Contourner les restrictions géographiques ou de sécurité.",
-        "Utiliser des bots, scripts ou outils automatisés pour accéder au Service."
-      ],
-      "deviceLimit": "Nous pouvons limiter le nombre d'appareils pouvant streamer simultanément."
-    },
-    "intellectualProperty": {
-      "title": "Propriété intellectuelle",
-      "description": "Tout le contenu Oliviuus (films, séries, design UI, assets de marque, logos, logiciels) est protégé par le droit d'auteur et autres lois sur la propriété intellectuelle.",
-      "notAllowed": "Vous ne pouvez pas :",
-      "points": [
-        "Modifier ou reproduire nos assets.",
-        "Créer des œuvres dérivées sans permission.",
-        "Utiliser le nom de la marque Oliviuus sans approbation écrite."
-      ]
-    },
-    "thirdPartyIntegrations": {
-      "title": "Intégrations tierces",
-      "description": "Oliviuus peut collaborer avec des partenaires tiers (analyse, processeurs de paiement, cloud).",
-      "notResponsible": "Nous ne sommes pas responsables de :",
-      "points": [
-        "Leurs contenus,",
-        "Leurs politiques, ou",
-        "Les erreurs causées par leurs systèmes."
-      ]
-    },
-    "termination": {
-      "title": "Résiliation",
-      "description": "Nous pouvons suspendre ou résilier votre compte si :",
-      "points": [
-        "Vous violez ces Conditions,",
-        "Vous vous engagez dans des activités illégales ou nuisibles,",
-        "Vous abusez du Service ou du système de paiement."
-      ],
-      "userRight": "Vous pouvez également supprimer votre compte à tout moment."
-    },
-    "serviceAvailability": {
-      "title": "Disponibilité du Service",
-      "description": "Nous nous efforçons de fournir un service ininterrompu, mais :",
-      "points": [
-        "Des interruptions, maintenances ou erreurs peuvent survenir.",
-        "Nous ne garantissons pas une disponibilité de 100%.",
-        "Certain contenu peut être ajouté ou retiré sans préavis."
-      ]
-    },
-    "disclaimer": {
-      "title": "Avertissement",
-      "description": "Oliviuus est fourni \"tel quel\" et \"selon disponibilité\".",
-      "notGuarantee": "Nous ne garantissons pas :",
-      "points": [
-        "Que le Service répondra à vos attentes,",
-        "Qu'il n'y aura pas d'interruptions ou erreurs,",
-        "Que tout le contenu restera toujours disponible."
-      ]
-    },
-    "limitationOfLiability": {
-      "title": "Limitation de responsabilité",
-      "description": "Dans la limite maximale permise par la loi :",
-      "points": [
-        "Oliviuus n'est pas responsable des dommages indirects, accessoires ou spéciaux.",
-        "Notre responsabilité totale ne dépassera pas le montant que vous avez payé pour le Service au cours des 3 derniers mois."
-      ]
-    },
-    "changesToTerms": {
-      "title": "Modifications des Conditions",
-      "description": "Nous pouvons mettre à jour ces Conditions de temps en temps.",
-      "continuation": "Continuer à utiliser Oliviuus après les mises à jour signifie que vous acceptez les Conditions révisées."
-    },
-    "contactInformation": {
-      "title": "Informations de contact",
-      "description": "Si vous avez des questions sur ces Conditions :",
-      "email": "oliviuusteam@gmail.com",
-      "location": "Musanze, Rwanda"
+    "footer": "Ces Conditions d'utilisation sont en vigueur à partir du {{date}}. En utilisant Oliviuus, vous reconnaissez avoir lu, compris et accepté d'être lié par ces Conditions.",
+    "seo": {
+      "title": "Conditions d'utilisation Oliviuus | Règles et politiques de la plateforme de streaming",
+      "description": "Lisez les Conditions d'utilisation d'Oliviuus. Découvrez les règles de notre plateforme de streaming, les politiques d'abonnement, les directives d'utilisation du contenu et les accords pour les utilisateurs au Rwanda et à l'international.",
+      "keywords": "conditions d'utilisation Oliviuus, règles plateforme streaming, politiques abonnement, directives utilisation contenu, accord utilisateur, service streaming Rwanda, conditions plateforme divertissement"
     }
   },
-  
-  "footer": "Ces Conditions d'utilisation sont en vigueur à partir du {{date}}. En utilisant Oliviuus, vous reconnaissez avoir lu, compris et accepté d'être lié par ces Conditions.",
-  
-  "seo": {
-    "title": "Conditions d'utilisation Oliviuus | Règles et politiques de la plateforme de streaming",
-    "description": "Lisez les Conditions d'utilisation d'Oliviuus. Découvrez les règles de notre plateforme de streaming, les politiques d'abonnement, les directives d'utilisation du contenu et les accords pour les utilisateurs au Rwanda et à l'international.",
-    "keywords": "conditions d'utilisation Oliviuus, règles plateforme streaming, politiques abonnement, directives utilisation contenu, accord utilisateur, service streaming Rwanda, conditions plateforme divertissement"
-  }
-}
-,
   "privacyPolicy": {
     "title": "Politique de Confidentialité",
     "lastUpdated": "Dernière Mise à Jour",
@@ -3010,6 +3015,340 @@
       "title": "Centre d'Aide Oliviuus | Support Client & FAQ",
       "description": "Obtenez de l'aide sur le service Oliviuus. Trouvez des réponses aux FAQ, guides de dépannage, support de compte, aide au paiement et informations de contact. Disponible en anglais, français et kinyarwanda.",
       "keywords": "centre d'aide Oliviuus, support streaming, dépannage compte, aide paiement, support technique Rwanda, service client, FAQ, contact Oliviuus"
+    }
+  },
+  "feedbackPage": {
+    "title": "Partagez Votre Avis",
+    "subtitle": "Vos idées nous aident à améliorer Oliviuus et à offrir une meilleure expérience de streaming à tous",
+    "chooseType": "Choisissez le type de feedback",
+    "selected": "Sélectionné",
+    "feedbackTypes": {
+      "LIKE": "Simple J’aime",
+      "DISLIKE": "Simple Je n’aime pas",
+      "DETAILED": "Feedback Détaillé"
+    },
+    "feedbackTypeDescriptions": {
+      "LIKE": "Dites-nous simplement ce que vous aimez !",
+      "DISLIKE": "Dites-nous ce qui doit être amélioré",
+      "DETAILED": "Partagez vos idées et suggestions détaillées"
+    },
+    "formTitles": {
+      "LIKE": "Partagez Ce Que Vous Aimez",
+      "DISLIKE": "Partagez Ce Que Vous N’aimez Pas",
+      "DETAILED": "Soumettre Votre Feedback"
+    },
+    "formFields": {
+      "name": {
+        "label": "Votre Nom",
+        "placeholder": "Entrez votre nom complet"
+      },
+      "email": {
+        "label": "Adresse Email",
+        "placeholder": "your.email@example.com"
+      },
+      "category": {
+        "label": "Catégorie",
+        "placeholder": "Sélectionnez une catégorie",
+        "hint": "Choisissez la catégorie qui correspond le mieux à votre feedback"
+      },
+      "rating": {
+        "label": "Évaluation Globale (Optionnel)",
+        "hint": "Cliquez pour évaluer (optionnel)"
+      },
+      "message": {
+        "label": "Votre Feedback",
+        "placeholder": "Veuillez fournir un feedback détaillé concernant votre expérience, vos suggestions ou tout problème rencontré...",
+        "hint": "Veuillez être précis afin de nous aider à mieux comprendre votre feedback",
+        "characters": "caractères"
+      }
+    },
+    "categories": [
+      {
+        "value": "FEATURE_REQUEST",
+        "label": "Demande de Fonctionnalité"
+      },
+      {
+        "value": "BUG_REPORT",
+        "label": "Rapport de Bug"
+      },
+      {
+        "value": "STREAMING_ISSUE",
+        "label": "Problèmes de Streaming"
+      },
+      {
+        "value": "CONTENT_SUGGESTION",
+        "label": "Suggestions de Contenu"
+      },
+      {
+        "value": "ACCOUNT_ISSUE",
+        "label": "Problèmes de Compte"
+      },
+      {
+        "value": "PAYMENT_ISSUE",
+        "label": "Problèmes de Paiement"
+      },
+      {
+        "value": "WEBSITE_APP_FEEDBACK",
+        "label": "Avis sur le Site/App"
+      },
+      {
+        "value": "CUSTOMER_SERVICE",
+        "label": "Service Client"
+      },
+      {
+        "value": "GENERAL_FEEDBACK",
+        "label": "Feedback Général"
+      }
+    ],
+    "ratings": {
+      "0": "Non noté",
+      "1": "Très Mauvais",
+      "2": "Mauvais",
+      "3": "Moyen",
+      "4": "Bon",
+      "5": "Excellent"
+    },
+    "simpleFeedbackMessage": "Feedback simple {{type}} - aucun détail supplémentaire nécessaire",
+    "validation": {
+      "nameRequired": "Le nom est requis",
+      "nameMinLength": "Le nom doit comporter au moins 2 caractères",
+      "emailRequired": "L’email est requis",
+      "emailInvalid": "Veuillez entrer une adresse email valide",
+      "categoryRequired": "La catégorie est requise pour le feedback détaillé",
+      "messageRequired": "Le message est requis pour le feedback détaillé",
+      "messageMinLength": "Veuillez donner plus de détails (au moins 10 caractères)",
+      "messageMaxLength": "Message trop long (maximum 2000 caractères)",
+      "simpleFeedbackNoMessage": "Le feedback simple (LIKE/DISLIKE) ne doit pas contenir de message",
+      "fixErrors": "Veuillez corriger les erreurs dans le formulaire"
+    },
+    "submitting": "Envoi...",
+    "submitButtons": {
+      "like": "Envoyer J’aime",
+      "dislike": "Envoyer Je n’aime pas",
+      "detailed": "Envoyer le Feedback"
+    },
+    "success": {
+      "title": "Merci pour Votre Feedback !",
+      "like": "Merci pour ce feedback positif ! Nous sommes ravis que vous appréciiez Oliviuus.",
+      "dislike": "Merci pour votre honnêteté. Nous utiliserons vos remarques pour nous améliorer.",
+      "detailed": "Votre feedback a été envoyé avec succès. Notre équipe l'examinera attentivement."
+    },
+    "error": {
+      "title": "Échec de l’envoi"
+    },
+    "submission": {
+      "failed": "Échec de l’envoi du feedback",
+      "error": "Impossible d’envoyer le feedback. Veuillez réessayer."
+    },
+    "requiredFields": "Champs obligatoires",
+    "contactMethods": {
+      "title": "Autres Moyens de Nous Contacter",
+      "email": {
+        "title": "Feedback par Email",
+        "subject": "Feedback Oliviuus",
+        "description": "Envoyez-nous un email avec votre avis",
+        "button": "Ouvrir Email"
+      },
+      "phone": {
+        "title": "Assistance Téléphonique",
+        "description": "Appelez-nous pour partager directement votre avis",
+        "button": "Appeler Maintenant"
+      },
+      "location": {
+        "title": "Notre Localisation",
+        "address": "Musanze, Rwanda",
+        "description": "Basés au Rwanda, nous servons des audiences dans le monde entier"
+      }
+    },
+    "process": {
+      "title": "Que Se Passe-t-Il Après Votre Envoi ?",
+      "description": "Nous apprécions chaque feedback reçu. Même si nous ne pouvons pas répondre individuellement, nous les lisons tous et les utilisons pour guider nos priorités.",
+      "steps": [
+        {
+          "title": "Analyse",
+          "description": "Notre équipe analyse chaque feedback"
+        },
+        {
+          "title": "Catégorisation",
+          "description": "Le feedback est classé et priorisé"
+        },
+        {
+          "title": "Planification",
+          "description": "Nous intégrons les informations dans notre feuille de route"
+        },
+        {
+          "title": "Mise en œuvre",
+          "description": "Les fonctionnalités et correctifs sont développés selon les retours"
+        }
+      ]
+    },
+    "seo": {
+      "title": "Oliviuus Feedback | Partagez Votre Expérience et Vos Suggestions",
+      "description": "Partagez votre avis sur Oliviuus. Rapports de bugs, demandes de fonctionnalités, suggestions de contenu et notes d’expérience.",
+      "keywords": "feedback Oliviuus, rapport bug, demande fonctionnalité, amélioration plateforme, avis utilisateur"
+    }
+  },
+  "aboutPage": {
+    "breadcrumb": "À propos de nous",
+    "hero": {
+      "title": "Notre",
+      "highlight": "Histoire",
+      "subtitle": "Un rêve rwandais construit sur la passion, la résilience et la conviction que nos histoires méritent une scène mondiale."
+    },
+    "stats": [
+      {
+        "number": "10K+",
+        "label": "Utilisateurs actifs",
+        "icon": "Users"
+      },
+      {
+        "number": "10+",
+        "label": "Films & Séries",
+        "icon": "Film"
+      },
+      {
+        "number": "10+",
+        "label": "Partenaires locaux",
+        "icon": "Globe"
+      },
+      {
+        "number": "24/7",
+        "label": "Support dédié",
+        "icon": "Award"
+      }
+    ],
+    "story": {
+      "title": "L’histoire de",
+      "highlight": "Oliviuus",
+      "scrollHint": "Faites défiler horizontalement pour découvrir notre histoire",
+      "scrollIndicator": "← Faites défiler horizontalement →",
+      "chapter": "Chapitre",
+      "goToChapter": "Aller au chapitre"
+    },
+    "storyChapters": [
+      {
+        "id": 1,
+        "title": "Un rêve enraciné au Rwanda",
+        "subtitle": "Le début d’une vision",
+        "emoji": "💭",
+        "content": "Oliviuus a commencé comme un rêve façonné par la passion, la perte, la résilience et la conviction que les histoires rwandaises méritent une scène mondiale.",
+        "background": "from-[#BC8BBC]/10 to-purple-600/10",
+        "color": "text-[#BC8BBC]",
+        "highlight": "Un rêve enraciné au Rwanda"
+      },
+      {
+        "id": 2,
+        "title": "La passion d’Olivier",
+        "subtitle": "L’inspiration",
+        "emoji": "👨‍🎬",
+        "content": "L’idée a été imaginée pour la première fois par HAGENIMANA Samuel, qui a grandi en voyant son frère, MANISHIMWE Olivier, profondément passionné par le cinéma. Olivier aimait jouer, réaliser, écrire et tout ce qui touche au cinéma.",
+        "background": "from-purple-600/10 to-blue-500/10",
+        "color": "text-purple-400",
+        "highlight": "La passion d’Olivier pour le cinéma"
+      },
+      {
+        "id": 3,
+        "title": "La réalité rwandaise",
+        "subtitle": "Défis rencontrés",
+        "emoji": "💔",
+        "content": "Comme beaucoup de créateurs talentueux rwandais, Olivier a fait face à des opportunités limitées, une faible promotion, une distribution faible et un système qui donne rarement aux jeunes cinéastes une réelle chance de briller.",
+        "background": "from-blue-500/10 to-cyan-500/10",
+        "color": "text-blue-400",
+        "highlight": "Opportunités limitées pour les créateurs"
+      },
+      {
+        "id": 4,
+        "title": "L’étincelle d’une idée",
+        "subtitle": "Transformer la réflexion en révolution",
+        "emoji": "✨",
+        "content": "Samuel a observé tout cela de près — chaque sacrifice, chaque tentative. Des années plus tard, il a réfléchi aux rêves de son frère et s’est demandé : Et si une plateforme était conçue pour distribuer, promouvoir et diffuser professionnellement les films rwandais ?",
+        "background": "from-cyan-500/10 to-emerald-500/10",
+        "color": "text-cyan-400",
+        "highlight": "Une idée révolutionnaire"
+      },
+      {
+        "id": 5,
+        "title": "Constitution de l’équipe",
+        "subtitle": "Les fondations",
+        "emoji": "🤝",
+        "content": "Samuel a rencontré HIRWA MAZIMPAKA Chris, un esprit créatif qui comprenait profondément le cinéma. Ensemble, ils ont exploré comment la technologie et le storytelling pouvaient se combiner pour impacter le cinéma rwandais.",
+        "background": "from-emerald-500/10 to-yellow-500/10",
+        "color": "text-emerald-400",
+        "highlight": "Partenariat et collaboration"
+      },
+      {
+        "id": 6,
+        "title": "Le nom Oliviuus",
+        "subtitle": "Un hommage",
+        "emoji": "🏷️",
+        "content": "Le nom 'Oliviuus' est venu naturellement — inspiré par Olivier, dont la passion a semé la première graine de la vision. Samuel a transformé le nom de son frère en quelque chose de moderne, cinématographique et attrayant mondialement.",
+        "background": "from-yellow-500/10 to-orange-500/10",
+        "color": "text-yellow-400",
+        "highlight": "Oliviuus : un hommage à Olivier"
+      },
+      {
+        "id": 7,
+        "title": "La mission",
+        "subtitle": "Vision 2024-2025",
+        "emoji": "🎯",
+        "content": "Autonomiser les cinéastes rwandais. Offrir aux créateurs un canal de distribution équitable et professionnel. Promouvoir les histoires locales avec une technologie de classe mondiale. Apporter le cinéma rwandais à tous les publics.",
+        "background": "from-orange-500/10 to-red-500/10",
+        "color": "text-orange-400",
+        "highlight": "Autonomiser les cinéastes rwandais"
+      },
+      {
+        "id": 8,
+        "title": "Oliviuus aujourd’hui",
+        "subtitle": "Le voyage continue",
+        "emoji": "🚀",
+        "content": "Aujourd’hui, Oliviuus est une plateforme de streaming rwandaise pionnière, combinant culture, innovation et technologie. Une plateforme construite avec un objectif, honorant les créateurs d’avant et créant des opportunités pour les générations futures.",
+        "background": "from-red-500/10 to-pink-500/10",
+        "color": "text-red-400",
+        "highlight": "Une plateforme pionnière pour le Rwanda"
+      }
+    ],
+    "foundersSection": {
+      "title": "Les",
+      "highlight": "Visionnaires",
+      "subtitle": "Rencontrez les fondateurs passionnés qui ont transformé un rêve en la principale plateforme de streaming rwandaise"
+    },
+    "founders": [
+      {
+        "name": "HAGENIMANA Samuel",
+        "role": "Fondateur & Président",
+        "emoji": "👑",
+        "description": "Visionnaire derrière Oliviuus, transformant une réflexion personnelle en révolution de plateforme"
+      },
+      {
+        "name": "MANISHIMWE Olivier",
+        "role": "Co-fondateur & CEO",
+        "emoji": "🎬",
+        "description": "Passionné de cinéma dont l’inspiration a donné le nom et la mission de la plateforme"
+      },
+      {
+        "name": "HIRWA MAZIMPAKA Chris",
+        "role": "Co-fondateur & Responsable du contenu",
+        "emoji": "✍️",
+        "description": "Directeur créatif façonnant les histoires rwandaises pour un public mondial"
+      }
+    ],
+    "quoteSection": {
+      "emoji": "🌟",
+      "quote": "\"Oliviuus existe parce que les rêves ne doivent pas s’éteindre. Les histoires ne doivent pas se perdre. Et le talent mérite un lieu où il peut être vu.\"",
+      "promise": "C’est notre promesse aux cinéastes rwandais et au public du monde entier."
+    },
+    "cta": {
+      "title": "Rejoignez la révolution du cinéma rwandais",
+      "subtitle": "Découvrez un streaming construit avec passion, objectif et fierté pour le storytelling rwandais.",
+      "buttons": {
+        "startNow": "Commencez maintenant",
+        "exploreCinema": "Explorez le cinéma rwandais"
+      }
+    },
+    "seo": {
+      "title": "À propos d’Oliviuus | Notre histoire, fondateurs & mission cinéma rwandais",
+      "description": "Découvrez l’histoire d’Oliviuus - une plateforme de streaming rwandaise basée sur la passion, la résilience et la volonté de mettre en valeur les histoires africaines. Apprenez-en plus sur nos fondateurs, notre mission et notre vision pour le cinéma rwandais.",
+      "keywords": "Oliviuus à propos, plateforme streaming rwandaise, cinéma africain, plateforme films Rwanda, fondateurs Oliviuus, storytelling rwandais, divertissement africain, plateforme digitale Rwanda"
     }
   }
 }

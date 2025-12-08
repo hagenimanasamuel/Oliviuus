@@ -8,10 +8,24 @@ import {
 } from 'lucide-react';
 import ShareModal from './ShareModal';
 import userPreferencesApi from '../../../../../../api/userPreferencesApi';
+import { useAuth } from '../../../../../../context/AuthContext';
+import { useSubscription } from '../../../../../../context/SubscriptionContext';
+import EmailInput from '../../../../../../pages/landing/EmailInput';
+import CryptoJS from "crypto-js";
+
+const SECRET_KEY = import.meta.env.VITE_EMAIL_STATE_SECRET;
+
+const encodeState = (data) => {
+  const str = JSON.stringify(data);
+  const encrypted = CryptoJS.AES.encrypt(str, SECRET_KEY).toString();
+  return encodeURIComponent(encrypted);
+};
 
 const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { currentSubscription } = useSubscription();
   
   const [isTrailerPlaying, setIsTrailerPlaying] = useState(false);
   const [isTrailerMuted, setIsTrailerMuted] = useState(false);
@@ -30,10 +44,11 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
   const videoRef = useRef(null);
   const contentRef = useRef(null);
 
-  // Check if content is already liked or in list
+  const canAccessContent = user && (currentSubscription || user.role === 'admin');
+
   useEffect(() => {
     const checkUserPreferences = async () => {
-      if (!contentData?.id) return;
+      if (!user || !contentData?.id) return;
 
       try {
         const response = await userPreferencesApi.getUserContentPreferences(contentData.id);
@@ -43,12 +58,11 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
         }
       } catch (error) {
         console.error('Error fetching user preferences:', error);
-        // Don't show error to user for preference loading
       }
     };
 
     checkUserPreferences();
-  }, [contentData?.id]);
+  }, [user, contentData?.id]);
 
   const getTrailer = () => {
     return contentData?.trailer || contentData?.media_assets?.find(asset => 
@@ -91,22 +105,26 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
     return t('contentdetail.metadata.durationMinutes', '{{mins}}m', { mins });
   };
 
-  const formatViewCount = (count) => {
-    return t('contentdetail.metadata.views', '{{count}} views', { count: count.toLocaleString() });
-  };
-
+  // Auto-play trailer functionality
   const startTrailerPlayback = async () => {
     const trailer = getTrailer();
     if (!trailer || !videoRef.current) return;
 
     try {
       videoRef.current.currentTime = 0;
-      videoRef.current.muted = isTrailerMuted;
+      videoRef.current.muted = false;
+      setIsTrailerMuted(false);
       setIsTrailerPlaying(true);
       await videoRef.current.play();
     } catch (error) {
       console.error('Trailer auto-play failed:', error);
-      setIsTrailerPlaying(false);
+      try {
+        videoRef.current.muted = true;
+        setIsTrailerMuted(true);
+        await videoRef.current.play();
+      } catch (mutedError) {
+        setIsTrailerPlaying(false);
+      }
     }
   };
 
@@ -139,7 +157,6 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
     }
   };
 
-  // Handle fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -149,30 +166,35 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  // Enhanced handlePlay with zoom-in animation
   const handlePlay = () => {
-    // Stop trailer if playing
     if (isTrailerPlaying) {
       stopTrailerPlayback();
     }
     
-    // Start redirect animation
+    if (!user) {
+      return;
+    }
+    
+    if (!canAccessContent) {
+      navigate('/subscription');
+      return;
+    }
+    
     setRedirecting(true);
     
-    // Wait for animation to complete before navigating
     setTimeout(() => {
-      // Navigate to WatchPage with the content ID
       if (contentData?.id) {
         navigate(`/watch/${contentData.id}`);
       }
-      
-      // Also call the original onPlay if provided
       onPlay?.(contentData);
-    }, 500); // Match this with CSS animation duration
+    }, 500);
   };
 
   const handleAddToList = async () => {
-    if (!contentData?.id) return;
+    if (!user || !contentData?.id) {
+      navigate('/auth');
+      return;
+    }
     
     setLoading(prev => ({ ...prev, watchlist: true }));
     setError(null);
@@ -186,13 +208,10 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
         setIsInList(newInListState);
         onAddToList?.(contentData, newInListState);
         
-        // Show success message
         const message = isInList 
           ? t('contentdetail.messages.removedFromList', 'Removed from your list')
           : t('contentdetail.messages.addedToList', 'Added to your list');
         setError(message);
-        
-        console.log(`Successfully ${action === 'add' ? 'added to' : 'removed from'} watchlist`);
       }
     } catch (error) {
       console.error('Error updating watchlist:', error);
@@ -206,7 +225,10 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
   };
 
   const handleLike = async () => {
-    if (!contentData?.id) return;
+    if (!user || !contentData?.id) {
+      navigate('/auth');
+      return;
+    }
     
     setLoading(prev => ({ ...prev, like: true }));
     setError(null);
@@ -218,13 +240,10 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
       if (response.success) {
         setIsLiked(!isLiked);
         
-        // Show success message
         const message = isLiked 
           ? t('contentdetail.messages.contentUnliked', 'Content unliked')
           : t('contentdetail.messages.contentLiked', 'Content liked');
         setError(message);
-        
-        console.log(`Successfully ${action}d content`);
       }
     } catch (error) {
       console.error('Error updating like:', error);
@@ -241,6 +260,32 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
     setShowShareModal(true);
   };
 
+  // Handle EmailInput submission - Navigates directly to auth page
+  const handleEmailSubmit = (result) => {
+    const nextStep = result.isExistingUser ? "password" : "code";
+
+    const stateData = {
+      step: nextStep,
+      email: result.email,
+      isExistingUser: result.isExistingUser
+    };
+
+    const hash = encodeState(stateData);
+    navigate(`/auth?state=${hash}`);
+  };
+
+  // Auto-play trailer on mount
+  useEffect(() => {
+    const trailer = getTrailer();
+    if (trailer && !isTrailerPlaying) {
+      const timer = setTimeout(() => {
+        startTrailerPlayback();
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [contentData?.id]);
+
   // Auto-hide error messages
   useEffect(() => {
     if (error) {
@@ -254,6 +299,12 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
 
   const trailer = getTrailer();
   const primaryImage = getPrimaryImage();
+
+  const getPlayButtonText = () => {
+    if (!user) return t('contentdetail.actions.startNow', 'Start Now');
+    if (!canAccessContent) return t('contentdetail.actions.startMembership', 'Start Membership');
+    return t('contentdetail.actions.playNow', 'Play Now');
+  };
 
   return (
     <>
@@ -305,9 +356,11 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
               onError={() => setIsTrailerPlaying(false)}
               playsInline
               preload="auto"
+              autoPlay={true}
+              loop={true}
             />
 
-            {/* Video Controls */}
+            {/* Video Controls - MOVED TO METADATA ROW */}
             <div className="absolute top-4 left-16 flex gap-2">
               <button
                 onClick={toggleMute}
@@ -364,7 +417,7 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
               {contentData?.title}
             </h1>
 
-            {/* Enhanced Metadata Row */}
+            {/* Enhanced Metadata Row with Trailer Button */}
             <div className="flex flex-wrap items-center gap-3 mb-8">
               <div className="flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20">
                 <Star className="w-4 h-4 text-yellow-400" />
@@ -396,92 +449,11 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
                 </div>
               )}
 
-              {contentData?.view_count && (
-                <div className="flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20">
-                  <Eye className="w-4 h-4" />
-                  <span className="font-medium">
-                    {formatViewCount(contentData.view_count)}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Enhanced Action Buttons */}
-            <div className="flex items-center gap-4 flex-wrap">
-              <button
-                onClick={handlePlay}
-                className="flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-105 shadow-2xl"
-                style={{
-                  backgroundColor: '#BC8BBC',
-                  color: 'white'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#a56ba5';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#BC8BBC';
-                }}
-              >
-                <Play className="w-6 h-6 fill-current" />
-                {t('contentdetail.actions.playNow', 'Play Now')}
-              </button>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleAddToList}
-                  disabled={loading.watchlist}
-                  className={`flex items-center justify-center rounded-xl p-3 transition-all duration-200 transform hover:scale-110 border backdrop-blur-sm group ${
-                    isInList 
-                      ? 'bg-[#BC8BBC] text-white border-[#BC8BBC]' 
-                      : 'text-white border-white/30'
-                  } ${loading.watchlist ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  title={isInList 
-                    ? t('contentdetail.actions.removeFromList', 'Remove from List') 
-                    : t('contentdetail.actions.addToList', 'Add to List')
-                  }
-                >
-                  {loading.watchlist ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : isInList ? (
-                    <Check className="w-5 h-5" />
-                  ) : (
-                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                  )}
-                </button>
-
-                <button
-                  onClick={handleLike}
-                  disabled={loading.like}
-                  className={`flex items-center justify-center rounded-xl p-3 transition-all duration-200 transform hover:scale-110 border backdrop-blur-sm ${
-                    isLiked 
-                      ? 'bg-red-500 text-white border-red-500' 
-                      : 'text-white border-white/30'
-                  } ${loading.like ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  title={isLiked 
-                    ? t('contentdetail.actions.unlike', 'Unlike') 
-                    : t('contentdetail.actions.like', 'Like')
-                  }
-                >
-                  {loading.like ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                  )}
-                </button>
-
-                <button
-                  onClick={handleShare}
-                  className="flex items-center justify-center text-white rounded-xl p-3 transition-all duration-200 transform hover:scale-110 border backdrop-blur-sm border-white/30"
-                  title={t('contentdetail.actions.share', 'Share')}
-                >
-                  <Share2 className="w-5 h-5" />
-                </button>
-              </div>
-
+              {/* Trailer Control Button - MOVED HERE */}
               {trailer && (
                 <button
                   onClick={isTrailerPlaying ? stopTrailerPlayback : startTrailerPlayback}
-                  className="flex items-center gap-2 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 border backdrop-blur-sm border-white/30"
+                  className="flex items-center gap-2 text-white px-4 py-1.5 rounded-full font-semibold transition-all duration-200 transform hover:scale-105 border backdrop-blur-sm border-white/30 bg-white/20"
                 >
                   <Play className="w-4 h-4" />
                   {isTrailerPlaying 
@@ -491,6 +463,109 @@ const HeroSection = ({ contentData, onPlay, onAddToList, onGoBack }) => {
                 </button>
               )}
             </div>
+
+            {/* Dynamic Section Based on User Status */}
+            {user ? (
+              /* LOGGED IN USER SECTION */
+              <>
+                {/* Enhanced Action Buttons for logged-in users */}
+                <div className="flex items-center gap-4 flex-wrap mb-6">
+                  {/* Main Play Button */}
+                  <button
+                    onClick={handlePlay}
+                    className="flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-105 shadow-2xl"
+                    style={{
+                      backgroundColor: '#BC8BBC',
+                      color: 'white'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#a56ba5';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = '#BC8BBC';
+                    }}
+                  >
+                    {!canAccessContent && <Star className="w-6 h-6 fill-current" />}
+                    {canAccessContent && <Play className="w-6 h-6 fill-current" />}
+                    {getPlayButtonText()}
+                  </button>
+
+                  {/* Additional buttons */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleAddToList}
+                      disabled={loading.watchlist}
+                      className={`flex items-center justify-center rounded-xl p-3 transition-all duration-200 transform hover:scale-110 border backdrop-blur-sm group ${
+                        isInList 
+                          ? 'bg-[#BC8BBC] text-white border-[#BC8BBC]' 
+                          : 'text-white border-white/30'
+                      } ${loading.watchlist ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      title={isInList 
+                        ? t('contentdetail.actions.removeFromList', 'Remove from List') 
+                        : t('contentdetail.actions.addToList', 'Add to List')
+                      }
+                    >
+                      {loading.watchlist ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : isInList ? (
+                        <Check className="w-5 h-5" />
+                      ) : (
+                        <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                      )}
+                    </button>
+
+                    <button
+                      onClick={handleLike}
+                      disabled={loading.like}
+                      className={`flex items-center justify-center rounded-xl p-3 transition-all duration-200 transform hover:scale-110 border backdrop-blur-sm ${
+                        isLiked 
+                          ? 'bg-red-500 text-white border-red-500' 
+                          : 'text-white border-white/30'
+                      } ${loading.like ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      title={isLiked 
+                        ? t('contentdetail.actions.unlike', 'Unlike') 
+                        : t('contentdetail.actions.like', 'Like')
+                      }
+                    >
+                      {loading.like ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                      )}
+                    </button>
+
+                    <button
+                      onClick={handleShare}
+                      className="flex items-center justify-center text-white rounded-xl p-3 transition-all duration-200 transform hover:scale-110 border backdrop-blur-sm border-white/30"
+                      title={t('contentdetail.actions.share', 'Share')}
+                    >
+                      <Share2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* NOT LOGGED IN USER SECTION */
+              <>
+                {/* Text above EmailInput */}
+                <div className="mb-6">
+                  <p className="text-xl font-semibold text-white mb-2">
+                    {t('contentdetail.emailInput.title', 'Ready to watch?')}
+                  </p>
+                  <p className="text-gray-300 text-lg">
+                    {t('contentdetail.emailInput.description', 'Enter your email to create or restart your membership.')}
+                  </p>
+                </div>
+
+                {/* Email Input */}
+                <div className="max-w-2xl mb-8">
+                  <EmailInput 
+                    onSubmit={handleEmailSubmit}
+                    isLoading={false}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

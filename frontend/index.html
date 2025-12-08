@@ -1,14 +1,22 @@
 <!DOCTYPE html>
-<html lang="en"> <!-- Changed to English since your content is in English -->
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  
+  <!-- PWA Meta Tags (ADDED) -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#BC8BBC" />
+  <meta name="description" content="Oliviuus - Streaming Platform for Rwandan Cinema & Global Entertainment. Launching 2026." />
+  
+  <!-- Apple Touch Icon (ADDED) -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/oliviuus_logo_transparent.png" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
   <!-- Basic SEO Meta Tags (React Helmet will override these) -->
-  <meta name="description" content="Oliviuus - Streaming Platform for Rwandan Cinema & Global Entertainment. Launching 2026." />
   <meta name="keywords" content="streaming platform, Rwandan movies, African cinema, movies online, TV shows, entertainment" />
   <meta name="author" content="Oliviuus" />
   <meta name="robots" content="index, follow" />
@@ -27,7 +35,7 @@
   <meta name="twitter:image" content="/oliviuus_logo_transparent.png" />
 
   <!-- Dynamic Title (Will be updated by React Helmet) -->
-  <title>Oliviuus </title>
+  <title>Oliviuus</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,12 +45,10 @@
   <!-- Preload key assets -->
   <link rel="preload" href="/oliviuus_logo_transparent.png" as="image" />
 
-  <!-- Theme Color -->
-  <meta name="theme-color" content="#BC8BBC" />
-
   <!-- Additional Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
 </head>
 
 <body>

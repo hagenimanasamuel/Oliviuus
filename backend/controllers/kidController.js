@@ -1,14 +1,16 @@
 // controllers/kidController.js
 const { query } = require("../config/dbConfig");
 
-// Cache configuration for kid content
+// PRODUCTION NOTE: Cache configuration for kid content
+// Cache durations are optimized for kid content which changes less frequently
 const kidCacheConfig = {
-  landingContent: 10 * 60 * 1000, // 10 minutes
-  contentList: 5 * 60 * 1000,    // 5 minutes
-  singleContent: 2 * 60 * 1000,  // 2 minutes
+  landingContent: 10 * 60 * 1000, // 10 minutes - landing page content
+  contentList: 5 * 60 * 1000,    // 5 minutes - content lists
+  singleContent: 2 * 60 * 1000,  // 2 minutes - single content
 };
 
 // In-memory cache for kid content
+// PRODUCTION NOTE: Consider Redis for distributed cache in production
 const kidContentCache = new Map();
 
 // Generate cache keys for kid content
@@ -23,6 +25,7 @@ const isCacheStale = (cacheEntry, cacheDuration) => {
 };
 
 // Clear related kid cache entries
+// PRODUCTION NOTE: Called when content is updated or preferences change
 const clearKidRelatedCache = (contentId = null, kidProfileId = '') => {
   const keysToDelete = [];
 
@@ -34,10 +37,9 @@ const clearKidRelatedCache = (contentId = null, kidProfileId = '') => {
   }
 
   keysToDelete.forEach(key => kidContentCache.delete(key));
-  console.log(`Cleared ${keysToDelete.length} kid cache entries`);
 };
 
-// Safe data parsing function
+// Safe data parsing function for kid preferences and blocked content
 const safeDataParse = (dataString, defaultValue = []) => {
   if (!dataString) return defaultValue;
 
@@ -55,14 +57,13 @@ const safeDataParse = (dataString, defaultValue = []) => {
       }
       return [dataString.trim()];
     } catch (error) {
-      console.error('Data parse error:', error);
       return defaultValue;
     }
   }
 };
 
-// Age rating system for kids
-// Kids only see content rated "all", "G", "TV-Y", "TV-Y7", "TV-G", "PG" (for older kids)
+// PRODUCTION NOTE: Age rating system for kids - strictly enforced
+// Kids only see content rated as appropriate for their age group
 const KID_ALLOWED_AGE_RATINGS = [
   'all',        // For all ages
   'G',          // General Audience
@@ -73,7 +74,7 @@ const KID_ALLOWED_AGE_RATINGS = [
   '7+', '8+', '9+', '10+', '11+', '12+' // Custom age ratings
 ];
 
-// Blocked age ratings for kids (never show these)
+// PRODUCTION CRITICAL: Blocked age ratings for kids (never show these)
 const KID_BLOCKED_AGE_RATINGS = [
   'TV-14',
   'TV-MA',
@@ -87,7 +88,7 @@ const KID_BLOCKED_AGE_RATINGS = [
   'MA'
 ];
 
-// Educational/Learning content detection
+// Educational/Learning content detection - used for learning page
 const EDUCATIONAL_CATEGORIES = [
   'Educational',
   'Documentary',
@@ -146,7 +147,7 @@ const FUN_GENRES = [
   'Action'
 ];
 
-// Educational categories and genres for learning page
+// Educational categories and genres for learning page - comprehensive list
 const EDUCATIONAL_CATEGORIES_FULL = [
   'Educational', 'Documentary', 'Science', 'History',
   'Nature', 'Learning', 'Education', 'Technology',
@@ -163,7 +164,7 @@ const EDUCATIONAL_GENRES_FULL = [
   'Crafts', 'Cooking', 'Sports'
 ];
 
-// Filter and sanitize content for kids
+// Filter and sanitize content for kids - removes sensitive/irrelevant data
 const sanitizeKidContent = (content) => {
   return {
     id: content.id,
@@ -184,13 +185,13 @@ const sanitizeKidContent = (content) => {
     categories: content.categories || [],
     trailer: content.trailer || null,
     primary_image_url: content.primary_image_url,
-    // Add educational/fun flags for frontend
+    // Add educational/fun flags for frontend categorization
     is_educational: content.is_educational || false,
     is_fun: content.is_fun || false
   };
 };
 
-// Check if content is educational
+// Check if content is educational based on categories, genres, and keywords
 const isContentEducational = (content) => {
   try {
     // Check categories
@@ -220,12 +221,11 @@ const isContentEducational = (content) => {
       searchText.includes(keyword.toLowerCase())
     );
   } catch (error) {
-    console.error('Error checking educational content:', error);
     return false;
   }
 };
 
-// Check if content is fun/entertainment
+// Check if content is fun/entertainment based on categories and genres
 const isContentFun = (content) => {
   try {
     // Check categories
@@ -250,12 +250,11 @@ const isContentFun = (content) => {
 
     return false;
   } catch (error) {
-    console.error('Error checking fun content:', error);
     return false;
   }
 };
 
-// Get trailer for kid content
+// Get trailer for kid content from media_assets table
 const getTrailerForKidContent = async (contentId) => {
   try {
     const trailers = await query(`
@@ -272,14 +271,13 @@ const getTrailerForKidContent = async (contentId) => {
 
     return trailers[0] || null;
   } catch (error) {
-    console.error('Error fetching trailer for kid content:', contentId, error);
     return null;
   }
 };
 
-// Build age rating condition (GENERAL FOR ALL KIDS)
+// Build age rating condition for SQL queries
+// PRODUCTION CRITICAL: This ensures kids only see age-appropriate content
 const buildAgeRatingCondition = () => {
-  // KIDS ONLY SEE THESE RATINGS - NO EXCEPTIONS
   const allowedRatings = KID_ALLOWED_AGE_RATINGS.map(() => '?').join(',');
   const blockedRatings = KID_BLOCKED_AGE_RATINGS.map(() => '?').join(',');
 
@@ -289,7 +287,7 @@ const buildAgeRatingCondition = () => {
   };
 };
 
-// Build blocked genres condition
+// Build blocked genres condition based on kid's preferences
 const buildGenreExclusionCondition = (blockedGenres) => {
   if (!blockedGenres || blockedGenres.length === 0) {
     return { condition: '1=1', params: [] };
@@ -301,12 +299,12 @@ const buildGenreExclusionCondition = (blockedGenres) => {
   return { condition: conditions.join(' AND '), params };
 };
 
-// Get kid hero content - SIMPLIFIED VERSION
+// Get kid hero content - featured or highest quality content for landing page
 const getKidHeroContent = async (kidProfile) => {
   try {
     const blockedGenres = safeDataParse(kidProfile.blocked_genres, []);
 
-    // Build conditions
+    // Build conditions for age-appropriate content
     const ageCondition = buildAgeRatingCondition();
     const genreCondition = buildGenreExclusionCondition(blockedGenres);
 
@@ -316,10 +314,9 @@ const getKidHeroContent = async (kidProfile) => {
       ...genreCondition.params
     ];
 
-    // Try to get featured content first
     let heroContent = null;
 
-    // 1. Try featured content
+    // 1. Try featured content first (prioritizes featured items)
     const featuredResult = await query(`
       SELECT DISTINCT
         c.*,
@@ -359,7 +356,7 @@ const getKidHeroContent = async (kidProfile) => {
     if (featuredResult.length > 0) {
       heroContent = featuredResult[0];
     } else {
-      // 2. Try any kid-safe content
+      // 2. Fallback to any kid-safe content if no featured content available
       const anyContent = await query(`
         SELECT DISTINCT
           c.*,
@@ -379,7 +376,7 @@ const getKidHeroContent = async (kidProfile) => {
               AND ma.upload_status = 'completed'
             ORDER BY ma.is_primary DESC, ma.created_at DESC
             LIMIT 1
-          ) as primary_image_url
+        ) as primary_image_url
         FROM contents c
         LEFT JOIN content_rights cr ON c.id = cr.content_id
         LEFT JOIN content_genres cg ON c.id = cg.content_id
@@ -399,18 +396,17 @@ const getKidHeroContent = async (kidProfile) => {
     }
 
     if (heroContent) {
-      // Get trailer
+      // Get trailer for hero content
       heroContent.trailer = await getTrailerForKidContent(heroContent.id);
     }
 
     return heroContent;
   } catch (error) {
-    console.error('Error getting kid hero content:', error);
     return null;
   }
 };
 
-// Get ALL kid-safe content (for all sections)
+// Get all kid-safe content with filtering applied
 const getKidSafeContent = async (kidProfile, limit = 20) => {
   try {
     const blockedGenres = safeDataParse(kidProfile.blocked_genres, []);
@@ -468,7 +464,7 @@ const getKidSafeContent = async (kidProfile, limit = 20) => {
     if (results.length > 0) {
       for (let item of results) {
         item.trailer = await getTrailerForKidContent(item.id);
-        // Add educational/fun flags
+        // Add educational/fun flags for frontend categorization
         item.is_educational = isContentEducational(item);
         item.is_fun = isContentFun(item);
       }
@@ -476,12 +472,11 @@ const getKidSafeContent = async (kidProfile, limit = 20) => {
 
     return results;
   } catch (error) {
-    console.error('Error getting kid-safe content:', error);
     return [];
   }
 };
 
-// Categorize content into sections
+// Categorize content into sections for landing page
 const categorizeKidContent = (allContent) => {
   const featured = [];
   const educational = [];
@@ -493,7 +488,7 @@ const categorizeKidContent = (allContent) => {
     new Date(b.created_at || b.release_date || 0) - new Date(a.created_at || a.release_date || 0)
   );
 
-  // Categorize each content
+  // Categorize each content item
   allContent.forEach(content => {
     // Featured: Has featured flag OR high views
     if (content.featured || content.view_count > 100) {
@@ -529,7 +524,7 @@ const categorizeKidContent = (allContent) => {
         .slice(0, needed);
       section.push(...backupContent);
     }
-    return section.slice(0, 12); // Limit to 12 items
+    return section.slice(0, 12); // Limit to 12 items per section
   };
 
   return {
@@ -540,7 +535,7 @@ const categorizeKidContent = (allContent) => {
   };
 };
 
-// Get kid landing page content
+// Get kid landing page content - main endpoint for kid dashboard
 const getKidLandingContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -556,8 +551,8 @@ const getKidLandingContent = async (req, res) => {
     const cacheEntry = kidContentCache.get(cacheKey);
     const forceRefresh = req.query.refresh === 'true';
 
+    // Return cached content if available and not stale
     if (!forceRefresh && cacheEntry && !isCacheStale(cacheEntry, kidCacheConfig.landingContent)) {
-      console.log('Serving kid landing content from cache');
       return res.json({
         success: true,
         data: cacheEntry.data,
@@ -567,7 +562,7 @@ const getKidLandingContent = async (req, res) => {
     }
 
     // Get ALL kid-safe content
-    const allKidContent = await getKidSafeContent(kidProfile, 50); // Get up to 50 items
+    const allKidContent = await getKidSafeContent(kidProfile, 50);
 
     if (allKidContent.length === 0) {
       return res.status(404).json({
@@ -614,7 +609,7 @@ const getKidLandingContent = async (req, res) => {
     const processedFun = processContentGenresCategories(categorized.fun);
     const processedRecent = processContentGenresCategories(categorized.recent);
 
-    // Create response data
+    // Create response data structure
     const responseData = {
       hero: processedHero ? sanitizeKidContent(processedHero) : null,
       featured: processedFeatured.map(item => sanitizeKidContent(item)),
@@ -639,7 +634,7 @@ const getKidLandingContent = async (req, res) => {
       }
     };
 
-    // Update cache
+    // Update cache for future requests
     kidContentCache.set(cacheKey, {
       data: responseData,
       timestamp: Date.now()
@@ -653,7 +648,6 @@ const getKidLandingContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching kid landing content:', error);
     res.status(500).json({
       error: 'Unable to load kid content at this time',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -661,7 +655,7 @@ const getKidLandingContent = async (req, res) => {
   }
 };
 
-// Get all kid content (listing)
+// Get all kid content (listing) - placeholder for future implementation
 const getAllKidContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -693,7 +687,6 @@ const getAllKidContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getAllKidContent:', error);
     res.status(500).json({
       error: 'Unable to process request',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -701,7 +694,7 @@ const getAllKidContent = async (req, res) => {
   }
 };
 
-// Get kid content by ID
+// Get kid content by ID - placeholder for future implementation
 const getKidContentById = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -715,7 +708,6 @@ const getKidContentById = async (req, res) => {
 
     const { contentId } = req.params;
 
-    // For now, return info about landing-only functionality
     res.json({
       success: true,
       message: 'Single kid content view will be implemented in next update. Use landing-content endpoint for now.',
@@ -729,14 +721,13 @@ const getKidContentById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getKidContentById:', error);
     res.status(500).json({
       error: 'Unable to process request'
     });
   }
 };
 
-// Track kid content view
+// Track kid content view - placeholder for future implementation
 const trackKidContentView = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -748,7 +739,6 @@ const trackKidContentView = async (req, res) => {
       });
     }
 
-    // For now, return success message
     res.json({
       success: true,
       message: 'View tracking will be implemented in next update.',
@@ -759,14 +749,13 @@ const trackKidContentView = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in trackKidContentView:', error);
     res.status(500).json({
       error: 'Unable to track view'
     });
   }
 };
 
-// Determine kid profile type
+// Determine kid profile type (family member vs kid profile)
 const getKidProfileType = (kidProfile) => {
   // Method 1: Check explicit flags FIRST
   if (kidProfile.is_family_member === true) {
@@ -816,7 +805,7 @@ const getKidProfileType = (kidProfile) => {
   return 'kid_profile'; // Default
 };
 
-// Get kid liked content (from kids_ratings_feedback)
+// Get kid liked content (from kids_ratings_feedback or user_likes based on profile type)
 const getKidLikedContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -996,13 +985,6 @@ const getKidLikedContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching kid liked content:', error);
-    
-    if (error.sql) {
-      console.error('SQL Error:', error.sql);
-      console.error('SQL Parameters:', error.params);
-    }
-    
     res.status(500).json({
       success: false,
       error: 'Unable to fetch liked content',
@@ -1181,7 +1163,6 @@ const getKidWatchLaterContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching kid watchlist:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch watchlist',
@@ -1303,7 +1284,6 @@ const toggleKidLikedContent = async (req, res) => {
     }
 
   } catch (error) {
-    console.error('Error updating kid liked content:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to update liked content'
@@ -1372,7 +1352,6 @@ const toggleKidWatchLaterContent = async (req, res) => {
     }
 
   } catch (error) {
-    console.error('Error updating kid watchlist:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to update watchlist'
@@ -1415,7 +1394,6 @@ const removeKidLikedContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error removing from kid liked content:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to remove from liked content'
@@ -1458,7 +1436,6 @@ const removeKidWatchLaterContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error removing from kid watchlist:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to remove from watchlist'
@@ -1466,7 +1443,7 @@ const removeKidWatchLaterContent = async (req, res) => {
   }
 };
 
-// Get batch kid likes status
+// Get batch kid likes status for multiple content items
 const getBatchKidLikesStatus = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1550,7 +1527,6 @@ const getBatchKidLikesStatus = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching likes status:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch likes status'
@@ -1558,7 +1534,7 @@ const getBatchKidLikesStatus = async (req, res) => {
   }
 };
 
-// Get kid filters
+// Get kid filters - placeholder for future implementation
 const getKidFilters = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1601,14 +1577,13 @@ const getKidFilters = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getKidFilters:', error);
     res.status(500).json({
       error: 'Unable to load filters'
     });
   }
 };
 
-// Get kid viewing history
+// Get kid viewing history - placeholder for future implementation
 const getKidViewingHistory = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1633,14 +1608,13 @@ const getKidViewingHistory = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getKidViewingHistory:', error);
     res.status(500).json({
       error: 'Unable to fetch viewing history'
     });
   }
 };
 
-// Clear kid viewing history
+// Clear kid viewing history - placeholder for future implementation
 const clearKidViewingHistory = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1661,14 +1635,13 @@ const clearKidViewingHistory = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in clearKidViewingHistory:', error);
     res.status(500).json({
       error: 'Unable to clear viewing history'
     });
   }
 };
 
-// Get kid recommendations
+// Get kid recommendations - placeholder for future implementation
 const getKidRecommendations = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1693,14 +1666,13 @@ const getKidRecommendations = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getKidRecommendations:', error);
     res.status(500).json({
       error: 'Unable to fetch recommendations'
     });
   }
 };
 
-// Get kid dashboard stats
+// Get kid dashboard stats - placeholder for future implementation
 const getKidDashboardStats = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1728,14 +1700,13 @@ const getKidDashboardStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getKidDashboardStats:', error);
     res.status(500).json({
       error: 'Unable to fetch dashboard stats'
     });
   }
 };
 
-// Get kid content preferences
+// Get kid content preferences - placeholder for future implementation
 const getKidContentPreferences = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1765,7 +1736,6 @@ const getKidContentPreferences = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getKidContentPreferences:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch preferences'
@@ -1773,7 +1743,7 @@ const getKidContentPreferences = async (req, res) => {
   }
 };
 
-// Get batch kid preferences
+// Get batch kid preferences - placeholder for future implementation
 const getBatchKidPreferences = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1812,7 +1782,6 @@ const getBatchKidPreferences = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getBatchKidPreferences:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch batch preferences'
@@ -1820,7 +1789,7 @@ const getBatchKidPreferences = async (req, res) => {
   }
 };
 
-// Search kid content
+// Search kid content - placeholder for future implementation
 const searchKidContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1860,7 +1829,6 @@ const searchKidContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in searchKidContent:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to perform search'
@@ -1868,7 +1836,7 @@ const searchKidContent = async (req, res) => {
   }
 };
 
-// Get kid trending content
+// Get kid trending content - placeholder for future implementation
 const getKidTrendingContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1896,7 +1864,6 @@ const getKidTrendingContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getKidTrendingContent:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch trending content'
@@ -1904,7 +1871,7 @@ const getKidTrendingContent = async (req, res) => {
   }
 };
 
-// Get kid learning content
+// Get kid learning content - educational content specifically for learning page
 const getKidLearningContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -2046,7 +2013,7 @@ const getKidLearningContent = async (req, res) => {
           WHERE kvh.content_id = c.id 
             AND kvh.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         ) as recent_views,
-        -- Educational score calculation
+        -- Educational score calculation for better sorting
         (
           CASE 
             WHEN cat.name IN (${EDUCATIONAL_CATEGORIES_FULL.map(() => '?').join(',')}) THEN 3
@@ -2166,7 +2133,6 @@ const getKidLearningContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching kid learning content:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch learning content',
@@ -2175,7 +2141,7 @@ const getKidLearningContent = async (req, res) => {
   }
 };
 
-// Get kid songs and music content
+// Get kid songs and music content - specialized endpoint for music content
 const getKidSongsMusicContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -2487,7 +2453,6 @@ const getKidSongsMusicContent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching kid songs and music content:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch songs and music content',

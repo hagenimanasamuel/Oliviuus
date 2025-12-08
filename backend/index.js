@@ -24,6 +24,7 @@ const {
   createKidsTables,
   createFamilyMembersTable,
   createFamilyPinSecurityTable,
+  createFeedbackTable,
 } = require('./config/dbConfig');
 const createAdminSeed = require('./seeds/seedAdmin');
 const authRoutes = require('./routes/authRoutes');
@@ -57,6 +58,7 @@ const kidRoutes = require('./routes/kidRoutes');
 const profileSelectionRoutes = require("./routes/profileSelectionRoutes");
 const familyRoutes = require("./routes/familyRoutes");
 const trendingRoutes = require('./routes/trendingRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 const cookieParser = require("cookie-parser");
 
@@ -109,6 +111,7 @@ app.use('/api/kid', kidRoutes);
 app.use("/api/profile", profileSelectionRoutes);
 app.use("/api/family", familyRoutes);
 app.use('/api/trending', trendingRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -136,7 +139,8 @@ createUserPreferencesTables(),
 createShareTables(),
 createKidsTables(),
 createFamilyMembersTable(),
-createFamilyPinSecurityTable(),])
+createFamilyPinSecurityTable(),
+createFeedbackTable(),])
   .then(async () => {
     console.log("✅ Tables checked/created");
     await createAdminSeed();

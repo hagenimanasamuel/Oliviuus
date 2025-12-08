@@ -24,29 +24,35 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Footer Links */}
-        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-4">
+        {/* Footer Links - Responsive grid for better mobile display */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mt-4 max-w-3xl mx-auto">
           <Link
             to="/terms"
-            className="hover:underline transition hover:text-[#9b69b2]"
+            className="hover:underline transition hover:text-[#9b69b2] px-2 py-1"
           >
             {t("footer.terms")}
           </Link>
           <Link
             to="/privacy"
-            className="hover:underline transition hover:text-[#9b69b2]"
+            className="hover:underline transition hover:text-[#9b69b2] px-2 py-1"
           >
             {t("footer.privacy")}
           </Link>
           <Link
+            to="/about"
+            className="hover:underline transition hover:text-[#9b69b2] px-2 py-1"
+          >
+            {t("footer.about")}
+          </Link>
+          <Link
             to="/help"
-            className="hover:underline transition hover:text-[#9b69b2]"
+            className="hover:underline transition hover:text-[#9b69b2] px-2 py-1"
           >
             {t("footer.help")}
           </Link>
           <Link
             to="/feedback"
-            className="hover:underline transition hover:text-[#9b69b2]"
+            className="hover:underline transition hover:text-[#9b69b2] px-2 py-1"
           >
             {t("footer.feedback")}
           </Link>

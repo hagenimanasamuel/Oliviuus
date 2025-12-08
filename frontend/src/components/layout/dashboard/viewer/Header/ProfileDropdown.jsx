@@ -20,6 +20,12 @@ const ProfileDropdown = ({ user, onLogout }) => {
 
   const getCurrentYear = () => new Date().getFullYear();
 
+  // Handle navigation for footer links
+  const handleFooterLinkClick = (path) => {
+    navigate(path);
+    setProfileOpen(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -121,15 +127,36 @@ const ProfileDropdown = ({ user, onLogout }) => {
           <div className="p-3 bg-gray-900/50 border-t border-gray-700">
             <div className="text-xs text-gray-500">
               <p>© {getCurrentYear()} {t("profile.dropdown.companyName")}</p>
-              <div className="flex gap-4 mt-2">
-                <button className="hover:text-gray-300 transition-colors">
+              <div className="flex gap-4 mt-2 flex-wrap">
+                <button 
+                  onClick={() => handleFooterLinkClick("/privacy")}
+                  className="hover:text-gray-300 transition-colors hover:underline"
+                >
                   {t("profile.dropdown.footer.privacy")}
                 </button>
-                <button className="hover:text-gray-300 transition-colors">
+                <button 
+                  onClick={() => handleFooterLinkClick("/terms")}
+                  className="hover:text-gray-300 transition-colors hover:underline"
+                >
                   {t("profile.dropdown.footer.terms")}
                 </button>
-                <button className="hover:text-gray-300 transition-colors">
+                <button 
+                  onClick={() => handleFooterLinkClick("/help")}
+                  className="hover:text-gray-300 transition-colors hover:underline"
+                >
                   {t("profile.dropdown.footer.help")}
+                </button>
+                <button 
+                  onClick={() => handleFooterLinkClick("/about")}
+                  className="hover:text-gray-300 transition-colors hover:underline"
+                >
+                  {t("profile.dropdown.footer.about")}
+                </button>
+                <button 
+                  onClick={() => handleFooterLinkClick("/feedback")}
+                  className="hover:text-gray-300 transition-colors hover:underline"
+                >
+                  {t("profile.dropdown.footer.feedback")}
                 </button>
               </div>
             </div>
