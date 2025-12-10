@@ -53,7 +53,7 @@ export default function ViewerLayout({ children, user, onLogout }) {
     return (
       <div className="flex h-screen bg-gray-900 text-gray-300">
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-pulse">Loading...</div>
+          {/* Loading state removed - skeleton will be shown by parent components */}
         </div>
       </div>
     );

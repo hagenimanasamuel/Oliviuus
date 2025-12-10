@@ -52,37 +52,33 @@ const Dashboard = () => {
 
   // Show generic loading during initial data fetch
   if (user && !dataLoaded && loadAttempted) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-900">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#BC8BBC] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <div className="text-lg text-white">Preparing your Home...</div>
-        </div>
-      </div>
-    );
+    // Return appropriate dashboard with skeleton instead of spinner
+    if (user.role === "admin") {
+      return <AdminDashboard bodyContent={<Overview />} />;
+    }
+    if (shouldShowKidDashboard) {
+      const effectiveKidProfile = kidProfile || (isFamilyMemberKidDashboard ? {
+        is_family_member: true,
+        family_owner_id: familyMemberData.family_owner_id,
+        member_role: familyMemberData.member_role,
+        dashboard_type: 'kid',
+        name: user?.email?.split('@')[0] || 'Kid',
+        max_age_rating: '7+',
+        id: user.id
+      } : null);
+      
+      if (effectiveKidProfile) {
+        return <KidDashboard kidProfile={effectiveKidProfile} />;
+      }
+    }
+    if (user.role === "viewer") {
+      return <ViewerDashboard bodyContent={<ViewerLandingPage />} />;
+    }
   }
 
   // Show generic error state (only for viewer mode without family plan)
   if (error && !shouldShowKidDashboard && !isFamilyPlanAccess) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-900">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-2xl">⚠️</span>
-          </div>
-          <h3 className="text-xl font-bold text-white mb-2">Temporary Issue</h3>
-          <p className="text-gray-300 mb-4">
-            We're having trouble loading your Home. Please try again.
-          </p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-[#BC8BBC] hover:bg-[#9b69b2] text-white font-semibold py-2 px-6 rounded-lg transition-colors"
-          >
-            Reload Page
-          </button>
-        </div>
-      </div>
-    );
+    return <ViewerDashboard bodyContent={<ViewerLandingPage />} />;
   }
 
   // Redirect to auth if no user
@@ -115,14 +111,7 @@ const Dashboard = () => {
 
   // 👀 VIEWER: For viewers, show generic loading until data is loaded
   if (user.role === "viewer" && !dataLoaded) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-900">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#BC8BBC] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <div className="text-lg text-white">Setting up your experience...</div>
-        </div>
-      </div>
-    );
+    return <ViewerDashboard bodyContent={<ViewerLandingPage />} />;
   }
 
   // 🛡️ VIEWER WITH SUBSCRIPTION OR FAMILY PLAN: Allow dashboard access
@@ -135,26 +124,8 @@ const Dashboard = () => {
     return <Navigate to="/subscription" replace />;
   }
 
-  // Handle unexpected cases with generic message
-  return (
-    <div className="flex items-center justify-center h-screen bg-gray-900">
-      <div className="text-center max-w-md">
-        <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-white text-2xl">⚙️</span>
-        </div>
-        <h3 className="text-xl font-bold text-white mb-2">Almost Ready</h3>
-        <p className="text-gray-300 mb-4">
-          Please refresh the page to continue.
-        </p>
-        <button 
-          onClick={() => window.location.reload()}
-          className="bg-[#BC8BBC] hover:bg-[#9b69b2] text-white font-semibold py-2 px-6 rounded-lg transition-colors"
-        >
-          Refresh
-        </button>
-      </div>
-    </div>
-  );
+  // Handle unexpected cases - show viewer dashboard
+  return <ViewerDashboard bodyContent={<ViewerLandingPage />} />;
 };
 
 export default Dashboard;

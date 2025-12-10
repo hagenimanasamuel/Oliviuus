@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import { AuthProvider } from "./context/AuthContext";
@@ -7,28 +7,112 @@ import ProfileSelector from "./components/layout/dashboard/viewer/kid/ProfileSel
 import { useAuth } from "./context/AuthContext";
 import { Wifi, WifiOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Logo from "./components/Logo";
 
-// Create a wrapper component to handle the profile selection logic
+// ==================== ELEGANT LOADING SCREEN ====================
+const ElegantLoadingScreen = () => {
+  const [isVisible, setIsVisible] = useState(true);
+  const [logoScale, setLogoScale] = useState(1);
+  const [glowIntensity, setGlowIntensity] = useState(0.2);
+
+  useEffect(() => {
+    // Subtle breathing animation
+    const breathInterval = setInterval(() => {
+      setLogoScale(prev => prev === 1 ? 1.02 : 1);
+      setGlowIntensity(prev => prev === 0.2 ? 0.25 : 0.2);
+    }, 2000);
+
+    // Auto-hide after minimum time (prevents flash)
+    const hideTimer = setTimeout(() => {
+      setIsVisible(false);
+    }, 500);
+
+    return () => {
+      clearInterval(breathInterval);
+      clearTimeout(hideTimer);
+    };
+  }, []);
+
+  if (!isVisible) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-gray-950 via-black to-gray-950 flex items-center justify-center overflow-hidden">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#BC8BBC]/5 via-transparent to-[#BC8BBC]/5" />
+      
+      {/* Animated particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-[2px] h-[2px] bg-[#BC8BBC]/30 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`,
+              animationDelay: `${i * 0.3}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Main logo with elegant effects */}
+      <div className="relative z-10">
+        <div className="relative" style={{ transform: `scale(${logoScale})`, transition: 'transform 2s ease-in-out' }}>
+          {/* Glow effect */}
+          <div 
+            className="absolute inset-[-30px] blur-3xl rounded-full transition-opacity duration-2000"
+            style={{ 
+              backgroundColor: '#BC8BBC',
+              opacity: glowIntensity 
+            }}
+          />
+          
+          {/* Outer ring */}
+          <div className="absolute inset-[-15px] border border-[#BC8BBC]/30 rounded-full" />
+          
+          {/* Logo */}
+          <div className="relative">
+            <Logo className="w-28 h-28 md:w-36 md:h-36 text-white" />
+          </div>
+        </div>
+      </div>
+
+      {/* Smooth fade-out overlay */}
+      <div className="absolute inset-0 bg-black/0" />
+    </div>
+  );
+};
+
+// ==================== OPTIMIZED APP WRAPPER ====================
 function AppWithProfileSelection() {
-  const { user, loading, showProfileSelector } = useAuth();
+  const { user, loading: authLoading, showProfileSelector } = useAuth();
   const { t } = useTranslation();
   
-  // ADD PWA Install Prompt State
+  // Optimized state management
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
-  
-  // ADD Internet Connection State
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showConnectionStatus, setShowConnectionStatus] = useState(false);
+  
+  // Performance optimizations
+  const connectionTimeoutRef = useRef(null);
+  const installTimeoutRef = useRef(null);
 
-  // ADD Internet Connection Effect
+  // Internet connection monitoring
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
       setShowConnectionStatus(true);
-      // Hide the status after 3 seconds when back online
-      setTimeout(() => {
+      
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+      }
+      
+      connectionTimeoutRef.current = setTimeout(() => {
         setShowConnectionStatus(false);
       }, 3000);
     };
@@ -38,10 +122,9 @@ function AppWithProfileSelection() {
       setShowConnectionStatus(true);
     };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline, { passive: true });
+    window.addEventListener('offline', handleOffline, { passive: true });
 
-    // Initial check
     if (!navigator.onLine) {
       setShowConnectionStatus(true);
     }
@@ -49,10 +132,13 @@ function AppWithProfileSelection() {
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+      }
     };
   }, []);
 
-  // ADD Device Detection Effect
+  // Device detection
   useEffect(() => {
     const checkDevice = () => {
       const userAgent = navigator.userAgent.toLowerCase();
@@ -63,15 +149,21 @@ function AppWithProfileSelection() {
 
     checkDevice();
     
-    // Optional: Listen for resize to handle responsive changes
-    window.addEventListener('resize', checkDevice);
+    let resizeTimer;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(checkDevice, 250);
+    };
+    
+    window.addEventListener('resize', handleResize, { passive: true });
     
     return () => {
-      window.removeEventListener('resize', checkDevice);
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
     };
   }, []);
 
-  // ADD PWA Install Prompt Effect (Only for Desktop)
+  // PWA installation handling
   useEffect(() => {
     if (!isDesktop) return;
 
@@ -79,105 +171,105 @@ function AppWithProfileSelection() {
       e.preventDefault();
       setDeferredPrompt(e);
       
-      // Show install button after a delay for better UX
-      setTimeout(() => {
-        setShowInstallButton(true);
-      }, 3000);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    const checkInstalled = () => {
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('App is already installed');
-        setShowInstallButton(false);
+      if (installTimeoutRef.current) {
+        clearTimeout(installTimeoutRef.current);
       }
+      installTimeoutRef.current = setTimeout(() => {
+        setShowInstallButton(true);
+      }, 5000);
     };
 
-    checkInstalled();
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt, { passive: true });
+
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setShowInstallButton(false);
+    }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      if (installTimeoutRef.current) {
+        clearTimeout(installTimeoutRef.current);
+      }
     };
-  }, [isDesktop]); // Only run when isDesktop changes
+  }, [isDesktop]);
 
-  // ADD PWA Install Handler
-  const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to the install prompt: ${outcome}`);
-      setDeferredPrompt(null);
-      setShowInstallButton(false);
-    }
-  };
-
-  // ADD Auto-hide Install Button Effect
+  // Install button auto-hide
   useEffect(() => {
     if (!showInstallButton || !isDesktop) return;
 
-    // Auto-hide after 30 seconds
     const hideTimer = setTimeout(() => {
       setShowInstallButton(false);
     }, 30000);
 
-    return () => {
-      clearTimeout(hideTimer);
-    };
+    return () => clearTimeout(hideTimer);
   }, [showInstallButton, isDesktop]);
 
-  // Show loading while checking authentication
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
-    );
+  // Loading screen management
+  const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLoadingScreen(false);
+    }, authLoading ? 600 : 300);
+    
+    return () => clearTimeout(timer);
+  }, [authLoading]);
+
+  // Show elegant loading screen during initial load
+  if (showLoadingScreen) {
+    return <ElegantLoadingScreen />;
   }
 
-  // Only show selector if user exists AND selector should be shown
+  // Profile selection screen
   if (user && showProfileSelector) {
     return (
       <>
         <ProfileSelector />
-        {/* ADD Internet Connection Indicator (Bottom Left) */}
+        
         {showConnectionStatus && (
-          <div className={`fixed bottom-4 left-4 z-50 px-4 py-2.5 rounded-xl backdrop-blur-sm border transition-all duration-300 ${isOnline
-            ? 'bg-green-500/10 border-green-500/20 text-green-400'
-            : 'bg-red-500/10 border-red-500/20 text-red-400'
-            }`}
-          >
+          <div className={`fixed bottom-4 left-4 z-50 px-4 py-2.5 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
+            isOnline
+              ? 'bg-green-500/10 border-green-500/20 text-green-400'
+              : 'bg-red-500/10 border-red-500/20 text-red-400'
+          }`}>
             <div className="flex items-center gap-2">
               {isOnline ? (
                 <>
                   <Wifi className="w-4 h-4" />
-                  <span className="text-sm">{t('connectionIndicator.online', 'Internet connection restored')}</span>
+                  <span className="text-sm">Connected</span>
                 </>
               ) : (
                 <>
                   <WifiOff className="w-4 h-4" />
-                  <span className="text-sm">{t('connectionIndicator.offline', 'No internet connection')}</span>
+                  <span className="text-sm">Offline</span>
                 </>
               )}
             </div>
           </div>
         )}
         
-        {/* ADD Minimal Install Button (Desktop Only) */}
         {showInstallButton && isDesktop && (
           <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
             <button 
-              onClick={handleInstallClick}
-              className="group relative bg-gradient-to-br from-purple-500/10 to-indigo-600/10 hover:from-purple-500/20 hover:to-indigo-600/20 backdrop-blur-sm border border-purple-500/30 hover:border-purple-400/50 text-purple-300 hover:text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col items-center justify-center gap-1"
-              title="Install App"
+              onClick={async () => {
+                if (deferredPrompt) {
+                  try {
+                    await deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    setDeferredPrompt(null);
+                    setShowInstallButton(false);
+                  } catch (error) {
+                    console.error('Installation error:', error);
+                  }
+                }
+              }}
+              className="group relative bg-gradient-to-br from-[#BC8BBC]/10 to-purple-600/10 hover:from-[#BC8BBC]/20 hover:to-purple-600/20 backdrop-blur-sm border border-[#BC8BBC]/30 hover:border-[#BC8BBC]/50 text-[#BC8BBC] hover:text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col items-center justify-center gap-1"
+              title="Install Oliviuus"
             >
               <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
               </svg>
               <span className="text-xs font-medium opacity-80 group-hover:opacity-100 transition-opacity">Install</span>
-              
-              {/* Optional: Add a subtle glow effect on hover */}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500/0 to-indigo-600/0 group-hover:from-purple-500/5 group-hover:to-indigo-600/5 transition-all duration-300" />
             </button>
           </div>
         )}
@@ -185,49 +277,55 @@ function AppWithProfileSelection() {
     );
   }
 
-  // Show main app routes in all other cases
+  // Main application routes
   return (
     <>
       <AppRoutes />
       
-      {/* ADD Internet Connection Indicator (Bottom Left) */}
       {showConnectionStatus && (
-        <div className={`fixed bottom-4 left-4 z-50 px-4 py-2.5 rounded-xl backdrop-blur-sm border transition-all duration-300 ${isOnline
-          ? 'bg-green-500/10 border-green-500/20 text-green-400'
-          : 'bg-red-500/10 border-red-500/20 text-red-400'
-          }`}
-        >
+        <div className={`fixed bottom-4 left-4 z-50 px-4 py-2.5 rounded-xl backdrop-blur-sm border transition-all duration-300 ${
+          isOnline
+            ? 'bg-green-500/10 border-green-500/20 text-green-400'
+            : 'bg-red-500/10 border-red-500/20 text-red-400'
+        }`}>
           <div className="flex items-center gap-2">
             {isOnline ? (
               <>
                 <Wifi className="w-4 h-4" />
-                <span className="text-sm">{t('connectionIndicator.online', 'Internet connection restored')}</span>
+                <span className="text-sm">Connected</span>
               </>
             ) : (
               <>
                 <WifiOff className="w-4 h-4" />
-                <span className="text-sm">{t('connectionIndicator.offline', 'No internet connection')}</span>
+                <span className="text-sm">Offline</span>
               </>
             )}
           </div>
         </div>
       )}
       
-      {/* ADD Minimal Install Button (Desktop Only) */}
       {showInstallButton && isDesktop && (
         <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
           <button 
-            onClick={handleInstallClick}
-            className="group relative bg-gradient-to-br from-purple-500/10 to-indigo-600/10 hover:from-purple-500/20 hover:to-indigo-600/20 backdrop-blur-sm border border-purple-500/30 hover:border-purple-400/50 text-purple-300 hover:text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col items-center justify-center gap-1"
-            title="Install App"
+            onClick={async () => {
+              if (deferredPrompt) {
+                try {
+                  await deferredPrompt.prompt();
+                  const { outcome } = await deferredPrompt.userChoice;
+                  setDeferredPrompt(null);
+                  setShowInstallButton(false);
+                } catch (error) {
+                  console.error('Installation error:', error);
+                }
+              }
+            }}
+            className="group relative bg-gradient-to-br from-[#BC8BBC]/10 to-purple-600/10 hover:from-[#BC8BBC]/20 hover:to-purple-600/20 backdrop-blur-sm border border-[#BC8BBC]/30 hover:border-[#BC8BBC]/50 text-[#BC8BBC] hover:text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col items-center justify-center gap-1"
+            title="Install Oliviuus"
           >
             <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
             <span className="text-xs font-medium opacity-80 group-hover:opacity-100 transition-opacity">Install</span>
-            
-            {/* Optional: Add a subtle glow effect on hover */}
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500/0 to-indigo-600/0 group-hover:from-purple-500/5 group-hover:to-indigo-600/5 transition-all duration-300" />
           </button>
         </div>
       )}
@@ -235,7 +333,23 @@ function AppWithProfileSelection() {
   );
 }
 
+// ==================== MAIN APPLICATION COMPONENT ====================
 function App() {
+  // Asset preloading for optimal performance
+  useEffect(() => {
+    const preloadCriticalAssets = () => {
+      // Preload fonts
+      const fontLink = document.createElement('link');
+      fontLink.rel = 'preload';
+      fontLink.as = 'font';
+      fontLink.href = '/fonts/inter.woff2';
+      fontLink.crossOrigin = 'anonymous';
+      document.head.appendChild(fontLink);
+    };
+
+    preloadCriticalAssets();
+  }, []);
+
   return (
     <AuthProvider>
       <SubscriptionProvider>
