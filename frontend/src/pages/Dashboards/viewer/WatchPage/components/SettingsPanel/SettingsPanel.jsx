@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Check
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const SettingsPanel = ({ 
   playbackRate, 
@@ -28,6 +29,7 @@ const SettingsPanel = ({
   onContrastChange,
   onSaturationChange
 }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(null);
   const [volumeBoost, setVolumeBoost] = useState(1);
   const [brightness, setBrightness] = useState(100);
@@ -39,67 +41,67 @@ const SettingsPanel = ({
   const settingsTabs = [
     {
       id: 'speed',
-      label: 'Playback Speed',
+      label: t('settingsPanel.tabs.speed', 'Playback Speed'),
       icon: <Gauge className="w-4 h-4" />,
       options: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
     },
     {
       id: 'quality',
-      label: 'Quality',
+      label: t('settingsPanel.tabs.quality', 'Quality'),
       icon: <Monitor className="w-4 h-4" />,
-      options: ['Auto'] // Only Auto remains
+      options: [t('settingsPanel.quality.auto', 'Auto')] // Only Auto remains
     },
     {
       id: 'advanced',
-      label: 'Advanced',
+      label: t('settingsPanel.tabs.advanced', 'Advanced'),
       icon: <Zap className="w-4 h-4" />,
       options: ['pip', 'sleeptimer'] // Removed screenshot and casting
     },
     {
       id: 'audio',
-      label: 'Audio',
+      label: t('settingsPanel.tabs.audio', 'Audio'),
       icon: <Volume2 className="w-4 h-4" />,
       options: ['volumeBoost', 'audioPresets']
     },
     {
       id: 'video',
-      label: 'Video',
+      label: t('settingsPanel.tabs.video', 'Video'),
       icon: <Palette className="w-4 h-4" />,
       options: ['brightness', 'contrast', 'saturation', 'reset']
     },
     {
       id: 'shortcuts',
-      label: 'Keyboard Shortcuts',
+      label: t('settingsPanel.tabs.shortcuts', 'Keyboard Shortcuts'),
       icon: <Zap className="w-4 h-4" />
     }
   ];
 
   const shortcuts = [
-    { key: 'Space / K', action: 'Play/Pause' },
-    { key: 'F', action: 'Fullscreen' },
-    { key: 'M', action: 'Mute' },
-    { key: '← / →', action: 'Seek 5s' },
-    { key: '↑ / ↓', action: 'Volume' },
-    { key: ', / .', action: 'Speed' },
-    { key: 'S', action: 'Settings' }
+    { key: t('settingsPanel.shortcuts.space', 'Space / K'), action: t('settingsPanel.shortcuts.playPause', 'Play/Pause') },
+    { key: t('settingsPanel.shortcuts.f', 'F'), action: t('settingsPanel.shortcuts.fullscreen', 'Fullscreen') },
+    { key: t('settingsPanel.shortcuts.m', 'M'), action: t('settingsPanel.shortcuts.mute', 'Mute') },
+    { key: t('settingsPanel.shortcuts.arrows', '← / →'), action: t('settingsPanel.shortcuts.seek', 'Seek 5s') },
+    { key: t('settingsPanel.shortcuts.volumeArrows', '↑ / ↓'), action: t('settingsPanel.shortcuts.volume', 'Volume') },
+    { key: t('settingsPanel.shortcuts.speed', ', / .'), action: t('settingsPanel.shortcuts.speedChange', 'Speed') },
+    { key: t('settingsPanel.shortcuts.s', 'S'), action: t('settingsPanel.shortcuts.settings', 'Settings') }
   ];
 
   const audioPresets = [
-    { id: 'default', name: 'Default', description: 'Original audio' },
-    { id: 'movie', name: 'Movie', description: 'Enhanced dialogue' },
-    { id: 'music', name: 'Music', description: 'Balanced frequencies' },
-    { id: 'speech', name: 'Speech', description: 'Clear vocals' },
-    { id: 'bass', name: 'Bass Boost', description: 'Enhanced low frequencies' }
+    { id: 'default', name: t('settingsPanel.audioPresets.default', 'Default'), description: t('settingsPanel.audioPresets.defaultDesc', 'Original audio') },
+    { id: 'movie', name: t('settingsPanel.audioPresets.movie', 'Movie'), description: t('settingsPanel.audioPresets.movieDesc', 'Enhanced dialogue') },
+    { id: 'music', name: t('settingsPanel.audioPresets.music', 'Music'), description: t('settingsPanel.audioPresets.musicDesc', 'Balanced frequencies') },
+    { id: 'speech', name: t('settingsPanel.audioPresets.speech', 'Speech'), description: t('settingsPanel.audioPresets.speechDesc', 'Clear vocals') },
+    { id: 'bass', name: t('settingsPanel.audioPresets.bass', 'Bass Boost'), description: t('settingsPanel.audioPresets.bassDesc', 'Enhanced low frequencies') }
   ];
 
   // Sleep timer options with dark mode styling
   const sleepTimerOptions = [
-    { minutes: 0, label: 'Off' },
-    { minutes: 5, label: '5 minutes' },
-    { minutes: 15, label: '15 minutes' },
-    { minutes: 30, label: '30 minutes' },
-    { minutes: 45, label: '45 minutes' },
-    { minutes: 60, label: '1 hour' }
+    { minutes: 0, label: t('settingsPanel.sleepTimer.off', 'Off') },
+    { minutes: 5, label: t('settingsPanel.sleepTimer.minutes', '{{minutes}} minutes', { minutes: 5 }) },
+    { minutes: 15, label: t('settingsPanel.sleepTimer.minutes', '{{minutes}} minutes', { minutes: 15 }) },
+    { minutes: 30, label: t('settingsPanel.sleepTimer.minutes', '{{minutes}} minutes', { minutes: 30 }) },
+    { minutes: 45, label: t('settingsPanel.sleepTimer.minutes', '{{minutes}} minutes', { minutes: 45 }) },
+    { minutes: 60, label: t('settingsPanel.sleepTimer.hour', '1 hour') }
   ];
 
   // Close when clicking outside
@@ -187,8 +189,9 @@ const SettingsPanel = ({
                     ? 'bg-purple-500 text-white shadow-lg'
                     : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'
                 }`}
+                aria-label={t('settingsPanel.speed.rate', '{{rate}}x speed', { rate: option })}
               >
-                {option === 1 ? 'Normal' : `${option}x`}
+                {option === 1 ? t('settingsPanel.speed.normal', 'Normal') : `${option}x`}
               </button>
             ))}
           </div>
@@ -206,12 +209,15 @@ const SettingsPanel = ({
                     ? 'bg-purple-500 text-white shadow-lg'
                     : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'
                 }`}
+                aria-label={t('settingsPanel.quality.option', '{{option}} quality', { option })}
               >
                 <div className="flex items-center justify-between">
                   <span>{option}</span>
                   {quality === option && <Check className="w-4 h-4" />}
                 </div>
-                <div className="text-xs opacity-70 mt-1">Best quality available</div>
+                <div className="text-xs opacity-70 mt-1">
+                  {t('settingsPanel.quality.bestAvailable', 'Best quality available')}
+                </div>
               </button>
             ))}
           </div>
@@ -223,16 +229,20 @@ const SettingsPanel = ({
             <button
               onClick={onTogglePip}
               className="w-full flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white"
+              aria-label={t('settingsPanel.advanced.pip', 'Picture-in-Picture')}
             >
               <PictureInPicture className="w-4 h-4" />
-              <span>Picture-in-Picture</span>
+              <span>{t('settingsPanel.advanced.pip', 'Picture-in-Picture')}</span>
             </button>
             
             <div className="space-y-2">
-              <label className="text-white text-sm font-medium">Sleep Timer</label>
+              <label className="text-white text-sm font-medium">
+                {t('settingsPanel.advanced.sleepTimer', 'Sleep Timer')}
+              </label>
               <select 
                 onChange={(e) => onToggleSleepTimer(parseInt(e.target.value))}
                 className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none transition-colors"
+                aria-label={t('settingsPanel.advanced.sleepTimerSelect', 'Select sleep timer duration')}
               >
                 {sleepTimerOptions.map(option => (
                   <option 
@@ -245,7 +255,7 @@ const SettingsPanel = ({
                 ))}
               </select>
               <div className="text-xs text-gray-400">
-                Video will automatically pause when timer ends
+                {t('settingsPanel.advanced.sleepTimerDescription', 'Video will automatically pause when timer ends')}
               </div>
             </div>
           </div>
@@ -256,8 +266,12 @@ const SettingsPanel = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-white text-sm font-medium flex justify-between">
-                <span>Volume Boost</span>
-                <span className="text-purple-400">{Math.round(volumeBoost * 100)}%</span>
+                <span>{t('settingsPanel.audio.volumeBoost', 'Volume Boost')}</span>
+                <span className="text-purple-400">
+                  {t('settingsPanel.audio.percentage', '{{percentage}}%', { 
+                    percentage: Math.round(volumeBoost * 100) 
+                  })}
+                </span>
               </label>
               <input
                 type="range"
@@ -267,15 +281,18 @@ const SettingsPanel = ({
                 value={volumeBoost}
                 onChange={(e) => handleVolumeBoostChange(parseFloat(e.target.value))}
                 className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                aria-label={t('settingsPanel.audio.volumeBoostSlider', 'Volume boost level')}
               />
               <div className="flex justify-between text-xs text-gray-400">
-                <span>Normal</span>
-                <span>Max Boost</span>
+                <span>{t('settingsPanel.audio.normal', 'Normal')}</span>
+                <span>{t('settingsPanel.audio.maxBoost', 'Max Boost')}</span>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-white text-sm font-medium">Audio Presets</label>
+              <label className="text-white text-sm font-medium">
+                {t('settingsPanel.audio.audioPresets', 'Audio Presets')}
+              </label>
               <div className="space-y-1">
                 {audioPresets.map(preset => (
                   <button
@@ -286,6 +303,7 @@ const SettingsPanel = ({
                         ? 'bg-purple-500 text-white'
                         : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'
                     }`}
+                    aria-label={t('settingsPanel.audio.preset', '{{name}} audio preset', { name: preset.name })}
                   >
                     <div className="text-left">
                       <div className="font-medium text-sm">{preset.name}</div>
@@ -306,9 +324,11 @@ const SettingsPanel = ({
               <label className="text-white text-sm font-medium flex justify-between">
                 <span className="flex items-center gap-2">
                   <Sun className="w-4 h-4" />
-                  Brightness
+                  {t('settingsPanel.video.brightness', 'Brightness')}
                 </span>
-                <span className="text-purple-400">{brightness}%</span>
+                <span className="text-purple-400">
+                  {t('settingsPanel.video.percentage', '{{percentage}}%', { percentage: brightness })}
+                </span>
               </label>
               <input
                 type="range"
@@ -321,6 +341,7 @@ const SettingsPanel = ({
                   onBrightnessChange(value);
                 }}
                 className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                aria-label={t('settingsPanel.video.brightnessSlider', 'Brightness level')}
               />
             </div>
 
@@ -328,9 +349,11 @@ const SettingsPanel = ({
               <label className="text-white text-sm font-medium flex justify-between">
                 <span className="flex items-center gap-2">
                   <Contrast className="w-4 h-4" />
-                  Contrast
+                  {t('settingsPanel.video.contrast', 'Contrast')}
                 </span>
-                <span className="text-purple-400">{contrast}%</span>
+                <span className="text-purple-400">
+                  {t('settingsPanel.video.percentage', '{{percentage}}%', { percentage: contrast })}
+                </span>
               </label>
               <input
                 type="range"
@@ -343,6 +366,7 @@ const SettingsPanel = ({
                   onContrastChange(value);
                 }}
                 className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                aria-label={t('settingsPanel.video.contrastSlider', 'Contrast level')}
               />
             </div>
 
@@ -350,9 +374,11 @@ const SettingsPanel = ({
               <label className="text-white text-sm font-medium flex justify-between">
                 <span className="flex items-center gap-2">
                   <Palette className="w-4 h-4" />
-                  Saturation
+                  {t('settingsPanel.video.saturation', 'Saturation')}
                 </span>
-                <span className="text-purple-400">{saturation}%</span>
+                <span className="text-purple-400">
+                  {t('settingsPanel.video.percentage', '{{percentage}}%', { percentage: saturation })}
+                </span>
               </label>
               <input
                 type="range"
@@ -365,15 +391,17 @@ const SettingsPanel = ({
                   onSaturationChange(value);
                 }}
                 className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                aria-label={t('settingsPanel.video.saturationSlider', 'Saturation level')}
               />
             </div>
 
             <button
               onClick={resetVideoEnhancements}
               className="w-full flex items-center justify-center gap-2 p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-white font-medium"
+              aria-label={t('settingsPanel.video.resetEnhancements', 'Reset all video enhancements')}
             >
               <RotateCcw className="w-4 h-4" />
-              Reset All Enhancements
+              {t('settingsPanel.video.resetAll', 'Reset All Enhancements')}
             </button>
           </div>
         );
@@ -401,6 +429,8 @@ const SettingsPanel = ({
     <div 
       ref={settingsRef}
       className="absolute bottom-full right-0 mb-3 w-80 bg-black/95 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border border-white/10 z-50"
+      role="menu"
+      aria-label={t('settingsPanel.menuLabel', 'Video settings menu')}
     >
       <div className="space-y-2">
         {settingsTabs.map((tab) => (
@@ -408,6 +438,8 @@ const SettingsPanel = ({
             <button
               onClick={() => handleTabClick(tab.id)}
               className="flex items-center justify-between w-full p-3 text-white hover:bg-white/10 rounded-lg transition-colors text-sm"
+              aria-expanded={activeTab === tab.id}
+              aria-controls={`settings-tab-${tab.id}`}
             >
               <div className="flex items-center gap-3">
                 {tab.icon}
@@ -417,7 +449,12 @@ const SettingsPanel = ({
             </button>
 
             {activeTab === tab.id && (
-              <div className="pl-4 space-y-3 animate-slide-down">
+              <div 
+                id={`settings-tab-${tab.id}`}
+                className="pl-4 space-y-3 animate-slide-down"
+                role="region"
+                aria-label={`${tab.label} settings`}
+              >
                 {renderTabContent(tab)}
               </div>
             )}

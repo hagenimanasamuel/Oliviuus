@@ -15,6 +15,7 @@ import {
 import { formatTime } from '../../utils/timeFormatters';
 import SettingsPanel from '../SettingsPanel/SettingsPanel';
 import PreviewThumbnail from '../Preview/PreviewThumbnail';
+import { useTranslation } from 'react-i18next';
 
 const PlayerControls = ({
   isPlaying,
@@ -30,7 +31,7 @@ const PlayerControls = ({
   timeDisplayMode,
   buffered,
   videoSource,
-  videoRef, // Added for SettingsPanel
+  videoRef,
   onTogglePlay,
   onSeek,
   onSkip,
@@ -44,7 +45,6 @@ const PlayerControls = ({
   containerRef,
   quality,
   onQualityChange,
-  // Add all the new props for SettingsPanel functionality
   onTogglePip,
   onToggleSleepTimer,
   onVolumeBoost,
@@ -52,6 +52,7 @@ const PlayerControls = ({
   onContrastChange,
   onSaturationChange
 }) => {
+  const { t } = useTranslation();
   const progressBarRef = useRef(null);
   const volumeContainerRef = useRef(null);
   const volumeHideTimerRef = useRef(null);
@@ -137,6 +138,8 @@ const PlayerControls = ({
         e.stopPropagation();
         // This will keep controls visible when moving within controls area
       }}
+      role="region"
+      aria-label={t('playerControls.accessibility.controls', 'Video player controls')}
     >
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none" />
@@ -161,6 +164,12 @@ const PlayerControls = ({
             onMouseMove={handleProgressHover}
             onMouseLeave={handleProgressLeave}
             onClick={handleProgressClick}
+            role="slider"
+            aria-label={t('playerControls.accessibility.progress', 'Video progress')}
+            aria-valuemin="0"
+            aria-valuemax={duration}
+            aria-valuenow={currentTime}
+            aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
           >
             {/* Progress Bar Background */}
             <div className="absolute inset-0 bg-gradient-to-r from-gray-700/60 to-gray-700/80 rounded-full overflow-hidden">
@@ -210,6 +219,14 @@ const PlayerControls = ({
             <button
               onClick={onTogglePlay}
               className="text-white hover:text-purple-400 transition-all duration-200 transform hover:scale-110 bg-white/10 hover:bg-white/20 p-2 rounded-full flex-shrink-0"
+              aria-label={isPlaying 
+                ? t('playerControls.buttons.pause', 'Pause') 
+                : t('playerControls.buttons.play', 'Play')
+              }
+              title={isPlaying 
+                ? t('playerControls.tooltips.pause', 'Pause (Space)') 
+                : t('playerControls.tooltips.play', 'Play (Space)')
+              }
             >
               {isPlaying ? (
                 <Pause className="w-5 h-5 md:w-6 md:h-6" />
@@ -223,14 +240,16 @@ const PlayerControls = ({
               <button
                 onClick={() => onSkip(-5)}
                 className="text-white hover:text-yellow-400 transition-all duration-200 transform hover:scale-110 bg-white/10 hover:bg-white/20 p-2 rounded-full flex-shrink-0"
-                title="Rewind 5s"
+                aria-label={t('playerControls.buttons.rewind', 'Rewind 5 seconds')}
+                title={t('playerControls.tooltips.rewind', 'Rewind 5s (←)')}
               >
                 <RotateCcw className="w-4 h-4 md:w-5 md:h-5" />
               </button>
               <button
                 onClick={() => onSkip(5)}
                 className="text-white hover:text-green-400 transition-all duration-200 transform hover:scale-110 bg-white/10 hover:bg-white/20 p-2 rounded-full flex-shrink-0"
-                title="Forward 5s"
+                aria-label={t('playerControls.buttons.forward', 'Forward 5 seconds')}
+                title={t('playerControls.tooltips.forward', 'Forward 5s (→)')}
               >
                 <SkipForward className="w-4 h-4 md:w-5 md:h-5" />
               </button>
@@ -246,6 +265,11 @@ const PlayerControls = ({
               <button
                 onClick={onToggleMute}
                 className="text-white hover:text-purple-400 transition-all duration-200 transform hover:scale-110 flex items-center justify-center bg-white/10 hover:bg-white/20 p-2 rounded-full w-10 h-10 md:w-12 md:h-12"
+                aria-label={isMuted || volume === 0 
+                  ? t('playerControls.buttons.unmute', 'Unmute') 
+                  : t('playerControls.buttons.mute', 'Mute')
+                }
+                title={t('playerControls.tooltips.mute', 'Mute (M)')}
               >
                 {isMuted || volume === 0 ? (
                   <VolumeX className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
@@ -279,6 +303,7 @@ const PlayerControls = ({
                       onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
                       className="volume-slider vertical h-24 md:h-32 accent-purple-500 mx-auto"
                       orient="vertical"
+                      aria-label={t('playerControls.accessibility.volume', 'Volume level')}
                     />
                   </div>
                 </div>
@@ -289,6 +314,8 @@ const PlayerControls = ({
             <button
               onClick={onTimeDisplayToggle}
               className="text-white hover:text-gray-300 transition-colors text-xs md:text-sm font-mono bg-white/10 hover:bg-white/20 px-2 md:px-3 py-1 md:py-2 rounded-lg min-w-[80px] md:min-w-[120px] text-center flex-shrink-0"
+              aria-label={t('playerControls.accessibility.timeDisplay', 'Video time display')}
+              title={t('playerControls.tooltips.timeDisplay', 'Toggle time display mode')}
             >
               {getDisplayTime()} / {formatTime(duration)}
             </button>
@@ -298,7 +325,10 @@ const PlayerControls = ({
           <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
             {/* Playback Rate Indicator */}
             {playbackRate !== 1 && (
-              <div className="text-white text-xs md:text-sm bg-purple-500 px-2 md:px-3 py-1 md:py-2 rounded-lg font-medium hidden sm:block">
+              <div 
+                className="text-white text-xs md:text-sm bg-purple-500 px-2 md:px-3 py-1 md:py-2 rounded-lg font-medium hidden sm:block"
+                aria-label={t('playerControls.accessibility.playbackRate', 'Playback rate: {{rate}}x', { rate: playbackRate })}
+              >
                 {playbackRate}x
               </div>
             )}
@@ -308,6 +338,8 @@ const PlayerControls = ({
               <button
                 onClick={() => onShowSettings(!showSettings)}
                 className={`text-white transition-all duration-200 transform hover:scale-110 bg-white/10 hover:bg-white/20 p-2 rounded-full ${showSettings ? 'text-purple-400 bg-white/20' : 'hover:text-purple-400'}`}
+                aria-label={t('playerControls.buttons.settings', 'Settings')}
+                title={t('playerControls.tooltips.settings', 'Settings (S)')}
               >
                 <Settings className="w-4 h-4 md:w-5 md:h-5" />
               </button>
@@ -335,6 +367,11 @@ const PlayerControls = ({
             <button
               onClick={onToggleFullscreen}
               className="text-white hover:text-purple-400 transition-all duration-200 transform hover:scale-110 bg-white/10 hover:bg-white/20 p-2 rounded-full flex-shrink-0"
+              aria-label={isFullscreen 
+                ? t('playerControls.buttons.exitFullscreen', 'Exit fullscreen') 
+                : t('playerControls.buttons.fullscreen', 'Enter fullscreen')
+              }
+              title={t('playerControls.tooltips.fullscreen', 'Fullscreen (F)')}
             >
               {isFullscreen ? (
                 <Minimize className="w-4 h-4 md:w-5 md:h-5" />

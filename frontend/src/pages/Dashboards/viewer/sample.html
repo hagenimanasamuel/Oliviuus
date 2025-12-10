@@ -133,3 +133,386 @@
 
 </body>
 </html>
+
+
+const getViewerContentById = async (req, res) => {
+  try {
+    const { contentId } = req.params;
+
+    // Check if user is authenticated (req.user is set by authMiddleware)
+    const isAuthenticated = req.user && req.user.id;
+    const userId = isAuthenticated ? req.user.id : null;
+
+    const cacheKey = generateCacheKey('singleContent', contentId, userId);
+    const cacheEntry = contentCache.get(cacheKey);
+    const forceRefresh = req.query.refresh === 'true';
+
+    if (!forceRefresh && cacheEntry && !isCacheStale(cacheEntry, cacheConfig.singleContent)) {
+      return res.json({
+        success: true,
+        data: cacheEntry.data,
+        cached: true,
+        timestamp: cacheEntry.timestamp,
+        is_authenticated: isAuthenticated
+      });
+    }
+
+    // Get basic content data (always public)
+    const contentRows = await query(`
+      SELECT 
+        c.*,
+        cr.license_type,
+        cr.downloadable,
+        cr.shareable,
+        cr.allowed_regions,
+        cr.blocked_countries,
+        cr.license_fee,
+        cr.revenue_share_percentage,
+        cr.start_date,
+        cr.end_date,
+        (
+          SELECT COUNT(*) 
+          FROM content_view_history 
+          WHERE content_id = c.id 
+          AND created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+        ) as recent_views_24h
+      FROM contents c
+      LEFT JOIN content_rights cr ON c.id = cr.content_id
+      WHERE c.id = ? 
+        AND c.status = 'published' 
+        AND c.visibility = 'public'
+    `, [contentId]);
+
+    if (contentRows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Content not found'
+      });
+    }
+
+    const content = contentRows[0];
+
+    // Get genres (public)
+    const genres = await query(`
+      SELECT g.* 
+      FROM content_genres cg 
+      JOIN genres g ON cg.genre_id = g.id 
+      WHERE cg.content_id = ?
+      ORDER BY cg.is_primary DESC, g.name ASC
+    `, [contentId]);
+    content.genres = genres;
+
+    // Get categories (public)
+    const categories = await query(`
+      SELECT cat.* 
+      FROM content_categories cc 
+      JOIN categories cat ON cc.category_id = cat.id 
+      WHERE cc.content_id = ?
+      ORDER BY cat.name ASC
+    `, [contentId]);
+    content.categories = categories;
+
+    // Get media assets (FIXED: removed visibility column)
+    const mediaAssets = await query(`
+      SELECT 
+        ma.*,
+        CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path) as url
+      FROM media_assets ma 
+      WHERE ma.content_id = ? 
+        AND ma.upload_status = 'completed'
+        -- visibility column doesn't exist, use content.visibility instead
+      ORDER BY 
+        ma.is_primary DESC,
+        FIELD(ma.asset_type, 'poster', 'thumbnail', 'trailer', 'mainVideo'),
+        ma.season_number,
+        ma.episode_number,
+        ma.created_at DESC
+    `, [process.env.R2_PUBLIC_URL_ID, contentId]);
+    content.media_assets = mediaAssets;
+
+    const trailerAsset = mediaAssets.find(asset => asset.asset_type === 'trailer');
+    content.trailer = trailerAsset || null;
+
+    const primaryImage = mediaAssets.find(asset =>
+      asset.is_primary && (asset.asset_type === 'poster' || asset.asset_type === 'thumbnail')
+    ) || mediaAssets.find(asset =>
+      asset.asset_type === 'poster' || asset.asset_type === 'thumbnail'
+    );
+    content.primary_image_url = primaryImage?.url || null;
+
+    // Get content warnings (if table exists)
+    try {
+      const warnings = await query(`
+        SELECT * FROM content_warnings 
+        WHERE content_id = ?
+        ORDER BY severity DESC, warning_type ASC
+      `, [contentId]);
+      content.content_warnings = warnings;
+    } catch (error) {
+      content.content_warnings = [];
+    }
+
+    // Get languages (if table exists)
+    try {
+      const languages = await query(`
+        SELECT 
+          cs.*,
+          cs.language_code as code,
+          cs.is_default as \`default\`
+        FROM content_subtitles cs 
+        WHERE cs.content_id = ?
+        ORDER BY cs.is_default DESC, cs.language_code ASC
+      `, [contentId]);
+      content.available_languages = languages;
+    } catch (error) {
+      content.available_languages = [];
+    }
+
+    // Get cast and crew
+    try {
+      const castCrew = await query(`
+        SELECT 
+          cp.*,
+          p.full_name,
+          p.display_name,
+          p.primary_role,
+          p.profile_image_url
+        FROM content_people cp
+        JOIN people p ON cp.person_id = p.id
+        WHERE cp.content_id = ?
+        ORDER BY 
+          cp.billing_order ASC,
+          FIELD(cp.role_type, 'director', 'producer', 'writer', 'actor'),
+          cp.character_name IS NULL,
+          cp.character_name ASC
+        LIMIT 20
+      `, [contentId]);
+      content.cast_crew = castCrew;
+      content.cast = castCrew.filter(person => person.role_type === 'actor');
+      content.crew = castCrew.filter(person => person.role_type !== 'actor');
+    } catch (error) {
+      content.cast_crew = [];
+      content.cast = [];
+      content.crew = [];
+    }
+
+    // Get ratings stats
+    try {
+      const ratingStats = await query(`
+        SELECT 
+          AVG(rating) as current_rating,
+          COUNT(*) as current_rating_count
+        FROM content_ratings 
+        WHERE content_id = ?
+      `, [contentId]);
+
+      content.current_rating = parseFloat(ratingStats[0].current_rating || 0).toFixed(2);
+      content.current_rating_count = ratingStats[0].current_rating_count || 0;
+    } catch (error) {
+      content.current_rating = "0.00";
+      content.current_rating_count = 0;
+    }
+
+    // Handle series content
+    if (content.content_type === 'series') {
+      const seasonNumbers = [...new Set(mediaAssets
+        .filter(asset => asset.season_number !== null && asset.season_number !== undefined)
+        .map(asset => asset.season_number)
+      )].sort((a, b) => a - b);
+
+      const seasons = [];
+
+      for (const seasonNumber of seasonNumbers) {
+        const seasonPoster = mediaAssets.find(asset =>
+          asset.season_number === seasonNumber &&
+          (asset.asset_type === 'season_poster' || asset.asset_type === 'poster')
+        );
+
+        // Find all episodes for this season (using episode_number field)
+        const episodeAssets = mediaAssets.filter(asset =>
+          asset.season_number === seasonNumber &&
+          asset.episode_number !== null &&
+          asset.episode_number !== undefined
+        );
+
+        // Get unique episode numbers
+        const episodeNumbers = [...new Set(episodeAssets
+          .map(asset => asset.episode_number)
+        )].sort((a, b) => a - b);
+
+        const episodes = [];
+
+        for (const episodeNumber of episodeNumbers) {
+          // Find episode-specific assets
+          const episodeVideo = episodeAssets.find(asset =>
+            asset.episode_number === episodeNumber &&
+            (asset.asset_type === 'episodeVideo' || asset.asset_type === 'mainVideo')
+          );
+
+          const episodeThumbnail = episodeAssets.find(asset =>
+            asset.episode_number === episodeNumber &&
+            asset.asset_type === 'episodeThumbnail'
+          );
+
+          const episodeTrailer = episodeAssets.find(asset =>
+            asset.episode_number === episodeNumber &&
+            asset.asset_type === 'episodeTrailer'
+          );
+
+          // Get any asset for this episode to extract episode metadata
+          const anyEpisodeAsset = episodeAssets.find(asset => asset.episode_number === episodeNumber);
+
+          episodes.push({
+            id: `season-${seasonNumber}-episode-${episodeNumber}`,
+            episode_number: episodeNumber,
+            title: anyEpisodeAsset?.episode_title || `Episode ${episodeNumber}`,
+            description: anyEpisodeAsset?.episode_description || null,
+            duration_minutes: episodeVideo?.duration_seconds ? Math.floor(episodeVideo.duration_seconds / 60) : null,
+            release_date: anyEpisodeAsset?.created_at || null,
+            episode_thumbnail_url: episodeThumbnail?.url || null,
+            episode_video_url: episodeVideo?.url || null,
+            has_trailer: !!episodeTrailer,
+            episode_trailer_url: episodeTrailer?.url || null
+          });
+        }
+
+        seasons.push({
+          id: `season-${seasonNumber}`,
+          season_number: seasonNumber,
+          title: `Season ${seasonNumber}`,
+          description: null,
+          release_date: null,
+          season_poster_url: seasonPoster?.url || null,
+          episode_count: episodes.length,
+          episodes: isAuthenticated ? episodes : episodes.slice(0, 3) // Show more episodes for authenticated users
+        });
+      }
+
+      content.seasons = seasons;
+    } else {
+      content.seasons = [];
+    }
+
+    // Get similar content
+    try {
+      const similarContent = await query(`
+        SELECT 
+          c.id,
+          c.title,
+          c.content_type,
+          c.duration_minutes,
+          c.release_date,
+          c.average_rating,
+          c.age_rating,
+          (
+            SELECT CONCAT('https://pub-', ?, '.r2.dev/', ma.file_path)
+            FROM media_assets ma 
+            WHERE ma.content_id = c.id 
+              AND ma.asset_type IN ('thumbnail', 'poster')
+              AND ma.upload_status = 'completed'
+            ORDER BY ma.is_primary DESC, ma.created_at DESC
+            LIMIT 1
+          ) as primary_image_url
+        FROM contents c
+        JOIN content_genres cg ON c.id = cg.content_id
+        WHERE cg.genre_id IN (
+          SELECT genre_id FROM content_genres WHERE content_id = ?
+        )
+        AND c.id != ?
+        AND c.status = 'published'
+        AND c.visibility = 'public'
+        GROUP BY c.id
+        ORDER BY COUNT(cg.genre_id) DESC
+        LIMIT 6
+      `, [process.env.R2_PUBLIC_URL_ID, contentId, contentId]);
+
+      content.similar_content = similarContent;
+    } catch (error) {
+      content.similar_content = [];
+    }
+
+    // USER-SPECIFIC DATA (only for authenticated users)
+    if (isAuthenticated) {
+      try {
+        // Get user rating
+        const userRating = await query(`
+          SELECT rating, review_text 
+          FROM content_ratings 
+          WHERE content_id = ? AND user_id = ?
+        `, [contentId, userId]);
+
+        if (userRating.length > 0) {
+          content.user_rating = userRating[0].rating;
+          content.user_review = userRating[0].review_text;
+        }
+
+        // Check if in watchlist
+        const watchlistCheck = await query(`
+          SELECT 1 FROM user_watchlist 
+          WHERE content_id = ? AND user_id = ?
+        `, [contentId, userId]);
+        content.in_watchlist = watchlistCheck.length > 0;
+
+        // Check if liked
+        const likeCheck = await query(`
+          SELECT 1 FROM user_likes 
+          WHERE content_id = ? AND user_id = ?
+        `, [contentId, userId]);
+        content.is_liked = likeCheck.length > 0;
+
+        // Get watch history
+        const watchHistory = await query(`
+          SELECT 
+            percentage_watched,
+            watch_duration_seconds,
+            last_watched_at
+          FROM content_view_history 
+          WHERE content_id = ? AND user_id = ?
+          ORDER BY last_watched_at DESC
+          LIMIT 1
+        `, [contentId, userId]);
+
+        if (watchHistory.length > 0) {
+          content.watch_history = {
+            percentage_watched: watchHistory[0].percentage_watched,
+            watch_duration_seconds: watchHistory[0].watch_duration_seconds,
+            last_watched_at: watchHistory[0].last_watched_at
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching user-specific data:', error.message);
+      }
+    }
+
+    // Add context info
+    content.context = {
+      is_authenticated: isAuthenticated,
+      can_access: isAuthenticated || content.visibility === 'public',
+      requires_subscription: !isAuthenticated,
+      last_updated: new Date().toISOString()
+    };
+
+    // Update cache
+    contentCache.set(cacheKey, {
+      data: content,
+      timestamp: Date.now()
+    });
+
+    res.json({
+      success: true,
+      data: content,
+      cached: false,
+      timestamp: Date.now(),
+      is_authenticated: isAuthenticated,
+      requires_subscription: !isAuthenticated
+    });
+
+  } catch (error) {
+    console.error('Error fetching content by ID:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Unable to load content',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};

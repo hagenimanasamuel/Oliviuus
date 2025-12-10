@@ -1,0 +1,92 @@
+{
+  "name": "Oliviuus",
+  "short_name": "Oliviuus",
+  "description": "Streaming Platform for Rwandan Cinema & Global Entertainment. Launching 2026.",
+  "theme_color": "#BC8BBC",
+  "background_color": "#000000",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "id": "/",
+  "categories": ["entertainment", "movies", "video", "streaming"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Oliviuus Desktop Streaming Interface"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Oliviuus Mobile App"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Movies",
+      "short_name": "Movies",
+      "description": "Browse latest movies",
+      "url": "/movies",
+      "icons": [{ "src": "/icon-movies.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "My Watchlist",
+      "short_name": "Watchlist",
+      "description": "View your saved content",
+      "url": "/watchlist",
+      "icons": [{ "src": "/icon-watchlist.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Continue Watching",
+      "short_name": "Continue",
+      "description": "Resume your last watched",
+      "url": "/continue",
+      "icons": [{ "src": "/icon-continue.png", "sizes": "96x96" }]
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": {
+      "title": "name",
+      "text": "description",
+      "url": "link"
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+oliviuus",
+      "url": "/open?url=%s"
+    }
+  ]
+}

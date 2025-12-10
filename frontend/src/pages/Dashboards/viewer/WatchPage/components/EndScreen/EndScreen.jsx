@@ -1,7 +1,7 @@
-// components/EndScreen/EndScreen.jsx
 import React, { useState, useEffect } from 'react';
 import { Play, Clock, RotateCcw, SkipForward, Film, Tv, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const EndScreen = ({ 
   content, 
@@ -13,6 +13,7 @@ const EndScreen = ({
   similarContent = [],
   isSeries 
 }) => {
+  const { t } = useTranslation();
   const [countdown, setCountdown] = useState(10);
   const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
   const navigate = useNavigate();
@@ -57,9 +58,11 @@ const EndScreen = ({
 
   const getContentTitle = () => {
     if (isSeries && currentEpisode) {
-      return currentEpisode.title || `Episode ${episodes.findIndex(ep => ep.id === currentEpisode.id) + 1}`;
+      return currentEpisode.title || t('endScreen.episodeNumber', 'Episode {{number}}', { 
+        number: episodes.findIndex(ep => ep.id === currentEpisode.id) + 1 
+      });
     }
-    return content?.title || 'Content';
+    return content?.title || t('endScreen.defaultContentTitle', 'Content');
   };
 
   // Get thumbnail URL for content
@@ -96,16 +99,16 @@ const EndScreen = ({
                 <span className="text-2xl md:text-3xl lg:text-4xl">🎉</span>
               </div>
               <h2 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Congratulations!
+                {t('endScreen.congratulations', 'Congratulations!')}
               </h2>
               <p className="text-base md:text-lg lg:text-xl text-gray-300 mb-2">
-                You've completed watching all episodes of
+                {t('endScreen.completedAllEpisodes', 'You\'ve completed watching all episodes of')}
               </p>
               <p className="text-lg md:text-xl lg:text-2xl font-semibold text-purple-400 mb-4">
                 "{content?.title}"
               </p>
               <p className="text-sm md:text-base text-gray-400">
-                Visit us next moment to watch more amazing content!
+                {t('endScreen.visitNextMoment', 'Visit us next moment to watch more amazing content!')}
               </p>
             </div>
 
@@ -113,7 +116,11 @@ const EndScreen = ({
             {filteredSimilarContent.length > 0 && (
               <div className="mt-6 md:mt-8 lg:mt-10">
                 <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-4 md:mb-6 text-center text-white">
-                  Check Out These Similar {isSeries ? 'Series' : 'Movies'}
+                  {t('endScreen.checkOutSimilar', 'Check Out These Similar {{type}}', { 
+                    type: isSeries 
+                      ? t('endScreen.contentTypes.series', 'Series') 
+                      : t('endScreen.contentTypes.movies', 'Movies')
+                  })}
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3 lg:gap-4">
                   {filteredSimilarContent.slice(0, 5).map((item) => {
@@ -123,6 +130,7 @@ const EndScreen = ({
                         key={item.id}
                         onClick={() => handleContentSelect(item)}
                         className="group text-left transition-all duration-300 hover:scale-105 focus:scale-105 focus:outline-none"
+                        aria-label={t('endScreen.aria.playContent', 'Play {{title}}', { title: item.title })}
                       >
                         <div className="relative aspect-[2/3] bg-gray-800 rounded-lg md:rounded-xl overflow-hidden mb-2 shadow-lg group-hover:shadow-xl group-hover:shadow-purple-500/20 transition-all duration-300">
                           {thumbnailUrl ? (
@@ -152,7 +160,10 @@ const EndScreen = ({
                           {item.title}
                         </h4>
                         <p className="text-xs text-gray-400 truncate">
-                          {item.content_type === 'series' ? 'Series' : 'Movie'}
+                          {item.content_type === 'series' 
+                            ? t('endScreen.contentType.series', 'Series') 
+                            : t('endScreen.contentType.movie', 'Movie')
+                          }
                         </p>
                       </button>
                     );
@@ -166,8 +177,9 @@ const EndScreen = ({
               <button
                 onClick={() => navigate('/browse')}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-base md:text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 w-full max-w-xs"
+                aria-label={t('endScreen.buttons.browseAllContent', 'Browse all content')}
               >
-                Browse All Content
+                {t('endScreen.buttons.browseAllContent', 'Browse All Content')}
               </button>
             </div>
           </div>
@@ -185,6 +197,7 @@ const EndScreen = ({
           <button
             onClick={onReplay}
             className="bg-gray-800 hover:bg-gray-700 p-2 rounded-lg transition-colors"
+            aria-label={t('common.actions.close', 'Close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -196,7 +209,10 @@ const EndScreen = ({
           {/* Main Actions Section */}
           <div className="text-center">
             <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 md:mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent px-2">
-              {isSeries && nextEpisode ? "Next Episode Starting Soon" : "You've Finished Watching"}
+              {isSeries && nextEpisode 
+                ? t('endScreen.nextEpisodeStarting', 'Next Episode Starting Soon') 
+                : t('endScreen.finishedWatching', 'You\'ve Finished Watching')
+              }
             </h2>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-4 md:mb-6 px-2">
               {getContentTitle()}
@@ -208,9 +224,10 @@ const EndScreen = ({
               <button
                 onClick={onReplay}
                 className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-4 py-3 md:px-6 md:py-4 rounded-xl text-sm md:text-base font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto justify-center shadow-lg hover:shadow-xl hover:shadow-purple-500/20 min-h-[44px]"
+                aria-label={t('endScreen.buttons.watchAgain', 'Watch again')}
               >
                 <RotateCcw className="w-4 h-4 md:w-5 md:h-5" />
-                Watch Again
+                {t('endScreen.buttons.watchAgain', 'Watch Again')}
               </button>
 
               {/* Next Episode Button (for series) */}
@@ -221,9 +238,10 @@ const EndScreen = ({
                     onNextEpisode(nextEpisode);
                   }}
                   className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 px-4 py-3 md:px-6 md:py-4 rounded-xl text-sm md:text-base font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto justify-center shadow-lg hover:shadow-xl hover:shadow-green-500/20 min-h-[44px]"
+                  aria-label={t('endScreen.buttons.nextEpisode', 'Play next episode')}
                 >
                   <Play className="w-4 h-4 md:w-5 md:h-5" />
-                  Next Episode
+                  {t('endScreen.buttons.nextEpisode', 'Next Episode')}
                 </button>
               )}
             </div>
@@ -234,18 +252,19 @@ const EndScreen = ({
             <div className="bg-gray-900/80 rounded-xl md:rounded-2xl p-3 md:p-4 lg:p-6 border border-gray-700/50 shadow-xl mx-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 md:mb-4 gap-2">
                 <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-white">
-                  Up Next
+                  {t('endScreen.upNext', 'Up Next')}
                 </h3>
                 <div className="flex items-center gap-2 bg-gray-800 px-3 py-2 rounded-lg">
                   <Clock className="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
                   <span className="text-base md:text-lg font-semibold text-white">
-                    {countdown}s
+                    {t('endScreen.countdown', '{{seconds}}s', { seconds: countdown })}
                   </span>
                   <button
                     onClick={handleSkipAutoPlay}
                     className="text-gray-400 hover:text-white transition-colors text-sm bg-transparent hover:bg-gray-700 px-2 py-1 rounded ml-2"
+                    aria-label={t('endScreen.buttons.skipAutoPlay', 'Skip auto-play')}
                   >
-                    Skip
+                    {t('endScreen.buttons.skip', 'Skip')}
                   </button>
                 </div>
               </div>
@@ -279,15 +298,16 @@ const EndScreen = ({
                     {nextContent.title}
                   </h4>
                   <p className="text-gray-300 mb-3 md:mb-4 line-clamp-2 md:line-clamp-3 text-sm md:text-base">
-                    {nextContent.description || 'No description available'}
+                    {nextContent.description || t('endScreen.noDescription', 'No description available')}
                   </p>
                   <div className="flex flex-col sm:flex-row items-center gap-2 md:gap-3 justify-center md:justify-start">
                     <button
                       onClick={handlePlayNow}
                       className="flex items-center gap-2 bg-white text-black px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg w-full sm:w-auto justify-center min-h-[44px] text-sm md:text-base"
+                      aria-label={t('endScreen.buttons.playNow', 'Play now')}
                     >
                       <Play className="w-4 h-4 md:w-5 md:h-5" />
-                      <span>Play Now</span>
+                      <span>{t('endScreen.buttons.playNow', 'Play Now')}</span>
                     </button>
                   </div>
                 </div>
@@ -299,7 +319,10 @@ const EndScreen = ({
           {filteredSimilarContent.length > 0 && (
             <div className="bg-gray-900/50 rounded-xl md:rounded-2xl p-3 md:p-4 lg:p-6 border border-gray-700/50 mx-2">
               <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-4 md:mb-6 text-white text-center md:text-left">
-                {isSeries ? "More Series Like This" : "More Movies Like This"}
+                {isSeries 
+                  ? t('endScreen.moreSeriesLikeThis', 'More Series Like This') 
+                  : t('endScreen.moreMoviesLikeThis', 'More Movies Like This')
+                }
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3 lg:gap-4">
                 {filteredSimilarContent.slice(0, 6).map((item, index) => {
@@ -309,6 +332,7 @@ const EndScreen = ({
                       key={item.id}
                       onClick={() => handleContentSelect(item)}
                       className="group text-left transition-all duration-300 hover:scale-105 focus:scale-105 focus:outline-none"
+                      aria-label={t('endScreen.aria.playContent', 'Play {{title}}', { title: item.title })}
                     >
                       <div className="relative aspect-[2/3] bg-gray-800 rounded-lg overflow-hidden mb-1 md:mb-2 shadow-lg group-hover:shadow-xl group-hover:shadow-purple-500/20 transition-all duration-300">
                         {thumbnailUrl ? (
@@ -338,7 +362,10 @@ const EndScreen = ({
                         {item.title}
                       </h4>
                       <p className="text-xs text-gray-400 truncate">
-                        {item.content_type === 'series' ? 'Series' : 'Movie'}
+                        {item.content_type === 'series' 
+                          ? t('endScreen.contentType.series', 'Series') 
+                          : t('endScreen.contentType.movie', 'Movie')
+                        }
                       </p>
                     </button>
                   );
@@ -352,13 +379,14 @@ const EndScreen = ({
             <div className="text-center py-6 md:py-8 bg-gray-900/50 rounded-xl md:rounded-2xl border border-gray-700/50 mx-2">
               <Film className="w-12 h-12 md:w-16 md:h-16 text-gray-500 mx-auto mb-3 md:mb-4" />
               <p className="text-gray-400 text-base md:text-lg mb-4 md:mb-6">
-                Check back later for more amazing content!
+                {t('endScreen.checkBackLater', 'Check back later for more amazing content!')}
               </p>
               <button
                 onClick={() => navigate('/browse')}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg min-h-[44px] text-sm md:text-base"
+                aria-label={t('endScreen.buttons.browseAllContent', 'Browse all content')}
               >
-                Browse All Content
+                {t('endScreen.buttons.browseAllContent', 'Browse All Content')}
               </button>
             </div>
           )}

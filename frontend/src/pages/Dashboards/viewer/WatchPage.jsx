@@ -1,23 +1,16 @@
-// Enhanced Professional WatchPage.jsx with Advanced Security & Custom Right-Click
+// Enhanced Professional WatchPage.jsx with Advanced Navigation System
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { X, ChevronLeft, AlertCircle, Shield, Users, Globe, Copy, Link, Download, Share } from 'lucide-react';
+import { X, ChevronLeft, AlertCircle, Shield, Users, Globe, Copy, Link, Download, Share, Check, ExternalLink } from 'lucide-react';
 import api from '../../../api/axios';
+import { Helmet } from 'react-helmet';
+import { useTranslation } from 'react-i18next';
 
 // Hooks
 import { useVideoPlayer } from './WatchPage/hooks/useVideoPlayer';
 import { useVideoControls } from './WatchPage/hooks/useVideoControls';
 import { useVideoState } from './WatchPage/hooks/useVideoState';
 import { useVideoQuality } from './WatchPage/hooks/useVideoQuality';
-
-// Components
-import VideoPlayer from './WatchPage/components/VideoPlayer/VideoPlayer';
-import PlayerControls from './WatchPage/components/PlayerControls/PlayerControls';
-import LoadingOverlay from './WatchPage/components/Overlays/LoadingOverlay';
-import JumpIndicator from './WatchPage/components/Overlays/JumpIndicator';
-import ConnectionIndicator from './WatchPage/components/Overlays/ConnectionIndicator';
-import EpisodeSelector from './WatchPage/components/EpisodeSelector/EpisodeSelector';
-import EndScreen from './WatchPage/components/EndScreen/EndScreen';
 
 // Enhanced device detection with download manager detection
 const detectDeviceType = () => {
@@ -80,24 +73,114 @@ const detectDownloadManager = () => {
   return hasDownloadManagerUA || hasDownloadManagerPlugin || hasDownloadManagerMime;
 };
 
-// Enhanced Security Error Component with Professional Messaging
-const SecurityErrorOverlay = ({ error, onBack, onRetry, errorDetails }) => {
-  const [countdown, setCountdown] = useState(10);
+// Navigation History Manager
+const useNavigationHistory = () => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      const previousPath = window.history.state?.usr?.from;
-      if (previousPath && previousPath.startsWith('/watch/')) {
-        navigate(-1);
-      } else {
-        navigate('/');
-      }
+  
+  // Save current path before navigating to watch page
+  const saveCurrentPath = useCallback(() => {
+    const currentPath = window.location.pathname;
+    if (!currentPath.startsWith('/watch/')) {
+      sessionStorage.setItem('lastNonWatchPath', currentPath);
+      // Also save in localStorage for persistence
+      localStorage.setItem('lastNonWatchPath', currentPath);
     }
-  }, [countdown, navigate]);
+  }, []);
+  
+  // Get the last non-watch path
+  const getLastNonWatchPath = useCallback(() => {
+    // Check sessionStorage first (more recent)
+    const sessionPath = sessionStorage.getItem('lastNonWatchPath');
+    if (sessionPath && !sessionPath.startsWith('/watch/')) {
+      return sessionPath;
+    }
+    
+    // Fallback to localStorage
+    const localPath = localStorage.getItem('lastNonWatchPath');
+    if (localPath && !localPath.startsWith('/watch/')) {
+      return localPath;
+    }
+    
+    return null;
+  }, []);
+  
+  // Save watch history
+  const saveWatchHistory = useCallback((watchPath) => {
+    const watchHistory = JSON.parse(sessionStorage.getItem('watchHistory') || '[]');
+    
+    // Remove any existing entry for this path to avoid duplicates
+    const filteredHistory = watchHistory.filter(path => path !== watchPath);
+    
+    // Add to beginning and keep only last 10
+    const updatedHistory = [watchPath, ...filteredHistory].slice(0, 10);
+    
+    sessionStorage.setItem('watchHistory', JSON.stringify(updatedHistory));
+  }, []);
+  
+  // Get smart navigation target
+  const getSmartNavigationTarget = useCallback(() => {
+    // Check if we have watch history
+    const watchHistory = JSON.parse(sessionStorage.getItem('watchHistory') || '[]');
+    
+    // Filter out current watch page and any other watch pages
+    const nonWatchHistory = watchHistory.filter(path => !path.startsWith('/watch/'));
+    
+    if (nonWatchHistory.length > 0) {
+      return nonWatchHistory[0]; // Return most recent non-watch page
+    }
+    
+    // Fallback to last non-watch path
+    const lastNonWatchPath = getLastNonWatchPath();
+    if (lastNonWatchPath) {
+      return lastNonWatchPath;
+    }
+    
+    // Default to homepage
+    return '/';
+  }, [getLastNonWatchPath]);
+  
+  // Navigate smartly
+  const smartNavigateBack = useCallback(() => {
+    const targetPath = getSmartNavigationTarget();
+    navigate(targetPath);
+  }, [navigate, getSmartNavigationTarget]);
+  
+  return {
+    saveCurrentPath,
+    saveWatchHistory,
+    smartNavigateBack,
+    getSmartNavigationTarget,
+    getLastNonWatchPath
+  };
+};
+
+// Enhanced Security Error Component with Professional Messaging
+const SecurityErrorOverlay = ({ error, onRetry, errorDetails }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const timerRef = useRef(null);
+  const { smartNavigateBack } = useNavigationHistory();
+
+  // Setup silent countdown
+  useEffect(() => {
+    timerRef.current = setTimeout(() => {
+      smartNavigateBack();
+    }, 10000); // 10 seconds silent countdown
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [smartNavigateBack]);
+
+  // Handle user interaction to stop countdown
+  const handleUserInteraction = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
 
   const getErrorIcon = () => {
     switch (errorDetails?.code) {
@@ -123,181 +206,262 @@ const SecurityErrorOverlay = ({ error, onBack, onRetry, errorDetails }) => {
   const getErrorTitle = () => {
     switch (errorDetails?.code) {
       case 'SUBSCRIPTION_REQUIRED':
-        return 'Subscription Required';
+        return t('watch.errors.subscriptionRequired.title', 'Subscription Required');
       case 'DEVICE_LIMIT_REACHED':
-        return errorDetails?.isFamilyShared ? 'Family Device Limit Reached' : 'Device Limit Reached';
+        return errorDetails?.isFamilyShared 
+          ? t('watch.errors.deviceLimitReached.familyTitle', 'Family Device Limit Reached')
+          : t('watch.errors.deviceLimitReached.title', 'Device Limit Reached');
       case 'STREAM_LIMIT_REACHED':
-        return errorDetails?.isFamilyShared ? 'Family Stream Limit Reached' : 'Stream Limit Reached';
+        return errorDetails?.isFamilyShared 
+          ? t('watch.errors.streamLimitReached.familyTitle', 'Family Stream Limit Reached')
+          : t('watch.errors.streamLimitReached.title', 'Stream Limit Reached');
       case 'GEO_RESTRICTED':
-        return 'Content Not Available';
+        return t('watch.errors.geoRestricted.title', 'Content Not Available');
       case 'PLAN_RESTRICTION':
-        return 'Plan Restriction';
+        return t('watch.errors.planRestriction.title', 'Plan Restriction');
       case 'FAMILY_ACCESS_RESTRICTED':
-        return 'Family Access Restricted';
+        return t('watch.errors.familyAccessRestricted.title', 'Family Access Restricted');
       case 'TIME_RESTRICTION':
-        return 'Access Time Restricted';
+        return t('watch.errors.timeRestriction.title', 'Access Time Restricted');
       default:
-        return 'Access Denied';
+        return t('watch.errors.accessDenied.title', 'Access Denied');
     }
   };
 
   const getErrorDescription = () => {
-    return error || 'You do not have permission to access this content.';
+    return error || t('watch.errors.default.description', 'You do not have permission to access this content.');
   };
 
   const getActionButtons = () => {
+    const buttons = [];
+
+    // Add Go Back button
+    buttons.push(
+      <button
+        key="go-back"
+        onClick={() => {
+          handleUserInteraction();
+          smartNavigateBack();
+        }}
+        className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+      >
+        {t('common.actions.goBack', 'Go Back')}
+      </button>
+    );
+
     switch (errorDetails?.code) {
       case 'SUBSCRIPTION_REQUIRED':
-        return (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        buttons.push(
+          <button
+            key="subscription"
+            onClick={() => {
+              handleUserInteraction();
+              window.location.href = '/account/settings#subscription';
+            }}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {t('watch.errors.subscriptionRequired.viewPlans', 'View Subscription Plans')}
+          </button>
+        );
+        if (errorDetails?.allowFamilyJoin) {
+          buttons.push(
             <button
-              onClick={() => window.location.href = '/account/settings#subscription'}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              View Subscription Plans
-            </button>
-            <button
-              onClick={() => window.location.href = '/family'}
+              key="family"
+              onClick={() => {
+                handleUserInteraction();
+                window.location.href = '/family';
+              }}
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
             >
-              Join Family Plan
+              {t('watch.errors.subscriptionRequired.joinFamily', 'Join Family Plan')}
             </button>
-          </div>
-        );
+          );
+        }
+        break;
 
       case 'DEVICE_LIMIT_REACHED':
-        return (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={() => window.location.href = '/account/settings#sessions'}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              {errorDetails?.isFamilyShared ? 'View Family Sessions' : 'Manage Active Sessions'}
-            </button>
-            <button
-              onClick={onRetry}
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              Try Again
-            </button>
-          </div>
+        buttons.push(
+          <button
+            key="sessions"
+            onClick={() => {
+              handleUserInteraction();
+              window.location.href = '/account/settings#sessions';
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {errorDetails?.isFamilyShared 
+              ? t('watch.errors.deviceLimitReached.viewFamilySessions', 'View Family Sessions')
+              : t('watch.errors.deviceLimitReached.manageSessions', 'Manage Active Sessions')}
+          </button>
         );
+        buttons.push(
+          <button
+            key="retry"
+            onClick={() => {
+              handleUserInteraction();
+              onRetry();
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {t('common.actions.tryAgain', 'Try Again')}
+          </button>
+        );
+        break;
 
       case 'STREAM_LIMIT_REACHED':
-        return (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={onRetry}
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              {errorDetails?.isFamilyShared ? 'Ask Family to Close Streams' : 'I\'ve Closed Other Streams'}
-            </button>
-          </div>
+        buttons.push(
+          <button
+            key="retry"
+            onClick={() => {
+              handleUserInteraction();
+              onRetry();
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {errorDetails?.isFamilyShared 
+              ? t('watch.errors.streamLimitReached.askFamily', 'Ask Family to Close Streams')
+              : t('watch.errors.streamLimitReached.closedOthers', 'I\'ve Closed Other Streams')}
+          </button>
         );
+        break;
 
       case 'PLAN_RESTRICTION':
-        return (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={() => window.location.href = '/account/settings#subscription'}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              Upgrade Plan
-            </button>
-          </div>
+        buttons.push(
+          <button
+            key="upgrade"
+            onClick={() => {
+              handleUserInteraction();
+              window.location.href = '/account/settings#subscription';
+            }}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {t('watch.errors.planRestriction.upgrade', 'Upgrade Plan')}
+          </button>
         );
+        break;
 
       case 'FAMILY_ACCESS_RESTRICTED':
-        return (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        buttons.push(
+          <button
+            key="family-settings"
+            onClick={() => {
+              handleUserInteraction();
+              window.location.href = '/account/settings';
+            }}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {t('watch.errors.familyAccessRestricted.manageSettings', 'Manage Family Settings')}
+          </button>
+        );
+        if (errorDetails?.allowPersonalPlan) {
+          buttons.push(
             <button
-              onClick={() => window.location.href = '/family'}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              Manage Family Settings
-            </button>
-            <button
-              onClick={() => window.location.href = '/account/settings#subscription'}
+              key="personal-plan"
+              onClick={() => {
+                handleUserInteraction();
+                window.location.href = '/account/settings#subscription';
+              }}
               className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
             >
-              Get Personal Plan
+              {t('watch.errors.familyAccessRestricted.getPersonalPlan', 'Get Personal Plan')}
             </button>
-          </div>
-        );
+          );
+        }
+        break;
 
       case 'TIME_RESTRICTION':
-        return (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={() => window.location.href = '/family#settings'}
-              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              View Time Settings
-            </button>
-            <button
-              onClick={onRetry}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              Try Again Later
-            </button>
-          </div>
+        buttons.push(
+          <button
+            key="time-settings"
+            onClick={() => {
+              handleUserInteraction();
+              window.location.href = '/account/settings';
+            }}
+            className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {t('watch.errors.timeRestriction.viewSettings', 'View Time Settings')}
+          </button>
         );
+        buttons.push(
+          <button
+            key="try-later"
+            onClick={() => {
+              handleUserInteraction();
+              onRetry();
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {t('watch.errors.timeRestriction.tryLater', 'Try Again Later')}
+          </button>
+        );
+        break;
 
       case 'GEO_RESTRICTED':
-        return (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={onRetry}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              Try Again
-            </button>
-          </div>
+        buttons.push(
+          <button
+            key="retry"
+            onClick={() => {
+              handleUserInteraction();
+              onRetry();
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {t('common.actions.tryAgain', 'Try Again')}
+          </button>
         );
+        break;
 
       default:
-        return (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={onRetry}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
-            >
-              Try Again
-            </button>
-          </div>
+        buttons.push(
+          <button
+            key="retry"
+            onClick={() => {
+              handleUserInteraction();
+              onRetry();
+            }}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 w-full sm:w-auto text-center"
+          >
+            {t('common.actions.tryAgain', 'Try Again')}
+          </button>
         );
     }
+
+    return (
+      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        {buttons}
+      </div>
+    );
   };
 
   const getHelpText = () => {
     switch (errorDetails?.code) {
       case 'DEVICE_LIMIT_REACHED':
         return errorDetails?.isFamilyShared
-          ? 'The family plan has reached its device limit. Ask the family owner to manage active sessions or upgrade the plan.'
-          : 'Manage your active sessions in account settings to free up device slots. Sessions automatically expire after 30 minutes of inactivity.';
-
+          ? t('watch.errors.deviceLimitReached.familyHelp', 'The family plan has reached its device limit. Ask the family owner to manage active sessions or upgrade the plan.')
+          : t('watch.errors.deviceLimitReached.help', 'Manage your active sessions in account settings to free up device slots. Sessions automatically expire after 30 minutes of inactivity.');
+      
       case 'STREAM_LIMIT_REACHED':
         return errorDetails?.isFamilyShared
-          ? 'Your family has reached the maximum number of simultaneous streams. Ask family members to close other video players.'
-          : 'Close video players on other devices or browser tabs to free up stream slots.';
-
+          ? t('watch.errors.streamLimitReached.familyHelp', 'Your family has reached the maximum number of simultaneous streams. Ask family members to close other video players.')
+          : t('watch.errors.streamLimitReached.help', 'Close video players on other devices or browser tabs to free up stream slots.');
+      
       case 'SUBSCRIPTION_REQUIRED':
-        return 'Choose from our flexible subscription plans or join a family plan to start watching unlimited content.';
-
+        return t('watch.errors.subscriptionRequired.help', 'Choose from our flexible subscription plans or join a family plan to start watching unlimited content.');
+      
       case 'PLAN_RESTRICTION':
-        return 'Upgrade to a premium plan to watch on all your favorite devices without restrictions.';
-
+        return t('watch.errors.planRestriction.help', 'Upgrade to a premium plan to watch on all your favorite devices without restrictions.');
+      
       case 'FAMILY_ACCESS_RESTRICTED':
-        return 'Your family access has been restricted. This could be due to suspension, expired family plan, or access time restrictions.';
-
+        return t('watch.errors.familyAccessRestricted.help', 'Your family access has been restricted. This could be due to suspension, expired family plan, or access time restrictions.');
+      
       case 'TIME_RESTRICTION':
-        return 'Your access is restricted during these hours due to family settings. Please try again during allowed access times.';
-
+        return t('watch.errors.timeRestriction.help', 'Your access is restricted during these hours due to family settings. Please try again during allowed access times.');
+      
       case 'GEO_RESTRICTED':
-        return 'This content is only available in specific regions due to licensing restrictions.';
-
+        return t('watch.errors.geoRestricted.help', 'This content is only available in specific regions due to licensing restrictions.');
+      
       default:
-        return 'If this problem persists, please contact our support team for assistance.';
+        return t('watch.errors.default.help', 'If this problem persists, please contact our support team for assistance.');
     }
   };
 
@@ -317,12 +481,31 @@ const SecurityErrorOverlay = ({ error, onBack, onRetry, errorDetails }) => {
         </div>
       );
     }
+    
+    // Show limit details for device and stream limits
+    if ((errorDetails?.code === 'DEVICE_LIMIT_REACHED' || errorDetails?.code === 'STREAM_LIMIT_REACHED') && errorDetails?.limits) {
+      return (
+        <div className="bg-gray-800/50 rounded-lg p-4 mb-6 border-l-4 border-yellow-500">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">{t('watch.errors.limits.active', 'Active')}</p>
+              <p className="text-white text-xl font-bold">{errorDetails.limits.active}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">{t('watch.errors.limits.maximum', 'Maximum')}</p>
+              <p className="text-white text-xl font-bold">{errorDetails.limits.maximum}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
     return null;
   };
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-6">
-      <div className="text-center max-w-md w-full animate-fadeIn">
+      <div className="text-center max-w-md w-full animate-fadeIn" onClick={handleUserInteraction}>
         {getErrorIcon()}
         <h3 className="text-white text-2xl font-bold mb-3">{getErrorTitle()}</h3>
         <p className="text-gray-300 text-lg mb-6 leading-relaxed">{getErrorDescription()}</p>
@@ -337,7 +520,7 @@ const SecurityErrorOverlay = ({ error, onBack, onRetry, errorDetails }) => {
           <p className="leading-relaxed">{getHelpText()}</p>
           <div className="pt-4 border-t border-gray-700/50">
             <p className="text-purple-400 font-medium">
-              Redirecting back in {countdown} seconds...
+              {t('watch.errors.redirecting', 'Auto-redirecting in 10 seconds...')}
             </p>
           </div>
         </div>
@@ -355,6 +538,7 @@ const CustomRightClickMenu = ({
   currentTime,
   isSeries 
 }) => {
+  const { t } = useTranslation();
   const menuRef = useRef(null);
   const [copied, setCopied] = useState(false);
 
@@ -435,7 +619,7 @@ const CustomRightClickMenu = ({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: content?.title || 'Video',
+          title: content?.title || t('common.video', 'Video'),
           url: window.location.href,
         });
         onClose();
@@ -449,25 +633,25 @@ const CustomRightClickMenu = ({
 
   const menuItems = [
     {
-      label: copied ? 'Copied!' : 'Copy Video Link',
+      label: copied ? t('common.copied', 'Copied!') : t('watch.rightClick.copyLink', 'Copy Video Link'),
       icon: copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />,
       onClick: handleCopyLink,
       disabled: false
     },
     {
-      label: 'Copy Link with Timestamp',
+      label: t('watch.rightClick.copyWithTimestamp', 'Copy Link with Timestamp'),
       icon: <Link className="w-4 h-4" />,
       onClick: handleCopyTimestamp,
       disabled: currentTime === 0
     },
     {
-      label: 'Share Video',
+      label: t('watch.rightClick.shareVideo', 'Share Video'),
       icon: <Share className="w-4 h-4" />,
       onClick: handleShare,
       disabled: false
     },
     {
-      label: 'Open in New Tab',
+      label: t('watch.rightClick.openNewTab', 'Open in New Tab'),
       icon: <ExternalLink className="w-4 h-4" />,
       onClick: () => {
         window.open(window.location.href, '_blank');
@@ -525,26 +709,21 @@ const CustomRightClickMenu = ({
       {/* Security Notice */}
       <div className="border-t border-gray-700/50 mt-2 pt-2 px-4">
         <p className="text-xs text-gray-400 text-center">
-          Protected Content
+          {t('watch.rightClick.protectedContent', 'Protected Content')}
         </p>
       </div>
     </div>
   );
 };
 
-// ExternalLink icon component
-const ExternalLink = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-  </svg>
-);
-
-// Check icon component
-const Check = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-  </svg>
-);
+// Components imports (kept as before)
+import VideoPlayer from './WatchPage/components/VideoPlayer/VideoPlayer';
+import PlayerControls from './WatchPage/components/PlayerControls/PlayerControls';
+import LoadingOverlay from './WatchPage/components/Overlays/LoadingOverlay';
+import JumpIndicator from './WatchPage/components/Overlays/JumpIndicator';
+import ConnectionIndicator from './WatchPage/components/Overlays/ConnectionIndicator';
+import EpisodeSelector from './WatchPage/components/EpisodeSelector/EpisodeSelector';
+import EndScreen from './WatchPage/components/EndScreen/EndScreen';
 
 const WatchPage = () => {
   const { id } = useParams();
@@ -552,6 +731,10 @@ const WatchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const containerRef = useRef(null);
   const videoContainerRef = useRef(null);
+  const { t } = useTranslation();
+  
+  // Navigation history manager
+  const { saveCurrentPath, saveWatchHistory, smartNavigateBack } = useNavigationHistory();
 
   // Content state
   const [content, setContent] = useState(null);
@@ -594,6 +777,43 @@ const WatchPage = () => {
   // Get episode ID from URL
   const episodeId = searchParams.get('ep');
 
+  // SEO Metadata
+  const pageTitle = useMemo(() => {
+    if (currentEpisode && content) {
+      const episodeNum = currentEpisode.episode_number || '';
+      const seasonNum = currentEpisode.season_number || '';
+      const episodeTitle = currentEpisode.title || '';
+      
+      if (seasonNum && episodeNum) {
+        return `${content.title} - Season ${seasonNum} Episode ${episodeNum}${episodeTitle ? ` - ${episodeTitle}` : ''}`;
+      }
+      return `${content.title}${episodeTitle ? ` - ${episodeTitle}` : ''}`;
+    }
+    return content?.title || t('watch.defaultTitle', 'Watch Video');
+  }, [content, currentEpisode, t]);
+
+  const pageDescription = useMemo(() => {
+    if (currentEpisode?.description) return currentEpisode.description;
+    if (content?.description) return content.description;
+    return t('watch.defaultDescription', 'Watch this video on our premium streaming platform.');
+  }, [content, currentEpisode, t]);
+
+  // Initialize navigation history
+  useEffect(() => {
+    // Save current path when component mounts
+    saveCurrentPath();
+    
+    // Save this watch to history
+    const currentPath = `/watch/${id}`;
+    saveWatchHistory(currentPath);
+    
+    // Also save series info if applicable
+    if (episodeId) {
+      const seriesPath = `/watch/${id}?ep=${episodeId}`;
+      saveWatchHistory(seriesPath);
+    }
+  }, [id, episodeId, saveCurrentPath, saveWatchHistory]);
+
   // Generate unique session ID for watch tracking
   const generateSessionId = useCallback(() => {
     return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -629,7 +849,8 @@ const WatchPage = () => {
           'x-screen-width': window.screen.width,
           'x-screen-height': window.screen.height,
           'x-has-download-manager': downloadManagerDetected.toString(),
-          'x-security-level': 'enhanced'
+          'x-security-level': 'enhanced',
+          'Accept-Language': localStorage.getItem('i18nextLng') || 'en'
         }
       };
 
@@ -652,27 +873,38 @@ const WatchPage = () => {
       // Enhanced error handling with specific messages
       if (err.response?.status === 403) {
         const errorData = err.response.data;
-        setSecurityError(errorData?.error || 'Access denied');
+        setSecurityError(errorData?.error || t('watch.errors.accessDenied.title', 'Access denied'));
         setErrorDetails({
           code: errorData?.code || 'ACCESS_DENIED',
-          details: errorData?.details || err.message
+          details: errorData?.details || err.message,
+          isFamilyShared: errorData?.is_family_shared || false,
+          limits: errorData?.limits,
+          additionalInfo: errorData?.additional_info,
+          allowFamilyJoin: errorData?.allow_family_join,
+          allowPersonalPlan: errorData?.allow_personal_plan
         });
         setSecurityChecked(true);
       } else if (err.response?.status === 404) {
-        setError('Content not found. It may have been removed or is unavailable.');
+        setError(t('watch.errors.contentNotFound', 'Content not found. It may have been removed or is unavailable.'));
       } else if (err.response?.status === 401) {
-        setSecurityError('Please log in to access this content.');
+        setSecurityError(t('watch.errors.authRequired.title', 'Please log in to access this content.'));
         setErrorDetails({
           code: 'AUTH_REQUIRED',
-          details: 'Your session may have expired. Please log in again.'
+          details: t('watch.errors.authRequired.details', 'Your session may have expired. Please log in again.')
         });
+      } else if (err.response?.status === 429) {
+        setError(t('watch.errors.tooManyRequests', 'Too many requests. Please try again later.'));
+      } else if (err.response?.status === 500) {
+        setError(t('watch.errors.serverError', 'Server error. Please try again later.'));
+      } else if (err.response?.status === 503) {
+        setError(t('watch.errors.serviceUnavailable', 'Service temporarily unavailable. Please try again later.'));
       } else {
-        setError('Unable to load this content. Please try again.');
+        setError(t('watch.errors.generic', 'Unable to load this content. Please try again.'));
       }
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   // Advanced download manager protection
   useEffect(() => {
@@ -989,6 +1221,10 @@ const WatchPage = () => {
       setSearchParams({ ep: episodeId });
     }
 
+    // Save series episode to history
+    const seriesPath = `/watch/${id}?ep=${episodeId}`;
+    saveWatchHistory(seriesPath);
+
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
@@ -1008,7 +1244,7 @@ const WatchPage = () => {
         }, 500);
       }, 300);
     }
-  }, [setIsPlaying, setCurrentTime, setSearchParams, videoRef, setAutoPlayAttempted, securityError]);
+  }, [setIsPlaying, setCurrentTime, setSearchParams, videoRef, setAutoPlayAttempted, securityError, id, saveWatchHistory]);
 
   // Navigate to next content
   const handleNextContent = useCallback((nextContent) => {
@@ -1323,16 +1559,10 @@ const WatchPage = () => {
     }
   }, [updateVideoFilters, securityError]);
 
-  // Smart back button handler
+  // Smart back button handler - Hybrid approach
   const handleBackClick = useCallback(() => {
-    const previousPath = window.history.state?.usr?.from;
-
-    if (previousPath && previousPath.startsWith('/watch/')) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
+    smartNavigateBack();
+  }, [smartNavigateBack]);
 
   // Retry function for security errors
   const handleRetry = useCallback(() => {
@@ -1470,293 +1700,379 @@ const WatchPage = () => {
       const episodeTitle = currentEpisode.title || currentEpisode.file_name || '';
 
       if (seasonNum && episodeNum) {
-        return `S${seasonNum}:E${episodeNum} - ${episodeTitle}`;
+        return `${t('watch.header.episodeFormat', 'S{{season}}:E{{episode}} - {{title}}', { 
+          season: seasonNum, 
+          episode: episodeNum, 
+          title: episodeTitle 
+        })}`;
       } else if (episodeNum) {
-        return `Episode ${episodeNum} - ${episodeTitle}`;
+        return `${t('watch.header.episode', 'Episode {{number}} - {{title}}', { 
+          number: episodeNum, 
+          title: episodeTitle 
+        })}`;
       }
       return episodeTitle;
     }
-    return content?.title || 'Now Playing';
+    return content?.title || t('watch.header.nowPlaying', 'Now Playing');
   };
 
   // Show security error overlay if there's a security error
   if (securityError) {
     return (
-      <SecurityErrorOverlay
-        error={securityError}
-        errorDetails={errorDetails}
-        onRetry={handleRetry}
-      />
+      <>
+        <Helmet>
+          <title>{t('watch.errors.title', 'Access Error - Streaming Platform')}</title>
+          <meta name="description" content={t('watch.errors.metaDescription', 'Access restricted to this content')} />
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <SecurityErrorOverlay
+          error={securityError}
+          errorDetails={errorDetails}
+          onRetry={handleRetry}
+        />
+      </>
     );
   }
 
   if (loading) {
-    return <LoadingOverlay type="initial" />;
+    return (
+      <>
+        <Helmet>
+          <title>{t('watch.loading.title', 'Loading... - Streaming Platform')}</title>
+          <meta name="description" content={t('watch.loading.metaDescription', 'Video is loading, please wait...')} />
+        </Helmet>
+        <LoadingOverlay type="initial" />
+      </>
+    );
   }
 
   if (error && !securityError) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center max-w-md animate-fadeIn">
-          <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <span className="text-red-400 text-2xl">!</span>
-          </div>
-          <h3 className="text-white text-xl font-semibold mb-2">Playback Error</h3>
-          <p className="text-gray-400 mb-6">{error}</p>
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={handleBackClick}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105"
-            >
-              Go Back
-            </button>
-            <button
-              onClick={handleRetry}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105"
-            >
-              Try Again
-            </button>
+      <>
+        <Helmet>
+          <title>{t('watch.errors.playbackError', 'Playback Error - Streaming Platform')}</title>
+          <meta name="description" content={t('watch.errors.playbackMetaDescription', 'Unable to play video due to an error')} />
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-center max-w-md animate-fadeIn">
+            <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <span className="text-red-400 text-2xl">!</span>
+            </div>
+            <h3 className="text-white text-xl font-semibold mb-2">
+              {t('watch.errors.playbackTitle', 'Playback Error')}
+            </h3>
+            <p className="text-gray-400 mb-6">{error}</p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={handleBackClick}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105"
+              >
+                {t('common.actions.goBack', 'Go Back')}
+              </button>
+              <button
+                onClick={handleRetry}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105"
+              >
+                {t('common.actions.tryAgain', 'Try Again')}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (!content) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-xl animate-pulse">Content not found</div>
-      </div>
+      <>
+        <Helmet>
+          <title>{t('watch.errors.notFound', 'Content Not Found - Streaming Platform')}</title>
+          <meta name="description" content={t('watch.errors.notFoundMetaDescription', 'The requested content could not be found')} />
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-white text-xl animate-pulse">
+            {t('watch.errors.contentNotFound', 'Content not found')}
+          </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black relative">
-      {/* Enhanced Header with current title */}
-      <div
-        className={`absolute top-0 left-0 right-0 z-50 p-4 md:p-6 bg-gradient-to-b from-black/90 via-black/60 to-transparent transition-all duration-500 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}`}
-        onMouseEnter={showControlsTemporarily}
-        onMouseMove={showControlsTemporarily}
-      >
-        <div className="flex items-center justify-between gap-4">
-          {/* Left side - Close/Back button */}
-          <button
-            onClick={handleBackClick}
-            className="flex items-center gap-2 text-white hover:text-purple-300 transition-all duration-200 group bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full"
-          >
-            <X className="w-5 h-5 md:w-6 md:h-6 group-hover:rotate-90 transition-transform duration-300" />
-            <span className="font-semibold hidden sm:inline">Close</span>
-          </button>
+    <>
+      {/* Enhanced SEO Meta Tags */}
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta name="keywords" content={content?.tags?.join(', ') || content?.title} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:type" content="video.movie" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:image" content={content?.thumbnail_url || content?.poster_url} />
+        <meta property="og:video:url" content={videoSource} />
+        <meta property="og:video:type" content="video/mp4" />
+        <meta property="og:video:width" content="1920" />
+        <meta property="og:video:height" content="1080" />
+        <meta name="twitter:card" content="player" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={content?.thumbnail_url || content?.poster_url} />
+        <meta name="twitter:player" content={videoSource} />
+        <meta name="twitter:player:width" content="1920" />
+        <meta name="twitter:player:height" content="1080" />
+        <link rel="canonical" href={`/watch/${id}`} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": pageTitle,
+            "description": pageDescription,
+            "thumbnailUrl": content?.thumbnail_url || content?.poster_url,
+            "uploadDate": content?.created_at || new Date().toISOString(),
+            "duration": duration ? `PT${Math.floor(duration)}S` : undefined,
+            "contentUrl": videoSource,
+            "embedUrl": window.location.href,
+            "interactionCount": content?.view_count || 0,
+            "author": {
+              "@type": "Organization",
+              "name": "Streaming Platform"
+            }
+          })}
+        </script>
+      </Helmet>
 
-          {/* Center - Current title */}
-          <div className="flex-1 text-center px-4 overflow-hidden">
-            <h1 className="text-white font-semibold text-sm md:text-lg truncate animate-fadeIn">
-              {getCurrentTitle()}
-            </h1>
-            {isSeries && content?.title && (
-              <p className="text-gray-400 text-xs md:text-sm truncate">
-                {content.title}
-              </p>
-            )}
-          </div>
+      <div className="min-h-screen bg-black relative">
+        {/* Enhanced Header with current title */}
+        <div
+          className={`absolute top-0 left-0 right-0 z-50 p-4 md:p-6 bg-gradient-to-b from-black/90 via-black/60 to-transparent transition-all duration-500 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}`}
+          onMouseEnter={showControlsTemporarily}
+          onMouseMove={showControlsTemporarily}
+        >
+          <div className="flex items-center justify-between gap-4">
+            {/* Left side - Close/Back button */}
+            <button
+              onClick={handleBackClick}
+              className="flex items-center gap-2 text-white hover:text-purple-300 transition-all duration-200 group bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full"
+            >
+              <X className="w-5 h-5 md:w-6 md:h-6 group-hover:rotate-90 transition-transform duration-300" />
+              <span className="font-semibold hidden sm:inline">
+                {t('common.actions.close', 'Close')}
+              </span>
+            </button>
 
-          {/* Right side - Episode selector */}
-          <EpisodeSelector
-            content={content}
-            currentEpisode={currentEpisode}
-            onEpisodeSelect={handleEpisodeSelect}
-            currentTime={currentTime}
-            duration={duration}
-            similarContent={similarContent}
-            showControlsTemporarily={showControlsTemporarily}
-          />
-        </div>
-      </div>
+            {/* Center - Current title */}
+            <div className="flex-1 text-center px-4 overflow-hidden">
+              <h1 className="text-white font-semibold text-sm md:text-lg truncate animate-fadeIn">
+                {getCurrentTitle()}
+              </h1>
+              {isSeries && content?.title && (
+                <p className="text-gray-400 text-xs md:text-sm truncate">
+                  {content.title}
+                </p>
+              )}
+            </div>
 
-      {/* Connection Indicator */}
-      <ConnectionIndicator
-        showConnectionMessage={showConnectionMessage}
-        isOnline={isOnline}
-      />
-
-      {/* Custom Right Click Menu */}
-      {rightClickMenu.show && (
-        <CustomRightClickMenu
-          position={rightClickMenu.position}
-          onClose={closeRightClickMenu}
-          content={content}
-          currentEpisode={currentEpisode}
-          currentTime={currentTime}
-          isSeries={isSeries}
-        />
-      )}
-
-      {/* Video Player Container */}
-      <div
-        ref={containerRef}
-        className="video-container relative w-full h-screen bg-black overflow-hidden"
-        onMouseMove={showControlsTemporarily}
-        onMouseLeave={() => {
-          if (isPlaying) {
-            setTimeout(() => {
-              setShowControls(false);
-              setShowVolumeSlider(false);
-            }, 1000);
-          }
-        }}
-      >
-        <VideoPlayer
-          videoSource={videoSource}
-          videoRef={videoRef}
-          videoEvents={videoEvents}
-          isPlaying={isPlaying}
-          autoPlayAttempted={autoPlayAttempted}
-          onTogglePlay={togglePlay}
-          videoFilters={videoFilters}
-        />
-
-        {/* Enhanced Loading Overlay with smooth transitions */}
-        {(isLoading || isBuffering || isLoadingNext) && (
-          <div className="animate-fadeIn">
-            <LoadingOverlay
-              isLoading={isLoading || isLoadingNext}
-              isBuffering={isBuffering}
-              message={isLoadingNext ? "Loading next episode..." : undefined}
-            />
-          </div>
-        )}
-
-        <JumpIndicator
-          jumpIndicator={jumpIndicator}
-          consecutiveSkips={consecutiveSkips}
-        />
-
-        {/* End Screen with smooth transition */}
-        {showEndScreen && (
-          <div className="animate-fadeIn">
-            <EndScreen
+            {/* Right side - Episode selector */}
+            <EpisodeSelector
               content={content}
               currentEpisode={currentEpisode}
-              episodes={episodes}
-              onReplay={handleReplay}
-              onNextEpisode={handleEpisodeSelect}
-              onNextContent={handleNextContent}
+              onEpisodeSelect={handleEpisodeSelect}
+              currentTime={currentTime}
+              duration={duration}
               similarContent={similarContent}
-              isSeries={isSeries}
+              showControlsTemporarily={showControlsTemporarily}
             />
           </div>
-        )}
+        </div>
 
-        {!showEndScreen && (
-          <PlayerControls
-            // Basic player props
-            isPlaying={isPlaying}
+        {/* Connection Indicator */}
+        <ConnectionIndicator
+          showConnectionMessage={showConnectionMessage}
+          isOnline={isOnline}
+        />
+
+        {/* Custom Right Click Menu */}
+        {rightClickMenu.show && (
+          <CustomRightClickMenu
+            position={rightClickMenu.position}
+            onClose={closeRightClickMenu}
+            content={content}
+            currentEpisode={currentEpisode}
             currentTime={currentTime}
-            duration={duration}
-            volume={volume}
-            isMuted={isMuted}
-            isFullscreen={isFullscreen}
-            showControls={showControls}
-            showSettings={showSettings}
-            showVolumeSlider={showVolumeSlider}
-            playbackRate={playbackRate}
-            quality={quality}
-            timeDisplayMode={timeDisplayMode}
-            buffered={buffered}
-            videoSource={videoSource}
-            videoRef={videoRef}
-
-            // Basic control functions
-            onTogglePlay={togglePlay}
-            onSeek={seek}
-            onSkip={handleSkip}
-            onVolumeChange={handleVolumeChange}
-            onToggleMute={toggleMute}
-            onToggleFullscreen={toggleFullscreenMode}
-            onPlaybackRateChange={changePlaybackRate}
-            onQualityChange={handleQualityChange}
-            onTimeDisplayToggle={() => setTimeDisplayMode(timeDisplayMode === 'elapsed' ? 'remaining' : 'elapsed')}
-            onShowSettings={setShowSettings}
-            onShowVolumeSlider={setShowVolumeSlider}
-            containerRef={containerRef}
-
-            // Settings Panel advanced functions
-            onTogglePip={handleTogglePip}
-            onToggleSleepTimer={handleSleepTimer}
-            onVolumeBoost={handleVolumeBoost}
-            onBrightnessChange={handleBrightnessChange}
-            onContrastChange={handleContrastChange}
-            onSaturationChange={handleSaturationChange}
+            isSeries={isSeries}
           />
         )}
+
+        {/* Video Player Container */}
+        <div
+          ref={containerRef}
+          className="video-container relative w-full h-screen bg-black overflow-hidden"
+          onMouseMove={showControlsTemporarily}
+          onMouseLeave={() => {
+            if (isPlaying) {
+              setTimeout(() => {
+                setShowControls(false);
+                setShowVolumeSlider(false);
+              }, 1000);
+            }
+          }}
+        >
+          <VideoPlayer
+            videoSource={videoSource}
+            videoRef={videoRef}
+            videoEvents={videoEvents}
+            isPlaying={isPlaying}
+            autoPlayAttempted={autoPlayAttempted}
+            onTogglePlay={togglePlay}
+            videoFilters={videoFilters}
+          />
+
+          {/* Enhanced Loading Overlay with smooth transitions */}
+          {(isLoading || isBuffering || isLoadingNext) && (
+            <div className="animate-fadeIn">
+              <LoadingOverlay
+                isLoading={isLoading || isLoadingNext}
+                isBuffering={isBuffering}
+                message={isLoadingNext ? t('watch.loading.nextEpisode', 'Loading next episode...') : undefined}
+              />
+            </div>
+          )}
+
+          <JumpIndicator
+            jumpIndicator={jumpIndicator}
+            consecutiveSkips={consecutiveSkips}
+          />
+
+          {/* End Screen with smooth transition */}
+          {showEndScreen && (
+            <div className="animate-fadeIn">
+              <EndScreen
+                content={content}
+                currentEpisode={currentEpisode}
+                episodes={episodes}
+                onReplay={handleReplay}
+                onNextEpisode={handleEpisodeSelect}
+                onNextContent={handleNextContent}
+                similarContent={similarContent}
+                isSeries={isSeries}
+              />
+            </div>
+          )}
+
+          {!showEndScreen && (
+            <PlayerControls
+              // Basic player props
+              isPlaying={isPlaying}
+              currentTime={currentTime}
+              duration={duration}
+              volume={volume}
+              isMuted={isMuted}
+              isFullscreen={isFullscreen}
+              showControls={showControls}
+              showSettings={showSettings}
+              showVolumeSlider={showVolumeSlider}
+              playbackRate={playbackRate}
+              quality={quality}
+              timeDisplayMode={timeDisplayMode}
+              buffered={buffered}
+              videoSource={videoSource}
+              videoRef={videoRef}
+
+              // Basic control functions
+              onTogglePlay={togglePlay}
+              onSeek={seek}
+              onSkip={handleSkip}
+              onVolumeChange={handleVolumeChange}
+              onToggleMute={toggleMute}
+              onToggleFullscreen={toggleFullscreenMode}
+              onPlaybackRateChange={changePlaybackRate}
+              onQualityChange={handleQualityChange}
+              onTimeDisplayToggle={() => setTimeDisplayMode(timeDisplayMode === 'elapsed' ? 'remaining' : 'elapsed')}
+              onShowSettings={setShowSettings}
+              onShowVolumeSlider={setShowVolumeSlider}
+              containerRef={containerRef}
+
+              // Settings Panel advanced functions
+              onTogglePip={handleTogglePip}
+              onToggleSleepTimer={handleSleepTimer}
+              onVolumeBoost={handleVolumeBoost}
+              onBrightnessChange={handleBrightnessChange}
+              onContrastChange={handleContrastChange}
+              onSaturationChange={handleSaturationChange}
+            />
+          )}
+        </div>
+
+        {/* Global Styles for animations */}
+        <style jsx>{`
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: translateX(-20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+
+          @keyframes pulse {
+            0%, 100% {
+              opacity: 1;
+            }
+            50% {
+              opacity: 0.5;
+            }
+          }
+
+          .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+          }
+
+          .animate-slideIn {
+            animation: slideIn 0.3s ease-out;
+          }
+
+          .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          }
+
+          /* Smooth scrollbar for episode list */
+          ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+          }
+
+          ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+          }
+
+          ::-webkit-scrollbar-thumb {
+            background: rgba(147, 51, 234, 0.5);
+            border-radius: 4px;
+          }
+
+          ::-webkit-scrollbar-thumb:hover {
+            background: rgba(147, 51, 234, 0.8);
+          }
+        `}</style>
       </div>
-
-      {/* Global Styles for animations */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-
-        .animate-slideIn {
-          animation: slideIn 0.3s ease-out;
-        }
-
-        .animate-pulse {
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        /* Smooth scrollbar for episode list */
-        ::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-          background: rgba(147, 51, 234, 0.5);
-          border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-          background: rgba(147, 51, 234, 0.8);
-        }
-      `}</style>
-    </div>
+    </>
   );
 };
 

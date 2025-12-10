@@ -1738,7 +1738,14 @@
     "noDate": "No date",
     "highScore": "High Score (>30%)",
     "topTrending": "Top Trending",
-    "home": "Home"
+    "home": "Home",
+    "actions": {
+      "close": "Close",
+      "goBack": "Go Back",
+      "tryAgain": "Try Again",
+      "copied": "Copied!"
+    },
+    "video": "Video"
   },
   "parentalControls": {
     "title": "Parental Controls",
@@ -3352,5 +3359,317 @@
       "description": "Discover the story of Oliviuus - a Rwandan streaming platform built on passion, resilience, and dedication to showcasing African stories. Learn about our founders, mission, and vision for Rwandan cinema.",
       "keywords": "Oliviuus about, Rwandan streaming platform, African cinema, Rwanda movie platform, Oliviuus founders, Rwandan storytelling, African entertainment, Rwanda digital platform"
     }
-  }
+  },
+  "watch": {
+    "title": "Watch",
+    "defaultTitle": "Watch Video",
+    "defaultDescription": "Watch this video on our premium streaming platform.",
+    "header": {
+      "nowPlaying": "Now Playing",
+      "episode": "Episode {{number}} - {{title}}",
+      "episodeFormat": "S{{season}}:E{{episode}} - {{title}}"
+    },
+    "loading": {
+      "title": "Loading... - Streaming Platform",
+      "metaDescription": "Video is loading, please wait...",
+      "nextEpisode": "Loading next episode..."
+    },
+    "errors": {
+      "title": "Access Error - Streaming Platform",
+      "metaDescription": "Access restricted to this content",
+      "playbackError": "Playback Error - Streaming Platform",
+      "playbackMetaDescription": "Unable to play video due to an error",
+      "playbackTitle": "Playback Error",
+      "notFound": "Content Not Found - Streaming Platform",
+      "notFoundMetaDescription": "The requested content could not be found",
+      "contentNotFound": "Content not found. It may have been removed or is unavailable.",
+      "authRequired": {
+        "title": "Please log in to access this content.",
+        "details": "Your session may have expired. Please log in again."
+      },
+      "tooManyRequests": "Too many requests. Please try again later.",
+      "serverError": "Server error. Please try again later.",
+      "serviceUnavailable": "Service temporarily unavailable. Please try again later.",
+      "generic": "Unable to load this content. Please try again.",
+      "accessDenied": {
+        "title": "Access Denied",
+        "description": "You do not have permission to access this content."
+      },
+      "subscriptionRequired": {
+        "title": "Subscription Required",
+        "help": "Choose from our flexible subscription plans or join a family plan to start watching unlimited content.",
+        "viewPlans": "View Subscription Plans",
+        "joinFamily": "Join Family Plan"
+      },
+      "deviceLimitReached": {
+        "title": "Device Limit Reached",
+        "familyTitle": "Family Device Limit Reached",
+        "help": "Manage your active sessions in account settings to free up device slots. Sessions automatically expire after 30 minutes of inactivity.",
+        "familyHelp": "The family plan has reached its device limit. Ask the family owner to manage active sessions or upgrade the plan.",
+        "viewFamilySessions": "View Family Sessions",
+        "manageSessions": "Manage Active Sessions"
+      },
+      "streamLimitReached": {
+        "title": "Stream Limit Reached",
+        "familyTitle": "Family Stream Limit Reached",
+        "help": "Close video players on other devices or browser tabs to free up stream slots.",
+        "familyHelp": "Your family has reached the maximum number of simultaneous streams. Ask family members to close other video players.",
+        "askFamily": "Ask Family to Close Streams",
+        "closedOthers": "I've Closed Other Streams"
+      },
+      "geoRestricted": {
+        "title": "Content Not Available",
+        "help": "This content is only available in specific regions due to licensing restrictions."
+      },
+      "planRestriction": {
+        "title": "Plan Restriction",
+        "help": "Upgrade to a premium plan to watch on all your favorite devices without restrictions.",
+        "upgrade": "Upgrade Plan"
+      },
+      "familyAccessRestricted": {
+        "title": "Family Access Restricted",
+        "help": "Your family access has been restricted. This could be due to suspension, expired family plan, or access time restrictions.",
+        "manageSettings": "Manage Family Settings",
+        "getPersonalPlan": "Get Personal Plan"
+      },
+      "timeRestriction": {
+        "title": "Access Time Restricted",
+        "help": "Your access is restricted during these hours due to family settings. Please try again during allowed access times.",
+        "viewSettings": "View Time Settings",
+        "tryLater": "Try Again Later"
+      },
+      "default": {
+        "description": "You do not have permission to access this content.",
+        "help": "If this problem persists, please contact our support team for assistance."
+      },
+      "limits": {
+        "active": "Active",
+        "maximum": "Maximum"
+      },
+      "redirecting": "Redirecting back in {{countdown}} seconds..."
+    },
+    "rightClick": {
+      "copyLink": "Copy Video Link",
+      "copyWithTimestamp": "Copy Link with Timestamp",
+      "shareVideo": "Share Video",
+      "openNewTab": "Open in New Tab",
+      "protectedContent": "Protected Content"
+    }
+  },
+  "videoPlayer": {
+      "accessibility": {
+        "videoPlayer": "Video player",
+        "playVideo": "Play video"
+      },
+      "buttons": {
+        "play": "Play"
+      },
+      "errors": {
+        "noVideo": {
+          "title": "No Video Available",
+          "description": "This content doesn't have a playable video file."
+        }
+      }
+    },
+    "playerControls": {
+      "accessibility": {
+        "controls": "Video player controls",
+        "progress": "Video progress",
+        "volume": "Volume level",
+        "timeDisplay": "Video time display",
+        "playbackRate": "Playback rate: {{rate}}x"
+      },
+      "buttons": {
+        "play": "Play",
+        "pause": "Pause",
+        "rewind": "Rewind 5 seconds",
+        "forward": "Forward 5 seconds",
+        "unmute": "Unmute",
+        "mute": "Mute",
+        "fullscreen": "Enter fullscreen",
+        "exitFullscreen": "Exit fullscreen",
+        "settings": "Settings"
+      },
+      "tooltips": {
+        "play": "Play (Space)",
+        "pause": "Pause (Space)",
+        "rewind": "Rewind 5s (←)",
+        "forward": "Forward 5s (→)",
+        "mute": "Mute (M)",
+        "fullscreen": "Fullscreen (F)",
+        "settings": "Settings (S)",
+        "timeDisplay": "Toggle time display mode"
+      }
+    },
+    "loadingOverlay": {
+      "initial": {
+        "title": "Preparing Your Stream",
+        "description": "Loading high-quality content..."
+      },
+      "buffering": "Buffering...",
+      "loading": "Loading...",
+      "waitMessage": "Please wait while we prepare the content"
+    },
+    "connectionIndicator": {
+      "online": "Internet connection restored",
+      "offline": "Internet connection lost"
+    },
+    "episodeSelector": {
+      "buttons": {
+        "episodes": "Episodes",
+        "continue": "Continue watching",
+        "continueFromTime": "Continue watching from {{time}}",
+        "continueWatching": "Continue Watching",
+        "startOver": "Start Over"
+      },
+      "menu": {
+        "episodes": "Episodes menu",
+        "continueWatching": "Continue watching menu"
+      },
+      "titles": {
+        "episodesSeasons": "Episodes & Seasons",
+        "continueWatching": "Continue Watching"
+      },
+      "episodeCount": "{{count}} episodes",
+      "noEpisodes": "No episodes available",
+      "season": "Season {{number}}",
+      "defaultEpisodeTitle": "Episode {{number}}",
+      "unknownDuration": "Unknown",
+      "progress": "{{percentage}}% watched",
+      "percentage": "{{percentage}}%",
+      "fromTime": "From {{time}}",
+      "watchFromBeginning": "Watch from beginning",
+      "similarSeries": "Similar Series",
+      "similarMovies": "Similar Movies",
+      "noVideoContent": "No video content available",
+      "contentType": {
+        "series": "Series",
+        "movie": "Movie"
+      },
+      "aria": {
+        "episode": "Episode: {{title}}",
+        "episodeNumber": "Episode {{number}}",
+        "similarSeries": "Similar series: {{title}}",
+        "similarMovie": "Similar movie: {{title}}"
+      }
+    },
+    "endScreen": {
+      "episodeNumber": "Episode {{number}}",
+      "defaultContentTitle": "Content",
+      "nextEpisodeStarting": "Next Episode Starting Soon",
+      "finishedWatching": "You've Finished Watching",
+      "completedAllEpisodes": "You've completed watching all episodes of",
+      "visitNextMoment": "Visit us next moment to watch more amazing content!",
+      "checkOutSimilar": "Check Out These Similar {{type}}",
+      "contentTypes": {
+        "series": "Series",
+        "movies": "Movies"
+      },
+      "aria": {
+        "playContent": "Play {{title}}"
+      },
+      "buttons": {
+        "watchAgain": "Watch Again",
+        "nextEpisode": "Next Episode",
+        "skip": "Skip",
+        "skipAutoPlay": "Skip auto-play",
+        "playNow": "Play Now",
+        "browseAllContent": "Browse All Content"
+      },
+      "congratulations": "Congratulations!",
+      "upNext": "Up Next",
+      "countdown": "{{seconds}}s",
+      "noDescription": "No description available",
+      "moreSeriesLikeThis": "More Series Like This",
+      "moreMoviesLikeThis": "More Movies Like This",
+      "checkBackLater": "Check back later for more amazing content!",
+      "contentType": {
+        "series": "Series",
+        "movie": "Movie"
+      }
+    },
+    "settingsPanel": {
+      "tabs": {
+        "speed": "Playback Speed",
+        "quality": "Quality",
+        "advanced": "Advanced",
+        "audio": "Audio",
+        "video": "Video",
+        "shortcuts": "Keyboard Shortcuts"
+      },
+      "quality": {
+        "auto": "Auto",
+        "bestAvailable": "Best quality available",
+        "option": "{{option}} quality"
+      },
+      "speed": {
+        "rate": "{{rate}}x speed",
+        "normal": "Normal"
+      },
+      "advanced": {
+        "pip": "Picture-in-Picture",
+        "sleepTimer": "Sleep Timer",
+        "sleepTimerDescription": "Video will automatically pause when timer ends",
+        "sleepTimerSelect": "Select sleep timer duration"
+      },
+      "audio": {
+        "volumeBoost": "Volume Boost",
+        "percentage": "{{percentage}}%",
+        "volumeBoostSlider": "Volume boost level",
+        "normal": "Normal",
+        "maxBoost": "Max Boost",
+        "audioPresets": "Audio Presets",
+        "preset": "{{name}} audio preset"
+      },
+      "audioPresets": {
+        "default": "Default",
+        "defaultDesc": "Original audio",
+        "movie": "Movie",
+        "movieDesc": "Enhanced dialogue",
+        "music": "Music",
+        "musicDesc": "Balanced frequencies",
+        "speech": "Speech",
+        "speechDesc": "Clear vocals",
+        "bass": "Bass Boost",
+        "bassDesc": "Enhanced low frequencies"
+      },
+      "video": {
+        "brightness": "Brightness",
+        "contrast": "Contrast",
+        "saturation": "Saturation",
+        "brightnessSlider": "Brightness level",
+        "contrastSlider": "Contrast level",
+        "saturationSlider": "Saturation level",
+        "resetEnhancements": "Reset all video enhancements",
+        "resetAll": "Reset All Enhancements"
+      },
+      "shortcuts": {
+        "space": "Space / K",
+        "playPause": "Play/Pause",
+        "f": "F",
+        "fullscreen": "Fullscreen",
+        "m": "M",
+        "mute": "Mute",
+        "arrows": "← / →",
+        "seek": "Seek 5s",
+        "volumeArrows": "↑ / ↓",
+        "volume": "Volume",
+        "speed": ", / .",
+        "speedChange": "Speed",
+        "s": "S",
+        "settings": "Settings"
+      },
+      "sleepTimer": {
+        "off": "Off",
+        "minutes": "{{minutes}} minutes",
+        "hour": "1 hour"
+      },
+      "menuLabel": "Video settings menu"
+    },
+    "previewThumbnail": {
+      "aria": {
+        "timePreview": "Preview for time: {{time}}"
+      },
+      "loading": "Loading preview..."
+    }
 }

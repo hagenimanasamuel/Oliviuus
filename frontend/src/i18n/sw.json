@@ -1736,7 +1736,14 @@
     "noDate": "Hakuna tarehe",
     "highScore": "Alama ya Juu (>30%)",
     "topTrending": "Zinazotrend Sana",
-    "home": "Nyumbani"
+    "home": "Nyumbani",
+    "actions": {
+      "close": "Funga",
+      "goBack": "Rudi Nyuma",
+      "tryAgain": "Jaribu Tena",
+      "copied": "Imenakiliwa!"
+    },
+    "video": "Video"
   },
   "parentalControls": {
     "title": "Udhibiti wa Wazazi",
@@ -3350,5 +3357,317 @@
       "description": "Gundua hadithi ya Oliviuus - jukwaa la streaming la Rwanda lililojengwa kwa shauku, uvumilivu, na kujitolea kuonyesha hadithi za Afrika. Jifunze kuhusu waanzilishi wetu, dhamira, na maono ya sinema ya Rwanda.",
       "keywords": "Oliviuus kuhusu, jukwaa la streaming Rwanda, sinema ya Afrika, jukwaa la filamu Rwanda, waanzilishi wa Oliviuus, uandishi wa hadithi Rwanda, burudani ya Afrika, jukwaa la kidijitali Rwanda"
     }
+  },
+  "watch": {
+    "title": "Tazama",
+    "defaultTitle": "Tazama Video",
+    "defaultDescription": "Tazama video hii kwenye jukwaa letu la premium.",
+    "header": {
+      "nowPlaying": "Inachezwa",
+      "episode": "Kipindi {{number}} - {{title}}",
+      "episodeFormat": "M{{season}}:K{{episode}} - {{title}}"
+    },
+    "loading": {
+      "title": "Inapakia... - Jukwaa la Ustreaming",
+      "metaDescription": "Video inapakia, tafadhali subiri...",
+      "nextEpisode": "Inapakia kipindi kinachofuata..."
+    },
+    "errors": {
+      "title": "Hitilafu ya Upatikanaji - Jukwaa la Ustreaming",
+      "metaDescription": "Upatikanaji wa maudhui haya umedhibitiwa",
+      "playbackError": "Hitilafu ya Uchezaji - Jukwaa la Ustreaming",
+      "playbackMetaDescription": "Haiwezekani kucheza video kutokana na hitilafu",
+      "playbackTitle": "Hitilafu ya Uchezaji",
+      "notFound": "Maudhui Hayajapatikana - Jukwaa la Ustreaming",
+      "notFoundMetaDescription": "Maudhui uliyotafuta hayajapatikana",
+      "contentNotFound": "Maudhui hayajapatikana. Huenda yameondolewa au hayapo tena.",
+      "authRequired": {
+        "title": "Tafadhali ingia ili kufikia maudhui haya.",
+        "details": "Session yako inaweza kuwa imeisha muda. Tafadhali ingia tena."
+      },
+      "tooManyRequests": "Maombi mengi sana. Tafadhali jaribu tena baadaye.",
+      "serverError": "Hitilafu ya seva. Tafadhali jaribu tena baadaye.",
+      "serviceUnavailable": "Huduma haipatikani kwa muda. Jaribu tena baadaye.",
+      "generic": "Haiwezekani kupakia maudhui haya. Tafadhali jaribu tena.",
+      "accessDenied": {
+        "title": "Upatikanaji Umekataliwa",
+        "description": "Huna ruhusa ya kufikia maudhui haya."
+      },
+      "subscriptionRequired": {
+        "title": "Inahitaji Usajili",
+        "help": "Chagua kutoka kwenye mipango yetu mbalimbali au jiunge na family plan ili kutazama maudhui bila kikomo.",
+        "viewPlans": "Tazama Mipango",
+        "joinFamily": "Jiunge na Family Plan"
+      },
+      "deviceLimitReached": {
+        "title": "Kikomo cha Vifaa Kimefikiwa",
+        "familyTitle": "Kikomo cha Vifaa cha Familia Kimefikiwa",
+        "help": "Dhibiti sessions zako kwenye mipangilio ya akaunti. Sessions huisha baada ya dakika 30 za kutotumika.",
+        "familyHelp": "Family plan imefikia kikomo cha vifaa. Muombe mmiliki adhibiti sessions au kuboresha mpango.",
+        "viewFamilySessions": "Tazama Sessions za Familia",
+        "manageSessions": "Dhibiti Sessions"
+      },
+      "streamLimitReached": {
+        "title": "Kikomo cha Uchezaji Kimefikiwa",
+        "familyTitle": "Kikomo cha Uchezaji cha Familia Kimefikiwa",
+        "help": "Funga video players kwenye vifaa vingine au tabs ili kutoa nafasi.",
+        "familyHelp": "Familia imefikia idadi ya juu ya streams zinazochezwa kwa wakati mmoja. Waombe wafunge players.",
+        "askFamily": "Waombe Familia Kufunga Streams",
+        "closedOthers": "Nimefunga Streams Zingine"
+      },
+      "geoRestricted": {
+        "title": "Maudhui Hayapatikani",
+        "help": "Maudhui haya yanapatikana tu katika maeneo maalum kutokana na mikataba ya leseni."
+      },
+      "planRestriction": {
+        "title": "Kikwazo cha Mpango",
+        "help": "Boresha hadi premium ili kutazama kwenye vifaa vyote bila vizuizi.",
+        "upgrade": "Boresha Mpango"
+      },
+      "familyAccessRestricted": {
+        "title": "Upatikanaji wa Familia Umepunguzwa",
+        "help": "Upatikanaji wako wa familia umedhibitiwa. Inaweza kuwa mpango umeisha, umesitishwa, au kuna muda maalum wa upatikanaji.",
+        "manageSettings": "Dhibiti Mipangilio ya Familia",
+        "getPersonalPlan": "Pata Mpango wa Binafsi"
+      },
+      "timeRestriction": {
+        "title": "Upatikanaji Umepunguzwa kwa Muda",
+        "help": "Upatikanaji umedhibitiwa kwa saa fulani kulingana na mipangilio ya familia. Jaribu tena baadaye.",
+        "viewSettings": "Tazama Mipangilio ya Muda",
+        "tryLater": "Jaribu Tena Baadaye"
+      },
+      "default": {
+        "description": "Huna ruhusa ya kufikia maudhui haya.",
+        "help": "Ikiwa tatizo litaendelea, tafadhali wasiliana na timu yetu ya msaada."
+      },
+      "limits": {
+        "active": "Inatumika",
+        "maximum": "Kikomo"
+      },
+      "redirecting": "Unarejeshwa katika sekunde {{countdown}}..."
+    },
+    "rightClick": {
+      "copyLink": "Nakili Kiungo cha Video",
+      "copyWithTimestamp": "Nakili Kiungo chenye Muda",
+      "shareVideo": "Shiriki Video",
+      "openNewTab": "Fungua kwenye Tab Mpya",
+      "protectedContent": "Maudhui Yamelindwa"
+    }
+  },
+  "videoPlayer": {
+    "accessibility": {
+      "videoPlayer": "Kichezaji cha video",
+      "playVideo": "Cheza video"
+    },
+    "buttons": {
+      "play": "Cheza"
+    },
+    "errors": {
+      "noVideo": {
+        "title": "Hakuna Video Inayopatikana",
+        "description": "Maudhui haya hayana faili la video linaloweza kuchezwa."
+      }
+    }
+  },
+  "playerControls": {
+    "accessibility": {
+      "controls": "Vidhibiti vya kichezaji video",
+      "progress": "Maendeleo ya video",
+      "volume": "Kiwango cha sauti",
+      "timeDisplay": "Onyesho la muda",
+      "playbackRate": "Kasi ya uchezaji: {{rate}}x"
+    },
+    "buttons": {
+      "play": "Cheza",
+      "pause": "Sitisha",
+      "rewind": "Rudisha sekunde 5",
+      "forward": "Sogeza mbele sekunde 5",
+      "unmute": "Washa sauti",
+      "mute": "Zima sauti",
+      "fullscreen": "Fungua skrini nzima",
+      "exitFullscreen": "Toka skrini nzima",
+      "settings": "Mipangilio"
+    },
+    "tooltips": {
+      "play": "Cheza (Space)",
+      "pause": "Sitisha (Space)",
+      "rewind": "Rudisha 5s (←)",
+      "forward": "Sogeza mbele 5s (→)",
+      "mute": "Zima sauti (M)",
+      "fullscreen": "Skrini nzima (F)",
+      "settings": "Mipangilio (S)",
+      "timeDisplay": "Badilisha aina ya onyesho la muda"
+    }
+  },
+  "loadingOverlay": {
+    "initial": {
+      "title": "Kuandaa Mwangalio Wako",
+      "description": "Inapakia maudhui yenye ubora wa juu..."
+    },
+    "buffering": "Inapakia...",
+    "loading": "Inapakia...",
+    "waitMessage": "Tafadhali subiri tunapoandaa maudhui"
+  },
+  "connectionIndicator": {
+    "online": "Muunganisho wa intaneti umerudi",
+    "offline": "Muunganisho wa intaneti umepotea"
+  },
+  "episodeSelector": {
+    "buttons": {
+      "episodes": "Vipindi",
+      "continue": "Endelea kutazama",
+      "continueFromTime": "Endelea kutoka {{time}}",
+      "continueWatching": "Endelea Kutazama",
+      "startOver": "Anza upya"
+    },
+    "menu": {
+      "episodes": "Menyu ya vipindi",
+      "continueWatching": "Menyu ya kuendelea kutazama"
+    },
+    "titles": {
+      "episodesSeasons": "Vipindi & Misimu",
+      "continueWatching": "Endelea Kutazama"
+    },
+    "episodeCount": "Vipindi {{count}}",
+    "noEpisodes": "Hakuna vipindi vinavyopatikana",
+    "season": "Msimu {{number}}",
+    "defaultEpisodeTitle": "Kipindi {{number}}",
+    "unknownDuration": "Haijulikani",
+    "progress": "{{percentage}}% imetazamwa",
+    "percentage": "{{percentage}}%",
+    "fromTime": "Kutoka {{time}}",
+    "watchFromBeginning": "Tazama kuanzia mwanzo",
+    "similarSeries": "Mfululizo Mwingine Kama Huu",
+    "similarMovies": "Filamu Nyingine Kama Hii",
+    "noVideoContent": "Hakuna maudhui ya video",
+    "contentType": {
+      "series": "Mfululizo",
+      "movie": "Filamu"
+    },
+    "aria": {
+      "episode": "Kipindi: {{title}}",
+      "episodeNumber": "Kipindi {{number}}",
+      "similarSeries": "Mfululizo unaofanana: {{title}}",
+      "similarMovie": "Filamu inayofanana: {{title}}"
+    }
+  },
+  "endScreen": {
+    "episodeNumber": "Kipindi {{number}}",
+    "defaultContentTitle": "Maudhui",
+    "nextEpisodeStarting": "Kipindi kingine kinaanza muda si mrefu",
+    "finishedWatching": "Ume maliza kutazama",
+    "completedAllEpisodes": "Umemaliza kutazama vipindi vyote vya",
+    "visitNextMoment": "Rudi wakati mwingine kutazama maudhui mengine mazuri!",
+    "checkOutSimilar": "Tazama {{type}} zingine zinazofanana",
+    "contentTypes": {
+      "series": "Mfululizo",
+      "movies": "Filamu"
+    },
+    "aria": {
+      "playContent": "Cheza {{title}}"
+    },
+    "buttons": {
+      "watchAgain": "Tazama tena",
+      "nextEpisode": "Kipindi kinachofuata",
+      "skip": "Ruka",
+      "skipAutoPlay": "Ruka uchezaji otomatiki",
+      "playNow": "Cheza sasa",
+      "browseAllContent": "Angalia Maudhui Yote"
+    },
+    "congratulations": "Hongera!",
+    "upNext": "Kinachofuata",
+    "countdown": "{{seconds}}s",
+    "noDescription": "Hakuna maelezo yaliyopo",
+    "moreSeriesLikeThis": "Mfululizo mingi kama huu",
+    "moreMoviesLikeThis": "Filamu nyingi kama hii",
+    "checkBackLater": "Rudi tena baadaye kwa maudhui zaidi mazuri!",
+    "contentType": {
+      "series": "Mfululizo",
+      "movie": "Filamu"
+    }
+  },
+  "settingsPanel": {
+    "tabs": {
+      "speed": "Kasi ya uchezaji",
+      "quality": "Ubora",
+      "advanced": "Advanced",
+      "audio": "Sauti",
+      "video": "Video",
+      "shortcuts": "Njia za mkato za kibodi"
+    },
+    "quality": {
+      "auto": "Otomatiki",
+      "bestAvailable": "Ubora bora unaopatikana",
+      "option": "Ubora wa {{option}}"
+    },
+    "speed": {
+      "rate": "Kasi {{rate}}x",
+      "normal": "Kawaida"
+    },
+    "advanced": {
+      "pip": "Picha-ndani-ya-Picha",
+      "sleepTimer": "Kipima muda cha kulala",
+      "sleepTimerDescription": "Video itasimama otomatiki muda utakapoisha",
+      "sleepTimerSelect": "Chagua muda wa kipima muda"
+    },
+    "audio": {
+      "volumeBoost": "Kuongeza sauti",
+      "percentage": "{{percentage}}%",
+      "volumeBoostSlider": "Kiwango cha kuongeza sauti",
+      "normal": "Kawaida",
+      "maxBoost": "Kuongeza kiwango cha juu",
+      "audioPresets": "Mpangilio wa sauti",
+      "preset": "Mpangilio wa sauti {{name}}"
+    },
+    "audioPresets": {
+      "default": "Chaguo msingi",
+      "defaultDesc": "Sauti ya asili",
+      "movie": "Filamu",
+      "movieDesc": "Mazungumzo yaliyoboreshwa",
+      "music": "Muziki",
+      "musicDesc": "Frekweansi zilizolinganishwa",
+      "speech": "Hotuba",
+      "speechDesc": "Sauti ya wazi",
+      "bass": "Kuongeza besi",
+      "bassDesc": "Kuongeza midundo ya chini"
+    },
+    "video": {
+      "brightness": "Mwanga",
+      "contrast": "Tofauti",
+      "saturation": "Usharabu",
+      "brightnessSlider": "Kiwango cha mwanga",
+      "contrastSlider": "Kiwango cha utofauti",
+      "saturationSlider": "Kiwango cha usharabu",
+      "resetEnhancements": "Rejesha maboresho ya video",
+      "resetAll": "Rejesha yote"
+    },
+    "shortcuts": {
+      "space": "Space / K",
+      "playPause": "Cheza/Sitisha",
+      "f": "F",
+      "fullscreen": "Skrini nzima",
+      "m": "M",
+      "mute": "Zima sauti",
+      "arrows": "← / →",
+      "seek": "Ruka mbele/nyuma 5s",
+      "volumeArrows": "↑ / ↓",
+      "volume": "Kiasi cha sauti",
+      "speed": ", / .",
+      "speedChange": "Kasi",
+      "s": "S",
+      "settings": "Mipangilio"
+    },
+    "sleepTimer": {
+      "off": "Zima",
+      "minutes": "Dakika {{minutes}}",
+      "hour": "Saa 1"
+    },
+    "menuLabel": "Menyu ya mipangilio ya video"
+  },
+  "previewThumbnail": {
+    "aria": {
+      "timePreview": "Hakikisho la muda: {{time}}"
+    },
+    "loading": "Inapakia hakikisho..."
   }
 }

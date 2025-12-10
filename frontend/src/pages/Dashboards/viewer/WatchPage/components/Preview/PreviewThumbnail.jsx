@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { formatTime } from '../../utils/timeFormatters';
+import { useTranslation } from 'react-i18next';
 
 const PreviewThumbnail = ({ 
   time, 
@@ -7,6 +8,7 @@ const PreviewThumbnail = ({
   videoSource,
   duration 
 }) => {
+  const { t } = useTranslation();
   const previewRef = useRef(null);
   const previewVideoRef = useRef(null);
   const [isReady, setIsReady] = useState(false);
@@ -100,13 +102,19 @@ const PreviewThumbnail = ({
     <div 
       className="absolute bottom-full mb-2 transform -translate-x-1/2 z-50 pointer-events-none"
       style={{ left: `${Math.max(8, Math.min(position, 92))}%` }}
+      role="tooltip"
+      aria-label={t('previewThumbnail.aria.timePreview', 'Preview for time: {{time}}', { 
+        time: formatTime(time) 
+      })}
     >
       <div className="bg-gradient-to-br from-gray-900 to-black backdrop-blur-md rounded-xl p-2 border border-purple-500/30 shadow-2xl shadow-purple-500/20 min-w-[160px]">
         <div className="w-40 h-[90px] bg-gray-800 rounded-lg overflow-hidden mb-2 relative border border-gray-700/50">
           {/* Loading State */}
           {(isLoading || !isReady) && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-800/90 z-10">
-              <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+              <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"
+                aria-label={t('previewThumbnail.loading', 'Loading preview...')}
+              ></div>
             </div>
           )}
           
@@ -122,6 +130,7 @@ const PreviewThumbnail = ({
             preload="auto"
             crossOrigin="anonymous"
             style={{ pointerEvents: 'none' }}
+            aria-hidden="true"
           />
         </div>
         

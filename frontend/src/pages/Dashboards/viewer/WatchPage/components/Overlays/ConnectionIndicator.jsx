@@ -1,7 +1,10 @@
 import React from 'react';
 import { Wifi, WifiOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ConnectionIndicator = ({ showConnectionMessage, isOnline }) => {
+  const { t } = useTranslation();
+
   if (!showConnectionMessage) return null;
 
   return (
@@ -14,12 +17,12 @@ const ConnectionIndicator = ({ showConnectionMessage, isOnline }) => {
         {isOnline ? (
           <>
             <Wifi className="w-5 h-5" />
-            <span>Internet connection restored</span>
+            <span>{t('connectionIndicator.online', 'Internet connection restored')}</span>
           </>
         ) : (
           <>
             <WifiOff className="w-5 h-5" />
-            <span>Internet connection lost</span>
+            <span>{t('connectionIndicator.offline', 'Internet connection lost')}</span>
           </>
         )}
       </div>

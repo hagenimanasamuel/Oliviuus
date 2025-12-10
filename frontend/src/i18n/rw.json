@@ -61,7 +61,7 @@
     "password_placeholder": "Ijambo ry'ibanga",
     "confirm_password_placeholder": "Emeza ijambo ry'ibanga",
     "continue": "Komeza",
-    "loading": "Birimo kubikwa...",
+    "loading": "Birimo gutunganywa...",
     "disclaimer_before": "Ukwiyandikisha cyangwa gukora konti wemera",
     "terms": "Amategeko & Amabwiriza",
     "and": "na",
@@ -1633,14 +1633,14 @@
       "clickForDetails": "Kanda ku butumire ubone ibisobanuro",
       "noInvitations": {
         "title": "Nta Butumire Butarasubizwa",
-        "description": "Ubu nta butumire bwa family ufite butarasubizwa."
+        "description": "Ubu nta butumire bw'umuryango ufite butarasubizwa."
       },
       "sent": "Byoherejwe",
       "stats": {
         "pendingInvitations": "Ubutumire butarasubizwa",
-        "familyStatus": "Imiterere ya Family",
+        "familyStatus": "Imiterere y'umuryango",
         "member": "Umuryango",
-        "noFamily": "Nta Family ufite",
+        "noFamily": "Nta Muryango ufite",
         "yourRole": "Inshingano yawe",
         "individual": "Ku giti cyawe"
       },
@@ -1669,24 +1669,24 @@
       "actions": {
         "accept": "Kwemera Ubutumire",
         "decline": "Kwanga",
-        "leaveFamily": "Gusohoka muri Family",
+        "leaveFamily": "Gusohoka mu muryango",
         "accepting": "birimo kwemerwa",
         "rejecting": "birimo kwangwa"
       },
       "leaveConfirmation": "Uremeza ko ushaka gusohoka muri iyi family? Uzahita utakaza uburenganzira bwo gukoresha subscription yabo.",
       "aboutFamilyPlans": {
-        "title": "Ibyerekeye Family Plan",
+        "title": "Ibyerekeye ifatabuguzi ry'umuryango",
         "accepting": {
           "title": "Kwemera Ubutumire",
           "benefit1": "Uzagabana subscription nyir’umuryango afite",
           "benefit2": "Amateka yo kureba n'ibikunogeye birahishirwa",
-          "benefit3": "Ushobora gusohoka muri family igihe ushakiye kuri uru rubuga"
+          "benefit3": "Ushobora gusohoka mu muryango igihe ushakiye kuri uru rubuga"
         },
         "subscription": {
           "title": "Icyitonderwa kuri Subscription",
           "note1": "Niba ufite subscription ikora, irahagarikwa byikora",
-          "note2": "Uzakoreshwa family plan aho gukoresha iyawe",
-          "note3": "Ushobora kongera gukoresha iyawe iyo usohotse muri family"
+          "note2": "Uzakoreshwa ifatabuguzi ry'umuryango aho gukoresha iyawe",
+          "note3": "Ushobora kongera gukoresha iyawe iyo usohotse mu muryango"
         }
       },
       "mobile": {
@@ -1694,9 +1694,9 @@
         "scrollToReview": "Sunikira hejuru urebe"
       },
       "errors": {
-        "loadFailed": "Ntibyakunze gupakurura ubutumire bwa family",
+        "loadFailed": "Ntibyakunze gupakurura ubutumire bw'umuryango",
         "actionFailed": "Ntibyakunze {{action}} ubutumire",
-        "leaveFailed": "Ntibyakunze gusohoka muri family"
+        "leaveFailed": "Ntibyakunze gusohoka mu muryango"
       }
     },
     "roles": {
@@ -1712,11 +1712,11 @@
       "adult": "Isanzwe"
     },
     "memberRoles": {
-      "parent": "Umubyeyi wa Family",
-      "teen": "Umusore/Inkumi wa Family",
-      "child": "Umwana wa Family",
+      "parent": "Umubyeyi w'umuryango",
+      "teen": "Umusore/Inkumi w'umuryango",
+      "child": "Umwana w'umuryango",
       "owner": "Nyir'umuryango",
-      "guest": "Umushyitsi wa Family",
+      "guest": "Umushyitsi w'umuryango",
       "familyMember": "Umunyamuryango"
     }
   },
@@ -1736,18 +1736,25 @@
     "noDate": "Nta tariki",
     "highScore": "Amanota Menshi (>30%)",
     "topTrending": "Bikunzwe Kurusha Ibindi",
-    "home": "Ahabanza"
+    "home": "Ahabanza",
+    "actions": {
+      "close": "Funga",
+      "goBack": "Subira Inyuma",
+      "tryAgain": "Ongera Ugerageze",
+      "copied": "Byakoporowe!"
+    },
+    "video": "Video"
   },
   "parentalControls": {
     "title": "Igenzura ry’Ababyeyi",
-    "subtitle": "Rinda igenamiterere rya family ukoresheje PIN yo kuburinzi",
+    "subtitle": "Rinda igenamiterere ry'umuryango ukoresheje PIN yo kuburinzi",
     "accessRestricted": {
       "title": "Uburenganzira Bwarinzwe",
-      "description": "Ugomba kuba Nyir’umuryango cyangwa Umubyeyi ufite family plan ikora kugira ngo ubone igenzura ry’ababyeyi."
+      "description": "Ugomba kuba Nyir’umuryango cyangwa Umubyeyi ufite ifatabuguzi ry'umuryango ikora kugira ngo ubone igenzura ry’ababyeyi."
     },
     "roles": {
       "familyOwner": "Nyir’umuryango",
-      "familyParent": "Umubyeyi wa Family"
+      "familyParent": "Umubyeyi w'umuryango"
     },
     "tabs": {
       "pinManagement": "Gucunga PIN",
@@ -1757,7 +1764,7 @@
       "activeTitle": "Master PIN Ikora",
       "setupTitle": "Shyiraho Master PIN",
       "activeDescription": "Master PIN yawe irarinzanya igenzura ry’ababyeyi. Emeza PIN yawe kugira ngo uhindure ibintu.",
-      "setupDescription": "Hanga PIN ya nimero 4 kugirango urinde igenzura ry’ababyeyi n’amagenamiterere ya family.",
+      "setupDescription": "Hanga PIN ya nimero 4 kugirango urinde igenzura ry’ababyeyi n’amagenamiterere y'umuryango.",
       "activeStatus": "Master PIN irimo gukora kandi irinda igenamiterere yawe",
       "createPin": "Hanga PIN yawe",
       "enterPinPlaceholder": "Injiza PIN ya nimero 4",
@@ -3360,5 +3367,317 @@
       "description": "Menya inkuru ya Oliviuus - urubuga rwa sinema y’u Rwanda rwubakiye ku kwitanga, kwihangana, no kwerekana inkuru z’Afurika. Menya abashinze, intego n’icyerekezo cya sinema y’u Rwanda.",
       "keywords": "Oliviuus ibyerekeye, urubuga rwa sinema y’u Rwanda, sinema ya Afurika, platform ya filime mu Rwanda, abashinze Oliviuus, inkuru z’u Rwanda, imyidagaduro ya Afurika, platform ya digitale Rwanda"
     }
+  },
+  "watch": {
+    "title": "Reba",
+    "defaultTitle": "Reba Video",
+    "defaultDescription": "Reba iyi video kuri platifomu yacu y'ubwiza bwo hejuru.",
+    "header": {
+      "nowPlaying": "Birimo Gukinwa",
+      "episode": "Agace {{number}} - {{title}}",
+      "episodeFormat": "S{{season}}:E{{episode}} - {{title}}"
+    },
+    "loading": {
+      "title": "Birimo Gutangira... - Urubuga rwo Kureba",
+      "metaDescription": "Video irimo gutangira, nyamuneka tegereza...",
+      "nextEpisode": "Agace gikurikiraho kirimo gutangira..."
+    },
+    "errors": {
+      "title": "Ikosa ry'Ubw tilgang - Urubuga rwo Kureba",
+      "metaDescription": "Kuboneza kuri iyi content birabujijwe",
+      "playbackError": "Ikosa mu Gukina Video - Urubuga rwo Kureba",
+      "playbackMetaDescription": "Ntibishoboka gukina video kubera ikosa",
+      "playbackTitle": "Ikosa mu Gukina",
+      "notFound": "Ibikubiyemo Ntibyabonetse - Urubuga rwo Kureba",
+      "notFoundMetaDescription": "Ibikubiyemo ushatse ntibyabonetse",
+      "contentNotFound": "Ibikubiyemo ntibyabonetse. Bishobora kuba byakuweho cyangwa bidahari.",
+      "authRequired": {
+        "title": "Injira kugira ngo ubone iyi content.",
+        "details": "Session yawe ishobora kuba yararangiye. Injira nanone."
+      },
+      "tooManyRequests": "Requests nyinshi cyane. Ongera ugerageze nyuma.",
+      "serverError": "Ikosa rya server. Ongera ugerageze nyuma.",
+      "serviceUnavailable": "Serivisi ntiboneka by'igihe gito. Ongera ugerageze nyuma.",
+      "generic": "Ntibishoboka gufungura ibi bikubiyemo. Ongera ugerageze.",
+      "accessDenied": {
+        "title": "Ubu butegetsi ntibwemerewe",
+        "description": "Nta burenganzira ufite bwo kureba ibi bikubiyemo."
+      },
+      "subscriptionRequired": {
+        "title": "Bisaba Ifatabuguzi",
+        "help": "Hitamo mumafatabuguzi yacu yoroshye cyangwa winjire muri ifatabuguzi ry'umuryango kugira ngo urebe content idahagarikwa.",
+        "viewPlans": "Reba Amafatabuguzi",
+        "joinFamily": "Injira muri ifatabuguzi ry'umuryango"
+      },
+      "deviceLimitReached": {
+        "title": "Limite y’Ibikoresho Yagezweho",
+        "familyTitle": "ibikoresho narengwa by'umuryango byagezweho",
+        "help": "Genzura sessions zakoreshwa mu mabwiriza ya konti kugira ngo ubone umwanya. Sessions zirangira nyuma y’iminota 30 zidakoreshwa.",
+        "familyHelp": "ifatabuguzi ry'umuryango igeze kuri limite y’ibikoresho. Saba nyir’umuryango gucunga sessions cyangwa kuzamura abonnement.",
+        "viewFamilySessions": "Reba Family Sessions",
+        "manageSessions": "Genzura Sessions"
+      },
+      "streamLimitReached": {
+        "title": "Limite yo Kureba Igezweho",
+        "familyTitle": "Family Stream Limit Igezweho",
+        "help": "Funga players ku bindi bikoresho cyangwa tabs kugira ngo ubone umwanya.",
+        "familyHelp": "Umuryango wageze ku mubare ntarengwa w’abareba icyarimwe. Saba abandi gufunga players.",
+        "askFamily": "Saba Umuryango Gufunga Streams",
+        "closedOthers": "Nafunze Streams Zindi"
+      },
+      "geoRestricted": {
+        "title": "Ibikubiyemo Ntibiboneka",
+        "help": "Ibi bikubiyemo biboneka gusa mu bice runaka bitewe n'amasezerano yo kubyerekana."
+      },
+      "planRestriction": {
+        "title": "Gukumirwa kw'ifatabuguzi",
+        "help": "Zamura ifatabuguzi kugira ngo ubashe kureba ku bikoresho byose nta mbogamizi.",
+        "upgrade": "Zamura ifatabuguzi"
+      },
+      "familyAccessRestricted": {
+        "title": "Uburenganzira bw'umuryango Burimo Gukumirwa",
+        "help": "Uburenganzira bw'umuryango bushobora kuba bwahagaritswe, bwararangiye cyangwa hari Gukumirwa kugihe.",
+        "manageSettings": "Genzura Igenamiterere ry'umuryango",
+        "getPersonalPlan": "Fata ifatabuguzi ry'umuntu kugiti cye"
+      },
+      "timeRestriction": {
+        "title": "Gukumirwa kugihe",
+        "help": "Uburenganzira bwawe bwarahagaritswe muri aya masaha bitewe nigenamiterere ry'umuryango. Gerageza nyuma.",
+        "viewSettings": "Reba igenamiterere ryigihe",
+        "tryLater": "Gerageza Nyuma"
+      },
+      "default": {
+        "description": "Nta burenganzira ufite bwo kureba ibi bikubiyemo.",
+        "help": "Niba ikibazo gikomeje, hamagara support yacu."
+      },
+      "limits": {
+        "active": "Bikora",
+        "maximum": "Ntarengwa"
+      },
+      "redirecting": "Urimo gusubizwa inyuma mu masegonda {{countdown}}..."
+    },
+    "rightClick": {
+      "copyLink": "Koporora Link ya Video",
+      "copyWithTimestamp": "Koporora Link ifite Igihe",
+      "shareVideo": "Sangira Video",
+      "openNewTab": "Fungura mu Tab Nshya",
+      "protectedContent": "Ibikubiyemo Birinzwe"
+    }
+  },
+  "videoPlayer": {
+    "accessibility": {
+      "videoPlayer": "Mudasobwa yo gukina amashusho",
+      "playVideo": "Kina videwo"
+    },
+    "buttons": {
+      "play": "Kina"
+    },
+    "errors": {
+      "noVideo": {
+        "title": "Nta Videwo Ihari",
+        "description": "Iyi content nta videwo ibasha gukinwa ifite."
+      }
+    }
+  },
+  "playerControls": {
+    "accessibility": {
+      "controls": "Igenzura rya videwo",
+      "progress": "Uko videwo irimo gukinwa",
+      "volume": "Urwinjiriro rw'amajwi",
+      "timeDisplay": "Igaragaza igihe cya videwo",
+      "playbackRate": "Umuvuduko wo gukina: {{rate}}x"
+    },
+    "buttons": {
+      "play": "Kina",
+      "pause": "Hagarika",
+      "rewind": "Subira inyuma amasegonda 5",
+      "forward": "Jya imbere amasegonda 5",
+      "unmute": "Fungura amajwi",
+      "mute": "Zimya amajwi",
+      "fullscreen": "Jya kuri ecran nini",
+      "exitFullscreen": "Sohoka kuri ecran nini",
+      "settings": "Igenamiterere"
+    },
+    "tooltips": {
+      "play": "Kina (Space)",
+      "pause": "Hagarika (Space)",
+      "rewind": "Subira inyuma 5s (←)",
+      "forward": "Jya imbere 5s (→)",
+      "mute": "Zimya amajwi (M)",
+      "fullscreen": "Ecran nini (F)",
+      "settings": "Igenamiterere (S)",
+      "timeDisplay": "Hinduza uburyo bwo kwerekana igihe"
+    }
+  },
+  "loadingOverlay": {
+    "initial": {
+      "title": "Videwo Iri Gutegurwa",
+      "description": "content irimo gutunganywa..."
+    },
+    "buffering": "Irimo gutunganywa...",
+    "loading": "irimo Gutunganywa...",
+    "waitMessage": "Mwihangane content irimo gutegurwa"
+  },
+  "connectionIndicator": {
+    "online": "Interineti yongeye kuboneka",
+    "offline": "Interineti yabuze"
+  },
+  "episodeSelector": {
+    "buttons": {
+      "episodes": "Ibice",
+      "continue": "Komeza kureba",
+      "continueFromTime": "Komeza urebe uhereye kuri {{time}}",
+      "continueWatching": "Komeza Kureba",
+      "startOver": "Tangirira aho byatangiriye"
+    },
+    "menu": {
+      "episodes": "Urutonde rw'ibice",
+      "continueWatching": "Menu yo gukomeza kureba"
+    },
+    "titles": {
+      "episodesSeasons": "Ibice & Ibihembwe",
+      "continueWatching": "Komeza Kureba"
+    },
+    "episodeCount": "Igice {{count}}",
+    "noEpisodes": "Nta Bice bihari",
+    "season": "Season {{number}}",
+    "defaultEpisodeTitle": "Igice {{number}}",
+    "unknownDuration": "Ntamara igihe kizwi",
+    "progress": "{{percentage}}% byarebwe",
+    "percentage": "{{percentage}}%",
+    "fromTime": "Uhereye kuri {{time}}",
+    "watchFromBeginning": "Tangirira ku ntangiriro",
+    "similarSeries": "Series Bisa Na Iyi",
+    "similarMovies": "Filime Bisa Na Iyi",
+    "noVideoContent": "Nta videwo iboneka",
+    "contentType": {
+      "series": "Series",
+      "movie": "Filime"
+    },
+    "aria": {
+      "episode": "Igice: {{title}}",
+      "episodeNumber": "Igice {{number}}",
+      "similarSeries": "Series isa nayo: {{title}}",
+      "similarMovie": "Filime isa nayo: {{title}}"
+    }
+  },
+  "endScreen": {
+    "episodeNumber": "Igice {{number}}",
+    "defaultContentTitle": "Ibindi Bicuruzwa",
+    "nextEpisodeStarting": "Icyiciro gikurikiraho gitangira vuba",
+    "finishedWatching": "Uzuye kureba",
+    "completedAllEpisodes": "Urangije kureba Ibice byose bya",
+    "visitNextMoment": "Garuka ubutaha urebe ibindi birimo gusohoka!",
+    "checkOutSimilar": "Reba Ibindi Bisa Na {{type}}",
+    "contentTypes": {
+      "series": "Series",
+      "movies": "Filime"
+    },
+    "aria": {
+      "playContent": "Kina {{title}}"
+    },
+    "buttons": {
+      "watchAgain": "Ongera urebemo",
+      "nextEpisode": "Icyiciro gikurikiraho",
+      "skip": "Simbuka",
+      "skipAutoPlay": "Simbuka auto-play",
+      "playNow": "Kina Ubu",
+      "browseAllContent": "Reba content Yose"
+    },
+    "congratulations": "Mwakoze!",
+    "upNext": "Ikurikira",
+    "countdown": "{{seconds}}s",
+    "noDescription": "Nta bisobanuro bihari",
+    "moreSeriesLikeThis": "Izindi Series Bisa Na Iyi",
+    "moreMoviesLikeThis": "Izindi Filime Bisa Na Iyi",
+    "checkBackLater": "Garuka hanyuma ubone ibindi birimo gusohoka!",
+    "contentType": {
+      "series": "Series",
+      "movie": "Filime"
+    }
+  },
+  "settingsPanel": {
+    "tabs": {
+      "speed": "Umuvuduko wo Gukinira",
+      "quality": "Ubwiza",
+      "advanced": "Ibindi byisumbuyeho",
+      "audio": "Amajwi",
+      "video": "Videwo",
+      "shortcuts": "Inshamake za Clavier"
+    },
+    "quality": {
+      "auto": "Automatic",
+      "bestAvailable": "Ubwiza bwiza buboneka",
+      "option": "Ubwiza bwa {{option}}"
+    },
+    "speed": {
+      "rate": "Umuvuduko wa {{rate}}x",
+      "normal": "Bisanzwe"
+    },
+    "advanced": {
+      "pip": "Picture-in-Picture",
+      "sleepTimer": "Igihe cyo guhagarika",
+      "sleepTimerDescription": "Videwo izahagarara igihe timer irangiye",
+      "sleepTimerSelect": "Hitamo igihe cya sleep timer"
+    },
+    "audio": {
+      "volumeBoost": "Kongera Amajwi",
+      "percentage": "{{percentage}}%",
+      "volumeBoostSlider": "Urwego rwo kongera amajwi",
+      "normal": "Bisanzwe",
+      "maxBoost": "Kuzamura cyane",
+      "audioPresets": "Amoko y'amajwi",
+      "preset": "Amahitamo ya {{name}}"
+    },
+    "audioPresets": {
+      "default": "Default",
+      "defaultDesc": "Amajwi asanzwe",
+      "movie": "Filime",
+      "movieDesc": "Amagambo asobanutse",
+      "music": "Umuziki",
+      "musicDesc": "Amajwi areshya neza",
+      "speech": "Ijwi",
+      "speechDesc": "Amajwi y'ijwi asobanutse",
+      "bass": "Kongera Bass",
+      "bassDesc": "Amajwi yo hasi yazamuwe"
+    },
+    "video": {
+      "brightness": "Umucyo",
+      "contrast": "Itandukaniro",
+      "saturation": "Gusatura",
+      "brightnessSlider": "Urwego rw'umucyo",
+      "contrastSlider": "Urwego rw'itandukaniro",
+      "saturationSlider": "Urwego rwo gusatura",
+      "resetEnhancements": "Siba ibyo wongereye byose",
+      "resetAll": "Siba byose"
+    },
+    "shortcuts": {
+      "space": "Space / K",
+      "playPause": "Kina/Hagarika",
+      "f": "F",
+      "fullscreen": "Ecran nini",
+      "m": "M",
+      "mute": "Zimya amajwi",
+      "arrows": "← / →",
+      "seek": "Subira cyangwa jya imbere 5s",
+      "volumeArrows": "↑ / ↓",
+      "volume": "Amajwi",
+      "speed": ", / .",
+      "speedChange": "Hindura umuvuduko",
+      "s": "S",
+      "settings": "Igenamiterere"
+    },
+    "sleepTimer": {
+      "off": "Oya",
+      "minutes": "Iminota {{minutes}}",
+      "hour": "Isaha 1"
+    },
+    "menuLabel": "Menu y'igenamiterere rya videwo"
+  },
+  "previewThumbnail": {
+    "aria": {
+      "timePreview": "Igaragaza ishusho y’igihe: {{time}}"
+    },
+    "loading": "Turimo gupakira ishusho..."
   }
 }

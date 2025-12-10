@@ -12,39 +12,13 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
-      manifest: {
-        name: 'Oliviuus',
-        short_name: 'Oliviuus',
-        description: 'Streaming Platform for Rwandan Cinema & Global Entertainment',
-        theme_color: '#BC8BBC',
-        background_color: '#000000',
-        display: 'standalone',
-        orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
-        icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ]
-      },
-      // ADD THIS workbox configuration to fix the error:
+      // Disable auto-manifest generation
+      manifest: false, // Set to false to use your own manifest.json
       workbox: {
-        maximumFileSizeToCacheInBytes: 5000000, // Increase to 5MB
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,ttf}'],
+        maximumFileSizeToCacheInBytes: 5000000,
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,ttf,json}'],
+        // IMPORTANT: Include manifest.json in cache
+        globIgnores: [],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -85,29 +59,17 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    // Fix chunk splitting - simpler approach
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // Keep it simple - just one vendor chunk
           if (id.includes('node_modules')) {
-            // Split vendor chunks more aggressively
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'vendor-react';
-            }
-            if (id.includes('firebase')) {
-              return 'vendor-firebase';
-            }
-            if (id.includes('@mui') || id.includes('@material-ui')) {
-              return 'vendor-material';
-            }
-            if (id.includes('@stripe')) {
-              return 'vendor-stripe';
-            }
             return 'vendor';
           }
         }
       }
     },
-    // Add chunk size limit to suppress warning
     chunkSizeWarningLimit: 1000
   }
 });

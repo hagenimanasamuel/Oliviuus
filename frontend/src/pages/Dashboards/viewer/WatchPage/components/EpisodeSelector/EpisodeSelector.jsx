@@ -1,7 +1,7 @@
-// Enhanced EpisodeSelector.jsx with Professional Features
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Clock, Check, ChevronDown, Tv, Film, PlayCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const EpisodeSelector = ({ 
   content, 
@@ -12,6 +12,7 @@ const EpisodeSelector = ({
   similarContent = [],
   showControlsTemporarily
 }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredEpisode, setHoveredEpisode] = useState(null);
   const dropdownRef = useRef(null);
@@ -173,16 +174,26 @@ const EpisodeSelector = ({
         onMouseEnter={showControlsTemporarily}
         onMouseMove={showControlsTemporarily}
         className={`flex items-center gap-2 text-white transition-all duration-300 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg font-semibold border border-white/20 hover:border-purple-400 hover:bg-white/20 transform hover:scale-105 ${isOpen ? 'bg-purple-600 border-purple-400' : ''}`}
+        aria-label={isSeries 
+          ? t('episodeSelector.buttons.episodes', 'Episodes') 
+          : t('episodeSelector.buttons.continue', 'Continue watching')
+        }
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
       >
         {isSeries ? (
           <>
             <Tv className="w-5 h-5" />
-            <span className="hidden sm:inline">Episodes</span>
+            <span className="hidden sm:inline">
+              {t('episodeSelector.buttons.episodes', 'Episodes')}
+            </span>
           </>
         ) : (
           <>
             <Film className="w-5 h-5" />
-            <span className="hidden sm:inline">Continue</span>
+            <span className="hidden sm:inline">
+              {t('episodeSelector.buttons.continue', 'Continue')}
+            </span>
           </>
         )}
         <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
@@ -210,6 +221,11 @@ const EpisodeSelector = ({
               showControlsTemporarily();
             }
           }}
+          role="menu"
+          aria-label={isSeries 
+            ? t('episodeSelector.menu.episodes', 'Episodes menu') 
+            : t('episodeSelector.menu.continueWatching', 'Continue watching menu')
+          }
         >
           {isSeries ? (
             // Series Content - Episodes by Season
@@ -217,10 +233,10 @@ const EpisodeSelector = ({
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <h3 className="text-white font-bold text-lg flex items-center gap-2">
                   <Tv className="w-5 h-5 text-purple-400" />
-                  Episodes & Seasons
+                  {t('episodeSelector.titles.episodesSeasons', 'Episodes & Seasons')}
                 </h3>
                 <span className="text-xs text-gray-400 bg-white/10 px-2 py-1 rounded">
-                  {episodes.length} episodes
+                  {t('episodeSelector.episodeCount', '{{count}} episodes', { count: episodes.length })}
                 </span>
               </div>
               
@@ -229,7 +245,9 @@ const EpisodeSelector = ({
                   <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-3">
                     <Tv className="w-8 h-8 text-gray-500" />
                   </div>
-                  <p className="text-gray-400 text-sm">No episodes available</p>
+                  <p className="text-gray-400 text-sm">
+                    {t('episodeSelector.noEpisodes', 'No episodes available')}
+                  </p>
                 </div>
               ) : (
                 Object.entries(episodesBySeason).map(([season, seasonEpisodes]) => (
@@ -237,7 +255,7 @@ const EpisodeSelector = ({
                     <div className="flex items-center gap-2">
                       <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
                       <h4 className="text-white font-semibold text-sm bg-purple-600/20 px-3 py-1 rounded-full border border-purple-500/30">
-                        Season {season}
+                        {t('episodeSelector.season', 'Season {{number}}', { number: season })}
                       </h4>
                       <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
                     </div>
@@ -261,6 +279,15 @@ const EpisodeSelector = ({
                                 ? 'bg-white/20 text-white scale-[1.02] shadow-lg'
                                 : 'bg-white/5 text-gray-300 hover:bg-white/10'
                             }`}
+                            role="menuitem"
+                            aria-label={episode.title 
+                              ? t('episodeSelector.aria.episode', 'Episode: {{title}}', { title: episode.title })
+                              : t('episodeSelector.aria.episodeNumber', 'Episode {{number}}', { number: episode.episode_number || index + 1 })
+                            }
+                            aria-describedby={progress > 0 
+                              ? `episode-${episodeId}-progress` 
+                              : undefined
+                            }
                           >
                             {/* Episode Number/Icon */}
                             <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 ${
@@ -282,17 +309,20 @@ const EpisodeSelector = ({
                             {/* Episode Info */}
                             <div className="flex-1 min-w-0">
                               <div className="font-semibold text-sm truncate mb-1">
-                                {episode.title || `Episode ${episode.episode_number || index + 1}`}
+                                {episode.title || t('episodeSelector.defaultEpisodeTitle', 'Episode {{number}}', { number: episode.episode_number || index + 1 })}
                               </div>
                               <div className="flex items-center gap-2 text-xs">
                                 <span className={`${isPlaying ? 'text-white/80' : 'text-gray-400'}`}>
-                                  {episode.duration ? formatTime(episode.duration) : 'Unknown'}
+                                  {episode.duration ? formatTime(episode.duration) : t('episodeSelector.unknownDuration', 'Unknown')}
                                 </span>
                                 {progress > 0 && (
                                   <>
                                     <span className={`${isPlaying ? 'text-white/60' : 'text-gray-500'}`}>•</span>
-                                    <span className={`${progress > 90 ? 'text-green-400' : 'text-yellow-400'}`}>
-                                      {Math.round(progress)}% watched
+                                    <span 
+                                      className={`${progress > 90 ? 'text-green-400' : 'text-yellow-400'}`}
+                                      id={`episode-${episodeId}-progress`}
+                                    >
+                                      {t('episodeSelector.progress', '{{percentage}}% watched', { percentage: Math.round(progress) })}
                                     </span>
                                   </>
                                 )}
@@ -310,6 +340,7 @@ const EpisodeSelector = ({
                                         : 'bg-purple-400'
                                     }`}
                                     style={{ width: `${progress}%` }}
+                                    aria-hidden="true"
                                   />
                                 </div>
                               )}
@@ -317,7 +348,7 @@ const EpisodeSelector = ({
 
                             {/* Play Icon on Hover */}
                             {!isPlaying && isHovered && (
-                              <PlayCircle className="w-6 h-6 text-purple-400 animate-fadeIn" />
+                              <PlayCircle className="w-6 h-6 text-purple-400 animate-fadeIn" aria-hidden="true" />
                             )}
                           </button>
                         );
@@ -332,7 +363,7 @@ const EpisodeSelector = ({
                 <div className="pt-4 border-t border-white/10 animate-fadeIn">
                   <h4 className="text-white font-semibold text-sm mb-3 flex items-center gap-2">
                     <Play className="w-4 h-4 text-purple-400" />
-                    Similar Series
+                    {t('episodeSelector.similarSeries', 'Similar Series')}
                   </h4>
                   <div className="space-y-2">
                     {similarContent.slice(0, 3).map((item) => {
@@ -342,6 +373,8 @@ const EpisodeSelector = ({
                           key={item.id}
                           onClick={() => handleSimilarContentSelect(item)}
                           className="w-full flex items-center gap-3 p-2 bg-white/5 hover:bg-white/15 rounded-lg transition-all duration-300 text-left group hover:scale-[1.02]"
+                          role="menuitem"
+                          aria-label={t('episodeSelector.aria.similarSeries', 'Similar series: {{title}}', { title: item.title })}
                         >
                           <div className="w-16 h-20 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0 relative group-hover:shadow-lg transition-shadow">
                             {thumbnailUrl ? (
@@ -349,6 +382,10 @@ const EpisodeSelector = ({
                                 src={thumbnailUrl} 
                                 alt={item.title}
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
                               />
                             ) : (
                               <div className="w-full h-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
@@ -364,7 +401,10 @@ const EpisodeSelector = ({
                               {item.title}
                             </div>
                             <div className="text-xs text-gray-400">
-                              {item.content_type === 'series' ? 'Series' : 'Movie'}
+                              {item.content_type === 'series' 
+                                ? t('episodeSelector.contentType.series', 'Series') 
+                                : t('episodeSelector.contentType.movie', 'Movie')
+                              }
                             </div>
                           </div>
                         </button>
@@ -380,7 +420,7 @@ const EpisodeSelector = ({
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <h3 className="text-white font-bold text-lg flex items-center gap-2">
                   <Film className="w-5 h-5 text-purple-400" />
-                  Continue Watching
+                  {t('episodeSelector.titles.continueWatching', 'Continue Watching')}
                 </h3>
               </div>
               
@@ -391,14 +431,22 @@ const EpisodeSelector = ({
                     <button
                       onClick={handleContinueWatching}
                       className="w-full flex items-center gap-3 p-4 bg-gradient-to-r from-purple-600/20 to-blue-600/20 hover:from-purple-600/40 hover:to-blue-600/40 rounded-xl transition-all duration-300 text-white border border-purple-500/30 hover:border-purple-400 hover:scale-[1.02] group"
+                      role="menuitem"
+                      aria-label={t('episodeSelector.buttons.continueFromTime', 'Continue watching from {{time}}', { 
+                        time: formatTime(getContinueWatchingTime()) 
+                      })}
                     >
                       <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                         <Play className="w-6 h-6 fill-current" />
                       </div>
                       <div className="flex-1 text-left">
-                        <div className="font-semibold mb-1">Continue Watching</div>
+                        <div className="font-semibold mb-1">
+                          {t('episodeSelector.buttons.continueWatching', 'Continue Watching')}
+                        </div>
                         <div className="text-sm text-gray-300">
-                          From {formatTime(getContinueWatchingTime())}
+                          {t('episodeSelector.fromTime', 'From {{time}}', { 
+                            time: formatTime(getContinueWatchingTime()) 
+                          })}
                         </div>
                       </div>
                     </button>
@@ -408,13 +456,19 @@ const EpisodeSelector = ({
                   <button
                     onClick={handleStartOver}
                     className="w-full flex items-center gap-3 p-4 bg-white/5 hover:bg-white/15 rounded-xl transition-all duration-300 text-white hover:scale-[1.02] group"
+                    role="menuitem"
+                    aria-label={t('episodeSelector.buttons.startOver', 'Start over from beginning')}
                   >
                     <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Clock className="w-6 h-6" />
                     </div>
                     <div className="flex-1 text-left">
-                      <div className="font-semibold mb-1">Start Over</div>
-                      <div className="text-sm text-gray-400">Watch from beginning</div>
+                      <div className="font-semibold mb-1">
+                        {t('episodeSelector.buttons.startOver', 'Start Over')}
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        {t('episodeSelector.watchFromBeginning', 'Watch from beginning')}
+                      </div>
                     </div>
                   </button>
                 </div>
@@ -424,15 +478,20 @@ const EpisodeSelector = ({
               {getContinueWatchingTime() > 0 && duration > 0 && (
                 <div className="space-y-2 pt-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Progress</span>
+                    <span className="text-gray-400">
+                      {t('episodeSelector.progress', 'Progress')}
+                    </span>
                     <span className="text-purple-400 font-semibold">
-                      {Math.round((getContinueWatchingTime() / duration) * 100)}%
+                      {t('episodeSelector.percentage', '{{percentage}}%', { 
+                        percentage: Math.round((getContinueWatchingTime() / duration) * 100) 
+                      })}
                     </span>
                   </div>
                   <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500 relative"
                       style={{ width: `${(getContinueWatchingTime() / duration) * 100}%` }}
+                      aria-hidden="true"
                     >
                       <div className="absolute inset-0 bg-white/30 animate-shimmer"></div>
                     </div>
@@ -445,7 +504,7 @@ const EpisodeSelector = ({
                 <div className="pt-4 border-t border-white/10 animate-fadeIn">
                   <h4 className="text-white font-semibold text-sm mb-3 flex items-center gap-2">
                     <Play className="w-4 h-4 text-purple-400" />
-                    Similar Movies
+                    {t('episodeSelector.similarMovies', 'Similar Movies')}
                   </h4>
                   <div className="space-y-2">
                     {similarContent.slice(0, 3).map((item) => {
@@ -455,6 +514,8 @@ const EpisodeSelector = ({
                           key={item.id}
                           onClick={() => handleSimilarContentSelect(item)}
                           className="w-full flex items-center gap-3 p-2 bg-white/5 hover:bg-white/15 rounded-lg transition-all duration-300 text-left group hover:scale-[1.02]"
+                          role="menuitem"
+                          aria-label={t('episodeSelector.aria.similarMovie', 'Similar movie: {{title}}', { title: item.title })}
                         >
                           <div className="w-16 h-20 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0 relative group-hover:shadow-lg transition-shadow">
                             {thumbnailUrl ? (
@@ -462,6 +523,10 @@ const EpisodeSelector = ({
                                 src={thumbnailUrl} 
                                 alt={item.title}
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
                               />
                             ) : (
                               <div className="w-full h-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
@@ -477,7 +542,10 @@ const EpisodeSelector = ({
                               {item.title}
                             </div>
                             <div className="text-xs text-gray-400">
-                              {item.content_type === 'series' ? 'Series' : 'Movie'}
+                              {item.content_type === 'series' 
+                                ? t('episodeSelector.contentType.series', 'Series') 
+                                : t('episodeSelector.contentType.movie', 'Movie')
+                              }
                             </div>
                           </div>
                         </button>
@@ -492,7 +560,9 @@ const EpisodeSelector = ({
                   <div className="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-3">
                     <Film className="w-8 h-8 text-gray-500" />
                   </div>
-                  <p className="text-gray-400 text-sm">No video content available</p>
+                  <p className="text-gray-400 text-sm">
+                    {t('episodeSelector.noVideoContent', 'No video content available')}
+                  </p>
                 </div>
               )}
             </div>
