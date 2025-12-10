@@ -94,7 +94,6 @@ function AppWithProfileSelection() {
   // Optimized state management
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showConnectionStatus, setShowConnectionStatus] = useState(false);
   
@@ -138,35 +137,8 @@ function AppWithProfileSelection() {
     };
   }, []);
 
-  // Device detection
+  // PWA installation handling - REMOVED DEVICE CHECK
   useEffect(() => {
-    const checkDevice = () => {
-      const userAgent = navigator.userAgent.toLowerCase();
-      const isMobile = /iphone|ipad|ipod|android|webos|blackberry|windows phone/.test(userAgent);
-      const isTablet = /(ipad|tablet|playbook|silk)|(android(?!.*mobile))/.test(userAgent);
-      setIsDesktop(!isMobile && !isTablet);
-    };
-
-    checkDevice();
-    
-    let resizeTimer;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(checkDevice, 250);
-    };
-    
-    window.addEventListener('resize', handleResize, { passive: true });
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(resizeTimer);
-    };
-  }, []);
-
-  // PWA installation handling
-  useEffect(() => {
-    if (!isDesktop) return;
-
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -191,18 +163,18 @@ function AppWithProfileSelection() {
         clearTimeout(installTimeoutRef.current);
       }
     };
-  }, [isDesktop]);
+  }, []); // Removed isDesktop dependency
 
-  // Install button auto-hide
+  // Install button auto-hide - REMOVED DEVICE CHECK
   useEffect(() => {
-    if (!showInstallButton || !isDesktop) return;
+    if (!showInstallButton) return;
 
     const hideTimer = setTimeout(() => {
       setShowInstallButton(false);
     }, 30000);
 
     return () => clearTimeout(hideTimer);
-  }, [showInstallButton, isDesktop]);
+  }, [showInstallButton]); // Removed isDesktop dependency
 
   // Loading screen management
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
@@ -248,7 +220,7 @@ function AppWithProfileSelection() {
           </div>
         )}
         
-        {showInstallButton && isDesktop && (
+        {showInstallButton && (
           <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
             <button 
               onClick={async () => {
@@ -304,7 +276,7 @@ function AppWithProfileSelection() {
         </div>
       )}
       
-      {showInstallButton && isDesktop && (
+      {showInstallButton && (
         <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
           <button 
             onClick={async () => {
