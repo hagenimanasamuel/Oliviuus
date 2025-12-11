@@ -19,15 +19,9 @@ export default function ViewerDashboard({ bodyContent }) {
     }
   };
 
-  // Show loading while checking subscription
-  if (subscriptionLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-black">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
-  }
-
+  // Show loading while checking subscription - REMOVED
+  // Loading is already handled in App.js loading screen
+  
   // Check if user can access premium content
   // This runs globally in the background via SubscriptionContext
   if (!canAccessPremium()) {

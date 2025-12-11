@@ -1,7 +1,6 @@
 // src/routes/AppRoutes.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useSubscription } from "../context/SubscriptionContext";
 import { useState, useEffect, useMemo, useRef } from "react";
 import NotFound from "../pages/NotFound";
 import AuthForm from "../pages/auth/AuthForm";
@@ -167,16 +166,14 @@ const KidSkeleton = () => (
 
 export default function AppRoutes() {
   const { user, loading: authLoading, isKidMode } = useAuth();
-  const { currentSubscription, loading: subLoading } = useSubscription();
-
+  
+  // REMOVED: const { currentSubscription, loading: subLoading } = useSubscription();
   const [predictedView, setPredictedView] = useState('landing');
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const [contentReady, setContentReady] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   
-  // Track previous loading states to detect changes
+  // Track previous loading states
   const prevAuthLoading = useRef(authLoading);
-  const prevSubLoading = useRef(subLoading);
 
   // Ultra-fast view prediction
   useEffect(() => {
@@ -194,41 +191,30 @@ export default function AppRoutes() {
     setPredictedView(predictView());
   }, []);
 
-  // Smooth loading state management
+  // Simplified loading state management
   useEffect(() => {
-    // If loading just finished, mark content as ready
-    if (!authLoading && !subLoading && !contentReady) {
-      // Small delay for smooth transition
+    // Hide skeleton after auth loading completes
+    if (!authLoading && !hasLoadedOnce) {
       const timer = setTimeout(() => {
-        setContentReady(true);
-      }, 50); // 50ms delay for smoothness
+        setShowSkeleton(false);
+        setHasLoadedOnce(true);
+      }, 100); // Small delay for smooth transition
       
       return () => clearTimeout(timer);
     }
-    
-    // If loading started, show skeleton immediately
-    if ((authLoading || subLoading) && !hasLoadedOnce) {
-      setShowSkeleton(true);
-      setContentReady(false);
-    }
-  }, [authLoading, subLoading, contentReady, hasLoadedOnce]);
-
-  // Mark as loaded once to prevent future skeleton flashes
-  useEffect(() => {
-    if (!authLoading && !subLoading && !hasLoadedOnce) {
-      setHasLoadedOnce(true);
-    }
-  }, [authLoading, subLoading, hasLoadedOnce]);
+  }, [authLoading, hasLoadedOnce]);
 
   // Memoized content to prevent re-renders
   const cachedContent = useMemo(() => {
     if (!user) return <LandingPage />;
     if (user.role === "admin") return <Dashboard />;
     if (isKidMode) return <Dashboard />;
-    if (user.role === "viewer" && !currentSubscription) return <LandingPage />;
-    if (user.role === "viewer" && currentSubscription) return <Dashboard />;
+    
+    // For viewers, let Dashboard component handle subscription check internally
+    if (user.role === "viewer") return <Dashboard />;
+    
     return <LandingPage />;
-  }, [user, currentSubscription, isKidMode]);
+  }, [user, isKidMode]);
 
   // Skeleton selection
   const getSkeleton = () => {
@@ -240,203 +226,180 @@ export default function AppRoutes() {
     }
   };
 
-  // ========== SMOOTH RENDERING LOGIC ==========
-  // Only show skeleton on initial load, not on subsequent auth changes
-  const shouldShowSkeleton = showSkeleton && (!hasLoadedOnce || (authLoading && !contentReady));
-  
-  // If we should show skeleton, show it with overlay for smooth transition
-  if (shouldShowSkeleton) {
-    return (
-      <>
-        {getSkeleton()}
-        {/* Hidden content ready to appear */}
-        <div style={{ display: 'none' }}>
-          <RoutesComponent />
-        </div>
-      </>
-    );
+  // Show skeleton only on initial load
+  if (showSkeleton && !hasLoadedOnce) {
+    return getSkeleton();
   }
 
-  // Main routes component extracted for clean rendering
-  function RoutesComponent() {
-    const AdminRoute = ({ element }) => (
-      <ProtectedRoute allowedRoles={["admin"]}>
-        <KidProtectedRoute>
-          <AdminDashboard bodyContent={element} />
-        </KidProtectedRoute>
-      </ProtectedRoute>
-    );
+  // Route component helpers
+  const AdminRoute = ({ element }) => (
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <KidProtectedRoute>
+        <AdminDashboard bodyContent={element} />
+      </KidProtectedRoute>
+    </ProtectedRoute>
+  );
 
-    const ViewerRoute = ({ element }) => (
-      <ProtectedRoute allowedRoles={["viewer"]}>
-        <KidProtectedRoute>
-          <ViewerDashboard bodyContent={element} />
-        </KidProtectedRoute>
-      </ProtectedRoute>
-    );
+  const ViewerRoute = ({ element }) => (
+    <ProtectedRoute allowedRoles={["viewer"]}>
+      <KidProtectedRoute>
+        <ViewerDashboard bodyContent={element} />
+      </KidProtectedRoute>
+    </ProtectedRoute>
+  );
 
-    const ProtectedWatchRoute = ({ element }) => (
-      <ProtectedRoute allowedRoles={["viewer"]}>
-        <KidProtectedRoute>
-          {element}
-        </KidProtectedRoute>
-      </ProtectedRoute>
-    );
+  const ProtectedWatchRoute = ({ element }) => (
+    <ProtectedRoute allowedRoles={["viewer"]}>
+      <KidProtectedRoute>
+        {element}
+      </KidProtectedRoute>
+    </ProtectedRoute>
+  );
 
-    const KidRoute = ({ element }) => (
-      <ProtectedRoute allowedRoles={["viewer"]}>
-        <KidProtectedRoute requireKidMode={true}>
-          <KidDashboard bodyContent={element} />
-        </KidProtectedRoute>
-      </ProtectedRoute>
-    );
+  const KidRoute = ({ element }) => (
+    <ProtectedRoute allowedRoles={["viewer"]}>
+      <KidProtectedRoute requireKidMode={true}>
+        <KidDashboard bodyContent={element} />
+      </KidProtectedRoute>
+    </ProtectedRoute>
+  );
 
-    return (
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <KidProtectedRoute>
-              {cachedContent}
-            </KidProtectedRoute>
-          }
-        />
+  return (
+    <Routes>
+      {/* Root route - Dashboard handles subscription internally */}
+      <Route
+        path="/"
+        element={
+          <KidProtectedRoute>
+            {cachedContent}
+          </KidProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/auth"
-          element={
-            <KidProtectedRoute>
-              {user ? <Navigate to="/" replace /> : <AuthForm />}
-            </KidProtectedRoute>
-          }
-        />
+      <Route
+        path="/auth"
+        element={
+          <KidProtectedRoute>
+            {user ? <Navigate to="/" replace /> : <AuthForm />}
+          </KidProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/reset-password"
-          element={
-            <KidProtectedRoute>
-              <ResetPassword />
-            </KidProtectedRoute>
-          }
-        />
+      <Route
+        path="/reset-password"
+        element={
+          <KidProtectedRoute>
+            <ResetPassword />
+          </KidProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/subscription"
-          element={
-            <KidProtectedRoute>
-              {user && user.role === "viewer" && !currentSubscription ? (
-                <SubscriptionPage />
-              ) : user && user.role === "viewer" && currentSubscription ? (
-                <Navigate to="/" replace />
-              ) : !user ? (
-                <Navigate to="/auth" replace />
-              ) : (
-                <Navigate to="/" replace />
-              )}
-            </KidProtectedRoute>
-          }
-        />
+      {/* Subscription route - Let the page handle its own logic */}
+      <Route
+        path="/subscription"
+        element={
+          <KidProtectedRoute>
+            <SubscriptionPage />
+          </KidProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/payment"
-          element={
-            <KidProtectedRoute>
-              {user && user.role === "viewer" && !currentSubscription ? (
-                <PaymentPage />
-              ) : user ? (
-                <Navigate to="/" replace />
-              ) : (
-                <Navigate to="/auth" replace state={{ from: '/payment' }} />
-              )}
-            </KidProtectedRoute>
-          }
-        />
+      <Route
+        path="/payment"
+        element={
+          <KidProtectedRoute>
+            {user ? <PaymentPage /> : <Navigate to="/auth" replace state={{ from: '/payment' }} />}
+          </KidProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/account/settings"
-          element={
-            <KidProtectedRoute>
-              <ProtectedRoute allowedRoles={["viewer", "admin"]}>
-                <AccountSettings />
-              </ProtectedRoute>
-            </KidProtectedRoute>
-          }
-        />
+      <Route
+        path="/account/settings"
+        element={
+          <KidProtectedRoute>
+            <ProtectedRoute allowedRoles={["viewer", "admin"]}>
+              <AccountSettings />
+            </ProtectedRoute>
+          </KidProtectedRoute>
+        }
+      />
 
-        <Route path="/admin" element={<AdminRoute element={<Overview />} />} />
-        <Route path="/admin/overview" element={<AdminRoute element={<Overview />} />} />
-        <Route path="/admin/users" element={<AdminRoute element={<Users />} />} />
-        <Route path="/admin/library" element={<AdminRoute element={<Library />} />} />
-        <Route path="/admin/subscriptions" element={<AdminRoute element={<Subscriptions />} />} />
-        <Route path="/admin/analytics" element={<AdminRoute element={<Analytics />} />} />
-        <Route path="/admin/global-management" element={<AdminRoute element={<GlobalManagement />} />} />
-        <Route path="/admin/support" element={<AdminRoute element={<Support />} />} />
+      {/* Admin routes */}
+      <Route path="/admin" element={<AdminRoute element={<Overview />} />} />
+      <Route path="/admin/overview" element={<AdminRoute element={<Overview />} />} />
+      <Route path="/admin/users" element={<AdminRoute element={<Users />} />} />
+      <Route path="/admin/library" element={<AdminRoute element={<Library />} />} />
+      <Route path="/admin/subscriptions" element={<AdminRoute element={<Subscriptions />} />} />
+      <Route path="/admin/analytics" element={<AdminRoute element={<Analytics />} />} />
+      <Route path="/admin/global-management" element={<AdminRoute element={<GlobalManagement />} />} />
+      <Route path="/admin/support" element={<AdminRoute element={<Support />} />} />
 
-        <Route path="/library" element={<ViewerRoute element={<MyLibrary />} />} />
-        <Route path="/downloads" element={<ViewerRoute element={<DownloadPage />} />} />
-        <Route path="/history" element={<ViewerRoute element={<WatchHistoryPage />} />} />
-        <Route path="/my-list" element={<ViewerRoute element={<WatchlistPage />} />} />
-        <Route path="/tv" element={<ViewerRoute element={<TvShowsPage />} />} />
-        <Route path="/movies" element={<ViewerRoute element={<MoviesPage />} />} />
-        <Route path="/new" element={<ViewerRoute element={<NewPopularPage />} />} />
-        <Route path="/browse" element={<ViewerRoute element={<BrowsePage />} />} />
-        <Route path="/profile" element={<ViewerRoute element={<ProfilePage />} />} />
-        <Route path="/search" element={<ViewerRoute element={<SearchModal isPage={true} />} />} />
+      {/* Viewer routes - Each component handles its own subscription logic */}
+      <Route path="/library" element={<ViewerRoute element={<MyLibrary />} />} />
+      <Route path="/downloads" element={<ViewerRoute element={<DownloadPage />} />} />
+      <Route path="/history" element={<ViewerRoute element={<WatchHistoryPage />} />} />
+      <Route path="/my-list" element={<ViewerRoute element={<WatchlistPage />} />} />
+      <Route path="/tv" element={<ViewerRoute element={<TvShowsPage />} />} />
+      <Route path="/movies" element={<ViewerRoute element={<MoviesPage />} />} />
+      <Route path="/new" element={<ViewerRoute element={<NewPopularPage />} />} />
+      <Route path="/browse" element={<ViewerRoute element={<BrowsePage />} />} />
+      <Route path="/profile" element={<ViewerRoute element={<ProfilePage />} />} />
+      <Route path="/search" element={<ViewerRoute element={<SearchModal isPage={true} />} />} />
 
-        <Route path="/learn" element={<KidRoute element={<KidLearningPage />} />} />
-        <Route path="/favorites" element={<KidRoute element={<KidFavoritesPage />} />} />
-        <Route path="/music" element={<KidRoute element={<KidSongsMusicPage />} />} />
-        <Route path="/play" element={<KidRoute element={<KidGamesPage />} />} />
+      {/* Kid routes */}
+      <Route path="/learn" element={<KidRoute element={<KidLearningPage />} />} />
+      <Route path="/favorites" element={<KidRoute element={<KidFavoritesPage />} />} />
+      <Route path="/music" element={<KidRoute element={<KidSongsMusicPage />} />} />
+      <Route path="/play" element={<KidRoute element={<KidGamesPage />} />} />
 
-        <Route path="/terms" element={<TermsOfService />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/help" element={<HelpCenter />} />
-        <Route path="/feedback" element={<FeedbackPage />} />
-        <Route path="/about" element={<About />} />
+      {/* Public routes */}
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/help" element={<HelpCenter />} />
+      <Route path="/feedback" element={<FeedbackPage />} />
+      <Route path="/about" element={<About />} />
 
-        <Route
-          path="/watch/:id"
-          element={
-            <ProtectedWatchRoute element={<WatchPage />} />
-          }
-        />
-        <Route
-          path="/title/:id"
-          element={
-            <ContentDetailPage />
-          }
-        />
+      {/* Watch and content routes */}
+      <Route
+        path="/watch/:id"
+        element={
+          <ProtectedWatchRoute element={<WatchPage />} />
+        }
+      />
+      <Route
+        path="/title/:id"
+        element={
+          <ContentDetailPage />
+        }
+      />
 
-        <Route
-          path="/sample/security"
-          element={
-            <KidProtectedRoute>
-              <SecurityGridPresentation />
-            </KidProtectedRoute>
-          }
-        />
-        <Route
-          path="/sample/oliviuus"
-          element={
-            <KidProtectedRoute>
-              <OliviuusInvestorPitch />
-            </KidProtectedRoute>
-          }
-        />
-        <Route
-          path="/sample/game"
-          element={
-            <KidProtectedRoute>
-              <UmukinoWoKwiruka />
-            </KidProtectedRoute>
-          }
-        />
+      {/* Sample routes */}
+      <Route
+        path="/sample/security"
+        element={
+          <KidProtectedRoute>
+            <SecurityGridPresentation />
+          </KidProtectedRoute>
+        }
+      />
+      <Route
+        path="/sample/oliviuus"
+        element={
+          <KidProtectedRoute>
+            <OliviuusInvestorPitch />
+          </KidProtectedRoute>
+        }
+      />
+      <Route
+        path="/sample/game"
+        element={
+          <KidProtectedRoute>
+            <UmukinoWoKwiruka />
+          </KidProtectedRoute>
+        }
+      />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    );
-  }
-
-  // Always render the routes component
-  return <RoutesComponent />;
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
 }

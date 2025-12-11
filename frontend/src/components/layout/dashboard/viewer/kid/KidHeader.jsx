@@ -5,11 +5,11 @@ import { useAuth } from "../../../../../context/AuthContext";
 import Logo from "../../../../Logo";
 import PinVerificationModal from "./modals/PinVerificationModal";
 import api from "../../../../../api/axios";
-import { useTranslation } from "react-i18next"; // Import translation hook
+import { useTranslation } from "react-i18next";
 
 export default function KidHeader({ kidProfile, onExit, isScrolled }) {
   const { user, familyMemberData, logoutUser } = useAuth();
-  const { t } = useTranslation(); // Initialize translation hook
+  const { t } = useTranslation(); 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(false);
   const [showUpperSection, setShowUpperSection] = useState(true);

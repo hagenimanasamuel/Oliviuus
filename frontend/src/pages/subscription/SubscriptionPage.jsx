@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 // Components
@@ -32,6 +32,22 @@ const SubscriptionPage = () => {
   // Get current language
   const currentLang = i18n.language;
 
+  // ==================== SUBSCRIPTION ACCESS CHECK ====================
+  // Check if user has active subscription and redirect
+  useEffect(() => {
+    if (currentSubscription && currentSubscription.real_time_status === 'active') {
+      // User has active subscription, redirect to home
+      navigate("/", { replace: true });
+    }
+  }, [currentSubscription, navigate]);
+
+  // If user has active subscription, show redirect immediately
+  if (currentSubscription && currentSubscription.real_time_status === 'active') {
+    return <Navigate to="/" replace />;
+  }
+
+  // ==================== REST OF YOUR ORIGINAL CODE ====================
+  
   // SEO content based on language
   const seoContent = {
     en: {
@@ -46,13 +62,13 @@ const SubscriptionPage = () => {
       "description": "Reba ifatabuguzi za Oliviuus zitangira kuri RWF 3,000. Hitamo hagati ya Basic, Standard, Mobile, na Family. Ushobora guhagarika igihe icyo ari cyo cyose.",
       "keywords": "ifatabuguzi za Oliviuus, streaming Rwanda, serivisi za streaming mu Rwanda, streaming ihendutse Rwanda, alternative ya Netflix Rwanda",
       "ogTitle": "Hitamo ifatabuguzi ya Oliviuus",
-      "ogDescription": "Streaming idafite umupaka ya filime nyarwanda n’ibirimo by’isi. ifatabuguzi zitangira kuri RWF 3,000 buri kwezi."
+      "ogDescription": "Streaming idafite umupaka ya filime nyarwanda n'ibirimo by'isi. ifatabuguzi zitangira kuri RWF 3,000 buri kwezi."
     },
     fr: {
-      "title": "Plans d’Abonnement Oliviuus - Choisissez Votre Plan de Streaming",
-      "description": "Découvrez les plans d’abonnement Oliviuus à partir de 3 000 RWF. Choisissez entre Basic, Standard, Mobile et Family. Annulez à tout moment.",
+      "title": "Plans d'Abonnement Oliviuus - Choisissez Votre Plan de Streaming",
+      "description": "Découvrez les plans d'abonnement Oliviuus à partir de 3 000 RWF. Choisissez entre Basic, Standard, Mobile et Family. Annulez à tout moment.",
       "keywords": "abonnement Oliviuus, plans de streaming Rwanda, service de streaming rwandais, streaming abordable Rwanda, alternative Netflix Rwanda",
-      "ogTitle": "Choisissez Votre Plan d’Abonnement Oliviuus",
+      "ogTitle": "Choisissez Votre Plan d'Abonnement Oliviuus",
       "ogDescription": "Streaming illimité de films rwandais et contenus mondiaux. Plans dès 3 000 RWF/mois."
     },
     sw: {
