@@ -1,343 +1,128 @@
-import React, { useEffect, useRef } from 'react';
-import Phaser from 'phaser';
+import { useState, useEffect } from "react";
 
-const UmukinoWoKwiruka = () => {
-  const gameRef = useRef(null);
+export default function CountingGame() {
+  const [level, setLevel] = useState(1);
+  const [question, setQuestion] = useState({ a: 1, b: 1 });
+  const [answer, setAnswer] = useState("");
+  const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [feedback, setFeedback] = useState("");
+  const [gameOver, setGameOver] = useState(false);
+
+  // Generate a new counting question based on level
+  const generateQuestion = (lvl) => {
+    const max = lvl * 5; // difficulty increases gradually
+    const a = Math.floor(Math.random() * max) + 1;
+    const b = Math.floor(Math.random() * max) + 1;
+    setQuestion({ a, b });
+    setAnswer("");
+    setFeedback("");
+  };
 
   useEffect(() => {
-    const config = {
-      type: Phaser.AUTO,
-      width: 800,
-      height: 600,
-      parent: gameRef.current,
-      physics: {
-        default: 'arcade',
-        arcade: {
-          gravity: { y: 0 },
-          debug: false
-        }
-      },
-      scene: {
-        preload: preload,
-        create: create,
-        update: update
-      }
-    };
+    generateQuestion(level);
+  }, [level]);
 
-    let car;
-    let obstacles;
-    let amasimu;
-    let score = 0;
-    let umubareWamamoto;
-    let timer;
-    let timeLeft = 60;
-    let gameOver = false;
-    let cursors;
-    let amanotaText;
-    let igiheText;
-    let imirongo;
+  const checkAnswer = () => {
+    const correct = question.a + question.b;
 
-    function preload() {
-      // Create simple graphics instead of loading images
-      this.load.baseURL = 'data:image/png;base64,';
-      
-      // Red car (player)
-      const carGraphics = this.cache.addImage('car', '', createCarGraphics());
-      
-      // Green obstacles
-      const obstacleGraphics = this.cache.addImage('obstacle', '', createObstacleGraphics());
-      
-      // Yellow coins
-      const coinGraphics = this.cache.addImage('coin', '', createCoinGraphics());
-      
-      // Road lines
-      const lineGraphics = this.cache.addImage('line', '', createLineGraphics());
-    }
+    if (Number(answer) === correct) {
+      setScore((s) => s + 1);
+      setFeedback("✅ Correct! Well done!");
 
-    function createCarGraphics() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 40;
-      canvas.height = 70;
-      const ctx = canvas.getContext('2d');
-      
-      // Red car body
-      ctx.fillStyle = '#FF0000';
-      ctx.fillRect(5, 0, 30, 50);
-      ctx.fillRect(0, 20, 40, 30);
-      
-      // Windows
-      ctx.fillStyle = '#87CEEB';
-      ctx.fillRect(10, 5, 20, 15);
-      
-      // Wheels
-      ctx.fillStyle = '#333333';
-      ctx.fillRect(5, 45, 8, 8);
-      ctx.fillRect(27, 45, 8, 8);
-      ctx.fillRect(5, 10, 8, 8);
-      ctx.fillRect(27, 10, 8, 8);
-      
-      return canvas.toDataURL().split(',')[1];
-    }
-
-    function createObstacleGraphics() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 50;
-      canvas.height = 50;
-      const ctx = canvas.getContext('2d');
-      
-      // Green obstacle
-      ctx.fillStyle = '#00FF00';
-      ctx.fillRect(0, 0, 50, 50);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = '20px Arial';
-      ctx.fillText('STOP', 5, 30);
-      
-      return canvas.toDataURL().split(',')[1];
-    }
-
-    function createCoinGraphics() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 30;
-      canvas.height = 30;
-      const ctx = canvas.getContext('2d');
-      
-      // Yellow coin
-      ctx.fillStyle = '#FFD700';
-      ctx.beginPath();
-      ctx.arc(15, 15, 15, 0, 2 * Math.PI);
-      ctx.fill();
-      
-      ctx.fillStyle = '#FFA500';
-      ctx.beginPath();
-      ctx.arc(15, 15, 10, 0, 2 * Math.PI);
-      ctx.fill();
-      
-      return canvas.toDataURL().split(',')[1];
-    }
-
-    function createLineGraphics() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 10;
-      canvas.height = 30;
-      const ctx = canvas.getContext('2d');
-      
-      // White road line
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, 10, 30);
-      
-      return canvas.toDataURL().split(',')[1];
-    }
-
-    function create() {
-      // Add road background
-      this.add.rectangle(400, 300, 800, 600, 0x666666);
-      
-      // Create road lines (middle divider)
-      imirongo = this.physics.add.group();
-      for (let i = 0; i < 20; i++) {
-        const line = imirongo.create(400, i * 60, 'line');
-        line.setVelocityY(200);
-      }
-
-      // Create player car
-      car = this.physics.add.sprite(400, 500, 'car');
-      car.setCollideWorldBounds(true);
-
-      // Create obstacles
-      obstacles = this.physics.add.group();
-      
-      // Create coins
-      amasimu = this.physics.add.group();
-
-      // Setup controls
-      cursors = this.input.keyboard.createCursorKeys();
-
-      // Create score and timer text
-      amanotaText = this.add.text(16, 16, 'Amanota: 0', { 
-        fontSize: '24px', 
-        fill: '#FFFFFF',
-        fontFamily: 'Arial'
-      });
-
-      igiheText = this.add.text(600, 16, 'Igihe: 60', { 
-        fontSize: '24px', 
-        fill: '#FFFFFF',
-        fontFamily: 'Arial'
-      });
-
-      // Game instructions
-      this.add.text(250, 550, 'Koresha arrow keys kugirango utware imodoka!', {
-        fontSize: '16px',
-        fill: '#FFFFFF',
-        fontFamily: 'Arial'
-      });
-
-      // Timer event
-      timer = this.time.addEvent({
-        delay: 1000,
-        callback: updateTimer,
-        callbackScope: this,
-        loop: true
-      });
-
-      // Spawn obstacles and coins
-      this.time.addEvent({
-        delay: 1500,
-        callback: spawnObstacle,
-        callbackScope: this,
-        loop: true
-      });
-
-      this.time.addEvent({
-        delay: 1000,
-        callback: spawnCoin,
-        callbackScope: this,
-        loop: true
-      });
-
-      // Collisions
-      this.physics.add.overlap(car, amasimu, collectCoin, null, this);
-      this.physics.add.collider(car, obstacles, hitObstacle, null, this);
-    }
-
-    function spawnObstacle() {
-      if (gameOver) return;
-      
-      const x = Phaser.Math.Between(100, 700);
-      const obstacle = obstacles.create(x, -50, 'obstacle');
-      obstacle.setVelocityY(Phaser.Math.Between(150, 250));
-      obstacle.setAngularVelocity(Phaser.Math.Between(-50, 50));
-    }
-
-    function spawnCoin() {
-      if (gameOver) return;
-      
-      const x = Phaser.Math.Between(100, 700);
-      const coin = amasimu.create(x, -30, 'coin');
-      coin.setVelocityY(Phaser.Math.Between(100, 200));
-    }
-
-    function collectCoin(car, coin) {
-      coin.disableBody(true, true);
-      score += 10;
-      amanotaText.setText('Amanota: ' + score);
-    }
-
-    function hitObstacle(car, obstacle) {
-      obstacle.disableBody(true, true);
-      score = Math.max(0, score - 5);
-      amanotaText.setText('Amanota: ' + score);
-    }
-
-    function updateTimer() {
-      timeLeft--;
-      igiheText.setText('Igihe: ' + timeLeft);
-      
-      if (timeLeft <= 0) {
-        endGame();
-      }
-    }
-
-    function endGame() {
-      gameOver = true;
-      timer.remove();
-      
-      // Stop all objects
-      obstacles.clear(true, true);
-      amasimu.clear(true, true);
-      imirongo.clear(true, true);
-      
-      // Display final score
-      const finalScore = this.add.text(400, 250, 'Umukino Warangije!', {
-        fontSize: '32px',
-        fill: '#FFFFFF',
-        fontFamily: 'Arial'
-      }).setOrigin(0.5);
-      
-      this.add.text(400, 300, 'Amanota Yawe: ' + score, {
-        fontSize: '28px',
-        fill: '#FFD700',
-        fontFamily: 'Arial'
-      }).setOrigin(0.5);
-      
-      if (score >= 100) {
-        this.add.text(400, 350, 'Utsinze! 🏆', {
-          fontSize: '32px',
-          fill: '#00FF00',
-          fontFamily: 'Arial'
-        }).setOrigin(0.5);
+      // Level up every 3 correct answers
+      if ((score + 1) % 3 === 0) {
+        setLevel((l) => l + 1);
       } else {
-        this.add.text(400, 350, 'Ongera ugerageze! 💪', {
-          fontSize: '32px',
-          fill: '#FF0000',
-          fontFamily: 'Arial'
-        }).setOrigin(0.5);
+        generateQuestion(level);
       }
-      
-      this.add.text(400, 400, 'Kanda R kugirango utangire nanone', {
-        fontSize: '20px',
-        fill: '#FFFFFF',
-        fontFamily: 'Arial'
-      }).setOrigin(0.5);
+    } else {
+      setLives((l) => l - 1);
+      setFeedback(`❌ Try again!`);
+
+      if (lives - 1 <= 0) {
+        setGameOver(true);
+      }
     }
+  };
 
-    function update() {
-      if (gameOver) {
-        // Restart game when R is pressed
-        if (cursors.space.isDown) {
-          this.scene.restart();
-        }
-        return;
-      }
+  const resetGame = () => {
+    setLevel(1);
+    setScore(0);
+    setLives(3);
+    setGameOver(false);
+    setFeedback("");
+    generateQuestion(1);
+  };
 
-      // Car controls
-      if (cursors.left.isDown) {
-        car.setVelocityX(-300);
-      } else if (cursors.right.isDown) {
-        car.setVelocityX(300);
-      } else {
-        car.setVelocityX(0);
-      }
-
-      if (cursors.up.isDown) {
-        car.setVelocityY(-300);
-      } else if (cursors.down.isDown) {
-        car.setVelocityY(300);
-      } else {
-        car.setVelocityY(0);
-      }
-
-      // Clean up objects that go off screen
-      obstacles.getChildren().forEach(obstacle => {
-        if (obstacle.y > 650) {
-          obstacle.disableBody(true, true);
-        }
-      });
-
-      amasimu.getChildren().forEach(coin => {
-        if (coin.y > 650) {
-          coin.disableBody(true, true);
-        }
-      });
-    }
-
-    const game = new Phaser.Game(config);
-
-    return () => {
-      game.destroy(true);
-    };
-  }, []);
+  if (gameOver) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow p-6 text-center">
+          <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+            Game Over
+          </h1>
+          <p className="text-lg mb-2 text-gray-700 dark:text-gray-300">
+            Your Score: <strong>{score}</strong>
+          </p>
+          <button
+            onClick={resetGame}
+            className="mt-4 px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700"
+          >
+            Play Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h2>Umukino Wo Kwiruka - Igitaragaza</h2>
-      <div ref={gameRef} />
-      <div style={{ marginTop: '10px', color: '#666' }}>
-        <p><strong>Amabwiriza:</strong> Twara imodoka yawe ukwira amasimu (Zahabu) udakubita ibyago (Ibirara)</p>
-        <p><strong>Intego:</strong> Kunga amanota menshi mumabura minota!</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+        <h1 className="text-2xl font-bold text-center mb-4 text-gray-800 dark:text-gray-100">
+          Counting Game
+        </h1>
+
+        <div className="flex justify-between text-sm mb-4 text-gray-700 dark:text-gray-300">
+          <span>Level: {level}</span>
+          <span>Score: {score}</span>
+          <span>❤️ {lives}</span>
+        </div>
+
+        <div className="text-center mb-6">
+          <p className="text-lg text-gray-800 dark:text-gray-100 mb-2">
+            Count and add:
+          </p>
+          <div className="text-3xl font-bold text-blue-600">
+            {question.a} + {question.b}
+          </div>
+        </div>
+
+        <input
+          type="number"
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          placeholder="Your answer"
+          className="w-full mb-4 px-4 py-3 rounded-xl border text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <button
+          onClick={checkAnswer}
+          className="w-full py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700"
+        >
+          Check Answer
+        </button>
+
+        {feedback && (
+          <div className="mt-4 text-center text-lg font-medium">
+            {feedback}
+          </div>
+        )}
+
+        <p className="mt-6 text-xs text-center text-gray-500 dark:text-gray-400">
+          Learn counting step by step. No images. Just thinking!
+        </p>
       </div>
     </div>
   );
-};
-
-export default UmukinoWoKwiruka;
+}

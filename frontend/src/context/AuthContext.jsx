@@ -18,6 +18,16 @@ export const AuthProvider = ({ children }) => {
     () => localStorage.getItem('hasMadeProfileSelection') === 'true'
   );
 
+  const refreshAuth = async () => {
+    try {
+      await loadUserData();
+      return true;
+    } catch (error) {
+      console.error("refreshAuth failed:", error);
+      return false;
+    }
+  };
+
   const applyLanguage = (userData) => {
     const lang = userData?.preferences?.language || currentLanguage;
     i18n.changeLanguage(lang);
@@ -128,16 +138,12 @@ export const AuthProvider = ({ children }) => {
 
   const checkSessionMode = async () => {
     try {
-      console.log('🔄 Checking session mode...');
       const res = await axios.get("/kids/current", {
         withCredentials: true
       });
 
-      console.log('📡 Session mode response:', res.data);
-
       // Handle family members with kid dashboard
       if (res.data && res.data.active_kid_profile?.is_family_member) {
-        console.log('✅ Family member with kid dashboard detected');
         setKidProfile(res.data.active_kid_profile);
         setShowProfileSelector(false);
         setProfileSelectionMade(true);
@@ -146,18 +152,16 @@ export const AuthProvider = ({ children }) => {
 
       // Regular kid mode check
       if (res.data && res.data.session_mode === 'kid' && res.data.active_kid_profile) {
-        console.log('✅ Regular kid mode detected');
         setKidProfile(res.data.active_kid_profile);
         setShowProfileSelector(false);
         setProfileSelectionMade(true);
         return { isKidMode: true, kidProfile: res.data.active_kid_profile };
       } else {
-        console.log('✅ Parent/normal mode detected');
         setKidProfile(null);
         return { isKidMode: false, kidProfile: null };
       }
     } catch (error) {
-      console.error("❌ Session mode check error:", error);
+      console.error("Session mode check error:", error);
       setKidProfile(null);
       return { isKidMode: false, kidProfile: null };
     }
@@ -390,6 +394,7 @@ export const AuthProvider = ({ children }) => {
     currentLanguage,
     changeLanguage,
     refreshUser: loadUserData,
+    refreshAuth: refreshAuth,
     kidProfile,
     isKidMode,
     showProfileSelector,

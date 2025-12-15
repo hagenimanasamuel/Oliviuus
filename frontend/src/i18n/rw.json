@@ -13,6 +13,7 @@
     "home_button": "Subira Ahabanza"
   },
   "auth": {
+    "or_continue_with_email": "Cyangwa komeza ukoresheje Google email",
     "enter_email": "Nyamuneka shyiramo aderesi email yawe",
     "enter_email_desc": "Shyiramo email yawe kugirango ukomeze",
     "email_placeholder": "Aderesi Email",
@@ -28,12 +29,12 @@
     "forgot_password": "Wibagiwe ijambo ry'ibanga?",
     "login": "Injira",
     "loading": "Birimo gutunganywa...",
-    "reset_password": "Kongera gusubiramo ijambo ry'ibanga",
-    "reset_link_confirm": "Ushaka kohereza umurongo wo gusubiramo ijambo ry'ibanga kuri",
+    "reset_password": "Kongera guhindura ijambo ry'ibanga",
+    "reset_link_confirm": "Ushaka kohereza umurongo wo guhindura ijambo ry'ibanga kuri",
     "cancel": "Hagarika",
     "send_reset_link": "Ohereza Umurongo",
     "sending": "Birimo koherezwa...",
-    "reset_link_sent": "Link yo kongera ijambo ry’ibanga yoherejwe kuri {{email}}",
+    "reset_link_sent": "Link yo guhindura ijambo ry’ibanga yoherejwe kuri {{email}}",
     "reset_link_error": "Ntibyashobotse kohereza link. Ongera ugerageze.",
     "invalid_reset_link": "Uru rukuta rwo guhindura ijambo ry'ibanga ntabwo ruriho cyangwa rwarangiritse.",
     "password_mismatch": "Amagambo y’ibanga ntabwo ahuye.",
@@ -41,6 +42,12 @@
     "new_password": "Ijambo rishya ry'ibanga",
     "confirm_password": "Emeza Ijambo ry'Ibanga",
     "reset_password_button": "Hindura Ijambo ry'Ibanga"
+  },
+  "oneTap": {
+    "title": "Injira Vuba",
+    "subtitle": "Komeza ukoresheje konti yawe ya Google",
+    "privacy": "Amakuru yawe ararinzwe",
+    "notNow": "Funga"
   },
   "verifyEmail": {
     "code_required": "Kode yo kugenzura irakenewe",
@@ -1572,6 +1579,23 @@
     "refresh": "Kongera Kuvugurura",
     "loading": "Gukuraho amakuru y'ifatabuguzi...",
     "more": "Ibindi",
+    "perMonth": "/kwezi",
+    "plans": {
+      "mobile": {
+        "popular": "Ihitwa Cyane"
+      },
+      "standard": {
+        "popular": "Ihitwa Cyane"
+      }
+    },
+    "comparison": {
+      "devices": "ibikoresho",
+      "simultaneous": "bikorwa icyarimwe",
+      "videoQuality": "ubwiza bwa videwo",
+      "downloads": "ibikururwa",
+      "unlimited": "Bitagira Umupaka",
+      "downloadItems": "ibintu {count}"
+    },
     "tabs": {
       "current": "ifatabuguzi Uriho",
       "history": "Amateka",
@@ -1589,10 +1613,31 @@
       },
       "expired": {
         "title": "Ifatabuguzi Yararangiye",
-        "description": "Ifatabuguzi yawe yararangiye. Iyisubize kugira ngo ukomeze gukoresha serivisi"
+        "description": "Ifatabuguzi ryawe ryararangiye. Iyisubize kugira ngo ukomeze gukoresha serivisi"
       },
       "renews": "Izongerwa ku",
-      "ends": "Izarangira ku"
+      "ends": "Izarangira ku",
+      "scheduled": {
+        "title": "Abonema Yateganijwe",
+        "description": "Abonema yawe izatangira vuba"
+      },
+      "grace_period": {
+        "title": "Igihe cy'Imbabazi",
+        "description": "Abonema yawe iri mu gihe cy'imbabazi"
+      },
+      "trialing": {
+        "title": "Igeragezwa",
+        "description": "Uri mu gihe cy'igeragezwa"
+      },
+      "past_due": {
+        "title": "Ubwishyu Buratinze",
+        "description": "Ubwishyu bwawe bwatinze"
+      },
+      "no_subscription": {
+        "title": "Nta Abonema",
+        "description": "Nta abonema ikora ufite"
+      },
+      "starts": "Itangira ku"
     },
     "errors": {
       "title": "Ikosa mu Gukuraho Ifatabuguzi",
@@ -3679,5 +3724,407 @@
       "timePreview": "Igaragaza ishusho y’igihe: {{time}}"
     },
     "loading": "Turimo gupakira ishusho..."
+  },
+  "history": {
+    "title": "Amateka",
+    "subtitle": "Kurikirana amateka ya konti n'ubwishyu bwawe",
+    "loadingHistory": "Gupakira Amateka",
+    "fetchingRecords": "Turimo gushaka amakuru yawe...",
+    "refresh": "Ongera Ubone",
+    "refreshing": "Turimo kongera kuboneza...",
+    "tabs": {
+      "billing": "Amateka y'Ubwishyu",
+      "subscription": "Amateka ya Abonema"
+    },
+    "noBillingHistory": "Nta Mateka y'Ubwishyu",
+    "noBillingDescription": "Amateka y'ubwishyu azagaragara umaze kwishyura.",
+    "noSubscriptionHistory": "Nta Mateka ya Abonema",
+    "noSubscriptionDescription": "Amateka ya abonema azagaragara umaze kwiyandikisha.",
+    "status": {
+      "active": "Irakora",
+      "cancelled": "Yahagaritswe",
+      "expired": "Yarangiye",
+      "completed": "Byarangiye neza",
+      "failed": "Byanze",
+      "pending": "Biracyategerejwe",
+      "refunded": "Yasubijwe"
+    },
+    "transactionTypes": {
+      "subscription": "Ubwishyu bwa Abonema",
+      "one_time": "Ubwishyu Rimwe",
+      "refund": "Gusubizwa Amafaranga"
+    },
+    "invoiceNumber": "Inyemezabwishyu #{id}",
+    "viewDetails": "Reba Ibisobanuro",
+    "to": "kugeza",
+    "daysCount": "iminsi {days}",
+    "table": {
+      "dateTime": "Itariki & Igihe",
+      "description": "Ibisobanuro",
+      "type": "Ubwoko",
+      "amount": "Amafaranga",
+      "status": "Imiterere",
+      "actions": "Ibikorwa",
+      "plan": "Ifatabuguzi",
+      "period": "Igihe",
+      "autoRenew": "Kwiyongera byikora",
+      "date": "Itariki"
+    },
+    "invoiceDetails": {
+      "title": "Ibisobanuro by'Ubwishyu",
+      "paymentDetails": "Ibisobanuro by'Ubwishyu",
+      "transactionInfo": "Amakuru y'Igikorwa",
+      "provider": "Utanga Serivisi",
+      "amountDetails": "Ibisobanuro by'Amafaranga",
+      "fee": "Amafaranga y'inyongera"
+    },
+    "subscriptionModal": {
+      "plan": "Ifatabuguzi",
+      "details": "Ibisobanuro bya Abonema",
+      "startDate": "Itariki yo Gutangira",
+      "endDate": "Itariki yo Kurangiza",
+      "enabled": "Yemewe",
+      "disabled": "Yahagaritswe",
+      "billingInfo": "Amakuru y'Ubwishyu",
+      "currency": "Ifaranga",
+      "billingCycle": "Igihe cyo Kwishyura",
+      "monthly": "Buri kwezi",
+      "cancelled": "Yahagaritswe",
+      "cancelledOn": "Iyi abonema yahagaritswe ku itariki {date}"
+    }
+  },
+  "newPlanModal": {
+    "title": "Gura Ifatabuguzi Rishya",
+    "subtitle": "Hitamo Ifatabuguzi nshya izatangira nyuma y'iy'ubu",
+    "purchaseNewPlan": "Gura Ifatabuguzi Nshya",
+    "purchaseDescription": "Gura abonema nshya izatangira mu buryo bwikora iyo iyawe irangiye.",
+    "currentPlanActive": "Ifatabuguzi yawe irakora",
+    "newPlanStartDate": "Ifatabuguzi nshya izatangira ku itariki {date}",
+    "newPlan": "Ifatabuguzi Nshya",
+    "startsOn": "Itangira: {date}",
+    "yourNewPlanWillStartOn": "Ifatabuguzi ryawe rishya rizatangira ku wa",
+    "startsLabel": "Itangira:",
+    "backToPlans": "Subira ku Ifatabuguzi",
+    "newPlanPurchase": "Kugura Ifatabuguzi rishya",
+    "monthly": "Buri kwezi",
+    "planStartDate": "Itariki yo Gutangira Ifatabuguzi",
+    "startAfterCurrent": "Ifatabuguzi nshya izatangira mu buryo bwikora nyuma y'iy'ubu.",
+    "startImmediately": "Ifatabuguzi nshya izatangira ako kanya nyuma yo kwishyura.",
+    "planName": "Izina rya Ifatabuguzi",
+    "billing": "Ubwishyu",
+    "devices": "Ibikoresho",
+    "simultaneous": "Bikora icyarimwe",
+    "quality": "Ubwiza",
+    "paymentAmount": "Amafaranga yo Kwishyura",
+    "firstMonth": "Ukwezi kwa mbere",
+    "firstMonthCharge": "Aya mafaranga azishyurwa ku kwezi kwa mbere",
+    "securePayment": "Ubwishyu Butezimberewe",
+    "securityFeatures": "🔒 Ihuriro ryizewe • 🛡️ Kurinda uburiganya • 📱 Mobile Money itekanye",
+    "considerUpgrade": "Wifuza Kuzamura Ifatabuguzi?",
+    "upgradeSuggestion": "Kugira ngo ubone serivisi nziza ako kanya, hitamo guhindura Ifatabuguzi.",
+    "processingPurchase": "Turimo gutunganya ubwishyu...",
+    "purchaseNewPlanButton": "Gura Ifatabuguzi Nshya",
+    "processingDescription": "Ubwishyu bwawe burimo gutunganywa mu mutekano...",
+    "processingFeatures": "🔒 Igikorwa gitekanye • 📱 Reba telefoni yawe",
+    "purchaseSuccessful": "Kugura Byagenze Neza!",
+    "purchaseSuccessDescription": "Ifatabuguzi ya {plan} yaguzwe neza.",
+    "willStartOn": "Izatangira ku itariki {date}",
+    "successFeatures": "✅ Byarangiye • 🔒 Ubwishyu butekanye • 📅 Itangira {date}",
+    "loadingPlans": "Gupakira Ifatabuguzi...",
+    "fetchingPlans": "Turimo gushaka Ifatabuguzi zihari",
+    "confirmPurchase": "Emeza Kugura Ifatabuguzi Nshya",
+    "reviewPlan": "Subiramo ibisobanuro bya Ifatabuguzi yawe",
+    "successDescription": "Ifatabuguzi nshya yaguzwe neza",
+    "security": {
+      "sessionTimeout": "Igihe cyarangiye",
+      "devToolsDetected": "Ibikoresho bya developer byabonetse",
+      "contextMenuAttempt": "Kugerageza gufungura menu",
+      "windowHidden": "Idirishya ryahishuwe",
+      "dimensionDevTools": "Ibikoresho bya developer byabonetse",
+      "violationDetected": "Habonetse ihohoterwa ry'umutekano",
+      "maxRetries": "Kugerageza birenze urugero",
+      "authenticationError": "Ikosa ryo kwemeza",
+      "alertTitle": "Impuruza y'Umutekano",
+      "alertDescription": "Habonetse igikorwa kitari cyemewe.",
+      "violationRefresh": "Habonetse ihohoterwa. Ongera ugerageze."
+    },
+    "errors": {
+      "fetchPlans": "Ntibishoboye gupakira Ifatabuguzi.",
+      "paymentFailed": "Ubwishyu bwa Ifatabuguzi nshya bwanze",
+      "paymentTimeout": "Igihe cy'ubwishyu cyarangiye."
+    },
+    "validation": {
+      "phoneRequired": "Numero ya telefoni irakenewe",
+      "phoneInvalid": "Injiza numero ya telefoni yemewe",
+      "phonePattern": "Imiterere ya telefoni siyo",
+      "nameInvalid": "Injiza izina ryemewe"
+    }
+  },
+  "usageMetrics": {
+    "title": "Imikoreshereze Rusange",
+    "subtitle": "Ibikorwa byawe byo kureba mu gihe nyacyo",
+    "noActiveSubscription": "Nta Abonema Ikora",
+    "noSubscriptionDescription": "Imikoreshereze iboneka gusa ufite abonema ikora.",
+    "subscribeToStart": "Iyandikishe utangire gukurikirana imikoreshereze.",
+    "scheduledSubscription": "Abonema Yateganijwe",
+    "scheduledDescription": "Imikoreshereze izaboneka ku itariki {date}.",
+    "checkBackAfterStart": "Garuka umaze gutangira",
+    "subscriptionInactive": "Abonema Ntikora",
+    "inactiveDescription": "Imikoreshereze iboneka gusa abonema ikora.",
+    "renewToAccess": "Ongera wiyandikishe",
+    "loadingUsageData": "Gupakira Imikoreshereze",
+    "gatheringInsights": "Turimo gukusanya amakuru...",
+    "noUsageData": "Nta Makuru ahari",
+    "startStreaming": "Tangira kureba ibikurikirwa",
+    "watchContent": "Reba filime cyangwa series",
+    "checkAgain": "Ongera ugerageze",
+    "week": "Icyumweru",
+    "month": "Ukwezi",
+    "refresh": "Ongera",
+    "activeSubscription": "Abonema Ikora",
+    "currentPlan": "Uri kuri Ifatabuguzi ya <strong>{plan}</strong>",
+    "activeDevices": "Ibikoresho Bikora",
+    "ofLimit": "ku mipaka",
+    "connectedDevices": "Ibikoresho bihujwe",
+    "currentlyActive": "Biri gukora",
+    "noActiveDevices": "Nta bikoresho bikora",
+    "streamingTime": "Igihe cyo Kureba",
+    "dailyAverage": "impuzandengo ya buri munsi",
+    "thisWeek": "Iki cyumweru",
+    "total": "Igiteranyo: {hours}h",
+    "dataUsage": "Imikoreshereze ya Data",
+    "unlimitedData": "Data itagira umupaka",
+    "of": "ku",
+    "increasing": "Biriyongera",
+    "stable": "Birahagaze",
+    "ofLimitUsed": "byakoreshejwe",
+    "usageInsights": "Isesengura ry'Imikoreshereze",
+    "yourPatterns": "Uburyo Ureba",
+    "devicesCount": "ibikoresho {count}",
+    "totalWatchTime": "Igihe cyose",
+    "hoursCount": "amasaha {hours}",
+    "hoursPerDay": "{hours}h/umunsi",
+    "quickTips": "Inama Zihuse",
+    "tipOffPeak": "Reba mu masaha make",
+    "tipOffPeakDesc": "ubone ubwiza bwiza",
+    "tipWifi": "Koresha Wi-Fi",
+    "tipWifiDesc": "ugabanye gukoresha data",
+    "tipLogout": "Sohoka ku bikoresho bitakoreshejwe",
+    "tipLogoutDesc": "ubohore imyanya",
+    "dataUpdated": "Amakuru avugururwa ako kanya",
+    "showingUsage": "Kwerekana imikoreshereze ya {period}"
+  },
+  "currentPlan": {
+    "previousDetails": "Ibisobanuro bya Ifatabuguzi Iheruka",
+    "plan": "Ifatabuguzi",
+    "ended": "Yarangiye",
+    "renewSubscription": "Ongera Abonema",
+    "getNewPlan": "Fata Ifatabuguzi Nshya",
+    "scheduledSubscription": "Abonema Yateganijwe",
+    "scheduledDescription": "Ifatabuguzi yawe izatangira ku itariki {date}",
+    "monthlyPrice": "Igiciro cya Buri Kwezi",
+    "startsIn": "Itangira mu",
+    "startDate": "Itariki yo Gutangira",
+    "days": "imunsi",
+    "days_plural": "iminsi",
+    "devices": "Ibikoresho",
+    "quality": "Ubwiza",
+    "downloads": "Ibikururwa",
+    "profiles": "Ama-Profayili",
+    "planFeatures": "Ibiranga Ifatabuguzi",
+    "supportedDevices": "Ibikoresho Bishyigikiwe",
+    "deviceTypes": "ubwoko bw'ibikoresho",
+    "videoQuality": "Ubwiza bwa Videwo",
+    "offlineDownloads": "Ibikururwa Offline",
+    "available": "Birahari",
+    "notAvailable": "Ntibihari",
+    "simultaneousStreams": "Kureba icyarimwe",
+    "parentalControls": "Kugenzura Ababyeyi",
+    "enabled": "Birakora",
+    "disabled": "Ntibikora",
+    "exclusiveContent": "Ibirimo Byihariye",
+    "access": "Uburenganzira",
+    "noAccess": "Nta burenganzira",
+    "hdrSupport": "Inkunga ya HDR",
+    "earlyAccess": "Kwinjira Hakiri Kare",
+    "scheduledDetails": "Ibisobanuro Byateganijwe",
+    "status": "Imiterere",
+    "scheduledStart": "Itangira Ryateganijwe",
+    "endDate": "Itariki yo Kurangiza",
+    "autoRenew": "Kwiyongera byikora",
+    "quickActions": "Ibikorwa Byihuse",
+    "addAnotherPlan": "Ongeramo Indi Ifatabuguzi",
+    "refreshStatus": "Ongera Imiterere",
+    "needHelp": "Ukeneye Ubufasha?",
+    "scheduledSupportDescription": "Ufite ikibazo kuri abonema yateganijwe? Turi hano kugufasha.",
+    "contactSupport": "Vugana n'Ubufasha",
+    "billingCycle": "Igihe cyo Kwishyura",
+    "monthly": "Buri kwezi",
+    "renewsIn": "Izasubiramo mu",
+    "subscriptionDetails": "Ibisobanuro bya Abonema",
+    "started": "Yatangiye",
+    "renews": "Irasubiramo",
+    "cancelledOn": "Yahagaritswe ku",
+    "changePlan": "Hindura Ifatabuguzi",
+    "addNewPlan": "Ongeramo Ifatabuguzi Nshya",
+    "supportDescription": "Ufite ikibazo kuri abonema yawe? Turi hano kugufasha.",
+    "subscriptionSupport": "Ubufasha bwa Abonema",
+    "subscriptionSupportDescription": "Ukeneye ubufasha kuri abonema yawe? Twandikire ku bwishyu, guhindura Ifatabuguzi, cyangwa ibindi bibazo."
+  },
+  "planChangeModal": {
+    "title": "Zamura Ifatabuguzi Yawe",
+    "subtitle": "Hitamo Ifatabuguzi iri hejuru uhabwe serivisi ako kanya",
+    "secureUpgrade": "Kuzamura Ifatabuguzi Mu Mutekano",
+    "secureDescription": "Ibikorwa byose birarinzwe kandi bikurikiranwa. Amakuru yawe yo kwishyura ararinzwe.",
+    "currentPlan": "Ifatabuguzi Iriho: {plan}",
+    "upgradeImmediate": "Zamura Ifatabuguzi ubone serivisi ako kanya hishingiwe ku minsi isigaye.",
+    "highestPlan": "Uri kuri Ifatabuguzi Yo Hejuru",
+    "noUpgradesAvailable": "Uri kuri Ifatabuguzi yo hejuru. Nta yindi yo kuzamurirwaho ubu.",
+    "upgrade": "Zamura",
+    "upgradeAvailable": "Kuzamura Birahari",
+    "clickToCalculate": "Kanda ubare igiciro gisigaye",
+    "calculatingUpgrade": "Kubara Kuzamura",
+    "calculatingDescription": "Turimo kubara igiciro cyo kuzamura...",
+    "backToPlans": "Subira ku Ifatabuguzi",
+    "planUpgrade": "Kuzamura Ifatabuguzi",
+    "calculating": "Turimo kubara...",
+    "proratedUpgrade": "Kuzamura hakurikijwe igihe",
+    "costBreakdown": "Isesengura ry'Igiciro",
+    "baseUpgrade": "Igiciro shingiro",
+    "operationalAdjustment": "Ihinduka ry'Imikorere",
+    "total": "Igiteranyo",
+    "basedOnDays": "Bishingiye ku minsi {days} isigaye",
+    "currentPlanLabel": "Ifatabuguzi Iriho",
+    "newPlan": "Ifatabuguzi Nshya",
+    "effective": "Bikora",
+    "immediately": "Ako kanya",
+    "remainingDays": "Iminsi Isigaye",
+    "days": "iminsi",
+    "upgradeAmount": "Amafaranga yo Kuzamura",
+    "serverCalculated": "Byabazwe na Seriveri",
+    "amountSecure": "Amafaranga abarwa neza kandi ntashobora guhindurwa",
+    "securePayment": "Ubwishyu bwo Kuzamura Butezimberewe",
+    "securityFeatures": "🔒 Ihuriro ryizewe • 🛡️ Kurinda uburiganya • 📱 Mobile Money itekanye",
+    "processingUpgrade": "Turimo gutunganya kuzamura...",
+    "securePaymentUpgrade": "Ubwishyu Butezimberewe & Kuzamura",
+    "processingUpgradeTitle": "Gutunganya Kuzamura",
+    "processingDescription": "Kuzamura Ifatabuguzi birimo gutunganywa mu mutekano...",
+    "processingFeatures": "🔒 Igikorwa gitekanye • 📱 Reba telefoni yawe",
+    "upgradeSuccessful": "Kuzamura Byagenze Neza!",
+    "upgradeSuccessDescription": "Ifatabuguzi yawe yazamuriwe kuri {plan}.",
+    "successFeatures": "✅ Byarangiye • 🔒 Ubwishyu butekanye • 🚀 Ibiranga byafunguwe",
+    "loadingUpgradeOptions": "Gupakira Amahitamo yo Kuzamura...",
+    "fetchingUpgradePlans": "Turimo gushaka Ifatabuguzi zo kuzamura",
+    "paymentDescription": "Injiza amakuru yo kwishyura urangize kuzamura",
+    "successDescription": "Ifatabuguzi yawe yazamuwe neza",
+    "security": {
+      "sessionTimeout": "Igihe cya sesi cyarangiye",
+      "devToolsDetected": "Ibikoresho bya developer byabonetse",
+      "contextMenuAttempt": "Kugerageza menu",
+      "windowHidden": "Idirishya ryahishuwe",
+      "dimensionDevTools": "Ibikoresho bya developer byabonetse",
+      "violationDetected": "Ihohoterwa ry'umutekano",
+      "maxRetries": "Kugerageza birenze urugero",
+      "authenticationError": "Ikosa ryo kwemeza",
+      "alertTitle": "Impuruza y'Umutekano",
+      "alertDescription": "Habonetse igikorwa kitari cyemewe.",
+      "violationRefresh": "Habonetse ihohoterwa. Ongera."
+    },
+    "errors": {
+      "fetchUpgrades": "Ntibishoboye gupakira amahitamo yo kuzamura.",
+      "calculateCost": "Ntibyashoboye kubara igiciro",
+      "upgradeFailed": "Ubwishyu bwo kuzamura bwanze",
+      "paymentFailed": "Ubwishyu bwo kuzamura bwanze. Ongera ugerageze.",
+      "paymentTimeout": "Igihe cy'ubwishyu cyarangiye. Reba Mobile Money."
+    },
+    "validation": {
+      "phoneRequired": "Numero ya telefoni irakenewe",
+      "phoneInvalid": "Injiza numero yemewe",
+      "phonePattern": "Imiterere ya telefoni siyo",
+      "nameInvalid": "Injiza izina ryemewe"
+    }
+  },
+  "paymentMethods": {
+    "loading": "Gupakira amakuru y'ubwishyu",
+    "checkingSettings": "Kureba igenamiterere ry'ubwishyu bwawe...",
+    "title": "Umutekano w’Ubwishyu",
+    "subtitle": "Umutekano wawe ni wo dushyira imbere. Twashyizeho uburyo bukomeye bwo kurinda amakuru y’ubwishyu bwawe.",
+    "noStoredData": {
+      "title": "Nta makuru y'ubwishyu abitswe",
+      "description": "Ntidubika amakuru ya Mobile Money yawe kuri seriveri zacu kugira ngo umutekano wawe urusheho kuba mwiza."
+    },
+    "fastPayments": {
+      "title": "Ubwishyu bwihuse bwa Mobile Money",
+      "description": "Bikorwa na LMB Tech na Intouch mu gutunganya ubwishyu bwa Mobile Money mu kanya gato."
+    },
+    "instantProcessing": {
+      "title": "Gutunganya byihuse",
+      "description": "Gutunganya ubwishyu mu gihe nyacyo, umutekano usesuye, no guhita wemererwa kwiyandikisha."
+    },
+    "enhancedSecurity": {
+      "title": "Umutekano wihariye ubanza",
+      "description": "Kubw’umutekano wawe no gutuza umutima, ntitubika uburyo bw'ubwishyu kuri porogaramu yacu.",
+      "points": {
+        "freshAuthorization": "Buri bwishyu busaba kwemezwa bushya",
+        "eliminateRisk": "Bigabanya ibyago byo kwibwa amakuru y'ubwishyu",
+        "poweredBy": "Bikorwa na LMB Tech na Intouch Communications",
+        "financialData": "Amakuru yawe y’imari agumana n’imiyoboro ya Mobile Money yizewe"
+      }
+    },
+    "howItWorks": {
+      "title": "Uko ubwishyu bwa Mobile Money bukora",
+      "steps": {
+        "choosePlan": "Hitamo porogaramu",
+        "enterPhone": "Andika nimero ya telefone",
+        "confirmPayment": "Emeza ubwishyu",
+        "instantAccess": "Kubona serivisi ako kanya"
+      },
+      "descriptions": {
+        "choosePlan": "Hitamo porogaramu yo kwiyandikisha ukunda",
+        "enterPhone": "Tanga nimero yawe ya Mobile Money",
+        "confirmPayment": "Emeza ubwishyu kuri telefone yawe",
+        "instantAccess": "Hita utangira gukoresha serivisi"
+      }
+    },
+    "supportedProviders": {
+      "title": "Abatanga Mobile Money bashyigikiwe",
+      "mtn": {
+        "title": "MTN Mobile Money",
+        "description": "Ubwishyu bwihuse kandi butekanye binyuze kuri MTN"
+      },
+      "airtel": {
+        "title": "Airtel Money",
+        "description": "Ubwishyu butekanye binyuze kuri Airtel"
+      },
+      "instantProcessing": "Gutunganya byihuse"
+    },
+    "comingSoon": {
+      "title": "Ubundi buryo bw'ubwishyu buraje vuba",
+      "description": "Turimo gukora ku kongeramo ubundi buryo bw'ubwishyu kugira ngo tuboneke neza"
+    },
+    "technologyPartners": {
+      "title": "Dukorana n'abafatanyabikorwa b’ikoranabuhanga bizewe",
+      "subtitle": "Gutunganya ubwishyu butekanye binyuze ku bafatanyabikorwa bacu",
+      "lmbTech": {
+        "title": "LMB Tech",
+        "description": "Link Mobile Technology Ltd",
+        "role": "Umufatanyabikorwa mu ikoranabuhanga ry'ubwishyu"
+      },
+      "intouch": {
+        "title": "Intouch Communications",
+        "description": "Imiyoboro ya Mobile Money",
+        "role": "Umufatanyabikorwa mu gutunganya ubwishyu"
+      }
+    },
+    "securityAssurance": {
+      "title": "Umutekano wawe urizewe",
+      "description": "Dushyira umutekano w’amafaranga yawe ku isonga. Kutabika uburyo bw'ubwishyu bituma tugabanya ibyago byo kwibwa amakuru, mu gihe dukomeza serivisi zoroshye zishingiye kuri Mobile Money binyuze kuri LMB Tech na Intouch Communications."
+    },
+    "contactSupport": {
+      "description": "Ufite ibibazo ku mutekano w'ubwishyu cyangwa Mobile Money?",
+      "button": "Vugana n'abafasha",
+      "title": "Inkunga ku bwishyu n'ibyo kwishyura",
+      "subtitle": "Ukeneye ubufasha kuri Mobile Money, ibibazo by'ubwishyu, cyangwa umutekano? Itsinda ryacu riri hano kugufasha."
+    }
   }
 }

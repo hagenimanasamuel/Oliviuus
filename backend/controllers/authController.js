@@ -463,6 +463,133 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Google Sign-In authentication
+const googleAuth = async (req, res) => {
+  const { token } = req.body;
+  
+  if (!token) {
+    return res.status(400).json({ error: "Google token is required" });
+  }
+
+  try {
+    const { OAuth2Client } = require('google-auth-library');
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    
+    // Verify Google token
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture, email_verified } = payload;
+    
+    // Check if user exists in your database
+    const existingUser = await query("SELECT id, role, is_active, profile_avatar_url FROM users WHERE email = ?", [email]);
+    
+    let userId;
+    let userRole = "viewer";
+    let isNewUser = false;
+    
+    if (existingUser.length > 0) {
+      // Existing user
+      userId = existingUser[0].id;
+      userRole = existingUser[0].role;
+      
+      if (!existingUser[0].is_active) {
+        return res.status(403).json({ error: "Account is disabled" });
+      }
+    } else {
+      // New user - create account
+      isNewUser = true;
+      
+      // Generate avatar URL using DiceBear (based on googleId)
+      const avatarUrl = picture || `https://api.dicebear.com/7.x/shapes/svg?seed=${googleId}`;
+      
+      // Insert new user
+      const result = await query(
+        `INSERT INTO users 
+        (email, password, email_verified, is_active, role, subscription_plan, profile_avatar_url)
+        VALUES (?, ?, ?, true, 'viewer', 'none', ?)`,
+        [email, 'google_oauth', email_verified || false, avatarUrl]
+      );
+      
+      userId = result.insertId;
+      
+      // Set default language
+      const language = req.headers['accept-language']?.split(',')[0]?.split('-')[0] || 'rw';
+      await query(
+        `INSERT INTO user_preferences (user_id, language) VALUES (?, ?)`,
+        [userId, language]
+      );
+      
+      // Send welcome notifications
+      await sendWelcomeNotifications(userId, language);
+    }
+    
+    // Generate JWT token
+    const jwtToken = jwt.sign(
+      { id: userId, role: userRole },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+    
+    // Set HttpOnly cookie
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    
+    // Record session
+    const ip_address = req.headers["x-forwarded-for"] || req.connection.remoteAddress || "Unknown";
+    const user_agent = req.headers["user-agent"] || "Unknown";
+    
+    await query(
+      `INSERT INTO user_session 
+      (user_id, session_token, device_name, device_type, ip_address, 
+       user_agent, token_expires, session_mode, active_kid_profile_id)
+      VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), NULL, NULL)`,
+      [
+        userId,
+        jwtToken,
+        "Google Sign-In",
+        "web",
+        ip_address,
+        user_agent,
+      ]
+    );
+    
+    // Send login notification
+    await handleSuccessfulLogin(userId, email, ip_address, "Google Sign-In", "web", user_agent);
+    
+    return res.status(200).json({
+      success: true,
+      message: isNewUser ? "Account created and logged in successfully" : "Login successful",
+      user: {
+        id: userId,
+        email,
+        role: userRole,
+        profile_avatar_url: existingUser.length > 0 ? existingUser[0].profile_avatar_url : (picture || null),
+        is_new_user: isNewUser
+      }
+    });
+    
+  } catch (error) {
+    console.error("❌ Google auth error:", error);
+    
+    if (error.message.includes('Token used too late')) {
+      return res.status(401).json({ error: "Google token has expired" });
+    }
+    
+    res.status(401).json({ 
+      success: false,
+      error: "Google authentication failed"
+    });
+  }
+};
+
 // Helper function to handle failed login attempts with rate limiting
 const handleFailedLoginAttempt = async (userId, email, ip_address, device_name, device_type, reason) => {
   try {
@@ -1002,6 +1129,7 @@ module.exports = {
   getMe,
   logout,
   loginUser,
+  googleAuth,
   updateProfileAvatar,
   updatePassword,
   requestPasswordReset,

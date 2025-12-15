@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import api from "../../../../../api/axios";
+import { useTranslation } from "react-i18next";
 import { 
   CheckCircle, 
   XCircle, 
@@ -19,7 +20,10 @@ import {
   MoreHorizontal
 } from "lucide-react";
 
-export default function History({ subscription }) {
+export default function History({ subscription, t }) {
+  const { t: translate } = useTranslation();
+  const tFunc = t || translate;
+  
   const [activeTab, setActiveTab] = useState('billing'); // 'billing' or 'subscription'
   const [billingHistory, setBillingHistory] = useState([]);
   const [subscriptionHistory, setSubscriptionHistory] = useState([]);
@@ -41,8 +45,8 @@ export default function History({ subscription }) {
 
   // History sub-tabs
   const historySubTabs = [
-    { id: 'billing', label: 'Billing History', icon: CreditCard, count: billingHistory.length },
-    { id: 'subscription', label: 'Subscription History', icon: Users, count: subscriptionHistory.length }
+    { id: 'billing', label: tFunc('history.tabs.billing'), icon: CreditCard, count: billingHistory.length },
+    { id: 'subscription', label: tFunc('history.tabs.subscription'), icon: Users, count: subscriptionHistory.length }
   ];
 
   useEffect(() => {
@@ -55,7 +59,6 @@ export default function History({ subscription }) {
       ...tab,
       count: tab.id === 'billing' ? billingHistory.length : subscriptionHistory.length
     }));
-    // You might want to handle this differently if you need reactive counts
   }, [billingHistory.length, subscriptionHistory.length]);
 
   // Handle responsive overflow for tabs
@@ -199,37 +202,37 @@ export default function History({ subscription }) {
     const statusConfigs = {
       active: { 
         icon: CheckCircle, 
-        text: 'Active',
+        text: tFunc('history.status.active'),
         badgeColor: 'text-green-400 bg-green-500/20 border-green-500/30'
       },
       cancelled: { 
         icon: XCircle, 
-        text: 'Cancelled',
+        text: tFunc('history.status.cancelled'),
         badgeColor: 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30'
       },
       expired: { 
         icon: Clock, 
-        text: 'Expired',
+        text: tFunc('history.status.expired'),
         badgeColor: 'text-red-400 bg-red-500/20 border-red-500/30'
       },
       completed: { 
         icon: CheckCircle, 
-        text: 'Completed',
+        text: tFunc('history.status.completed'),
         badgeColor: 'text-green-400 bg-green-500/20 border-green-500/30'
       },
       failed: { 
         icon: XCircle, 
-        text: 'Failed',
+        text: tFunc('history.status.failed'),
         badgeColor: 'text-red-400 bg-red-500/20 border-red-500/30'
       },
       pending: { 
         icon: Clock, 
-        text: 'Pending',
+        text: tFunc('history.status.pending'),
         badgeColor: 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30'
       },
       refunded: { 
         icon: RefreshCw, 
-        text: 'Refunded',
+        text: tFunc('history.status.refunded'),
         badgeColor: 'text-blue-400 bg-blue-500/20 border-blue-500/30'
       }
     };
@@ -261,9 +264,9 @@ export default function History({ subscription }) {
 
   const getTransactionType = (type) => {
     const types = {
-      subscription: 'Subscription Payment',
-      one_time: 'One-time Payment',
-      refund: 'Refund'
+      subscription: tFunc('history.transactionTypes.subscription'),
+      one_time: tFunc('history.transactionTypes.one_time'),
+      refund: tFunc('history.transactionTypes.refund')
     };
     return types[type] || type;
   };
@@ -273,9 +276,11 @@ export default function History({ subscription }) {
       return (
         <div className="text-center py-16 bg-gray-800 rounded-2xl border border-gray-700">
           <FileText className="w-20 h-20 text-gray-500 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">No Billing History</h3>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            {tFunc('history.noBillingHistory')}
+          </h3>
           <p className="text-gray-400 mb-6">
-            Your payment history will appear here once you make transactions.
+            {tFunc('history.noBillingDescription')}
           </p>
         </div>
       );
@@ -288,12 +293,24 @@ export default function History({ subscription }) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-700 bg-gray-750">
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Date & Time</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Description</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Type</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Amount</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Status</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Actions</th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.dateTime')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.description')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.type')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.amount')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.status')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.actions')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
@@ -315,7 +332,9 @@ export default function History({ subscription }) {
                   <td className="p-6">
                     <div className="text-white font-medium">{invoice.description}</div>
                     {invoice.invoice_id && (
-                      <div className="text-gray-400 text-sm">Invoice #{invoice.invoice_id}</div>
+                      <div className="text-gray-400 text-sm">
+                        {tFunc('history.invoiceNumber', { id: invoice.invoice_id })}
+                      </div>
                     )}
                   </td>
                   <td className="p-6">
@@ -342,7 +361,7 @@ export default function History({ subscription }) {
                       className="flex items-center gap-2 text-[#BC8BBC] hover:text-[#9b69b2] transition-colors font-medium"
                     >
                       <Eye className="w-4 h-4" />
-                      View Details
+                      {tFunc('history.viewDetails')}
                     </button>
                   </td>
                 </tr>
@@ -369,7 +388,7 @@ export default function History({ subscription }) {
               
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <p className="text-gray-400 text-sm">Amount</p>
+                  <p className="text-gray-400 text-sm">{tFunc('history.table.amount')}</p>
                   <p className={`text-lg font-semibold ${
                     invoice.transaction_type === 'refund' ? 'text-red-400' : 'text-white'
                   }`}>
@@ -377,7 +396,7 @@ export default function History({ subscription }) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Type</p>
+                  <p className="text-gray-400 text-sm">{tFunc('history.table.type')}</p>
                   <p className="text-white font-medium capitalize">
                     {getTransactionType(invoice.transaction_type)}
                   </p>
@@ -392,7 +411,7 @@ export default function History({ subscription }) {
                 className="w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"
               >
                 <Eye className="w-4 h-4" />
-                View Details
+                {tFunc('history.viewDetails')}
               </button>
             </div>
           ))}
@@ -406,9 +425,11 @@ export default function History({ subscription }) {
       return (
         <div className="text-center py-16 bg-gray-800 rounded-2xl border border-gray-700">
           <Users className="w-20 h-20 text-gray-500 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">No Subscription History</h3>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            {tFunc('history.noSubscriptionHistory')}
+          </h3>
           <p className="text-gray-400 mb-6">
-            Your subscription history will appear here once you subscribe to plans.
+            {tFunc('history.noSubscriptionDescription')}
           </p>
         </div>
       );
@@ -421,12 +442,24 @@ export default function History({ subscription }) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-700 bg-gray-750">
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Plan</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Period</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Amount</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Status</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Auto Renew</th>
-                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Actions</th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.plan')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.period')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.amount')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.status')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.autoRenew')}
+                </th>
+                <th className="text-left p-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  {tFunc('history.table.actions')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
@@ -450,7 +483,9 @@ export default function History({ subscription }) {
                       {formatDate(sub.start_date)} - {formatDate(sub.end_date)}
                     </div>
                     <div className="text-gray-400 text-sm">
-                      {Math.ceil((new Date(sub.end_date) - new Date(sub.start_date)) / (1000 * 60 * 60 * 24))} days
+                      {tFunc('history.daysCount', { 
+                        days: Math.ceil((new Date(sub.end_date) - new Date(sub.start_date)) / (1000 * 60 * 60 * 24))
+                      })}
                     </div>
                   </td>
                   <td className="p-6">
@@ -464,7 +499,7 @@ export default function History({ subscription }) {
                   </td>
                   <td className="p-6">
                     <span className={`font-medium ${sub.auto_renew ? 'text-green-400' : 'text-yellow-400'}`}>
-                      {sub.auto_renew ? 'Yes' : 'No'}
+                      {sub.auto_renew ? tFunc('common.yes') : tFunc('common.no')}
                     </span>
                   </td>
                   <td className="p-6">
@@ -476,7 +511,7 @@ export default function History({ subscription }) {
                       className="flex items-center gap-2 text-[#BC8BBC] hover:text-[#9b69b2] transition-colors font-medium"
                     >
                       <Eye className="w-4 h-4" />
-                      View Details
+                      {tFunc('history.viewDetails')}
                     </button>
                   </td>
                 </tr>
@@ -506,23 +541,23 @@ export default function History({ subscription }) {
               
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <p className="text-gray-400 text-sm">Amount</p>
+                  <p className="text-gray-400 text-sm">{tFunc('history.table.amount')}</p>
                   <p className="text-lg font-semibold text-white">
                     {formatCurrency(sub.subscription_price)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Auto Renew</p>
+                  <p className="text-gray-400 text-sm">{tFunc('history.table.autoRenew')}</p>
                   <p className={`font-medium ${sub.auto_renew ? 'text-green-400' : 'text-yellow-400'}`}>
-                    {sub.auto_renew ? 'Yes' : 'No'}
+                    {sub.auto_renew ? tFunc('common.yes') : tFunc('common.no')}
                   </p>
                 </div>
               </div>
 
               <div className="mb-4">
-                <p className="text-gray-400 text-sm">Period</p>
+                <p className="text-gray-400 text-sm">{tFunc('history.table.period')}</p>
                 <p className="text-white text-sm">
-                  {formatDate(sub.start_date)} to {formatDate(sub.end_date)}
+                  {formatDate(sub.start_date)} {tFunc('history.to')} {formatDate(sub.end_date)}
                 </p>
               </div>
 
@@ -534,7 +569,7 @@ export default function History({ subscription }) {
                 className="w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors"
               >
                 <Eye className="w-4 h-4" />
-                View Details
+                {tFunc('history.viewDetails')}
               </button>
             </div>
           ))}
@@ -548,8 +583,10 @@ export default function History({ subscription }) {
       <div className="flex flex-col items-center justify-center py-12 space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#BC8BBC]"></div>
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-white mb-2">Loading History</h3>
-          <p className="text-gray-400">Fetching your records...</p>
+          <h3 className="text-lg font-semibold text-white mb-2">
+            {tFunc('history.loadingHistory')}
+          </h3>
+          <p className="text-gray-400">{tFunc('history.fetchingRecords')}</p>
         </div>
       </div>
     );
@@ -560,9 +597,9 @@ export default function History({ subscription }) {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-2xl font-bold text-white">History</h3>
+          <h3 className="text-2xl font-bold text-white">{tFunc('history.title')}</h3>
           <p className="text-gray-400 mt-1">
-            Track your subscription and payment history
+            {tFunc('history.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -572,7 +609,7 @@ export default function History({ subscription }) {
             className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 text-white px-4 py-2 rounded-lg transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            {refreshing ? 'Refreshing...' : 'Refresh'}
+            {refreshing ? tFunc('history.refreshing') : tFunc('history.refresh')}
           </button>
         </div>
       </div>
@@ -606,7 +643,7 @@ export default function History({ subscription }) {
               className="p-2 rounded-full hover:bg-gray-800 transition flex items-center gap-1"
             >
               <MoreHorizontal size={20} />
-              More
+              {tFunc('subscription.more')}
             </button>
             {showMore && (
               <div
@@ -652,6 +689,7 @@ export default function History({ subscription }) {
           formatDateTime={formatDateTime}
           getStatusBadge={getStatusBadge}
           getTransactionType={getTransactionType}
+          t={tFunc}
         />
       )}
 
@@ -662,26 +700,26 @@ export default function History({ subscription }) {
           onClose={handleCloseModal}
           formatCurrency={formatCurrency}
           formatDate={formatDate}
-          formatDateTime={formatDateTime}
           getStatusBadge={getStatusBadge}
           getPlanIcon={getPlanIcon}
+          t={tFunc}
         />
       )}
     </div>
   );
 }
 
-// Invoice Modal Component (keep the same)
-const InvoiceModal = ({ invoice, onClose, formatCurrency, formatDate, formatDateTime, getStatusBadge, getTransactionType }) => (
+// Invoice Modal Component
+const InvoiceModal = ({ invoice, onClose, formatCurrency, formatDate, formatDateTime, getStatusBadge, getTransactionType, t }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div className="bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
       <div className="flex items-center justify-between p-6 border-b border-gray-700 sticky top-0 bg-gray-800 rounded-t-2xl">
         <div className="flex items-center gap-3">
           <FileText className="w-6 h-6 text-[#BC8BBC]" />
           <div>
-            <h3 className="text-xl font-bold text-white">Transaction Details</h3>
+            <h3 className="text-xl font-bold text-white">{t('history.invoiceDetails.title')}</h3>
             <p className="text-gray-400 text-sm">
-              {invoice.invoice_id ? `Invoice #${invoice.invoice_id}` : 'Payment Details'}
+              {invoice.invoice_id ? t('history.invoiceDetails.invoiceNumber', { id: invoice.invoice_id }) : t('history.invoiceDetails.paymentDetails')}
             </p>
           </div>
         </div>
@@ -708,19 +746,19 @@ const InvoiceModal = ({ invoice, onClose, formatCurrency, formatDate, formatDate
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white">Transaction Information</h4>
+            <h4 className="text-lg font-semibold text-white">{t('history.invoiceDetails.transactionInfo')}</h4>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-400">Type</span>
+                <span className="text-gray-400">{t('history.table.type')}</span>
                 <span className="text-white font-medium">{getTransactionType(invoice.transaction_type)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Date</span>
+                <span className="text-gray-400">{t('history.table.date')}</span>
                 <span className="text-white font-medium">{formatDateTime(invoice.created_at)}</span>
               </div>
               {invoice.provider && (
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Provider</span>
+                  <span className="text-gray-400">{t('history.invoiceDetails.provider')}</span>
                   <span className="text-white font-medium capitalize">{invoice.provider}</span>
                 </div>
               )}
@@ -728,15 +766,15 @@ const InvoiceModal = ({ invoice, onClose, formatCurrency, formatDate, formatDate
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white">Amount Details</h4>
+            <h4 className="text-lg font-semibold text-white">{t('history.invoiceDetails.amountDetails')}</h4>
             <div className="space-y-3 bg-gray-750 rounded-lg p-4">
               <div className="flex justify-between">
-                <span className="text-gray-400">Amount</span>
+                <span className="text-gray-400">{t('history.table.amount')}</span>
                 <span className="text-white font-medium">{formatCurrency(invoice.amount)}</span>
               </div>
               {invoice.fee_amount > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Fee</span>
+                  <span className="text-gray-400">{t('history.invoiceDetails.fee')}</span>
                   <span className="text-white font-medium">{formatCurrency(invoice.fee_amount)}</span>
                 </div>
               )}
@@ -747,15 +785,15 @@ const InvoiceModal = ({ invoice, onClose, formatCurrency, formatDate, formatDate
 
       <div className="flex gap-3 p-6 border-t border-gray-700">
         <button onClick={onClose} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-lg transition-colors font-semibold">
-          Close
+          {t('common.close')}
         </button>
       </div>
     </div>
   </div>
 );
 
-// Subscription Modal Component (keep the same)
-const SubscriptionModal = ({ subscription, onClose, formatCurrency, formatDate, getStatusBadge, getPlanIcon }) => (
+// Subscription Modal Component
+const SubscriptionModal = ({ subscription, onClose, formatCurrency, formatDate, getStatusBadge, getPlanIcon, t }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div className="bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
       <div className="flex items-center justify-between p-6 border-b border-gray-700 sticky top-0 bg-gray-800 rounded-t-2xl">
@@ -763,7 +801,7 @@ const SubscriptionModal = ({ subscription, onClose, formatCurrency, formatDate, 
           {getPlanIcon(subscription.plan_type)}
           <div>
             <h3 className="text-xl font-bold text-white">{subscription.subscription_name}</h3>
-            <p className="text-gray-400 text-sm capitalize">{subscription.plan_type} Plan</p>
+            <p className="text-gray-400 text-sm capitalize">{subscription.plan_type} {t('history.subscriptionModal.plan')}</p>
           </div>
         </div>
         <button onClick={onClose} className="p-2 text-gray-400 hover:text-white transition-colors">
@@ -774,43 +812,43 @@ const SubscriptionModal = ({ subscription, onClose, formatCurrency, formatDate, 
       <div className="p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white">Subscription Details</h4>
+            <h4 className="text-lg font-semibold text-white">{t('history.subscriptionModal.details')}</h4>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-400">Status</span>
+                <span className="text-gray-400">{t('history.table.status')}</span>
                 {getStatusBadge(subscription.status)}
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Start Date</span>
+                <span className="text-gray-400">{t('history.subscriptionModal.startDate')}</span>
                 <span className="text-white font-medium">{formatDate(subscription.start_date)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">End Date</span>
+                <span className="text-gray-400">{t('history.subscriptionModal.endDate')}</span>
                 <span className="text-white font-medium">{formatDate(subscription.end_date)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Auto Renew</span>
+                <span className="text-gray-400">{t('history.table.autoRenew')}</span>
                 <span className={`font-medium ${subscription.auto_renew ? 'text-green-400' : 'text-yellow-400'}`}>
-                  {subscription.auto_renew ? 'Enabled' : 'Disabled'}
+                  {subscription.auto_renew ? t('history.subscriptionModal.enabled') : t('history.subscriptionModal.disabled')}
                 </span>
               </div>
             </div>
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white">Billing Information</h4>
+            <h4 className="text-lg font-semibold text-white">{t('history.subscriptionModal.billingInfo')}</h4>
             <div className="space-y-3 bg-gray-750 rounded-lg p-4">
               <div className="flex justify-between">
-                <span className="text-gray-400">Amount</span>
+                <span className="text-gray-400">{t('history.table.amount')}</span>
                 <span className="text-white font-medium">{formatCurrency(subscription.subscription_price)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Currency</span>
+                <span className="text-gray-400">{t('history.subscriptionModal.currency')}</span>
                 <span className="text-white font-medium">{subscription.subscription_currency}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Billing Cycle</span>
-                <span className="text-white font-medium">Monthly</span>
+                <span className="text-gray-400">{t('history.subscriptionModal.billingCycle')}</span>
+                <span className="text-white font-medium">{t('history.subscriptionModal.monthly')}</span>
               </div>
             </div>
           </div>
@@ -820,10 +858,10 @@ const SubscriptionModal = ({ subscription, onClose, formatCurrency, formatDate, 
           <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
             <div className="flex items-center gap-2 text-yellow-400">
               <AlertCircle className="w-4 h-4" />
-              <span className="font-semibold">Cancelled</span>
+              <span className="font-semibold">{t('history.subscriptionModal.cancelled')}</span>
             </div>
             <p className="text-yellow-300 text-sm mt-1">
-              This subscription was cancelled on {formatDate(subscription.cancelled_at)}
+              {t('history.subscriptionModal.cancelledOn', { date: formatDate(subscription.cancelled_at) })}
             </p>
           </div>
         )}
@@ -831,7 +869,7 @@ const SubscriptionModal = ({ subscription, onClose, formatCurrency, formatDate, 
 
       <div className="flex gap-3 p-6 border-t border-gray-700">
         <button onClick={onClose} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-lg transition-colors font-semibold">
-          Close
+          {t('common.close')}
         </button>
       </div>
     </div>

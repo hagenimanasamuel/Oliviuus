@@ -42,7 +42,7 @@ class EnhancedSubscriptionController {
 const getCurrentSubscription = async (req, res) => {
   try {
     const userId = req.user.id;
-    
+  
     console.log('🔍 getCurrentSubscription called for user:', userId, {
       is_family_member: req.user.is_family_member,
       has_family_plan_access: req.user.has_family_plan_access

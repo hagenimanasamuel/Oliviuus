@@ -93,7 +93,7 @@ export default function SubscriptionInfo({ user }) {
           setSubscriptionData(subscription);
         }
       } else {
-        throw new Error(response.data.message || 'Failed to fetch subscription data');
+        throw new Error(response.data.message || t('subscription.errors.loadFailed'));
       }
     } catch (err) {
       console.error('Error fetching subscription data:', err);
@@ -235,7 +235,8 @@ export default function SubscriptionInfo({ user }) {
     const enhancedProps = {
       subscription: subscriptionData,
       realTimeStatus: realTimeStatus,
-      onRefresh: fetchSubscriptionData
+      onRefresh: fetchSubscriptionData,
+      t: t // Pass translation function to child components
     };
 
     switch (activeSubTab) {

@@ -13,6 +13,7 @@
     "home_button": "Retour à l'accueil"
   },
   "auth": {
+    "or_continue_with_email": "Ou continuer avec l'email",
     "enter_email": "Veuillez entrer votre adresse e-mail",
     "enter_email_desc": "Entrez votre e-mail pour continuer",
     "email_placeholder": "Adresse e-mail",
@@ -41,6 +42,12 @@
     "new_password": "Nouveau mot de passe",
     "confirm_password": "Confirmer le mot de passe",
     "reset_password_button": "Réinitialiser le mot de passe"
+  },
+  "oneTap": {
+    "title": "Connexion Rapide",
+    "subtitle": "Continuer avec votre compte Google",
+    "privacy": "Vos données sont sécurisées",
+    "notNow": "Pas maintenant"
   },
   "verifyEmail": {
     "code_required": "Le code de vérification est requis",
@@ -1572,6 +1579,23 @@
     "refresh": "Actualiser",
     "loading": "Chargement des données d’abonnement...",
     "more": "Plus",
+    "perMonth": "/mois",
+    "plans": {
+      "mobile": {
+        "popular": "Populaire"
+      },
+      "standard": {
+        "popular": "Populaire"
+      }
+    },
+    "comparison": {
+      "devices": "appareils",
+      "simultaneous": "simultané",
+      "videoQuality": "qualité vidéo",
+      "downloads": "téléchargements",
+      "unlimited": "Illimité",
+      "downloadItems": "{count} éléments"
+    },
     "tabs": {
       "current": "Plan Actuel",
       "history": "Historique",
@@ -1592,7 +1616,28 @@
         "description": "Votre abonnement a expiré. Renouvelez pour continuer l’accès"
       },
       "renews": "Renouvelle le",
-      "ends": "Se termine le"
+      "ends": "Se termine le",
+      "scheduled": {
+        "title": "Abonnement programmé",
+        "description": "Votre abonnement commencera bientôt"
+      },
+      "grace_period": {
+        "title": "Période de grâce",
+        "description": "Votre abonnement est en période de grâce"
+      },
+      "trialing": {
+        "title": "Essai",
+        "description": "Vous êtes en période d’essai"
+      },
+      "past_due": {
+        "title": "Paiement en retard",
+        "description": "Votre paiement est en retard"
+      },
+      "no_subscription": {
+        "title": "Aucun abonnement",
+        "description": "Vous n’avez aucun abonnement actif"
+      },
+      "starts": "Commence le"
     },
     "errors": {
       "title": "Erreur de Chargement",
@@ -3469,7 +3514,6 @@
       }
     }
   },
-
   "playerControls": {
     "accessibility": {
       "controls": "Commandes du lecteur vidéo",
@@ -3500,7 +3544,6 @@
       "timeDisplay": "Changer le mode d’affichage du temps"
     }
   },
-
   "loadingOverlay": {
     "initial": {
       "title": "Préparation de votre lecture",
@@ -3510,12 +3553,10 @@
     "loading": "Chargement...",
     "waitMessage": "Veuillez patienter pendant que nous préparons le contenu"
   },
-
   "connectionIndicator": {
     "online": "Connexion Internet rétablie",
     "offline": "Connexion Internet perdue"
   },
-
   "episodeSelector": {
     "buttons": {
       "episodes": "Épisodes",
@@ -3555,7 +3596,6 @@
       "similarMovie": "Film similaire : {{title}}"
     }
   },
-
   "endScreen": {
     "episodeNumber": "Épisode {{number}}",
     "defaultContentTitle": "Contenu",
@@ -3591,7 +3631,6 @@
       "movie": "Film"
     }
   },
-
   "settingsPanel": {
     "tabs": {
       "speed": "Vitesse de lecture",
@@ -3670,11 +3709,412 @@
     },
     "menuLabel": "Menu des paramètres vidéo"
   },
-
   "previewThumbnail": {
     "aria": {
       "timePreview": "Aperçu pour le temps : {{time}}"
     },
     "loading": "Chargement de l’aperçu..."
+  },
+  "history": {
+    "title": "Historique",
+    "subtitle": "Suivez votre historique d’abonnement et de paiements",
+    "loadingHistory": "Chargement de l’historique",
+    "fetchingRecords": "Récupération de vos données...",
+    "refresh": "Actualiser",
+    "refreshing": "Actualisation...",
+    "tabs": {
+      "billing": "Historique de facturation",
+      "subscription": "Historique d’abonnement"
+    },
+    "noBillingHistory": "Aucun historique de facturation",
+    "noBillingDescription": "Votre historique de paiements apparaîtra après vos premières transactions.",
+    "noSubscriptionHistory": "Aucun historique d’abonnement",
+    "noSubscriptionDescription": "Votre historique d’abonnement apparaîtra une fois abonné à un plan.",
+    "status": {
+      "active": "Actif",
+      "cancelled": "Annulé",
+      "expired": "Expiré",
+      "completed": "Terminé",
+      "failed": "Échoué",
+      "pending": "En attente",
+      "refunded": "Remboursé"
+    },
+    "transactionTypes": {
+      "subscription": "Paiement d’abonnement",
+      "one_time": "Paiement unique",
+      "refund": "Remboursement"
+    },
+    "invoiceNumber": "Facture n°{id}",
+    "viewDetails": "Voir les détails",
+    "to": "à",
+    "daysCount": "{days} jours",
+    "table": {
+      "dateTime": "Date et heure",
+      "description": "Description",
+      "type": "Type",
+      "amount": "Montant",
+      "status": "Statut",
+      "actions": "Actions",
+      "plan": "Plan",
+      "period": "Période",
+      "autoRenew": "Renouvellement automatique",
+      "date": "Date"
+    },
+    "invoiceDetails": {
+      "title": "Détails de la transaction",
+      "paymentDetails": "Détails du paiement",
+      "transactionInfo": "Informations sur la transaction",
+      "provider": "Fournisseur",
+      "amountDetails": "Détails du montant",
+      "fee": "Frais"
+    },
+    "subscriptionModal": {
+      "plan": "Plan",
+      "details": "Détails de l’abonnement",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "billingInfo": "Informations de facturation",
+      "currency": "Devise",
+      "billingCycle": "Cycle de facturation",
+      "monthly": "Mensuel",
+      "cancelled": "Annulé",
+      "cancelledOn": "Cet abonnement a été annulé le {date}"
+    }
+  },
+  "newPlanModal": {
+    "title": "Acheter un nouveau plan",
+    "subtitle": "Choisissez un nouveau plan qui commencera après votre abonnement actuel",
+    "purchaseNewPlan": "Acheter un nouveau plan",
+    "purchaseDescription": "Achetez un nouvel abonnement qui démarrera automatiquement après la fin de votre plan actuel.",
+    "currentPlanActive": "Plan actuel actif",
+    "newPlanStartDate": "Votre nouveau plan commencera le {date}",
+    "newPlan": "Nouveau plan",
+    "startsOn": "Débute le : {date}",
+    "yourNewPlanWillStartOn": "Votre nouveau forfait commencera le",
+    "startsLabel": "Commence le :",
+    "backToPlans": "Retour aux plans",
+    "newPlanPurchase": "Achat d’un nouveau plan",
+    "monthly": "Mensuel",
+    "planStartDate": "Date de début du plan",
+    "startAfterCurrent": "Votre nouveau plan commencera automatiquement après la fin du plan actuel.",
+    "startImmediately": "Votre nouveau plan commencera immédiatement après le paiement.",
+    "planName": "Nom du plan",
+    "billing": "Facturation",
+    "devices": "Appareils",
+    "simultaneous": "Simultané",
+    "quality": "Qualité",
+    "paymentAmount": "Montant du paiement",
+    "firstMonth": "Premier mois",
+    "firstMonthCharge": "Ce montant sera facturé pour le premier mois de votre nouveau plan",
+    "securePayment": "Paiement sécurisé",
+    "securityFeatures": "🔒 Connexion chiffrée • 🛡️ Protection contre la fraude • 📱 Mobile Money sécurisé",
+    "considerUpgrade": "Envisager une mise à niveau ?",
+    "upgradeSuggestion": "Pour un accès immédiat à de meilleures fonctionnalités, utilisez plutôt l’option « Changer de plan ».",
+    "processingPurchase": "Traitement de l’achat...",
+    "purchaseNewPlanButton": "Acheter un nouveau plan",
+    "processingDescription": "Votre achat est en cours de traitement sécurisé...",
+    "processingFeatures": "🔒 Transaction sécurisée • 📱 Vérifiez votre téléphone",
+    "purchaseSuccessful": "Achat réussi !",
+    "purchaseSuccessDescription": "Votre plan {plan} a été acheté avec succès.",
+    "willStartOn": "Il commencera automatiquement le {date}",
+    "successFeatures": "✅ Achat terminé • 🔒 Paiement sécurisé • 📅 Débute le {date}",
+    "loadingPlans": "Chargement des plans...",
+    "fetchingPlans": "Récupération des plans disponibles",
+    "confirmPurchase": "Confirmer l’achat du nouveau plan",
+    "reviewPlan": "Vérifiez les détails de votre nouveau plan et finalisez le paiement",
+    "successDescription": "Votre nouveau plan a été acheté avec succès",
+    "security": {
+      "sessionTimeout": "Session expirée",
+      "devToolsDetected": "Outils de développement détectés",
+      "contextMenuAttempt": "Tentative de menu contextuel",
+      "windowHidden": "Fenêtre masquée – inspection possible",
+      "dimensionDevTools": "Outils détectés par les dimensions",
+      "violationDetected": "Violation de sécurité détectée",
+      "maxRetries": "Nombre maximal de tentatives dépassé",
+      "authenticationError": "Erreur d’authentification",
+      "alertTitle": "Alerte de sécurité",
+      "alertDescription": "Activité non autorisée détectée. Cette session a été interrompue.",
+      "violationRefresh": "Violation de sécurité détectée. Veuillez actualiser la page."
+    },
+    "errors": {
+      "fetchPlans": "Impossible de charger les plans. Veuillez actualiser la page.",
+      "paymentFailed": "Le paiement du nouveau plan a échoué",
+      "paymentTimeout": "Délai de paiement dépassé. Veuillez vérifier votre Mobile Money."
+    },
+    "validation": {
+      "phoneRequired": "Le numéro de téléphone est requis pour Mobile Money",
+      "phoneInvalid": "Veuillez entrer un numéro de téléphone valide",
+      "phonePattern": "Format de numéro de téléphone invalide",
+      "nameInvalid": "Veuillez entrer un nom valide"
+    }
+  },
+  "usageMetrics": {
+    "title": "Aperçu de l’utilisation",
+    "subtitle": "Votre activité de streaming en temps réel",
+    "noActiveSubscription": "Aucun abonnement actif",
+    "noSubscriptionDescription": "Les statistiques sont disponibles avec un abonnement actif.",
+    "subscribeToStart": "Abonnez-vous pour commencer le suivi de votre activité.",
+    "scheduledSubscription": "Abonnement programmé",
+    "scheduledDescription": "Les statistiques seront disponibles à partir du {date}.",
+    "checkBackAfterStart": "Revenez après l’activation de votre plan.",
+    "subscriptionInactive": "Abonnement inactif",
+    "inactiveDescription": "Les statistiques sont disponibles uniquement avec un abonnement actif.",
+    "renewToAccess": "Renouvelez votre abonnement pour y accéder.",
+    "loadingUsageData": "Chargement des données",
+    "gatheringInsights": "Collecte de vos statistiques...",
+    "noUsageData": "Aucune donnée disponible",
+    "startStreaming": "Commencez à regarder du contenu",
+    "watchContent": "Regardez des films ou des séries",
+    "checkAgain": "Vérifier à nouveau",
+    "week": "Semaine",
+    "month": "Mois",
+    "refresh": "Actualiser",
+    "activeSubscription": "Abonnement actif",
+    "currentPlan": "Vous êtes actuellement sur le <strong>plan {plan}</strong>",
+    "activeDevices": "Appareils actifs",
+    "ofLimit": "sur la limite",
+    "connectedDevices": "Appareils connectés",
+    "currentlyActive": "Actuellement actifs",
+    "noActiveDevices": "Aucun appareil actif",
+    "streamingTime": "Temps de visionnage",
+    "dailyAverage": "moyenne quotidienne",
+    "thisWeek": "Cette semaine",
+    "total": "Total : {hours}h",
+    "dataUsage": "Utilisation des données",
+    "unlimitedData": "Données illimitées",
+    "of": "sur",
+    "increasing": "En augmentation",
+    "stable": "Stable",
+    "ofLimitUsed": "de la limite utilisée",
+    "usageInsights": "Analyse d’utilisation",
+    "yourPatterns": "Vos habitudes de streaming",
+    "devicesCount": "{count} appareils",
+    "totalWatchTime": "Temps total de visionnage",
+    "hoursCount": "{hours} heures",
+    "hoursPerDay": "{hours}h/jour",
+    "quickTips": "Conseils rapides",
+    "tipOffPeak": "Regardez hors heures de pointe",
+    "tipOffPeakDesc": "pour une meilleure qualité",
+    "tipWifi": "Utilisez le Wi-Fi",
+    "tipWifiDesc": "pour économiser les données mobiles",
+    "tipLogout": "Déconnectez les appareils inutilisés",
+    "tipLogoutDesc": "pour libérer des emplacements",
+    "dataUpdated": "Données mises à jour en temps réel",
+    "showingUsage": "Affichage de l’utilisation {period}"
+  },
+  "currentPlan": {
+    "previousDetails": "Détails du plan précédent",
+    "plan": "Plan",
+    "ended": "Terminé",
+    "renewSubscription": "Renouveler l’abonnement",
+    "getNewPlan": "Obtenir un nouveau plan",
+    "scheduledSubscription": "Abonnement programmé",
+    "scheduledDescription": "Votre plan s’activera automatiquement le {date}",
+    "monthlyPrice": "Prix mensuel",
+    "startsIn": "Commence dans",
+    "startDate": "Date de début",
+    "days": "jour",
+    "days_plural": "jours",
+    "devices": "Appareils",
+    "quality": "Qualité",
+    "downloads": "Téléchargements",
+    "profiles": "Profils",
+    "planFeatures": "Fonctionnalités du plan",
+    "supportedDevices": "Appareils pris en charge",
+    "deviceTypes": "types d’appareils",
+    "videoQuality": "Qualité vidéo",
+    "offlineDownloads": "Téléchargements hors ligne",
+    "available": "Disponible",
+    "notAvailable": "Non disponible",
+    "simultaneousStreams": "Lectures simultanées",
+    "parentalControls": "Contrôles parentaux",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "exclusiveContent": "Contenu exclusif",
+    "access": "Accès",
+    "noAccess": "Pas d’accès",
+    "hdrSupport": "Prise en charge HDR",
+    "earlyAccess": "Accès anticipé",
+    "scheduledDetails": "Détails programmés",
+    "status": "Statut",
+    "scheduledStart": "Début programmé",
+    "endDate": "Date de fin",
+    "autoRenew": "Renouvellement automatique",
+    "quickActions": "Actions rapides",
+    "addAnotherPlan": "Ajouter un autre plan",
+    "refreshStatus": "Actualiser le statut",
+    "needHelp": "Besoin d’aide ?",
+    "scheduledSupportDescription": "Des questions sur votre abonnement programmé ? Notre équipe peut vous aider.",
+    "contactSupport": "Contacter le support",
+    "billingCycle": "Cycle de facturation",
+    "monthly": "Mensuel",
+    "renewsIn": "Renouvelle dans",
+    "subscriptionDetails": "Détails de l’abonnement",
+    "started": "Commencé",
+    "renews": "Renouvelle",
+    "cancelledOn": "Annulé le",
+    "changePlan": "Changer de plan",
+    "addNewPlan": "Ajouter un nouveau plan",
+    "supportDescription": "Des problèmes avec votre abonnement ? Notre équipe est là pour vous aider.",
+    "subscriptionSupport": "Support abonnement",
+    "subscriptionSupportDescription": "Besoin d’aide pour votre abonnement ? Contactez notre support pour la facturation, les changements de plan ou toute autre question."
+  },
+  "planChangeModal": {
+    "title": "Mettre à niveau votre plan",
+    "subtitle": "Choisissez un plan supérieur pour un accès immédiat",
+    "secureUpgrade": "Mise à niveau sécurisée",
+    "secureDescription": "Toutes les transactions sont chiffrées et surveillées.",
+    "currentPlan": "Plan actuel : {plan}",
+    "upgradeImmediate": "Passez à un plan supérieur avec un tarif au prorata.",
+    "highestPlan": "Vous êtes sur le plan le plus élevé",
+    "noUpgradesAvailable": "Aucune mise à niveau disponible actuellement.",
+    "upgrade": "Mettre à niveau",
+    "upgradeAvailable": "Mise à niveau disponible",
+    "clickToCalculate": "Cliquez pour calculer le coût",
+    "calculatingUpgrade": "Calcul de la mise à niveau",
+    "calculatingDescription": "Calcul du coût au prorata...",
+    "backToPlans": "Retour aux plans",
+    "planUpgrade": "Mise à niveau du plan",
+    "calculating": "Calcul en cours...",
+    "proratedUpgrade": "Mise à niveau au prorata",
+    "costBreakdown": "Détail des coûts",
+    "baseUpgrade": "Base de mise à niveau",
+    "operationalAdjustment": "Ajustement opérationnel",
+    "total": "Total",
+    "basedOnDays": "Basé sur {days} jours restants",
+    "currentPlanLabel": "Plan actuel",
+    "newPlan": "Nouveau plan",
+    "effective": "Effectif",
+    "immediately": "Immédiatement",
+    "remainingDays": "Jours restants",
+    "days": "jours",
+    "upgradeAmount": "Montant de la mise à niveau",
+    "serverCalculated": "Calculé par le serveur",
+    "amountSecure": "Le montant est calculé de manière sécurisée",
+    "securePayment": "Paiement sécurisé",
+    "securityFeatures": "🔒 Connexion chiffrée • 🛡️ Protection contre la fraude • 📱 Mobile Money sécurisé",
+    "processingUpgrade": "Traitement de la mise à niveau...",
+    "securePaymentUpgrade": "Paiement sécurisé et mise à niveau",
+    "processingUpgradeTitle": "Traitement",
+    "processingDescription": "Votre mise à niveau est en cours...",
+    "processingFeatures": "🔒 Transaction sécurisée • 📱 Vérifiez votre téléphone",
+    "upgradeSuccessful": "Mise à niveau réussie !",
+    "upgradeSuccessDescription": "Votre plan a été mis à niveau vers {plan}.",
+    "successFeatures": "✅ Terminé • 🔒 Paiement sécurisé • 🚀 Fonctionnalités activées",
+    "loadingUpgradeOptions": "Chargement des options...",
+    "fetchingUpgradePlans": "Récupération des plans",
+    "paymentDescription": "Entrez vos informations de paiement",
+    "successDescription": "Votre plan a été mis à niveau avec succès",
+    "security": {
+      "sessionTimeout": "Session expirée",
+      "devToolsDetected": "Outils de développement détectés",
+      "contextMenuAttempt": "Tentative de menu contextuel",
+      "windowHidden": "Fenêtre masquée",
+      "dimensionDevTools": "Outils détectés",
+      "violationDetected": "Violation de sécurité",
+      "maxRetries": "Nombre maximal de tentatives dépassé",
+      "authenticationError": "Erreur d’authentification",
+      "alertTitle": "Alerte de sécurité",
+      "alertDescription": "Activité non autorisée détectée.",
+      "violationRefresh": "Violation détectée. Actualisez la page."
+    },
+    "errors": {
+      "fetchUpgrades": "Impossible de charger les options.",
+      "calculateCost": "Échec du calcul du coût",
+      "upgradeFailed": "Le paiement de la mise à niveau a échoué",
+      "paymentFailed": "Paiement échoué. Veuillez réessayer.",
+      "paymentTimeout": "Délai dépassé. Vérifiez votre Mobile Money."
+    },
+    "validation": {
+      "phoneRequired": "Le numéro de téléphone est requis",
+      "phoneInvalid": "Numéro de téléphone invalide",
+      "phonePattern": "Format invalide",
+      "nameInvalid": "Nom invalide"
+    }
+  },
+  "paymentMethods": {
+    "loading": "Chargement des informations de paiement",
+    "checkingSettings": "Vérification de vos paramètres de paiement...",
+    "title": "Sécurité des paiements",
+    "subtitle": "Votre sécurité est notre priorité absolue. Nous avons mis en place des protections renforcées pour vos informations de paiement.",
+    "noStoredData": {
+      "title": "Aucune donnée de paiement stockée",
+      "description": "Nous ne stockons jamais vos informations Mobile Money sur nos serveurs afin de garantir une sécurité maximale."
+    },
+    "fastPayments": {
+      "title": "Paiements mobiles rapides",
+      "description": "Propulsé par LMB Tech et Intouch pour un traitement instantané des paiements Mobile Money."
+    },
+    "instantProcessing": {
+      "title": "Traitement instantané",
+      "description": "Traitement sécurisé en temps réel avec activation immédiate de l’abonnement."
+    },
+    "enhancedSecurity": {
+      "title": "Approche axée sur la sécurité renforcée",
+      "description": "Pour votre sécurité et votre tranquillité d’esprit, nous ne stockons aucun moyen de paiement sur notre plateforme.",
+      "points": {
+        "freshAuthorization": "Chaque transaction nécessite une nouvelle autorisation",
+        "eliminateRisk": "Élimine les risques liés au stockage des données de paiement",
+        "poweredBy": "Propulsé par LMB Tech et Intouch Communications",
+        "financialData": "Vos données financières restent auprès des réseaux Mobile Money de confiance"
+      }
+    },
+    "howItWorks": {
+      "title": "Comment fonctionne le paiement Mobile Money",
+      "steps": {
+        "choosePlan": "Choisir un forfait",
+        "enterPhone": "Entrer le numéro",
+        "confirmPayment": "Confirmer le paiement",
+        "instantAccess": "Accès immédiat"
+      },
+      "descriptions": {
+        "choosePlan": "Sélectionnez votre forfait d’abonnement préféré",
+        "enterPhone": "Saisissez votre numéro Mobile Money",
+        "confirmPayment": "Autorisez le paiement sur votre téléphone",
+        "instantAccess": "Accédez immédiatement à votre abonnement"
+      }
+    },
+    "supportedProviders": {
+      "title": "Fournisseurs Mobile Money pris en charge",
+      "mtn": {
+        "title": "MTN Mobile Money",
+        "description": "Paiements rapides et sécurisés via MTN"
+      },
+      "airtel": {
+        "title": "Airtel Money",
+        "description": "Paiements sécurisés via Airtel"
+      },
+      "instantProcessing": "Traitement instantané"
+    },
+    "comingSoon": {
+      "title": "D'autres options de paiement arrivent bientôt",
+      "description": "Nous travaillons à l’ajout de nouveaux moyens de paiement pour mieux vous servir"
+    },
+    "technologyPartners": {
+      "title": "Propulsé par des partenaires technologiques de confiance",
+      "subtitle": "Traitement sécurisé des paiements grâce à nos partenaires",
+      "lmbTech": {
+        "title": "LMB Tech",
+        "description": "Link Mobile Technology Ltd",
+        "role": "Partenaire technologique de paiement"
+      },
+      "intouch": {
+        "title": "Intouch Communications",
+        "description": "Infrastructure Mobile Money",
+        "role": "Partenaire de traitement des paiements"
+      }
+    },
+    "securityAssurance": {
+      "title": "Votre sécurité est garantie",
+      "description": "Nous plaçons la sécurité de vos finances au premier plan. En ne stockant aucun moyen de paiement, nous éliminons les risques de violation des données tout en assurant une gestion fluide des abonnements grâce au traitement Mobile Money sécurisé en temps réel par LMB Tech et Intouch Communications."
+    },
+    "contactSupport": {
+      "description": "Des questions sur la sécurité des paiements ou Mobile Money ?",
+      "button": "Contacter le support",
+      "title": "Support Paiement & Facturation",
+      "subtitle": "Besoin d’aide concernant les paiements Mobile Money, la facturation ou la sécurité ? Notre équipe est là pour vous aider."
+    }
   }
 }

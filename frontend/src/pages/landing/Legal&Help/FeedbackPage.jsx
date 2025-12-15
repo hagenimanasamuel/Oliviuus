@@ -364,8 +364,6 @@ const FeedbackPage = () => {
         
         {/* Multilingual alternate links for SEO */}
         <link rel="alternate" hreflang="en" href={`${window.location.origin}/feedback`} />
-        <link rel="alternate" hreflang="fr" href={`${window.location.origin}/fr/feedback`} />
-        <link rel="alternate" hreflang="rw" href={`${window.location.origin}/rw/feedback`} />
         <link rel="alternate" hreflang="x-default" href={`${window.location.origin}/feedback`} />
       </Helmet>
 

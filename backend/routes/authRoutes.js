@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { checkEmail, saveUserInfo, getMe, logout, loginUser, updateProfileAvatar, requestPasswordReset, resetPassword, createUser } = require("../controllers/authController");
+const { checkEmail, saveUserInfo, getMe, logout, loginUser, googleAuth, updateProfileAvatar, requestPasswordReset, resetPassword, createUser } = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 // POST /api/auth/check-email
@@ -16,7 +16,10 @@ router.get("/me", authMiddleware, getMe);
 router.post("/logout", authMiddleware, logout);
 
 // login route
-router.post("/login", loginUser);  
+router.post("/login", loginUser);
+
+// google oauth
+router.post('/google', googleAuth);
 
 // update the user profile
 router.put("/update-avatar", authMiddleware, updateProfileAvatar);

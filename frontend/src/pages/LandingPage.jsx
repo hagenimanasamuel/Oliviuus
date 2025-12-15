@@ -92,10 +92,6 @@ export default function LandingPage() {
 
         {/* Language Alternates */}
         <link rel="alternate" href="https://oliviuus.com/" hreflang="x-default" />
-        <link rel="alternate" href="https://oliviuus.com/rw" hreflang="rw" />
-        <link rel="alternate" href="https://oliviuus.com/en" hreflang="en" />
-        <link rel="alternate" href="https://oliviuus.com/fr" hreflang="fr" />
-        <link rel="alternate" href="https://oliviuus.com/sw" hreflang="sw" />
 
         {/* Canonical URL */}
         <link rel="canonical" href="https://oliviuus.com/" />

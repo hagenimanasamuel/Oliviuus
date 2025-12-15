@@ -318,8 +318,6 @@ const HelpCenter = () => {
         
         {/* Multilingual alternate links for SEO */}
         <link rel="alternate" hreflang="en" href={`${window.location.origin}/help-center`} />
-        <link rel="alternate" hreflang="fr" href={`${window.location.origin}/fr/help-center`} />
-        <link rel="alternate" hreflang="rw" href={`${window.location.origin}/rw/help-center`} />
         <link rel="alternate" hreflang="x-default" href={`${window.location.origin}/help-center`} />
       </Helmet>
 

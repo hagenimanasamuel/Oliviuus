@@ -44,7 +44,6 @@ import MoviesPage from "../pages/Dashboards/viewer/MoviesPage.jsx";
 import NewPopularPage from "../pages/Dashboards/viewer/NewPopularPage.jsx";
 import BrowsePage from "../pages/Dashboards/viewer/BrowsePage.jsx";
 import OliviuusInvestorPitch from "../pages/subscription/OliviuusPpt.jsx";
-import UmukinoWoKwiruka from "../pages/subscription/SimpleGame.jsx";
 import WatchHistoryPage from "../pages/Dashboards/viewer/WatchHistoryPage.jsx";
 import KidDashboard from "../pages/Dashboards/viewer/kid/KidDashboard.jsx";
 import KidFavoritesPage from "../pages/Dashboards/viewer/kid/KidFavoritesPage.jsx";
@@ -55,6 +54,8 @@ import PrivacyPolicy from "../pages/landing/Legal&Help/PrivacyPolicy.jsx";
 import HelpCenter from "../pages/landing/Legal&Help/HelpCenter.jsx";
 import FeedbackPage from "../pages/landing/Legal&Help/FeedbackPage.jsx";
 import About from "../pages/landing/Legal&Help/About.jsx";
+import CountingGame from "../pages/subscription/SimpleGame.jsx";
+import EndlessRacer from "../pages/subscription/SimpleGame2.jsx";
 
 // ==================== PRO SKELETON LOADERS ====================
 const DashboardSkeleton = () => (
@@ -394,7 +395,15 @@ export default function AppRoutes() {
         path="/sample/game"
         element={
           <KidProtectedRoute>
-            <UmukinoWoKwiruka />
+            <CountingGame />
+          </KidProtectedRoute>
+        }
+      />
+      <Route
+        path="/sample/game/2"
+        element={
+          <KidProtectedRoute>
+            <EndlessRacer />
           </KidProtectedRoute>
         }
       />

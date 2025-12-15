@@ -332,10 +332,6 @@ const SubscriptionPage = () => {
 
         {/* Language Alternates */}
         <link rel="alternate" href="https://oliviuus.com/subscription" hreflang="x-default" />
-        <link rel="alternate" href="https://oliviuus.com/rw/subscription" hreflang="rw" />
-        <link rel="alternate" href="https://oliviuus.com/en/subscription" hreflang="en" />
-        <link rel="alternate" href="https://oliviuus.com/fr/subscription" hreflang="fr" />
-        <link rel="alternate" href="https://oliviuus.com/sw/subscription" hreflang="sw" />
 
         {/* Structured Data for Subscription Page */}
         <script type="application/ld+json">

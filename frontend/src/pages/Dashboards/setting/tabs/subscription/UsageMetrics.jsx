@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../../../api/axios";
+import { useTranslation } from "react-i18next";
 import { 
   Users, 
   Video, 
@@ -16,7 +17,10 @@ import {
   XCircle
 } from "lucide-react";
 
-export default function UsageMetrics({ subscription, realTimeStatus }) {
+export default function UsageMetrics({ subscription, realTimeStatus, t }) {
+  const { t: translate } = useTranslation();
+  const tFunc = t || translate;
+  
   const [usageData, setUsageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -164,12 +168,14 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
     return (
       <div className="text-center py-12">
         <XCircle className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">No Active Subscription</h3>
+        <h3 className="text-xl font-semibold text-white mb-2">
+          {tFunc('usageMetrics.noActiveSubscription')}
+        </h3>
         <p className="text-gray-400 mb-4">
-          Usage metrics are available with an active subscription plan.
+          {tFunc('usageMetrics.noSubscriptionDescription')}
         </p>
         <p className="text-gray-500 text-sm">
-          Subscribe to start tracking your streaming activity and device usage.
+          {tFunc('usageMetrics.subscribeToStart')}
         </p>
       </div>
     );
@@ -180,13 +186,15 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
     return (
       <div className="text-center py-12">
         <Clock className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">Subscription Scheduled</h3>
+        <h3 className="text-xl font-semibold text-white mb-2">
+          {tFunc('usageMetrics.scheduledSubscription')}
+        </h3>
         <p className="text-gray-400 mb-4">
-          Usage metrics will be available once your subscription starts on{' '}
-          {new Date(subscription.start_date).toLocaleDateString()}.
+          {/* HARDCODED: Using direct string interpolation */}
+          Usage metrics will be available once your subscription starts on {new Date(subscription.start_date).toLocaleDateString()}.
         </p>
         <p className="text-gray-500 text-sm">
-          Check back after your plan becomes active to view your streaming insights.
+          {tFunc('usageMetrics.checkBackAfterStart')}
         </p>
       </div>
     );
@@ -197,12 +205,14 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
     return (
       <div className="text-center py-12">
         <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">Subscription Inactive</h3>
+        <h3 className="text-xl font-semibold text-white mb-2">
+          {tFunc('usageMetrics.subscriptionInactive')}
+        </h3>
         <p className="text-gray-400 mb-4">
-          Usage metrics are only available with an active subscription.
+          {tFunc('usageMetrics.inactiveDescription')}
         </p>
         <p className="text-gray-500 text-sm">
-          Renew your subscription to access usage tracking and analytics.
+          {tFunc('usageMetrics.renewToAccess')}
         </p>
       </div>
     );
@@ -214,8 +224,10 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
       <div className="flex flex-col items-center justify-center py-12 space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#BC8BBC]"></div>
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-white mb-2">Loading Usage Data</h3>
-          <p className="text-gray-400">Gathering your streaming insights...</p>
+          <h3 className="text-lg font-semibold text-white mb-2">
+            {tFunc('usageMetrics.loadingUsageData')}
+          </h3>
+          <p className="text-gray-400">{tFunc('usageMetrics.gatheringInsights')}</p>
         </div>
       </div>
     );
@@ -226,12 +238,14 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
     return (
       <div className="text-center py-12">
         <BarChart3 className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-white mb-2">No Usage Data Available</h3>
+        <h3 className="text-lg font-semibold text-white mb-2">
+          {tFunc('usageMetrics.noUsageData')}
+        </h3>
         <p className="text-gray-400 mb-4">
-          Start streaming content to see your usage metrics and analytics.
+          {tFunc('usageMetrics.startStreaming')}
         </p>
         <p className="text-gray-500 text-sm mb-6">
-          Watch movies, series, or other content to generate usage insights.
+          {tFunc('usageMetrics.watchContent')}
         </p>
         <button 
           onClick={handleRefresh}
@@ -239,7 +253,7 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
           className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors mx-auto"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-          Check Again
+          {tFunc('usageMetrics.checkAgain')}
         </button>
       </div>
     );
@@ -251,8 +265,8 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-2xl font-bold text-white">Usage Overview</h3>
-          <p className="text-gray-400 mt-1">Your real-time streaming activity</p>
+          <h3 className="text-2xl font-bold text-white">{tFunc('usageMetrics.title')}</h3>
+          <p className="text-gray-400 mt-1">{tFunc('usageMetrics.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           {/* Time Range Selector */}
@@ -267,7 +281,7 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                {range.charAt(0).toUpperCase() + range.slice(1)}
+                {range === 'week' ? tFunc('usageMetrics.week') : tFunc('usageMetrics.month')}
               </button>
             ))}
           </div>
@@ -278,7 +292,7 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
             className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 text-white px-4 py-2 rounded-lg transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            {tFunc('usageMetrics.refresh')}
           </button>
         </div>
       </div>
@@ -288,8 +302,9 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
         <div className="flex items-center gap-3">
           <Crown className="w-5 h-5 text-green-400" />
           <div>
-            <p className="text-green-300 font-semibold">Active Subscription</p>
+            <p className="text-green-300 font-semibold">{tFunc('usageMetrics.activeSubscription')}</p>
             <p className="text-green-200 text-sm">
+              {/* HARDCODED: Using direct string interpolation */}
               You're currently on the <strong>{subscription.plan_name || subscription.plan_type} Plan</strong>
             </p>
           </div>
@@ -301,19 +316,22 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
         {/* Left Column - Active Devices */}
         <UsageCard
           icon={<Users />}
-          title="Active Devices"
+          title={tFunc('usageMetrics.activeDevices')}
           value={`${usageData.devices.current}/${usageData.devices.limit}`}
-          subtitle={`${Math.round((usageData.devices.current / usageData.devices.limit) * 100)}% of limit`}
+          subtitle={`${Math.round((usageData.devices.current / usageData.devices.limit) * 100)}% ${tFunc('usageMetrics.ofLimit')}`}
         >
           <ProgressBar 
             current={usageData.devices.current} 
             limit={usageData.devices.limit} 
+            // HARDCODED: Using English directly
             label="Connected devices"
           />
           
           {/* Active Devices List */}
           <div className="mt-4 space-y-2">
-            <p className="text-gray-400 text-sm font-medium">Currently Active:</p>
+            <p className="text-gray-400 text-sm font-medium">
+              {tFunc('usageMetrics.currentlyActive')}:
+            </p>
             {usageData.devices.devices && usageData.devices.devices.length > 0 ? (
               usageData.devices.devices.map((device, index) => (
                 <div key={index} className="flex items-center justify-between text-sm">
@@ -325,7 +343,7 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-sm">No active devices</p>
+              <p className="text-gray-500 text-sm">{tFunc('usageMetrics.noActiveDevices')}</p>
             )}
           </div>
         </UsageCard>
@@ -335,14 +353,15 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
           {/* Streaming Hours */}
           <UsageCard
             icon={<Video />}
-            title="Streaming Time"
+            title={tFunc('usageMetrics.streamingTime')}
             value={`${usageData.streaming.hours}h`}
-            subtitle={`${usageData.streaming.average}h daily average`}
+            subtitle={`${usageData.streaming.average}h ${tFunc('usageMetrics.dailyAverage')}`}
           >
             <div className="space-y-4">
               <SimpleBarChart data={usageData.streaming.daily_breakdown} />
               <div className="flex justify-between text-xs text-gray-400">
-                <span>This week</span>
+                <span>{tFunc('usageMetrics.thisWeek')}</span>
+                {/* HARDCODED: Using direct string interpolation */}
                 <span>Total: {usageData.streaming.hours}h</span>
               </div>
             </div>
@@ -351,15 +370,21 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
           {/* Data Usage */}
           <UsageCard
             icon={<Activity />}
-            title="Data Usage"
+            title={tFunc('usageMetrics.dataUsage')}
             value={`${usageData.data.used} GB`}
-            subtitle={usageData.data.limit === 'Unlimited' ? 'Unlimited data' : `of ${usageData.data.limit}`}
+            subtitle={usageData.data.limit === 'Unlimited' ? 
+              tFunc('usageMetrics.unlimitedData') : 
+              `${tFunc('usageMetrics.of')} ${usageData.data.limit}`
+            }
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wifi className={`w-4 h-4 ${usageData.data.trend === 'up' ? 'text-green-400' : 'text-blue-400'}`} />
                 <span className="text-white text-sm">
-                  {usageData.data.trend === 'up' ? 'Increasing' : 'Stable'}
+                  {usageData.data.trend === 'up' ? 
+                    tFunc('usageMetrics.increasing') : 
+                    tFunc('usageMetrics.stable')
+                  }
                 </span>
               </div>
               {usageData.data.limit !== 'Unlimited' && (
@@ -367,7 +392,7 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
                   <div className="text-white font-semibold">
                     {Math.round((usageData.data.used / parseInt(usageData.data.limit)) * 100)}%
                   </div>
-                  <div className="text-gray-400 text-xs">of limit used</div>
+                  <div className="text-gray-400 text-xs">{tFunc('usageMetrics.ofLimitUsed')}</div>
                 </div>
               )}
             </div>
@@ -379,43 +404,55 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
       <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
         <h4 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-[#BC8BBC]" />
-          Usage Insights
+          {tFunc('usageMetrics.usageInsights')}
         </h4>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h5 className="text-gray-400 text-sm mb-3 font-medium">Your Streaming Patterns</h5>
+            <h5 className="text-gray-400 text-sm mb-3 font-medium">{tFunc('usageMetrics.yourPatterns')}</h5>
             <div className="space-y-3">
               <div className="flex justify-between items-center p-3 bg-gray-750 rounded-lg">
-                <span className="text-white text-sm">Active devices</span>
-                <span className="text-[#BC8BBC] font-semibold">{usageData.devices.current} devices</span>
+                <span className="text-white text-sm">{tFunc('usageMetrics.activeDevices')}</span>
+                {/* HARDCODED: Using direct string interpolation */}
+                <span className="text-[#BC8BBC] font-semibold">
+                  {usageData.devices.current} devices
+                </span>
               </div>
               <div className="flex justify-between items-center p-3 bg-gray-750 rounded-lg">
-                <span className="text-white text-sm">Total watch time</span>
-                <span className="text-[#BC8BBC] font-semibold">{usageData.streaming.hours} hours</span>
+                <span className="text-white text-sm">{tFunc('usageMetrics.totalWatchTime')}</span>
+                {/* HARDCODED: Using direct string interpolation */}
+                <span className="text-[#BC8BBC] font-semibold">
+                  {usageData.streaming.hours} hours
+                </span>
               </div>
               <div className="flex justify-between items-center p-3 bg-gray-750 rounded-lg">
-                <span className="text-white text-sm">Daily average</span>
-                <span className="text-[#BC8BBC] font-semibold">{usageData.streaming.average}h/day</span>
+                <span className="text-white text-sm">{tFunc('usageMetrics.dailyAverage')}</span>
+                {/* HARDCODED: Using direct string interpolation */}
+                <span className="text-[#BC8BBC] font-semibold">
+                  {usageData.streaming.average}h/day
+                </span>
               </div>
             </div>
           </div>
           
           <div>
-            <h5 className="text-gray-400 text-sm mb-3 font-medium">Quick Tips</h5>
+            <h5 className="text-gray-400 text-sm mb-3 font-medium">{tFunc('usageMetrics.quickTips')}</h5>
             <div className="space-y-3">
               <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                 <p className="text-blue-300 text-sm">
+                  {/* HARDCODED: Using English directly */}
                   💡 <strong>Watch in off-peak hours</strong> for better streaming quality
                 </p>
               </div>
               <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
                 <p className="text-green-300 text-sm">
+                  {/* HARDCODED: Using English directly */}
                   📱 <strong>Use Wi-Fi when available</strong> to save mobile data
                 </p>
               </div>
               <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
                 <p className="text-purple-300 text-sm">
+                  {/* HARDCODED: Using English directly */}
                   ⚡ <strong>Log out from unused devices</strong> to free up slots
                 </p>
               </div>
@@ -427,6 +464,7 @@ export default function UsageMetrics({ subscription, realTimeStatus }) {
       {/* Data Last Updated */}
       <div className="text-center">
         <p className="text-gray-500 text-sm">
+          {/* HARDCODED: Using English directly */}
           Data updated in real-time • Showing {timeRange}ly usage
         </p>
       </div>

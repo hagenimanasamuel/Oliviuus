@@ -26,6 +26,7 @@ const {
   createFamilyPinSecurityTable,
   createFeedbackTable,
 } = require('./config/dbConfig');
+const { initializeSubscriptionMonitor } = require('./controllers/subscriptionMonitorController');
 const createAdminSeed = require('./seeds/seedAdmin');
 const authRoutes = require('./routes/authRoutes');
 const emailVerificationRoutes = require('./routes/emailVerificationRoutes');
@@ -59,6 +60,7 @@ const profileSelectionRoutes = require("./routes/profileSelectionRoutes");
 const familyRoutes = require("./routes/familyRoutes");
 const trendingRoutes = require('./routes/trendingRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const securityRoutes = require('./routes/viewerSecurity');
 
 const cookieParser = require("cookie-parser");
 
@@ -112,6 +114,7 @@ app.use("/api/profile", profileSelectionRoutes);
 app.use("/api/family", familyRoutes);
 app.use('/api/trending', trendingRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/security', securityRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -144,6 +147,10 @@ createFeedbackTable(),])
   .then(async () => {
     console.log("✅ Tables checked/created");
     await createAdminSeed();
+
+    // 🚀 Initialize subscription monitor AFTER tables are ready
+    initializeSubscriptionMonitor();
+    console.log("✅ Subscription monitor started");
   })
   .catch(err => console.error("❌ Error creating tables:", err));
 

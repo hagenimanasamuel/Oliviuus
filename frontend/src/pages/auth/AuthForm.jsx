@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CryptoJS from "crypto-js";
+import api from "../../api/axios";
+
+// Add Google OAuth provider
+import { GoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
+
 
 import EmailStep from "./EmailStep";
 import CodeStep from "./CodeStep";
@@ -45,9 +50,52 @@ const AuthForm = () => {
   const [code, setCode] = useState(savedState.code || "");
   const [password, setPassword] = useState(savedState.password || "");
   const [loading, setLoading] = useState(false);
+  const googleButtonRef = useRef(null);
 
   // Get current language
   const currentLang = i18n.language;
+
+  // Handle Google Sign-In Success - USING YOUR API INSTANCE
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    
+    try {
+      // Use your api instance like EmailStep does
+      const response = await api.post("/auth/google", { 
+        token: credentialResponse.credential 
+      });
+
+      if (response.data && response.data.success) {
+        // Handle successful login
+        // Simple redirect - will trigger AuthContext to detect user
+        window.location.href = '/';
+      } else {
+        throw new Error(response.data?.error || 'Google authentication failed');
+      }
+    } catch (error) {
+      alert(error.message || "Please try again or use email login.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    alert("Google login failed. Please try again or use email login.");
+  };
+
+  // Professional Google One-Tap Login (like LinkedIn)
+  useGoogleOneTapLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: handleGoogleError,
+    disabled: step !== "email", // Only show on email step
+    promptMomentNotification: (notification) => {
+      // You can customize the display moment
+      if (notification.getNotDisplayedReason() === 'opt_out_or_no_session') {
+        // User opted out or no session, don't show One-Tap
+      }
+    },
+    cancel_on_tap_outside: true,
+  });
 
   // SEO content based on language and step
   const getSeoContent = () => {
@@ -78,7 +126,7 @@ const AuthForm = () => {
       rw: {
         "default": {
           "title": "Injira kuri Oliviuus - Reba Imyidagaduro Itagira Umupaka",
-          "description": "Injira kuri Oliviuus ubone filime nyarwanda, ibirimo by’isi, n’iyindi streaming yihariye. Tangira urugendo rwawe uyu munsi.",
+          "description": "Injira kuri Oliviuus ubone filime nyarwanda, ibirimo by'isi, n'iyindi streaming yihariye. Tangira urugendo rwawe uyu munsi.",
           "keywords": "Oliviuus login, kwiyandikisha Oliviuus, streaming Rwanda, filime nyarwanda, streaming Afurika"
         },
         "email": {
@@ -91,7 +139,7 @@ const AuthForm = () => {
         },
         "password": {
           "title": "Andika Ijambo ry'Ibanga - Kwemeza Oliviuus",
-          "description": "Andika ijambo ry’ibanga ryawe kugira ngo winjire muri konti ya Oliviuus utangire kureba."
+          "description": "Andika ijambo ry'ibanga ryawe kugira ngo winjire muri konti ya Oliviuus utangire kureba."
         },
         "userInfo": {
           "title": "Zuza Profayili - Kwiyandikisha Oliviuus",
@@ -101,11 +149,11 @@ const AuthForm = () => {
       fr: {
         "default": {
           "title": "Connectez-vous à Oliviuus - Streaming Illimité",
-          "description": "Connectez-vous à Oliviuus et accédez aux films rwandais, contenus mondiaux et streaming exclusif. Commencez votre parcours aujourd’hui.",
+          "description": "Connectez-vous à Oliviuus et accédez aux films rwandais, contenus mondiaux et streaming exclusif. Commencez votre parcours aujourd'hui.",
           "keywords": "connexion Oliviuus, inscription Oliviuus, streaming Rwanda, films rwandais, streaming africain"
         },
         "email": {
-          "title": "Entrez l’Email - Authentification Oliviuus",
+          "title": "Entrez l'Email - Authentification Oliviuus",
           "description": "Entrez votre email pour vous connecter ou créer un nouveau compte Oliviuus. Accédez au streaming illimité."
         },
         "code": {
@@ -188,7 +236,6 @@ const AuthForm = () => {
       setLoading(false);
       setPassword(enteredPassword);
       updateUrlState({ password: enteredPassword });
-      console.log("Password submitted:", enteredPassword, "for email:", email);
     }, 400);
   };
 
@@ -238,10 +285,6 @@ const AuthForm = () => {
 
         {/* Language alternates */}
         <link rel="alternate" href="https://oliviuus.com/auth" hreflang="x-default" />
-        <link rel="alternate" href="https://oliviuus.com/rw/auth" hreflang="rw" />
-        <link rel="alternate" href="https://oliviuus.com/en/auth" hreflang="en" />
-        <link rel="alternate" href="https://oliviuus.com/fr/auth" hreflang="fr" />
-        <link rel="alternate" href="https://oliviuus.com/sw/auth" hreflang="sw" />
 
         {/* Structured Data for Sign In Action */}
         <script type="application/ld+json">
@@ -318,6 +361,38 @@ const AuthForm = () => {
                   }}
                 />
               </div>
+            )}
+
+            {/* Add Google Sign-In button only on email step */}
+            {step === "email" && (
+              <>
+                <div className="mb-6" ref={googleButtonRef}>
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    useOneTap={false} // We're using One-Tap separately
+                    theme="filled_blue"
+                    shape="rectangular"
+                    size="large"
+                    text="signin_with"
+                    logo_alignment="left"
+                    width="100%"
+                    locale={currentLang}
+                    ux_mode="popup"
+                  />
+                </div>
+                
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-600"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-[#1f1f1f] text-gray-400">
+                      {t("auth.or_continue_with_email", "Or continue with email")}
+                    </span>
+                  </div>
+                </div>
+              </>
             )}
 
             {step === "email" && <EmailStep onSubmit={handleEmailSubmit} />}

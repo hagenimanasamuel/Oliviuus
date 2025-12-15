@@ -542,7 +542,7 @@ const PaymentPage = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-300">Airtel:</span>
-                  <span className="text-white font-mono">*500#</span>
+                  <span className="text-white font-mono">--</span>
                 </div>
                 <p className="text-yellow-200 text-xs mt-1">{t('userSubscription.pending.cashOutNote')}</p>
               </div>

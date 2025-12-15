@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Users, 
-  Video, 
-  Download, 
-  Star, 
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  Users,
+  Video,
+  Download,
+  Star,
   Zap,
   Shield,
   Crown,
@@ -22,15 +22,20 @@ import {
   PlusCircle
 } from "lucide-react";
 import api from "../../../../../api/axios";
+import { useTranslation } from "react-i18next";
 import ContactSupport from "../../../../../components/subscription/HelpSupport";
 import PlanChangeModal from "./PlanChangeModal";
 import NewPlanModal from "./NewPlanModal";
 
-export default function CurrentPlan({ subscription, onRefresh, realTimeStatus }) {
+export default function CurrentPlan({ subscription, onRefresh, realTimeStatus, t }) {
   const [loading, setLoading] = useState(false);
   const [showContactSupport, setShowContactSupport] = useState(false);
   const [showPlanChangeModal, setShowPlanChangeModal] = useState(false);
   const [showNewPlanModal, setShowNewPlanModal] = useState(false);
+
+  // Use translation from props or hook
+  const { t: translate } = useTranslation();
+  const tFunc = t || translate;
 
   const handleRefresh = async () => {
     setLoading(true);
@@ -41,7 +46,7 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
   const handleContactSupport = () => {
     setShowContactSupport(true);
     setTimeout(() => {
-      document.getElementById('contact-support-section')?.scrollIntoView({ 
+      document.getElementById('contact-support-section')?.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
@@ -79,12 +84,12 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
   // 🛡️ CRITICAL: Use backend-provided time remaining instead of frontend calculation
   const getDaysRemaining = () => {
     if (!subscription) return 0;
-    
+
     // 🛡️ Use backend-calculated time remaining if available
     if (subscription.time_remaining) {
       return subscription.time_remaining.days || 0;
     }
-    
+
     // Fallback to frontend calculation (should rarely be needed)
     const end = new Date(subscription.end_date);
     const now = new Date();
@@ -96,7 +101,7 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
   // 🛡️ CRITICAL: Get days until start for scheduled subscriptions
   const getDaysUntilStart = () => {
     if (!subscription || !subscription.start_date) return 0;
-    
+
     const start = new Date(subscription.start_date);
     const now = new Date();
     const diffTime = start - now;
@@ -107,7 +112,7 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
   // 🛡️ CRITICAL: Use backend-provided status instead of frontend logic
   const getSubscriptionStatus = () => {
     if (!subscription) return 'no_subscription';
-    
+
     // 🛡️ Use backend real_time_status if available
     return subscription.real_time_status || subscription.status;
   };
@@ -127,7 +132,7 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
   // 🛡️ CRITICAL: Check if we should show "No Current Subscription"
   const shouldShowNoSubscription = () => {
     if (!subscription) return true;
-    
+
     const status = getSubscriptionStatus();
     // Show "No Current Subscription" only for expired, cancelled, or no subscription
     return status === 'expired' || status === 'cancelled' || status === 'no_subscription';
@@ -152,15 +157,15 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
   // 🛡️ CRITICAL: Get status badge using backend status
   const getStatusBadge = () => {
     const status = getSubscriptionStatus();
-    
+
     const statusConfig = {
-      active: { color: 'bg-green-500 text-white', icon: CheckCircle, text: 'Active' },
-      scheduled: { color: 'bg-blue-500 text-white', icon: Clock, text: 'Scheduled' },
-      grace_period: { color: 'bg-yellow-500 text-white', icon: AlertTriangle, text: 'Grace Period' },
-      cancelled: { color: 'bg-yellow-500 text-white', icon: Clock, text: 'Cancelled' },
-      expired: { color: 'bg-red-500 text-white', icon: XCircle, text: 'Expired' },
-      trialing: { color: 'bg-purple-500 text-white', icon: Clock, text: 'Trial' },
-      past_due: { color: 'bg-orange-500 text-white', icon: AlertTriangle, text: 'Past Due' }
+      active: { color: 'bg-green-500 text-white', icon: CheckCircle, text: tFunc('subscription.status.active.title') },
+      scheduled: { color: 'bg-blue-500 text-white', icon: Clock, text: tFunc('subscription.status.scheduled.title') },
+      grace_period: { color: 'bg-yellow-500 text-white', icon: AlertTriangle, text: tFunc('subscription.status.grace_period.title') },
+      cancelled: { color: 'bg-yellow-500 text-white', icon: Clock, text: tFunc('subscription.status.cancelled.title') },
+      expired: { color: 'bg-red-500 text-white', icon: XCircle, text: tFunc('subscription.status.expired.title') },
+      trialing: { color: 'bg-purple-500 text-white', icon: Clock, text: tFunc('subscription.status.trialing.title') },
+      past_due: { color: 'bg-orange-500 text-white', icon: AlertTriangle, text: tFunc('subscription.status.past_due.title') }
     };
 
     const config = statusConfig[status] || statusConfig.active;
@@ -183,8 +188,8 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
   const renderFeature = (icon, text, value, available = true) => (
     <div className={`flex items-center justify-between py-3 ${available ? 'text-white' : 'text-gray-500'}`}>
       <div className="flex items-center gap-3">
-        {React.cloneElement(icon, { 
-          className: `w-4 h-4 ${available ? 'text-green-400' : 'text-gray-600'}` 
+        {React.cloneElement(icon, {
+          className: `w-4 h-4 ${available ? 'text-green-400' : 'text-gray-600'}`
         })}
         <span className={available ? '' : 'line-through'}>{text}</span>
       </div>
@@ -200,26 +205,26 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
       <div className="max-w-md mx-auto">
         <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
         <h3 className="text-xl font-semibold text-white mb-2">
-          {getSubscriptionStatus() === 'expired' ? 'Subscription Expired' : 'Subscription Cancelled'}
+          {getSubscriptionStatus() === 'expired' ? tFunc('subscription.status.expired.title') : tFunc('subscription.status.cancelled.title')}
         </h3>
         <p className="text-gray-400 mb-6">
-          {getSubscriptionStatus() === 'expired' 
-            ? 'Your subscription has ended. Choose a new plan to continue enjoying premium content.'
-            : 'Your subscription has been cancelled. You can still access your account features.'
+          {getSubscriptionStatus() === 'expired'
+            ? tFunc('subscription.status.expired.description')
+            : tFunc('subscription.status.cancelled.description')
           }
         </p>
-        
+
         {/* Show previous plan details */}
         {subscription && (
           <div className="bg-gray-800 rounded-lg p-4 mb-6 text-left">
-            <h4 className="text-white font-semibold mb-2">Previous Plan Details</h4>
+            <h4 className="text-white font-semibold mb-2">{tFunc('currentPlan.previousDetails')}</h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-400">Plan:</span>
-                <p className="text-white font-medium">{subscription.plan_name || `${subscription.plan_type} Plan`}</p>
+                <span className="text-gray-400">{tFunc('currentPlan.plan')}:</span>
+                <p className="text-white font-medium">{subscription.plan_name || `${subscription.plan_type} ${tFunc('currentPlan.plan')}`}</p>
               </div>
               <div>
-                <span className="text-gray-400">Ended:</span>
+                <span className="text-gray-400">{tFunc('currentPlan.ended')}:</span>
                 <p className="text-white font-medium">{formatDate(subscription.end_date)}</p>
               </div>
             </div>
@@ -227,19 +232,19 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
         )}
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <button 
+          <button
             onClick={() => setShowNewPlanModal(true)}
             className="bg-[#BC8BBC] hover:bg-[#9b69b2] text-white px-6 py-3 rounded-lg transition-colors font-semibold"
           >
-            {getSubscriptionStatus() === 'expired' ? 'Renew Subscription' : 'Get New Plan'}
+            {getSubscriptionStatus() === 'expired' ? tFunc('currentPlan.renewSubscription') : tFunc('currentPlan.getNewPlan')}
           </button>
-          <button 
+          <button
             onClick={handleRefresh}
             disabled={loading}
             className="flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            {tFunc('common.actions.tryAgain')}
           </button>
         </div>
       </div>
@@ -260,10 +265,10 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
               </div>
               <div>
                 <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                  {subscription.plan_name || `${subscription.plan_type} Plan`}
+                  {subscription.plan_name || `${subscription.plan_type} ${tFunc('currentPlan.plan')}`}
                   <span className="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded-full text-sm">
                     <Clock className="w-3 h-3" />
-                    Scheduled
+                    {tFunc('subscription.status.scheduled.title')}
                   </span>
                 </h3>
                 <p className="text-gray-400 mt-1">{subscription.description}</p>
@@ -271,34 +276,34 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
             </div>
             {getStatusBadge()}
           </div>
-          
+
           {/* Scheduled Info Banner */}
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
             <div className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-blue-400" />
               <div>
-                <p className="text-blue-300 font-semibold">Subscription Scheduled</p>
+                <p className="text-blue-300 font-semibold">{tFunc('currentPlan.scheduledSubscription')}</p>
                 <p className="text-blue-200 text-sm">
-                  Your plan will automatically activate on {formatDate(subscription.start_date)}
+                  {tFunc('currentPlan.scheduledDescription', { date: formatDate(subscription.start_date) })}
                 </p>
               </div>
             </div>
           </div>
-          
+
           {/* Price and Schedule */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 p-4 bg-gray-750 rounded-lg">
             <div className="text-center sm:text-left">
-              <p className="text-gray-400 text-sm">Monthly Price</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.monthlyPrice')}</p>
               <p className="text-3xl font-bold text-white">{formatCurrency(subscription.subscription_price)}</p>
             </div>
             <div className="text-center">
-              <p className="text-gray-400 text-sm">Starts In</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.startsIn')}</p>
               <p className="text-lg font-semibold text-white">
-                {getDaysUntilStart()} day{getDaysUntilStart() !== 1 ? 's' : ''}
+                {tFunc('currentPlan.days', { count: getDaysRemaining() })}
               </p>
             </div>
             <div className="text-center sm:text-right">
-              <p className="text-gray-400 text-sm">Start Date</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.startDate')}</p>
               <p className="text-lg font-semibold text-white">{formatDate(subscription.start_date)}</p>
             </div>
           </div>
@@ -308,24 +313,24 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
             <div className="text-center p-3 bg-gray-750 rounded-lg">
               <Users className="w-6 h-6 text-blue-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">{subscription.device_limit || subscription.max_sessions}</p>
-              <p className="text-gray-400 text-sm">Devices</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.devices')}</p>
             </div>
             <div className="text-center p-3 bg-gray-750 rounded-lg">
               <Video className="w-6 h-6 text-green-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">{subscription.video_quality}</p>
-              <p className="text-gray-400 text-sm">Quality</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.quality')}</p>
             </div>
             <div className="text-center p-3 bg-gray-750 rounded-lg">
               <Download className="w-6 h-6 text-purple-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">
-                {subscription.max_downloads === -1 ? 'Unlimited' : subscription.max_downloads}
+                {subscription.max_downloads === -1 ? tFunc('subscription.comparison.unlimited') : subscription.max_downloads}
               </p>
-              <p className="text-gray-400 text-sm">Downloads</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.downloads')}</p>
             </div>
             <div className="text-center p-3 bg-gray-750 rounded-lg">
               <Shield className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">{subscription.max_profiles}</p>
-              <p className="text-gray-400 text-sm">Profiles</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.profiles')}</p>
             </div>
           </div>
 
@@ -333,55 +338,55 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white flex items-center gap-2">
               <Zap className="w-5 h-5 text-yellow-400" />
-              Plan Features (Available after start date)
+              {tFunc('currentPlan.planFeatures')}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderFeature(
-                <Smartphone />, 
-                "Supported Devices", 
-                `${subscription.devices_allowed?.length || 0} device types`,
+                <Smartphone />,
+                tFunc('currentPlan.supportedDevices'),
+                `${subscription.devices_allowed?.length || 0} ${tFunc('currentPlan.deviceTypes')}`,
                 true
               )}
               {renderFeature(
-                <Video />, 
-                "Video Quality", 
+                <Video />,
+                tFunc('currentPlan.videoQuality'),
                 subscription.video_quality || "HD",
                 true
               )}
               {renderFeature(
-                <Download />, 
-                "Offline Downloads", 
-                subscription.offline_downloads ? "Available" : "Not available",
+                <Download />,
+                tFunc('currentPlan.offlineDownloads'),
+                subscription.offline_downloads ? tFunc('currentPlan.available') : tFunc('currentPlan.notAvailable'),
                 subscription.offline_downloads
               )}
               {renderFeature(
-                <Users />, 
-                "Simultaneous Streams", 
-                `${subscription.device_limit || subscription.max_sessions} devices`,
+                <Users />,
+                tFunc('currentPlan.simultaneousStreams'),
+                `${subscription.device_limit || subscription.max_sessions} ${tFunc('currentPlan.devices')}`,
                 true
               )}
               {renderFeature(
-                <Shield />, 
-                "Parental Controls", 
-                subscription.parental_controls ? "Enabled" : "Disabled",
+                <Shield />,
+                tFunc('currentPlan.parentalControls'),
+                subscription.parental_controls ? tFunc('currentPlan.enabled') : tFunc('currentPlan.disabled'),
                 subscription.parental_controls
               )}
               {renderFeature(
-                <Crown />, 
-                "Exclusive Content", 
-                subscription.exclusive_content ? "Access" : "No access",
+                <Crown />,
+                tFunc('currentPlan.exclusiveContent'),
+                subscription.exclusive_content ? tFunc('currentPlan.access') : tFunc('currentPlan.noAccess'),
                 subscription.exclusive_content
               )}
               {renderFeature(
-                <Zap />, 
-                "HDR Support", 
-                subscription.hdr_support ? "Yes" : "No",
+                <Zap />,
+                tFunc('currentPlan.hdrSupport'),
+                subscription.hdr_support ? tFunc('common.yes') : tFunc('common.no'),
                 subscription.hdr_support
               )}
               {renderFeature(
-                <Star />, 
-                "Early Access", 
-                subscription.early_access ? "Yes" : "No",
+                <Star />,
+                tFunc('currentPlan.earlyAccess'),
+                subscription.early_access ? tFunc('common.yes') : tFunc('common.no'),
                 subscription.early_access
               )}
             </div>
@@ -394,25 +399,25 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
           <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg">
             <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <Info className="w-5 h-5 text-blue-400" />
-              Scheduled Details
+              {tFunc('currentPlan.scheduledDetails')}
             </h4>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Status</span>
+                <span className="text-gray-400">{tFunc('currentPlan.status')}</span>
                 {getStatusBadge()}
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Scheduled Start</span>
+                <span className="text-gray-400">{tFunc('currentPlan.scheduledStart')}</span>
                 <span className="text-white font-medium">{formatDate(subscription.start_date)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">End Date</span>
+                <span className="text-gray-400">{tFunc('currentPlan.endDate')}</span>
                 <span className="text-white font-medium">{formatDate(subscription.end_date)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Auto Renew</span>
+                <span className="text-gray-400">{tFunc('currentPlan.autoRenew')}</span>
                 <span className={`font-medium ${subscription.auto_renew ? 'text-green-400' : 'text-yellow-400'}`}>
-                  {subscription.auto_renew ? 'Enabled' : 'Disabled'}
+                  {subscription.auto_renew ? tFunc('currentPlan.enabled') : tFunc('currentPlan.disabled')}
                 </span>
               </div>
             </div>
@@ -420,39 +425,39 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
 
           {/* Quick Actions Card */}
           <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg">
-            <h4 className="text-lg font-semibold text-white mb-4">Quick Actions</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">{tFunc('currentPlan.quickActions')}</h4>
             <div className="space-y-3">
-              <button 
+              <button
                 onClick={() => setShowNewPlanModal(true)}
                 className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors font-semibold flex items-center justify-center gap-2"
               >
                 <PlusCircle className="w-4 h-4" />
-                Add Another Plan
+                {tFunc('currentPlan.addAnotherPlan')}
               </button>
-              
-              <button 
+
+              <button
                 onClick={handleRefresh}
                 disabled={loading}
                 className="w-full bg-gray-750 hover:bg-gray-600 text-white px-4 py-3 rounded-lg transition-colors font-semibold flex items-center justify-center gap-2"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                Refresh Status
+                {tFunc('currentPlan.refreshStatus')}
               </button>
             </div>
           </div>
 
           {/* Support Card */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-            <h4 className="text-lg font-semibold text-blue-400 mb-2">Need Help?</h4>
+            <h4 className="text-lg font-semibold text-blue-400 mb-2">{tFunc('currentPlan.needHelp')}</h4>
             <p className="text-blue-300 text-sm mb-4">
-              Questions about your scheduled subscription? Our support team can help.
+              {tFunc('currentPlan.scheduledSupportDescription')}
             </p>
-            <button 
+            <button
               onClick={handleContactSupport}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
             >
               <HelpCircle className="w-4 h-4" />
-              Contact Support
+              {tFunc('currentPlan.contactSupport')}
             </button>
           </div>
         </div>
@@ -474,11 +479,11 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
               </div>
               <div>
                 <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                  {subscription.plan_name || `${subscription.plan_type} Plan`}
+                  {subscription.plan_name || `${subscription.plan_type} ${tFunc('currentPlan.plan')}`}
                   {subscription.is_popular && (
                     <span className="flex items-center gap-1 bg-[#BC8BBC] text-white px-3 py-1 rounded-full text-sm">
                       <Star className="w-3 h-3" />
-                      Popular
+                      {tFunc('subscription.plans.standard.popular')}
                     </span>
                   )}
                 </h3>
@@ -487,21 +492,21 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
             </div>
             {getStatusBadge()}
           </div>
-          
+
           {/* Price and Billing */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 p-4 bg-gray-750 rounded-lg">
             <div className="text-center sm:text-left">
-              <p className="text-gray-400 text-sm">Monthly Price</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.monthlyPrice')}</p>
               <p className="text-3xl font-bold text-white">{formatCurrency(subscription.subscription_price)}</p>
             </div>
             <div className="text-center">
-              <p className="text-gray-400 text-sm">Billing Cycle</p>
-              <p className="text-lg font-semibold text-white">Monthly</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.billingCycle')}</p>
+              <p className="text-lg font-semibold text-white">{tFunc('currentPlan.monthly')}</p>
             </div>
             <div className="text-center sm:text-right">
-              <p className="text-gray-400 text-sm">Renews in</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.renewsIn')}</p>
               <p className="text-lg font-semibold text-white">
-                {getDaysRemaining()} day{getDaysRemaining() !== 1 ? 's' : ''}
+                {getDaysRemaining()} {tFunc('currentPlan.days', { count: getDaysRemaining() })}
               </p>
             </div>
           </div>
@@ -511,24 +516,24 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
             <div className="text-center p-3 bg-gray-750 rounded-lg">
               <Users className="w-6 h-6 text-blue-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">{subscription.device_limit || subscription.max_sessions}</p>
-              <p className="text-gray-400 text-sm">Devices</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.devices')}</p>
             </div>
             <div className="text-center p-3 bg-gray-750 rounded-lg">
               <Video className="w-6 h-6 text-green-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">{subscription.video_quality}</p>
-              <p className="text-gray-400 text-sm">Quality</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.quality')}</p>
             </div>
             <div className="text-center p-3 bg-gray-750 rounded-lg">
               <Download className="w-6 h-6 text-purple-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">
-                {subscription.max_downloads === -1 ? 'Unlimited' : subscription.max_downloads}
+                {subscription.max_downloads === -1 ? tFunc('subscription.comparison.unlimited') : subscription.max_downloads}
               </p>
-              <p className="text-gray-400 text-sm">Downloads</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.downloads')}</p>
             </div>
             <div className="text-center p-3 bg-gray-750 rounded-lg">
               <Shield className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">{subscription.max_profiles}</p>
-              <p className="text-gray-400 text-sm">Profiles</p>
+              <p className="text-gray-400 text-sm">{tFunc('currentPlan.profiles')}</p>
             </div>
           </div>
 
@@ -536,52 +541,52 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white flex items-center gap-2">
               <Zap className="w-5 h-5 text-yellow-400" />
-              Plan Features
+              {tFunc('currentPlan.planFeatures')}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderFeature(
-                <Smartphone />, 
-                "Supported Devices", 
-                `${subscription.devices_allowed?.length || 0} device types`
+                <Smartphone />,
+                tFunc('currentPlan.supportedDevices'),
+                `${subscription.devices_allowed?.length || 0} ${tFunc('currentPlan.deviceTypes')}`
               )}
               {renderFeature(
-                <Video />, 
-                "Video Quality", 
+                <Video />,
+                tFunc('currentPlan.videoQuality'),
                 subscription.video_quality || "HD"
               )}
               {renderFeature(
-                <Download />, 
-                "Offline Downloads", 
-                subscription.offline_downloads ? "Available" : "Not available",
+                <Download />,
+                tFunc('currentPlan.offlineDownloads'),
+                subscription.offline_downloads ? tFunc('currentPlan.available') : tFunc('currentPlan.notAvailable'),
                 subscription.offline_downloads
               )}
               {renderFeature(
-                <Users />, 
-                "Simultaneous Streams", 
-                `${subscription.device_limit || subscription.max_sessions} devices`
+                <Users />,
+                tFunc('currentPlan.simultaneousStreams'),
+                `${subscription.device_limit || subscription.max_sessions} ${tFunc('currentPlan.devices')}`
               )}
               {renderFeature(
-                <Shield />, 
-                "Parental Controls", 
-                subscription.parental_controls ? "Enabled" : "Disabled",
+                <Shield />,
+                tFunc('currentPlan.parentalControls'),
+                subscription.parental_controls ? tFunc('currentPlan.enabled') : tFunc('currentPlan.disabled'),
                 subscription.parental_controls
               )}
               {renderFeature(
-                <Crown />, 
-                "Exclusive Content", 
-                subscription.exclusive_content ? "Access" : "No access",
+                <Crown />,
+                tFunc('currentPlan.exclusiveContent'),
+                subscription.exclusive_content ? tFunc('currentPlan.access') : tFunc('currentPlan.noAccess'),
                 subscription.exclusive_content
               )}
               {renderFeature(
-                <Zap />, 
-                "HDR Support", 
-                subscription.hdr_support ? "Yes" : "No",
+                <Zap />,
+                tFunc('currentPlan.hdrSupport'),
+                subscription.hdr_support ? tFunc('common.yes') : tFunc('common.no'),
                 subscription.hdr_support
               )}
               {renderFeature(
-                <Star />, 
-                "Early Access", 
-                subscription.early_access ? "Yes" : "No",
+                <Star />,
+                tFunc('currentPlan.earlyAccess'),
+                subscription.early_access ? tFunc('common.yes') : tFunc('common.no'),
                 subscription.early_access
               )}
             </div>
@@ -594,30 +599,30 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
           <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg">
             <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <Info className="w-5 h-5 text-blue-400" />
-              Subscription Details
+              {tFunc('currentPlan.subscriptionDetails')}
             </h4>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Status</span>
+                <span className="text-gray-400">{tFunc('currentPlan.status')}</span>
                 {getStatusBadge()}
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Started</span>
+                <span className="text-gray-400">{tFunc('currentPlan.started')}</span>
                 <span className="text-white font-medium">{formatDate(subscription.start_date)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Renews</span>
+                <span className="text-gray-400">{tFunc('currentPlan.renews')}</span>
                 <span className="text-white font-medium">{formatDate(subscription.end_date)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Auto Renew</span>
+                <span className="text-gray-400">{tFunc('currentPlan.autoRenew')}</span>
                 <span className={`font-medium ${subscription.auto_renew ? 'text-green-400' : 'text-yellow-400'}`}>
-                  {subscription.auto_renew ? 'Enabled' : 'Disabled'}
+                  {subscription.auto_renew ? tFunc('currentPlan.enabled') : tFunc('currentPlan.disabled')}
                 </span>
               </div>
               {subscription.cancelled_at && (
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Cancelled On</span>
+                  <span className="text-gray-400">{tFunc('currentPlan.cancelledOn')}</span>
                   <span className="text-white font-medium">{formatDate(subscription.cancelled_at)}</span>
                 </div>
               )}
@@ -626,49 +631,49 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
 
           {/* Quick Actions Card */}
           <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg">
-            <h4 className="text-lg font-semibold text-white mb-4">Quick Actions</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">{tFunc('currentPlan.quickActions')}</h4>
             <div className="space-y-3">
               {canChangePlan() && (
-                <button 
+                <button
                   onClick={() => setShowPlanChangeModal(true)}
                   className="w-full bg-[#BC8BBC] hover:bg-[#9b69b2] text-white px-4 py-3 rounded-lg transition-colors font-semibold flex items-center justify-center gap-2"
                 >
                   <Crown className="w-4 h-4" />
-                  Change Plan
+                  {tFunc('currentPlan.changePlan')}
                 </button>
               )}
-              
-              <button 
+
+              <button
                 onClick={() => setShowNewPlanModal(true)}
                 className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors font-semibold flex items-center justify-center gap-2"
               >
                 <PlusCircle className="w-4 h-4" />
-                Add New Plan
+                {tFunc('currentPlan.addNewPlan')}
               </button>
-              
-              <button 
+
+              <button
                 onClick={handleRefresh}
                 disabled={loading}
                 className="w-full bg-gray-750 hover:bg-gray-600 text-white px-4 py-3 rounded-lg transition-colors font-semibold flex items-center justify-center gap-2"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                Refresh Status
+                {tFunc('currentPlan.refreshStatus')}
               </button>
             </div>
           </div>
 
           {/* Support Card */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-            <h4 className="text-lg font-semibold text-blue-400 mb-2">Need Help?</h4>
+            <h4 className="text-lg font-semibold text-blue-400 mb-2">{tFunc('currentPlan.needHelp')}</h4>
             <p className="text-blue-300 text-sm mb-4">
-              Having issues with your subscription? Our support team is here to help.
+              {tFunc('currentPlan.supportDescription')}
             </p>
-            <button 
+            <button
               onClick={handleContactSupport}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
             >
               <HelpCircle className="w-4 h-4" />
-              Contact Support
+              {tFunc('currentPlan.contactSupport')}
             </button>
           </div>
         </div>
@@ -681,13 +686,14 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
     return (
       <div className="space-y-6">
         {renderExpiredSubscription()}
-        
+
         {/* New Plan Modal */}
         {showNewPlanModal && (
           <NewPlanModal
             currentSubscription={subscription}
             onClose={() => setShowNewPlanModal(false)}
             onSuccess={handleNewPlanSuccess}
+            t={tFunc}
           />
         )}
       </div>
@@ -699,13 +705,13 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
     return (
       <div className="space-y-6">
         {renderScheduledSubscription()}
-        
+
         {/* Contact Support Section */}
         {showContactSupport && (
           <div id="contact-support-section" className="scroll-mt-8">
-            <ContactSupport 
-              title="Subscription Support"
-              subtitle="Need help with your subscription? Contact our support team for assistance with billing, plan changes, or any other questions."
+            <ContactSupport
+              title={tFunc('currentPlan.subscriptionSupport')}
+              subtitle={tFunc('currentPlan.subscriptionSupportDescription')}
               compact={true}
             />
           </div>
@@ -717,6 +723,7 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
             currentSubscription={subscription}
             onClose={() => setShowNewPlanModal(false)}
             onSuccess={handleNewPlanSuccess}
+            t={tFunc}
           />
         )}
       </div>
@@ -731,9 +738,9 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
       {/* Contact Support Section */}
       {showContactSupport && (
         <div id="contact-support-section" className="scroll-mt-8">
-          <ContactSupport 
-            title="Subscription Support"
-            subtitle="Need help with your subscription? Contact our support team for assistance with billing, plan changes, or any other questions."
+          <ContactSupport
+            title={tFunc('currentPlan.subscriptionSupport')}
+            subtitle={tFunc('currentPlan.subscriptionSupportDescription')}
             compact={true}
           />
         </div>
@@ -745,6 +752,7 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
           currentSubscription={subscription}
           onClose={() => setShowPlanChangeModal(false)}
           onSuccess={handlePlanChangeSuccess}
+          t={tFunc}
         />
       )}
 
@@ -754,6 +762,7 @@ export default function CurrentPlan({ subscription, onRefresh, realTimeStatus })
           currentSubscription={subscription}
           onClose={() => setShowNewPlanModal(false)}
           onSuccess={handleNewPlanSuccess}
+          t={tFunc}
         />
       )}
     </div>

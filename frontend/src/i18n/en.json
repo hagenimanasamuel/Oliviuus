@@ -13,6 +13,7 @@
     "home_button": "Go Back Home"
   },
   "auth": {
+    "or_continue_with_email": "Or continue with email",
     "enter_email": "Please enter your email address",
     "enter_email_desc": "Enter your email to continue",
     "email_placeholder": "Email Address",
@@ -42,6 +43,12 @@
     "new_password": "New Password",
     "confirm_password": "Confirm Password",
     "reset_password_button": "Reset Password"
+  },
+  "oneTap": {
+    "title": "Quick Sign In",
+    "subtitle": "Continue with your Google account",
+    "privacy": "Your data is secure",
+    "notNow": "Not now"
   },
   "verifyEmail": {
     "code_required": "Verification code is required",
@@ -1574,27 +1581,56 @@
     "refresh": "Refresh",
     "loading": "Loading subscription data...",
     "more": "More",
+    "perMonth": "/month",
+    "status": {
+      "scheduled": {
+        "title": "Scheduled Subscription",
+        "description": "Your subscription is scheduled to start soon"
+      },
+      "grace_period": {
+        "title": "Grace Period",
+        "description": "Your subscription is in grace period"
+      },
+      "cancelled": {
+        "title": "Cancelled",
+        "description": "Your subscription has been cancelled"
+      },
+      "trialing": {
+        "title": "Trial",
+        "description": "You are in trial period"
+      },
+      "past_due": {
+        "title": "Past Due",
+        "description": "Your payment is past due"
+      },
+      "no_subscription": {
+        "title": "No Subscription",
+        "description": "You don't have an active subscription"
+      },
+      "starts": "Starts on",
+      "ends": "Ends on"
+    },
+    "plans": {
+      "mobile": {
+        "popular": "Popular"
+      },
+      "standard": {
+        "popular": "Popular"
+      }
+    },
+    "comparison": {
+      "devices": "devices",
+      "simultaneous": "simultaneous",
+      "videoQuality": "video quality",
+      "downloads": "downloads",
+      "unlimited": "Unlimited",
+      "downloadItems": "{count} items"
+    },
     "tabs": {
       "current": "Current Plan",
       "history": "History",
       "payment": "Payment Methods",
       "usage": "Usage Metrics"
-    },
-    "status": {
-      "active": {
-        "title": "Active Subscription",
-        "description": "Your subscription is active and in good standing"
-      },
-      "cancelled": {
-        "title": "Subscription Cancelled",
-        "description": "Your subscription will end on the billing period end date"
-      },
-      "expired": {
-        "title": "Subscription Expired",
-        "description": "Your subscription has expired. Renew to continue access"
-      },
-      "renews": "Renews on",
-      "ends": "Ends on"
     },
     "errors": {
       "title": "Error Loading Subscription",
@@ -1666,7 +1702,21 @@
         "timeLeft": "Time Left:",
         "expired": "Expired",
         "oneDayLeft": "1 day left",
-        "daysLeft": "{{days}} days left"
+        "daysLeft": "{{days}} days left",
+        "active": {
+          "title": "Active Subscription",
+          "description": "Your subscription is active and in good standing"
+        },
+        "cancelled": {
+          "title": "Subscription Cancelled",
+          "description": "Your subscription will end on the billing period end date"
+        },
+        "expired": {
+          "title": "Subscription Expired",
+          "description": "Your subscription has expired. Renew to continue access"
+        },
+        "renews": "Renews on",
+        "ends": "Ends on"
       },
       "actions": {
         "accept": "Accept Invitation",
@@ -3457,219 +3507,621 @@
     }
   },
   "videoPlayer": {
-      "accessibility": {
-        "videoPlayer": "Video player",
-        "playVideo": "Play video"
-      },
-      "buttons": {
-        "play": "Play"
-      },
-      "errors": {
-        "noVideo": {
-          "title": "No Video Available",
-          "description": "This content doesn't have a playable video file."
-        }
+    "accessibility": {
+      "videoPlayer": "Video player",
+      "playVideo": "Play video"
+    },
+    "buttons": {
+      "play": "Play"
+    },
+    "errors": {
+      "noVideo": {
+        "title": "No Video Available",
+        "description": "This content doesn't have a playable video file."
       }
-    },
-    "playerControls": {
-      "accessibility": {
-        "controls": "Video player controls",
-        "progress": "Video progress",
-        "volume": "Volume level",
-        "timeDisplay": "Video time display",
-        "playbackRate": "Playback rate: {{rate}}x"
-      },
-      "buttons": {
-        "play": "Play",
-        "pause": "Pause",
-        "rewind": "Rewind 5 seconds",
-        "forward": "Forward 5 seconds",
-        "unmute": "Unmute",
-        "mute": "Mute",
-        "fullscreen": "Enter fullscreen",
-        "exitFullscreen": "Exit fullscreen",
-        "settings": "Settings"
-      },
-      "tooltips": {
-        "play": "Play (Space)",
-        "pause": "Pause (Space)",
-        "rewind": "Rewind 5s (←)",
-        "forward": "Forward 5s (→)",
-        "mute": "Mute (M)",
-        "fullscreen": "Fullscreen (F)",
-        "settings": "Settings (S)",
-        "timeDisplay": "Toggle time display mode"
-      }
-    },
-    "loadingOverlay": {
-      "initial": {
-        "title": "Preparing Your Stream",
-        "description": "Loading high-quality content..."
-      },
-      "buffering": "Buffering...",
-      "loading": "Loading...",
-      "waitMessage": "Please wait while we prepare the content"
-    },
-    "connectionIndicator": {
-      "online": "Internet connection restored",
-      "offline": "Internet connection lost"
-    },
-    "episodeSelector": {
-      "buttons": {
-        "episodes": "Episodes",
-        "continue": "Continue watching",
-        "continueFromTime": "Continue watching from {{time}}",
-        "continueWatching": "Continue Watching",
-        "startOver": "Start Over"
-      },
-      "menu": {
-        "episodes": "Episodes menu",
-        "continueWatching": "Continue watching menu"
-      },
-      "titles": {
-        "episodesSeasons": "Episodes & Seasons",
-        "continueWatching": "Continue Watching"
-      },
-      "episodeCount": "{{count}} episodes",
-      "noEpisodes": "No episodes available",
-      "season": "Season {{number}}",
-      "defaultEpisodeTitle": "Episode {{number}}",
-      "unknownDuration": "Unknown",
-      "progress": "{{percentage}}% watched",
-      "percentage": "{{percentage}}%",
-      "fromTime": "From {{time}}",
-      "watchFromBeginning": "Watch from beginning",
-      "similarSeries": "Similar Series",
-      "similarMovies": "Similar Movies",
-      "noVideoContent": "No video content available",
-      "contentType": {
-        "series": "Series",
-        "movie": "Movie"
-      },
-      "aria": {
-        "episode": "Episode: {{title}}",
-        "episodeNumber": "Episode {{number}}",
-        "similarSeries": "Similar series: {{title}}",
-        "similarMovie": "Similar movie: {{title}}"
-      }
-    },
-    "endScreen": {
-      "episodeNumber": "Episode {{number}}",
-      "defaultContentTitle": "Content",
-      "nextEpisodeStarting": "Next Episode Starting Soon",
-      "finishedWatching": "You've Finished Watching",
-      "completedAllEpisodes": "You've completed watching all episodes of",
-      "visitNextMoment": "Visit us next moment to watch more amazing content!",
-      "checkOutSimilar": "Check Out These Similar {{type}}",
-      "contentTypes": {
-        "series": "Series",
-        "movies": "Movies"
-      },
-      "aria": {
-        "playContent": "Play {{title}}"
-      },
-      "buttons": {
-        "watchAgain": "Watch Again",
-        "nextEpisode": "Next Episode",
-        "skip": "Skip",
-        "skipAutoPlay": "Skip auto-play",
-        "playNow": "Play Now",
-        "browseAllContent": "Browse All Content"
-      },
-      "congratulations": "Congratulations!",
-      "upNext": "Up Next",
-      "countdown": "{{seconds}}s",
-      "noDescription": "No description available",
-      "moreSeriesLikeThis": "More Series Like This",
-      "moreMoviesLikeThis": "More Movies Like This",
-      "checkBackLater": "Check back later for more amazing content!",
-      "contentType": {
-        "series": "Series",
-        "movie": "Movie"
-      }
-    },
-    "settingsPanel": {
-      "tabs": {
-        "speed": "Playback Speed",
-        "quality": "Quality",
-        "advanced": "Advanced",
-        "audio": "Audio",
-        "video": "Video",
-        "shortcuts": "Keyboard Shortcuts"
-      },
-      "quality": {
-        "auto": "Auto",
-        "bestAvailable": "Best quality available",
-        "option": "{{option}} quality"
-      },
-      "speed": {
-        "rate": "{{rate}}x speed",
-        "normal": "Normal"
-      },
-      "advanced": {
-        "pip": "Picture-in-Picture",
-        "sleepTimer": "Sleep Timer",
-        "sleepTimerDescription": "Video will automatically pause when timer ends",
-        "sleepTimerSelect": "Select sleep timer duration"
-      },
-      "audio": {
-        "volumeBoost": "Volume Boost",
-        "percentage": "{{percentage}}%",
-        "volumeBoostSlider": "Volume boost level",
-        "normal": "Normal",
-        "maxBoost": "Max Boost",
-        "audioPresets": "Audio Presets",
-        "preset": "{{name}} audio preset"
-      },
-      "audioPresets": {
-        "default": "Default",
-        "defaultDesc": "Original audio",
-        "movie": "Movie",
-        "movieDesc": "Enhanced dialogue",
-        "music": "Music",
-        "musicDesc": "Balanced frequencies",
-        "speech": "Speech",
-        "speechDesc": "Clear vocals",
-        "bass": "Bass Boost",
-        "bassDesc": "Enhanced low frequencies"
-      },
-      "video": {
-        "brightness": "Brightness",
-        "contrast": "Contrast",
-        "saturation": "Saturation",
-        "brightnessSlider": "Brightness level",
-        "contrastSlider": "Contrast level",
-        "saturationSlider": "Saturation level",
-        "resetEnhancements": "Reset all video enhancements",
-        "resetAll": "Reset All Enhancements"
-      },
-      "shortcuts": {
-        "space": "Space / K",
-        "playPause": "Play/Pause",
-        "f": "F",
-        "fullscreen": "Fullscreen",
-        "m": "M",
-        "mute": "Mute",
-        "arrows": "← / →",
-        "seek": "Seek 5s",
-        "volumeArrows": "↑ / ↓",
-        "volume": "Volume",
-        "speed": ", / .",
-        "speedChange": "Speed",
-        "s": "S",
-        "settings": "Settings"
-      },
-      "sleepTimer": {
-        "off": "Off",
-        "minutes": "{{minutes}} minutes",
-        "hour": "1 hour"
-      },
-      "menuLabel": "Video settings menu"
-    },
-    "previewThumbnail": {
-      "aria": {
-        "timePreview": "Preview for time: {{time}}"
-      },
-      "loading": "Loading preview..."
     }
+  },
+  "playerControls": {
+    "accessibility": {
+      "controls": "Video player controls",
+      "progress": "Video progress",
+      "volume": "Volume level",
+      "timeDisplay": "Video time display",
+      "playbackRate": "Playback rate: {{rate}}x"
+    },
+    "buttons": {
+      "play": "Play",
+      "pause": "Pause",
+      "rewind": "Rewind 5 seconds",
+      "forward": "Forward 5 seconds",
+      "unmute": "Unmute",
+      "mute": "Mute",
+      "fullscreen": "Enter fullscreen",
+      "exitFullscreen": "Exit fullscreen",
+      "settings": "Settings"
+    },
+    "tooltips": {
+      "play": "Play (Space)",
+      "pause": "Pause (Space)",
+      "rewind": "Rewind 5s (←)",
+      "forward": "Forward 5s (→)",
+      "mute": "Mute (M)",
+      "fullscreen": "Fullscreen (F)",
+      "settings": "Settings (S)",
+      "timeDisplay": "Toggle time display mode"
+    }
+  },
+  "loadingOverlay": {
+    "initial": {
+      "title": "Preparing Your Stream",
+      "description": "Loading high-quality content..."
+    },
+    "buffering": "Buffering...",
+    "loading": "Loading...",
+    "waitMessage": "Please wait while we prepare the content"
+  },
+  "connectionIndicator": {
+    "online": "Internet connection restored",
+    "offline": "Internet connection lost"
+  },
+  "episodeSelector": {
+    "buttons": {
+      "episodes": "Episodes",
+      "continue": "Continue watching",
+      "continueFromTime": "Continue watching from {{time}}",
+      "continueWatching": "Continue Watching",
+      "startOver": "Start Over"
+    },
+    "menu": {
+      "episodes": "Episodes menu",
+      "continueWatching": "Continue watching menu"
+    },
+    "titles": {
+      "episodesSeasons": "Episodes & Seasons",
+      "continueWatching": "Continue Watching"
+    },
+    "episodeCount": "{{count}} episodes",
+    "noEpisodes": "No episodes available",
+    "season": "Season {{number}}",
+    "defaultEpisodeTitle": "Episode {{number}}",
+    "unknownDuration": "Unknown",
+    "progress": "{{percentage}}% watched",
+    "percentage": "{{percentage}}%",
+    "fromTime": "From {{time}}",
+    "watchFromBeginning": "Watch from beginning",
+    "similarSeries": "Similar Series",
+    "similarMovies": "Similar Movies",
+    "noVideoContent": "No video content available",
+    "contentType": {
+      "series": "Series",
+      "movie": "Movie"
+    },
+    "aria": {
+      "episode": "Episode: {{title}}",
+      "episodeNumber": "Episode {{number}}",
+      "similarSeries": "Similar series: {{title}}",
+      "similarMovie": "Similar movie: {{title}}"
+    }
+  },
+  "endScreen": {
+    "episodeNumber": "Episode {{number}}",
+    "defaultContentTitle": "Content",
+    "nextEpisodeStarting": "Next Episode Starting Soon",
+    "finishedWatching": "You've Finished Watching",
+    "completedAllEpisodes": "You've completed watching all episodes of",
+    "visitNextMoment": "Visit us next moment to watch more amazing content!",
+    "checkOutSimilar": "Check Out These Similar {{type}}",
+    "contentTypes": {
+      "series": "Series",
+      "movies": "Movies"
+    },
+    "aria": {
+      "playContent": "Play {{title}}"
+    },
+    "buttons": {
+      "watchAgain": "Watch Again",
+      "nextEpisode": "Next Episode",
+      "skip": "Skip",
+      "skipAutoPlay": "Skip auto-play",
+      "playNow": "Play Now",
+      "browseAllContent": "Browse All Content"
+    },
+    "congratulations": "Congratulations!",
+    "upNext": "Up Next",
+    "countdown": "{{seconds}}s",
+    "noDescription": "No description available",
+    "moreSeriesLikeThis": "More Series Like This",
+    "moreMoviesLikeThis": "More Movies Like This",
+    "checkBackLater": "Check back later for more amazing content!",
+    "contentType": {
+      "series": "Series",
+      "movie": "Movie"
+    }
+  },
+  "settingsPanel": {
+    "tabs": {
+      "speed": "Playback Speed",
+      "quality": "Quality",
+      "advanced": "Advanced",
+      "audio": "Audio",
+      "video": "Video",
+      "shortcuts": "Keyboard Shortcuts"
+    },
+    "quality": {
+      "auto": "Auto",
+      "bestAvailable": "Best quality available",
+      "option": "{{option}} quality"
+    },
+    "speed": {
+      "rate": "{{rate}}x speed",
+      "normal": "Normal"
+    },
+    "advanced": {
+      "pip": "Picture-in-Picture",
+      "sleepTimer": "Sleep Timer",
+      "sleepTimerDescription": "Video will automatically pause when timer ends",
+      "sleepTimerSelect": "Select sleep timer duration"
+    },
+    "audio": {
+      "volumeBoost": "Volume Boost",
+      "percentage": "{{percentage}}%",
+      "volumeBoostSlider": "Volume boost level",
+      "normal": "Normal",
+      "maxBoost": "Max Boost",
+      "audioPresets": "Audio Presets",
+      "preset": "{{name}} audio preset"
+    },
+    "audioPresets": {
+      "default": "Default",
+      "defaultDesc": "Original audio",
+      "movie": "Movie",
+      "movieDesc": "Enhanced dialogue",
+      "music": "Music",
+      "musicDesc": "Balanced frequencies",
+      "speech": "Speech",
+      "speechDesc": "Clear vocals",
+      "bass": "Bass Boost",
+      "bassDesc": "Enhanced low frequencies"
+    },
+    "video": {
+      "brightness": "Brightness",
+      "contrast": "Contrast",
+      "saturation": "Saturation",
+      "brightnessSlider": "Brightness level",
+      "contrastSlider": "Contrast level",
+      "saturationSlider": "Saturation level",
+      "resetEnhancements": "Reset all video enhancements",
+      "resetAll": "Reset All Enhancements"
+    },
+    "shortcuts": {
+      "space": "Space / K",
+      "playPause": "Play/Pause",
+      "f": "F",
+      "fullscreen": "Fullscreen",
+      "m": "M",
+      "mute": "Mute",
+      "arrows": "← / →",
+      "seek": "Seek 5s",
+      "volumeArrows": "↑ / ↓",
+      "volume": "Volume",
+      "speed": ", / .",
+      "speedChange": "Speed",
+      "s": "S",
+      "settings": "Settings"
+    },
+    "sleepTimer": {
+      "off": "Off",
+      "minutes": "{{minutes}} minutes",
+      "hour": "1 hour"
+    },
+    "menuLabel": "Video settings menu"
+  },
+  "previewThumbnail": {
+    "aria": {
+      "timePreview": "Preview for time: {{time}}"
+    },
+    "loading": "Loading preview..."
+  },
+  "currentPlan": {
+    "previousDetails": "Previous Plan Details",
+    "plan": "Plan",
+    "ended": "Ended",
+    "renewSubscription": "Renew Subscription",
+    "getNewPlan": "Get New Plan",
+    "scheduledSubscription": "Subscription Scheduled",
+    "scheduledDescription": "Your plan will automatically activate on {date}",
+    "monthlyPrice": "Monthly Price",
+    "startsIn": "Starts In",
+    "startDate": "Start Date",
+    "days": "day",
+    "days_plural": "days",
+    "devices": "Devices",
+    "quality": "Quality",
+    "downloads": "Downloads",
+    "profiles": "Profiles",
+    "planFeatures": "Plan Features",
+    "supportedDevices": "Supported Devices",
+    "deviceTypes": "device types",
+    "videoQuality": "Video Quality",
+    "offlineDownloads": "Offline Downloads",
+    "available": "Available",
+    "notAvailable": "Not available",
+    "simultaneousStreams": "Simultaneous Streams",
+    "parentalControls": "Parental Controls",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "exclusiveContent": "Exclusive Content",
+    "access": "Access",
+    "noAccess": "No access",
+    "hdrSupport": "HDR Support",
+    "earlyAccess": "Early Access",
+    "scheduledDetails": "Scheduled Details",
+    "status": "Status",
+    "scheduledStart": "Scheduled Start",
+    "endDate": "End Date",
+    "autoRenew": "Auto Renew",
+    "quickActions": "Quick Actions",
+    "addAnotherPlan": "Add Another Plan",
+    "refreshStatus": "Refresh Status",
+    "needHelp": "Need Help?",
+    "scheduledSupportDescription": "Questions about your scheduled subscription? Our support team can help.",
+    "contactSupport": "Contact Support",
+    "billingCycle": "Billing Cycle",
+    "monthly": "Monthly",
+    "renewsIn": "Renews in",
+    "subscriptionDetails": "Subscription Details",
+    "started": "Started",
+    "renews": "Renews",
+    "cancelledOn": "Cancelled On",
+    "changePlan": "Change Plan",
+    "addNewPlan": "Add New Plan",
+    "supportDescription": "Having issues with your subscription? Our support team is here to help.",
+    "subscriptionSupport": "Subscription Support",
+    "subscriptionSupportDescription": "Need help with your subscription? Contact our support team for assistance with billing, plan changes, or any other questions."
+  },
+  "history": {
+    "title": "History",
+    "subtitle": "Track your subscription and payment history",
+    "loadingHistory": "Loading History",
+    "fetchingRecords": "Fetching your records...",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "tabs": {
+      "billing": "Billing History",
+      "subscription": "Subscription History"
+    },
+    "noBillingHistory": "No Billing History",
+    "noBillingDescription": "Your payment history will appear here once you make transactions.",
+    "noSubscriptionHistory": "No Subscription History",
+    "noSubscriptionDescription": "Your subscription history will appear here once you subscribe to plans.",
+    "status": {
+      "active": "Active",
+      "cancelled": "Cancelled",
+      "expired": "Expired",
+      "completed": "Completed",
+      "failed": "Failed",
+      "pending": "Pending",
+      "refunded": "Refunded"
+    },
+    "transactionTypes": {
+      "subscription": "Subscription Payment",
+      "one_time": "One-time Payment",
+      "refund": "Refund"
+    },
+    "invoiceNumber": "Invoice #{id}",
+    "viewDetails": "View Details",
+    "to": "to",
+    "daysCount": "{days} days",
+    "table": {
+      "dateTime": "Date & Time",
+      "description": "Description",
+      "type": "Type",
+      "amount": "Amount",
+      "status": "Status",
+      "actions": "Actions",
+      "plan": "Plan",
+      "period": "Period",
+      "autoRenew": "Auto Renew",
+      "date": "Date"
+    },
+    "invoiceDetails": {
+      "title": "Transaction Details",
+      "paymentDetails": "Payment Details",
+      "transactionInfo": "Transaction Information",
+      "provider": "Provider",
+      "amountDetails": "Amount Details",
+      "fee": "Fee"
+    },
+    "subscriptionModal": {
+      "plan": "Plan",
+      "details": "Subscription Details",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "billingInfo": "Billing Information",
+      "currency": "Currency",
+      "billingCycle": "Billing Cycle",
+      "monthly": "Monthly",
+      "cancelled": "Cancelled",
+      "cancelledOn": "This subscription was cancelled on {date}"
+    }
+  },
+  "newPlanModal": {
+    "title": "Purchase New Plan",
+    "subtitle": "Choose a new plan to start after your current subscription",
+    "purchaseNewPlan": "Purchase New Plan",
+    "purchaseDescription": "Buy a new subscription plan that will start automatically after your current plan ends.",
+    "currentPlanActive": "Current Plan Active",
+    "newPlanStartDate": "Your new plan will start on {date}",
+    "newPlan": "New Plan",
+    "startsOn": "Starts: {date}",
+    "yourNewPlanWillStartOn": "Your new plan will start on",
+    "startsLabel": "Starts:",
+    "backToPlans": "Back to Plans",
+    "newPlanPurchase": "New Plan Purchase",
+    "monthly": "Monthly",
+    "planStartDate": "Plan Start Date",
+    "startAfterCurrent": "Your new plan will start automatically after your current plan ends.",
+    "startImmediately": "Your new plan will start immediately after payment.",
+    "planName": "Plan Name",
+    "billing": "Billing",
+    "devices": "Devices",
+    "simultaneous": "Simultaneous",
+    "quality": "Quality",
+    "paymentAmount": "Payment Amount",
+    "firstMonth": "First Month",
+    "firstMonthCharge": "You'll be charged this amount for the first month of your new plan",
+    "securePayment": "Secure Payment",
+    "securityFeatures": "🔒 Encrypted connection • 🛡️ Fraud protected • 📱 Secure Mobile Money",
+    "considerUpgrade": "Consider Upgrade Instead?",
+    "upgradeSuggestion": "If you want to upgrade your current plan for immediate access, use the \"Change Plan\" option instead. This will give you instant access to better features.",
+    "processingPurchase": "Processing Purchase...",
+    "purchaseNewPlanButton": "Purchase New Plan",
+    "processingDescription": "Your new plan purchase is being securely processed...",
+    "processingFeatures": "🔒 Secure transaction in progress • 📱 Check your phone for prompt",
+    "purchaseSuccessful": "Purchase Successful!",
+    "purchaseSuccessDescription": "Your new {plan} plan has been purchased successfully.",
+    "willStartOn": "It will start automatically on {date}",
+    "successFeatures": "✅ Purchase complete • 🔒 Payment secured • 📅 Starts {date}",
+    "loadingPlans": "Loading Plans...",
+    "fetchingPlans": "Fetching available subscription plans",
+    "confirmPurchase": "Confirm New Plan Purchase",
+    "reviewPlan": "Review your new plan details and complete payment",
+    "successDescription": "Your new plan has been purchased successfully",
+    "security": {
+      "sessionTimeout": "Session timeout",
+      "devToolsDetected": "Developer tools detected",
+      "contextMenuAttempt": "Context menu attempt",
+      "windowHidden": "Window hidden - potential inspection",
+      "dimensionDevTools": "Dev tools detected by dimensions",
+      "violationDetected": "Security violation detected",
+      "maxRetries": "Maximum retry attempts exceeded",
+      "authenticationError": "Authentication error",
+      "alertTitle": "Security Alert",
+      "alertDescription": "Unauthorized activity detected. This session has been terminated for security reasons.",
+      "violationRefresh": "Security violation detected. Please refresh the page."
+    },
+    "errors": {
+      "fetchPlans": "Failed to load plans. Please refresh the page.",
+      "paymentFailed": "New plan payment failed",
+      "paymentTimeout": "Payment timeout. Please check your Mobile Money and try again."
+    },
+    "validation": {
+      "phoneRequired": "Phone number is required for Mobile Money payments",
+      "phoneInvalid": "Please enter a valid phone number",
+      "phonePattern": "Invalid phone number pattern",
+      "nameInvalid": "Please enter a valid name"
+    }
+  },
+  "usageMetrics": {
+    "title": "Usage Overview",
+    "subtitle": "Your real-time streaming activity",
+    "noActiveSubscription": "No Active Subscription",
+    "noSubscriptionDescription": "Usage metrics are available with an active subscription plan.",
+    "subscribeToStart": "Subscribe to start tracking your streaming activity and device usage.",
+    "scheduledSubscription": "Subscription Scheduled",
+    "scheduledDescription": "Usage metrics will be available once your subscription starts on {date}.",
+    "checkBackAfterStart": "Check back after your plan becomes active to view your streaming insights.",
+    "subscriptionInactive": "Subscription Inactive",
+    "inactiveDescription": "Usage metrics are only available with an active subscription.",
+    "renewToAccess": "Renew your subscription to access usage tracking and analytics.",
+    "loadingUsageData": "Loading Usage Data",
+    "gatheringInsights": "Gathering your streaming insights...",
+    "noUsageData": "No Usage Data Available",
+    "startStreaming": "Start streaming content to see your usage metrics and analytics.",
+    "watchContent": "Watch movies, series, or other content to generate usage insights.",
+    "checkAgain": "Check Again",
+    "week": "Week",
+    "month": "Month",
+    "refresh": "Refresh",
+    "activeSubscription": "Active Subscription",
+    "currentPlan": "You're currently on the {plan} Plan",
+    "activeDevices": "Active Devices",
+    "ofLimit": "of limit",
+    "connectedDevices": "Connected devices",
+    "currentlyActive": "Currently Active",
+    "noActiveDevices": "No active devices",
+    "streamingTime": "Streaming Time",
+    "dailyAverage": "daily average",
+    "thisWeek": "This week",
+    "total": "Total: {hours}h",
+    "dataUsage": "Data Usage",
+    "unlimitedData": "Unlimited data",
+    "of": "of",
+    "increasing": "Increasing",
+    "stable": "Stable",
+    "ofLimitUsed": "of limit used",
+    "usageInsights": "Usage Insights",
+    "yourPatterns": "Your Streaming Patterns",
+    "devicesCount": "{count} devices",
+    "totalWatchTime": "Total watch time",
+    "hoursCount": "{hours} hours",
+    "hoursPerDay": "{hours}h/day",
+    "quickTips": "Quick Tips",
+    "tipOffPeak": "Watch in off-peak hours",
+    "tipOffPeakDesc": "for better streaming quality",
+    "tipWifi": "Use Wi-Fi when available",
+    "tipWifiDesc": "to save mobile data",
+    "tipLogout": "Log out from unused devices",
+    "tipLogoutDesc": "to free up slots",
+    "dataUpdated": "Data updated in real-time",
+    "showingUsage": "Showing {period}ly usage"
+  },
+  "planChangeModal": {
+    "title": "Upgrade Your Plan",
+    "subtitle": "Choose a higher plan to upgrade instantly",
+    "secureUpgrade": "Secure Plan Upgrade",
+    "secureDescription": "All transactions are encrypted and monitored for security. Your payment details are protected.",
+    "currentPlan": "Current Plan: {plan}",
+    "upgradeImmediate": "Upgrade to a higher plan for immediate access with prorated pricing.",
+    "highestPlan": "You're on the Highest Plan",
+    "noUpgradesAvailable": "You're currently on our highest tier plan. There are no available upgrades at this time.",
+    "upgrade": "Upgrade",
+    "upgradeAvailable": "Upgrade Available",
+    "clickToCalculate": "Click to calculate prorated cost",
+    "calculatingUpgrade": "Calculating Upgrade",
+    "calculatingDescription": "Calculating your prorated upgrade cost...",
+    "backToPlans": "Back to Plans",
+    "planUpgrade": "Plan Upgrade",
+    "calculating": "Calculating...",
+    "proratedUpgrade": "Prorated Upgrade",
+    "costBreakdown": "Cost Breakdown",
+    "baseUpgrade": "Base Upgrade",
+    "operationalAdjustment": "Operational Adjustment",
+    "total": "Total",
+    "basedOnDays": "Based on {days} remaining days in your billing cycle",
+    "currentPlanLabel": "Current Plan",
+    "newPlan": "New Plan",
+    "effective": "Effective",
+    "immediately": "Immediately",
+    "remainingDays": "Remaining Days",
+    "days": "days",
+    "upgradeAmount": "Upgrade Amount",
+    "serverCalculated": "Server Calculated",
+    "amountSecure": "Amount is securely calculated on our servers and cannot be modified",
+    "securePayment": "Secure Upgrade Payment",
+    "securityFeatures": "🔒 Encrypted connection • 🛡️ Fraud protected • 📱 Secure Mobile Money",
+    "processingUpgrade": "Processing Upgrade...",
+    "securePaymentUpgrade": "Secure Payment & Upgrade",
+    "processingUpgradeTitle": "Processing Upgrade",
+    "processingDescription": "Your plan upgrade is being securely processed...",
+    "processingFeatures": "🔒 Secure transaction in progress • 📱 Check your phone for prompt",
+    "upgradeSuccessful": "Upgrade Successful!",
+    "upgradeSuccessDescription": "Your plan has been upgraded to {plan}. You now have access to all premium features.",
+    "successFeatures": "✅ Upgrade complete • 🔒 Payment secured • 🚀 Features activated",
+    "loadingUpgradeOptions": "Loading Upgrade Options...",
+    "fetchingUpgradePlans": "Fetching available upgrade plans",
+    "paymentDescription": "Enter your payment details to complete the upgrade",
+    "successDescription": "Your plan has been upgraded successfully",
+    "security": {
+      "sessionTimeout": "Session timeout",
+      "devToolsDetected": "Developer tools detected",
+      "contextMenuAttempt": "Context menu attempt",
+      "windowHidden": "Window hidden - potential inspection",
+      "dimensionDevTools": "Dev tools detected by dimensions",
+      "violationDetected": "Security violation detected",
+      "maxRetries": "Maximum retry attempts exceeded",
+      "authenticationError": "Authentication error",
+      "alertTitle": "Security Alert",
+      "alertDescription": "Unauthorized activity detected. This session has been terminated for security reasons.",
+      "violationRefresh": "Security violation detected. Please refresh the page."
+    },
+    "errors": {
+      "fetchUpgrades": "Failed to load upgrade options. Please refresh the page.",
+      "calculateCost": "Failed to calculate upgrade cost",
+      "upgradeFailed": "Upgrade payment failed",
+      "paymentFailed": "Upgrade payment failed. Please try again.",
+      "paymentTimeout": "Payment timeout. Please check your Mobile Money and try again."
+    },
+    "validation": {
+      "phoneRequired": "Phone number is required",
+      "phoneInvalid": "Please enter a valid phone number",
+      "phonePattern": "Invalid phone number pattern",
+      "nameInvalid": "Please enter a valid name"
+    }
+  },
+  "paymentMethods": {
+    "loading": "Loading Payment Information",
+    "checkingSettings": "Checking your payment settings...",
+    "title": "Payment Security",
+    "subtitle": "Your security is our top priority. We've implemented enhanced protection for your payment information.",
+    "noStoredData": {
+      "title": "No Stored Payment Data",
+      "description": "We never store your mobile money details on our servers for maximum security."
+    },
+    "fastPayments": {
+      "title": "Fast Mobile Payments",
+      "description": "Powered by LMB Tech & Intouch for instant mobile money processing."
+    },
+    "instantProcessing": {
+      "title": "Instant Processing",
+      "description": "Secure real-time payment processing with immediate subscription activation."
+    },
+    "enhancedSecurity": {
+      "title": "Enhanced Security First Approach",
+      "description": "For your security and peace of mind, we do not store payment methods on our platform.",
+      "points": {
+        "freshAuthorization": "Each transaction requires fresh payment authorization",
+        "eliminateRisk": "Eliminates risk of stored payment data breaches",
+        "poweredBy": "Powered by LMB Tech & Intouch Communications",
+        "financialData": "Your financial data remains with trusted mobile networks"
+      }
+    },
+    "howItWorks": {
+      "title": "How Mobile Money Payment Works",
+      "steps": {
+        "choosePlan": "Choose Plan",
+        "enterPhone": "Enter Phone",
+        "confirmPayment": "Confirm Payment",
+        "instantAccess": "Instant Access"
+      },
+      "descriptions": {
+        "choosePlan": "Select your preferred subscription plan",
+        "enterPhone": "Provide your mobile money number",
+        "confirmPayment": "Authorize payment on your phone",
+        "instantAccess": "Get immediate subscription access"
+      }
+    },
+    "supportedProviders": {
+      "title": "Supported Mobile Money Providers",
+      "mtn": {
+        "title": "MTN Mobile Money",
+        "description": "Fast and secure payments via MTN"
+      },
+      "airtel": {
+        "title": "Airtel Money",
+        "description": "Secure payments via Airtel"
+      },
+      "instantProcessing": "Instant Processing"
+    },
+    "comingSoon": {
+      "title": "More Payment Options Coming Soon",
+      "description": "We're working on adding more payment methods to serve you better"
+    },
+    "technologyPartners": {
+      "title": "Powered by Trusted Technology Partners",
+      "subtitle": "Secure payment processing through our trusted partners",
+      "lmbTech": {
+        "title": "LMB Tech",
+        "description": "Link Mobile Technology Ltd",
+        "role": "Payment Technology Partner"
+      },
+      "intouch": {
+        "title": "Intouch Communications",
+        "description": "Mobile Money Infrastructure",
+        "role": "Payment Processing Partner"
+      }
+    },
+    "securityAssurance": {
+      "title": "Your Security is Guaranteed",
+      "description": "We prioritize your financial security above all else. By not storing payment methods, we eliminate the risk of payment data breaches while maintaining seamless subscription management through secure, real-time mobile money processing powered by LMB Tech and Intouch Communications."
+    },
+    "contactSupport": {
+      "description": "Have questions about our payment security or mobile money payments?",
+      "button": "Contact Support",
+      "title": "Payment & Billing Support",
+      "subtitle": "Need help with mobile money payments, billing questions, or payment security? Our support team is here to help."
+    }
+  }
 }

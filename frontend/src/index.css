@@ -185,3 +185,87 @@ footer {
 .animate-subtle-pulse {
   animation: subtle-pulse 3s ease-in-out infinite;
 }
+
+/* Google One-Tap Styling - LinkedIn Style */
+.g_id_onload {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 1000 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 8px !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+/* Google Sign-In Button Professional Styling */
+.g_id_signin {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.g_id_signin > div {
+  width: 100% !important;
+  border-radius: 8px !important;
+  height: 48px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  border: 1px solid #dadce0 !important;
+  transition: all 0.2s ease !important;
+  background: white !important;
+  color: #3c4043 !important;
+}
+
+.g_id_signin > div:hover {
+  background-color: #f8f9fa !important;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.2) !important;
+  border-color: #d2e3fc !important;
+}
+
+.g_id_signin > div:active {
+  background-color: #f1f3f4 !important;
+}
+
+/* Make it responsive */
+@media (max-width: 640px) {
+  .g_id_onload {
+    top: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+    max-width: calc(100% - 20px) !important;
+  }
+  
+  .g_id_signin > div {
+    height: 44px !important;
+    font-size: 15px !important;
+  }
+}
+
+/* Animation for One-Tap */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.g_id_onload {
+  animation: slideInFromRight 0.3s ease-out !important;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .g_id_signin > div {
+    background: #2d2d2d !important;
+    border-color: #5f6368 !important;
+    color: #e8eaed !important;
+  }
+  
+  .g_id_signin > div:hover {
+    background-color: #3c4043 !important;
+    border-color: #8ab4f8 !important;
+  }
+}
