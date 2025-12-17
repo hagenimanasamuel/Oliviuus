@@ -4,7 +4,6 @@ const crypto = require("crypto");
 // Helper: Validate user can manage PINs (either family plan owner OR parent role in family)
 const validatePinManagementAccess = async (userId) => {
   try {
-    console.log("🔍 [DEBUG] validatePinManagementAccess called for user:", userId);
     
     // First check if user is family plan owner
     const subscription = await query(`
@@ -18,10 +17,8 @@ const validatePinManagementAccess = async (userId) => {
       LIMIT 1
     `, [userId]);
 
-    console.log("🔍 [DEBUG] Subscription query result:", subscription);
 
     if (subscription && subscription.length > 0) {
-      console.log("✅ [DEBUG] User is family plan owner");
       return { 
         valid: true, 
         subscription: subscription[0],
@@ -30,7 +27,6 @@ const validatePinManagementAccess = async (userId) => {
     }
 
     // If not family plan owner, check if user has parent role in a family
-    console.log("🔍 [DEBUG] Checking if user has parent role in family");
     const parentRoleCheck = await query(`
       SELECT fm.id, fm.family_owner_id, u.email as owner_email
       FROM family_members fm
@@ -42,10 +38,8 @@ const validatePinManagementAccess = async (userId) => {
       LIMIT 1
     `, [userId]);
 
-    console.log("🔍 [DEBUG] Parent role check result:", parentRoleCheck);
 
     if (parentRoleCheck && parentRoleCheck.length > 0) {
-      console.log("✅ [DEBUG] User has parent role in family");
       
       // Verify the family owner still has active subscription
       const ownerSubscription = await query(`
@@ -60,7 +54,6 @@ const validatePinManagementAccess = async (userId) => {
       `, [parentRoleCheck[0].family_owner_id]);
 
       if (ownerSubscription && ownerSubscription.length > 0) {
-        console.log("✅ [DEBUG] Family owner has active subscription");
         return { 
           valid: true, 
           subscription: ownerSubscription[0],
@@ -69,12 +62,10 @@ const validatePinManagementAccess = async (userId) => {
           familyOwnerId: parentRoleCheck[0].family_owner_id
         };
       } else {
-        console.log("❌ [DEBUG] Family owner does not have active subscription");
         return { valid: false, error: "Family owner's subscription is not active" };
       }
     }
 
-    console.log("❌ [DEBUG] User cannot manage PINs - not family owner or parent role");
     return { valid: false, error: "Family owner or parent role required" };
 
   } catch (error) {
@@ -132,20 +123,16 @@ const setMasterPin = async (req, res) => {
   const { pin } = req.body;
   const userId = req.user.id;
 
-  console.log("🔍 [DEBUG] setMasterPin called - User:", userId, "PIN provided:", !!pin);
 
   if (!pin) {
-    console.log("❌ [DEBUG] No PIN provided");
     return res.status(400).json({ error: "PIN is required" });
   }
 
   try {
     // Validate user can manage PINs (family plan owner OR parent role)
     const accessValidation = await validatePinManagementAccess(userId);
-    console.log("🔍 [DEBUG] Access validation result:", accessValidation);
     
     if (!accessValidation.valid) {
-      console.log("❌ [DEBUG] Access validation failed:", accessValidation.error);
       return res.status(403).json({ error: accessValidation.error });
     }
 
@@ -157,7 +144,6 @@ const setMasterPin = async (req, res) => {
 
     // Hash the PIN
     const hashedPin = hashPin(pin);
-    console.log("🔍 [DEBUG] Generated PIN hash:", hashedPin);
 
     // Get the actual parent user ID (family owner for parent role users)
     const parentUserId = accessValidation.isFamilyPlanOwner ? userId : accessValidation.familyOwnerId;
@@ -174,14 +160,12 @@ const setMasterPin = async (req, res) => {
         "UPDATE parental_controls SET master_pin_code = ?, updated_at = NOW() WHERE parent_user_id = ?",
         [hashedPin, parentUserId]
       );
-      console.log("✅ [DEBUG] Updated existing master PIN");
     } else {
       // Create new parental controls record
       await query(
         "INSERT INTO parental_controls (parent_user_id, master_pin_code) VALUES (?, ?)",
         [parentUserId, hashedPin]
       );
-      console.log("✅ [DEBUG] Created new master PIN record");
     }
 
     // Log the action
@@ -232,7 +216,6 @@ const verifyPin = async (req, res) => {
   const { pin } = req.body;
   const userId = req.user.id;
 
-  console.log("🔍 [DEBUG] verifyPin called - User:", userId, "PIN provided:", !!pin);
 
   if (!pin) {
     return res.status(400).json({ error: "PIN is required" });
@@ -241,10 +224,8 @@ const verifyPin = async (req, res) => {
   try {
     // Validate user can manage PINs (family plan owner OR parent role)
     const accessValidation = await validatePinManagementAccess(userId);
-    console.log("🔍 [DEBUG] Access validation result for verifyPin:", accessValidation);
     
     if (!accessValidation.valid) {
-      console.log("❌ [DEBUG] Access validation failed for verifyPin:", accessValidation.error);
       return res.status(403).json({ error: accessValidation.error });
     }
 
@@ -258,7 +239,6 @@ const verifyPin = async (req, res) => {
     );
 
     if (masterPinRecord.length === 0) {
-      console.log("❌ [DEBUG] No master PIN found for user");
       return res.status(404).json({ error: "Master PIN not set" });
     }
 
@@ -266,13 +246,9 @@ const verifyPin = async (req, res) => {
     const hashedPin = hashPin(pin);
     const storedPin = masterPinRecord[0].master_pin_code;
 
-    console.log("🔍 [DEBUG] PIN verification - Provided hash:", hashedPin);
-    console.log("🔍 [DEBUG] PIN verification - Stored hash:", storedPin);
-    console.log("🔍 [DEBUG] PIN verification - Hash lengths:", hashedPin.length, storedPin.length);
 
     // Verify the PIN
     if (hashedPin !== storedPin) {
-      console.log("❌ [DEBUG] PIN verification failed");
       
       // Log failed attempt
       await query(`
@@ -291,7 +267,6 @@ const verifyPin = async (req, res) => {
       return res.status(401).json({ error: "Invalid PIN" });
     }
 
-    console.log("✅ [DEBUG] PIN verification successful");
 
     // Log successful verification
     await query(`
@@ -337,15 +312,12 @@ const verifyPin = async (req, res) => {
 const getPinStatus = async (req, res) => {
   const userId = req.user.id;
 
-  console.log("🔍 [DEBUG] getPinStatus called - User:", userId);
 
   try {
     // Validate user can manage PINs (family plan owner OR parent role)
     const accessValidation = await validatePinManagementAccess(userId);
-    console.log("🔍 [DEBUG] Access validation result for getPinStatus:", accessValidation);
     
     if (!accessValidation.valid) {
-      console.log("❌ [DEBUG] Access validation failed for getPinStatus:", accessValidation.error);
       return res.status(403).json({ error: accessValidation.error });
     }
 
@@ -397,7 +369,6 @@ const getPinStatus = async (req, res) => {
       [familyOwnerId]
     );
 
-    console.log("✅ [DEBUG] PIN status retrieved successfully");
 
     res.status(200).json({
       master_pin_set: masterPin.length > 0 && !!masterPin[0].master_pin_code,
@@ -418,7 +389,6 @@ const setFamilyMemberPin = async (req, res) => {
   const { memberId, pin } = req.body;
   const userId = req.user.id;
 
-  console.log("🔍 [DEBUG] setFamilyMemberPin called - User:", userId, "Member:", memberId);
 
   if (!memberId || !pin) {
     return res.status(400).json({ error: "Member ID and PIN are required" });
@@ -493,7 +463,6 @@ const setFamilyMemberPin = async (req, res) => {
       `, [memberId, JSON.stringify([hashedPin])]);
     }
 
-    console.log("✅ [DEBUG] Family member PIN security record updated");
 
     // Log the action
     await query(`

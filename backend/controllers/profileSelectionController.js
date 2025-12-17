@@ -30,7 +30,7 @@ const checkProfileSelection = async (req, res) => {
       planCheck[0]?.plan_type === 'family' && 
       session[0].session_mode === null;
 
-    res.json({
+  res.json({
       requires_profile_selection: requiresProfileSelection
     });
 

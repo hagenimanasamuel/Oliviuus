@@ -69,19 +69,11 @@ const getCurrentSessionMode = async (req, res) => {
     const userId = req.user.id;
     const currentToken = req.cookies?.token;
 
-    // DEBUG: Log properly
-    console.log('getCurrentSessionMode called for user ID:', userId, {
-      is_family_member: req.user.is_family_member,
-      dashboard_type: req.user.dashboard_type,
-      member_role: req.user.member_role
-    });
-
     // Check if user is an INVITED family member with kid dashboard
     if (req.user.is_family_member && 
         req.user.member_role !== 'owner' && 
         req.user.dashboard_type === 'kid') {
       
-      console.log('✅ Processing invited family member with kid dashboard for user:', userId);
       
       return res.status(200).json({
         session_mode: 'kid',
@@ -114,17 +106,11 @@ const getCurrentSessionMode = async (req, res) => {
     `, [userId]);
 
     if (session.length === 0) {
-      console.log('❌ No active session found for user:', userId);
       return res.status(200).json({ 
         session_mode: null,
         active_kid_profile: null 
       });
     }
-
-    console.log('✅ Session found for user:', userId, {
-      session_mode: session[0].session_mode,
-      has_kid_profile: !!session[0].active_kid_profile_id
-    });
 
     return res.status(200).json({
       session_mode: session[0].session_mode,

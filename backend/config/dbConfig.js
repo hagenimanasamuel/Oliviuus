@@ -2104,8 +2104,770 @@ const createFeedbackTable = async () => {
   }
 };
 
-module.exports = {
-  createFeedbackTable
+const createGameTables = async () => {
+  try {
+    // 1. GAMES TABLE (Master list of games)
+    const sqlGames = `
+      CREATE TABLE IF NOT EXISTS games (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        game_key VARCHAR(100) UNIQUE NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        icon_emoji VARCHAR(10) DEFAULT '🎮',
+        color_gradient VARCHAR(100) DEFAULT 'from-[#FF5722] to-[#FF9800]',
+        category ENUM('Math', 'Puzzles', 'Colors', 'Memory', 'Science', 'Language', 'Racing', 'Logic', 'Action') DEFAULT 'Math',
+        age_minimum INT DEFAULT 3,
+        age_maximum INT DEFAULT 8,
+        is_active BOOLEAN DEFAULT TRUE,
+        requires_internet BOOLEAN DEFAULT TRUE,
+        game_component VARCHAR(100),
+        metadata JSON DEFAULT NULL,
+        sort_order INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        INDEX idx_games_key (game_key),
+        INDEX idx_games_category (category),
+        INDEX idx_games_active (is_active),
+        INDEX idx_games_sort_order (sort_order)
+      );
+    `;
+    await query(sqlGames);
+
+    // 2. GAME_SESSIONS TABLE (Supports both kid types)
+    const sqlGameSessions = `
+      CREATE TABLE IF NOT EXISTS game_sessions (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        
+        -- Identity fields for both kid types
+        user_id INT NULL,           -- For family member kids (references users.id)
+        kid_profile_id INT NULL,    -- For kid profile kids (references kids_profiles.id)
+        family_member_id INT NULL,  -- Alternative for family member kids
+        
+        -- Game information
+        game_id INT NOT NULL,
+        session_id VARCHAR(255) NOT NULL,
+        
+        -- Session details
+        start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+        end_time DATETIME DEFAULT NULL,
+        duration_seconds INT DEFAULT 0,
+        
+        -- Device information
+        device_type ENUM('web', 'mobile', 'tablet', 'smarttv') DEFAULT 'web',
+        device_name VARCHAR(100),
+        user_agent TEXT DEFAULT NULL,
+        ip_address VARCHAR(45) DEFAULT NULL,
+        
+        -- Session data (temporary game state)
+        session_data JSON DEFAULT NULL,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        -- Foreign keys
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (kid_profile_id) REFERENCES kids_profiles(id) ON DELETE CASCADE,
+        FOREIGN KEY (family_member_id) REFERENCES family_members(id) ON DELETE CASCADE,
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+        
+        -- Indexes for performance
+        INDEX idx_game_sessions_game (game_id),
+        INDEX idx_game_sessions_session (session_id),
+        INDEX idx_game_sessions_start (start_time),
+        INDEX idx_game_sessions_user (user_id),
+        INDEX idx_game_sessions_kid (kid_profile_id),
+        INDEX idx_game_sessions_family (family_member_id),
+        INDEX idx_game_sessions_device (device_type),
+        INDEX idx_game_sessions_created (created_at)
+      );
+    `;
+    await query(sqlGameSessions);
+
+    // 3. GAME_PROGRESS TABLE (Permanent progress tracking)
+    const sqlGameProgress = `
+      CREATE TABLE IF NOT EXISTS game_progress (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        
+        -- Identity fields (same as sessions)
+        user_id INT NULL,
+        kid_profile_id INT NULL,
+        family_member_id INT NULL,
+        
+        -- Game information
+        game_id INT NOT NULL,
+        
+        -- Progress metrics
+        highest_score INT DEFAULT 0,
+        total_playtime_seconds INT DEFAULT 0,
+        levels_completed INT DEFAULT 0,
+        times_played INT DEFAULT 0,
+        
+        -- Game-specific save state
+        save_state JSON DEFAULT NULL,
+        last_level_played INT DEFAULT 1,
+        
+        -- Achievements and unlockables
+        unlocked_features JSON DEFAULT NULL,
+        achievements_json JSON DEFAULT NULL,
+        
+        -- Statistics
+        average_session_time INT DEFAULT 0,
+        last_played DATETIME DEFAULT NULL,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        -- Foreign keys
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (kid_profile_id) REFERENCES kids_profiles(id) ON DELETE CASCADE,
+        FOREIGN KEY (family_member_id) REFERENCES family_members(id) ON DELETE CASCADE,
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+        
+        -- Unique constraints for each identity type
+        UNIQUE KEY unique_user_game (user_id, game_id),
+        UNIQUE KEY unique_kid_game (kid_profile_id, game_id),
+        UNIQUE KEY unique_family_game (family_member_id, game_id),
+        
+        -- Indexes for performance
+        INDEX idx_game_progress_game (game_id),
+        INDEX idx_game_progress_user (user_id),
+        INDEX idx_game_progress_kid (kid_profile_id),
+        INDEX idx_game_progress_family (family_member_id),
+        INDEX idx_game_progress_score (highest_score),
+        INDEX idx_game_progress_last_played (last_played),
+        INDEX idx_game_progress_times_played (times_played)
+      );
+    `;
+    await query(sqlGameProgress);
+
+    // 4. GAME_SCORES TABLE (Individual score records)
+    const sqlGameScores = `
+      CREATE TABLE IF NOT EXISTS game_scores (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        
+        -- Identity fields
+        user_id INT NULL,
+        kid_profile_id INT NULL,
+        family_member_id INT NULL,
+        
+        -- Game and session reference
+        game_id INT NOT NULL,
+        session_id BIGINT NOT NULL,
+        
+        -- Score details
+        score_value INT NOT NULL,
+        level INT DEFAULT 1,
+        moves_count INT DEFAULT 0,
+        time_taken_seconds INT DEFAULT 0,
+        accuracy_percentage DECIMAL(5,2) DEFAULT 0,
+        
+        -- Additional metrics (game-specific)
+        metrics_json JSON DEFAULT NULL,
+        
+        -- Completion flags
+        is_high_score BOOLEAN DEFAULT FALSE,
+        is_completed BOOLEAN DEFAULT FALSE,
+        completed_at DATETIME DEFAULT NULL,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        -- Foreign keys
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (kid_profile_id) REFERENCES kids_profiles(id) ON DELETE CASCADE,
+        FOREIGN KEY (family_member_id) REFERENCES family_members(id) ON DELETE CASCADE,
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+        FOREIGN KEY (session_id) REFERENCES game_sessions(id) ON DELETE CASCADE,
+        
+        -- Indexes for performance
+        INDEX idx_game_scores_game (game_id),
+        INDEX idx_game_scores_session (session_id),
+        INDEX idx_game_scores_user (user_id),
+        INDEX idx_game_scores_kid (kid_profile_id),
+        INDEX idx_game_scores_family (family_member_id),
+        INDEX idx_game_scores_score (score_value),
+        INDEX idx_game_scores_high_score (is_high_score),
+        INDEX idx_game_scores_level (level),
+        INDEX idx_game_scores_created (created_at),
+        INDEX idx_game_scores_completed (is_completed)
+      );
+    `;
+    await query(sqlGameScores);
+
+    // 5. EDUCATIONAL_SKILLS TABLE (Learning objectives)
+    const sqlEducationalSkills = `
+      CREATE TABLE IF NOT EXISTS educational_skills (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        
+        skill_key VARCHAR(100) UNIQUE NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        
+        -- Age appropriateness
+        age_range_min INT DEFAULT 3,
+        age_range_max INT DEFAULT 8,
+        
+        -- Classification
+        category ENUM('math', 'language', 'memory', 'logic', 'motor', 'social', 'creativity') NOT NULL,
+        difficulty_level ENUM('beginner', 'intermediate', 'advanced') DEFAULT 'beginner',
+        
+        -- Metadata
+        icon_emoji VARCHAR(10) DEFAULT '🎯',
+        is_active BOOLEAN DEFAULT TRUE,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        -- Indexes
+        INDEX idx_skills_key (skill_key),
+        INDEX idx_skills_category (category),
+        INDEX idx_skills_difficulty (difficulty_level),
+        INDEX idx_skills_age_range (age_range_min, age_range_max),
+        INDEX idx_skills_active (is_active)
+      );
+    `;
+    await query(sqlEducationalSkills);
+
+    // 6. GAME_SKILLS_MAPPING TABLE (Games to skills relationship)
+    const sqlGameSkillsMapping = `
+      CREATE TABLE IF NOT EXISTS game_skills_mapping (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        
+        game_id INT NOT NULL,
+        skill_id INT NOT NULL,
+        
+        -- Strength of relationship
+        strength_level ENUM('primary', 'secondary', 'supplementary') DEFAULT 'secondary',
+        
+        -- Expected improvement
+        expected_improvement_percentage INT DEFAULT 10,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        -- Foreign keys
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+        FOREIGN KEY (skill_id) REFERENCES educational_skills(id) ON DELETE CASCADE,
+        
+        -- Unique constraint
+        UNIQUE KEY unique_game_skill (game_id, skill_id),
+        
+        -- Indexes
+        INDEX idx_mapping_game (game_id),
+        INDEX idx_mapping_skill (skill_id),
+        INDEX idx_mapping_strength (strength_level)
+      );
+    `;
+    await query(sqlGameSkillsMapping);
+
+    // 7. KIDS_SKILL_PROGRESS TABLE (Track skill improvement per kid)
+    const sqlKidsSkillProgress = `
+      CREATE TABLE IF NOT EXISTS kids_skill_progress (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        
+        -- Identity fields
+        kid_profile_id INT NOT NULL,  -- Only for kid profiles
+        user_id INT NULL,             -- For family member kids
+        
+        skill_id INT NOT NULL,
+        
+        -- Progress metrics
+        baseline_score INT DEFAULT 0,
+        current_score INT DEFAULT 0,
+        improvement_percentage DECIMAL(5,2) DEFAULT 0,
+        
+        -- Assessment history
+        assessments JSON DEFAULT NULL,
+        
+        -- Activity tracking
+        last_assessed_date DATE,
+        games_played_count INT DEFAULT 0,
+        total_playtime_minutes INT DEFAULT 0,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        -- Foreign keys
+        FOREIGN KEY (kid_profile_id) REFERENCES kids_profiles(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (skill_id) REFERENCES educational_skills(id) ON DELETE CASCADE,
+        
+        -- Unique constraint
+        UNIQUE KEY unique_kid_skill (kid_profile_id, skill_id),
+        UNIQUE KEY unique_user_skill (user_id, skill_id),
+        
+        -- Indexes
+        INDEX idx_skill_progress_kid (kid_profile_id),
+        INDEX idx_skill_progress_user (user_id),
+        INDEX idx_skill_progress_skill (skill_id),
+        INDEX idx_skill_progress_score (current_score),
+        INDEX idx_skill_progress_improvement (improvement_percentage),
+        INDEX idx_skill_progress_last_assessed (last_assessed_date)
+      );
+    `;
+    await query(sqlKidsSkillProgress);
+
+    // 8. GAME_ACHIEVEMENTS TABLE (Badges and rewards)
+    const sqlGameAchievements = `
+      CREATE TABLE IF NOT EXISTS game_achievements (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        
+        -- Identity fields
+        user_id INT NULL,
+        kid_profile_id INT NULL,
+        family_member_id INT NULL,
+        
+        -- Game reference
+        game_id INT NOT NULL,
+        
+        -- Achievement details
+        achievement_key VARCHAR(100) NOT NULL,
+        achievement_name VARCHAR(255) NOT NULL,
+        description TEXT,
+        icon_emoji VARCHAR(10) DEFAULT '🏆',
+        
+        -- Unlock criteria
+        unlock_value INT DEFAULT 0,
+        unlock_type ENUM('score', 'level', 'time', 'streak', 'completion') DEFAULT 'score',
+        current_progress INT DEFAULT 0,
+        
+        -- Status
+        is_unlocked BOOLEAN DEFAULT FALSE,
+        unlocked_at DATETIME DEFAULT NULL,
+        
+        -- Display
+        rarity ENUM('common', 'uncommon', 'rare', 'epic', 'legendary') DEFAULT 'common',
+        display_order INT DEFAULT 0,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        -- Foreign keys
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (kid_profile_id) REFERENCES kids_profiles(id) ON DELETE CASCADE,
+        FOREIGN KEY (family_member_id) REFERENCES family_members(id) ON DELETE CASCADE,
+        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+        
+        -- Unique constraints
+        UNIQUE KEY unique_user_game_achievement (user_id, game_id, achievement_key),
+        UNIQUE KEY unique_kid_game_achievement (kid_profile_id, game_id, achievement_key),
+        UNIQUE KEY unique_family_game_achievement (family_member_id, game_id, achievement_key),
+        
+        -- Indexes
+        INDEX idx_game_achievements_game (game_id),
+        INDEX idx_game_achievements_user (user_id),
+        INDEX idx_game_achievements_kid (kid_profile_id),
+        INDEX idx_game_achievements_family (family_member_id),
+        INDEX idx_game_achievements_unlocked (is_unlocked),
+        INDEX idx_game_achievements_key (achievement_key),
+        INDEX idx_game_achievements_rarity (rarity)
+      );
+    `;
+    await query(sqlGameAchievements);
+
+    // 9. PARENT_GAME_REPORTS TABLE (Activity reports for parents)
+    const sqlParentGameReports = `
+      CREATE TABLE IF NOT EXISTS parent_game_reports (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        
+        parent_user_id INT NOT NULL,
+        kid_profile_id INT NULL,      -- For kid profiles
+        kid_user_id INT NULL,         -- For family member kids
+        
+        -- Report type and period
+        report_type ENUM('daily', 'weekly', 'monthly', 'achievement', 'summary') NOT NULL,
+        period_start DATE NOT NULL,
+        period_end DATE NOT NULL,
+        
+        -- Activity summary
+        games_played_count INT DEFAULT 0,
+        total_playtime_minutes INT DEFAULT 0,
+        average_session_minutes INT DEFAULT 0,
+        
+        -- Progress highlights
+        new_achievements JSON DEFAULT NULL,
+        skill_improvements JSON DEFAULT NULL,
+        top_games JSON DEFAULT NULL,
+        
+        -- Recommendations
+        recommendations JSON DEFAULT NULL,
+        suggested_games JSON DEFAULT NULL,
+        
+        -- Report status
+        status ENUM('generated', 'sent', 'viewed', 'archived') DEFAULT 'generated',
+        sent_at DATETIME DEFAULT NULL,
+        viewed_at DATETIME DEFAULT NULL,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        -- Foreign keys
+        FOREIGN KEY (parent_user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (kid_profile_id) REFERENCES kids_profiles(id) ON DELETE CASCADE,
+        FOREIGN KEY (kid_user_id) REFERENCES users(id) ON DELETE CASCADE,
+        
+        -- Unique constraint
+        UNIQUE KEY unique_period_report (parent_user_id, kid_profile_id, kid_user_id, report_type, period_start),
+        
+        -- Indexes
+        INDEX idx_game_reports_parent (parent_user_id),
+        INDEX idx_game_reports_kid_profile (kid_profile_id),
+        INDEX idx_game_reports_kid_user (kid_user_id),
+        INDEX idx_game_reports_type (report_type),
+        INDEX idx_game_reports_period (period_start, period_end),
+        INDEX idx_game_reports_status (status),
+        INDEX idx_game_reports_created (created_at)
+      );
+    `;
+    await query(sqlParentGameReports);
+
+    // 10. GAME_TIME_LIMITS TABLE (Game-specific time restrictions)
+    const sqlGameTimeLimits = `
+      CREATE TABLE IF NOT EXISTS game_time_limits (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        
+        -- Identity fields
+        kid_profile_id INT NOT NULL,  -- Primary for kid profiles
+        
+        -- Daily limits
+        daily_game_time_minutes INT DEFAULT 60,
+        current_daily_game_usage INT DEFAULT 0,
+        last_reset_date DATE DEFAULT CURDATE(),
+        
+        -- Per-game specific limits
+        per_game_limits JSON DEFAULT NULL,
+        
+        -- Break settings
+        game_break_reminder_minutes INT DEFAULT 20,
+        enforce_game_breaks BOOLEAN DEFAULT TRUE,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        -- Foreign key
+        FOREIGN KEY (kid_profile_id) REFERENCES kids_profiles(id) ON DELETE CASCADE,
+        
+        -- Unique constraint
+        UNIQUE KEY unique_kid_game_limits (kid_profile_id),
+        
+        -- Indexes
+        INDEX idx_game_limits_kid (kid_profile_id),
+        INDEX idx_game_limits_last_reset (last_reset_date)
+      );
+    `;
+    await query(sqlGameTimeLimits);
+
+    console.log("🎉 All game tables created successfully!");
+
+    // Insert default games data
+    await insertDefaultGames();
+    await insertDefaultSkills();
+    
+  } catch (error) {
+    console.error("❌ Error creating game tables:", error);
+    throw error;
+  }
+};
+
+// Insert default games
+const insertDefaultGames = async () => {
+  try {
+    const defaultGames = [
+      {
+        game_key: 'counting_game',
+        title: 'Counting Adventure',
+        description: 'Learn addition with fun visuals',
+        icon_emoji: '🎮',
+        color_gradient: 'from-[#FF5722] to-[#FF9800]',
+        category: 'Math',
+        age_minimum: 3,
+        age_maximum: 8,
+        game_component: 'CountingGame',
+        metadata: JSON.stringify({ features: ['Addition', 'Subtraction', 'Visual Learning'], difficulty: 'beginner' }),
+        sort_order: 1
+      },
+      {
+        game_key: 'shape_match_game',
+        title: 'Shape Match',
+        description: 'Match shapes and patterns',
+        icon_emoji: '🔺',
+        color_gradient: 'from-[#2196F3] to-[#03A9F4]',
+        category: 'Puzzles',
+        age_minimum: 3,
+        age_maximum: 6,
+        game_component: 'ShapeMatchGame',
+        metadata: JSON.stringify({ features: ['Shapes', 'Patterns', 'Matching'], difficulty: 'beginner' }),
+        sort_order: 2
+      },
+      {
+        game_key: 'color_quest_game',
+        title: 'Color Quest',
+        description: 'Learn colors through games',
+        icon_emoji: '🎨',
+        color_gradient: 'from-[#9C27B0] to-[#E91E63]',
+        category: 'Colors',
+        age_minimum: 2,
+        age_maximum: 5,
+        game_component: 'ColorQuestGame',
+        metadata: JSON.stringify({ features: ['Color Recognition', 'Matching', 'Memory'], difficulty: 'beginner' }),
+        sort_order: 3
+      },
+      {
+        game_key: 'memory_match_game',
+        title: 'Memory Match',
+        description: 'Improve memory skills',
+        icon_emoji: '🧠',
+        color_gradient: 'from-[#4CAF50] to-[#8BC34A]',
+        category: 'Memory',
+        age_minimum: 4,
+        age_maximum: 8,
+        game_component: 'MemoryMatchGame',
+        metadata: JSON.stringify({ features: ['Memory', 'Concentration', 'Matching'], difficulty: 'intermediate' }),
+        sort_order: 4
+      },
+      {
+        game_key: 'animal_safari_game',
+        title: 'Animal Safari',
+        description: 'Learn about animals',
+        icon_emoji: '🦁',
+        color_gradient: 'from-[#FF9800] to-[#FFC107]',
+        category: 'Science',
+        age_minimum: 3,
+        age_maximum: 7,
+        game_component: 'AnimalSafariGame',
+        metadata: JSON.stringify({ features: ['Animals', 'Sounds', 'Habitats'], difficulty: 'beginner' }),
+        sort_order: 5
+      },
+      {
+        game_key: 'alphabet_race_game',
+        title: 'Alphabet Race',
+        description: 'Learn letters while racing',
+        icon_emoji: '🚗',
+        color_gradient: 'from-[#3F51B5] to-[#2196F3]',
+        category: 'Language',
+        age_minimum: 3,
+        age_maximum: 6,
+        game_component: 'AlphabetRaceGame',
+        metadata: JSON.stringify({ features: ['Alphabet', 'Letters', 'Racing'], difficulty: 'beginner' }),
+        sort_order: 6
+      },
+      {
+        game_key: 'pro_racing_challenge',
+        title: 'Pro Racing Challenge',
+        description: 'Race through traffic and collect power-ups',
+        icon_emoji: '🏎️',
+        color_gradient: 'from-[#FF0000] to-[#FF8800]',
+        category: 'Racing',
+        age_minimum: 5,
+        age_maximum: 10,
+        game_component: 'ProRacingChallenge',
+        metadata: JSON.stringify({ features: ['Racing', 'Power-ups', 'Obstacles'], difficulty: 'intermediate' }),
+        sort_order: 7
+      },
+      {
+        game_key: 'water_sort_puzzle',
+        title: 'Water Sort Puzzle',
+        description: 'Sort colorful water in tubes',
+        icon_emoji: '💧',
+        color_gradient: 'from-[#2196F3] to-[#03A9F4]',
+        category: 'Logic',
+        age_minimum: 5,
+        age_maximum: 12,
+        game_component: 'WaterSortPuzzle',
+        metadata: JSON.stringify({ features: ['Logic', 'Puzzle', 'Problem Solving'], difficulty: 'advanced' }),
+        sort_order: 8
+      }
+    ];
+
+    for (const game of defaultGames) {
+      await query(
+        `INSERT IGNORE INTO games 
+        (game_key, title, description, icon_emoji, color_gradient, category, 
+         age_minimum, age_maximum, game_component, metadata, sort_order) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          game.game_key, game.title, game.description, game.icon_emoji, 
+          game.color_gradient, game.category, game.age_minimum, game.age_maximum,
+          game.game_component, game.metadata, game.sort_order
+        ]
+      );
+    }
+    console.log("✅ Default games inserted successfully!");
+  } catch (error) {
+    console.error("❌ Error inserting default games:", error);
+  }
+};
+
+// Insert default educational skills
+const insertDefaultSkills = async () => {
+  try {
+    const defaultSkills = [
+      {
+        skill_key: 'basic_addition',
+        name: 'Basic Addition',
+        description: 'Simple addition with numbers 1-10',
+        age_range_min: 3,
+        age_range_max: 6,
+        category: 'math',
+        difficulty_level: 'beginner',
+        icon_emoji: '➕'
+      },
+      {
+        skill_key: 'color_recognition',
+        name: 'Color Recognition',
+        description: 'Identifying and naming basic colors',
+        age_range_min: 2,
+        age_range_max: 5,
+        category: 'creativity',
+        difficulty_level: 'beginner',
+        icon_emoji: '🎨'
+      },
+      {
+        skill_key: 'shape_recognition',
+        name: 'Shape Recognition',
+        description: 'Identifying basic geometric shapes',
+        age_range_min: 3,
+        age_range_max: 6,
+        category: 'math',
+        difficulty_level: 'beginner',
+        icon_emoji: '🔺'
+      },
+      {
+        skill_key: 'memory_skills',
+        name: 'Memory Skills',
+        description: 'Improving short-term memory and recall',
+        age_range_min: 4,
+        age_range_max: 8,
+        category: 'memory',
+        difficulty_level: 'intermediate',
+        icon_emoji: '🧠'
+      },
+      {
+        skill_key: 'letter_recognition',
+        name: 'Letter Recognition',
+        description: 'Identifying alphabet letters',
+        age_range_min: 3,
+        age_range_max: 6,
+        category: 'language',
+        difficulty_level: 'beginner',
+        icon_emoji: '🔤'
+      },
+      {
+        skill_key: 'problem_solving',
+        name: 'Problem Solving',
+        description: 'Logical thinking and puzzle solving',
+        age_range_min: 5,
+        age_range_max: 12,
+        category: 'logic',
+        difficulty_level: 'advanced',
+        icon_emoji: '💡'
+      },
+      {
+        skill_key: 'hand_eye_coordination',
+        name: 'Hand-Eye Coordination',
+        description: 'Motor skills and timing',
+        age_range_min: 4,
+        age_range_max: 10,
+        category: 'motor',
+        difficulty_level: 'intermediate',
+        icon_emoji: '🎯'
+      },
+      {
+        skill_key: 'pattern_recognition',
+        name: 'Pattern Recognition',
+        description: 'Identifying and completing patterns',
+        age_range_min: 4,
+        age_range_max: 8,
+        category: 'logic',
+        difficulty_level: 'intermediate',
+        icon_emoji: '🔢'
+      }
+    ];
+
+    for (const skill of defaultSkills) {
+      await query(
+        `INSERT IGNORE INTO educational_skills 
+        (skill_key, name, description, age_range_min, age_range_max, 
+         category, difficulty_level, icon_emoji) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          skill.skill_key, skill.name, skill.description, 
+          skill.age_range_min, skill.age_range_max, skill.category,
+          skill.difficulty_level, skill.icon_emoji
+        ]
+      );
+    }
+    console.log("✅ Default educational skills inserted successfully!");
+
+    // Insert game-skill mappings
+    await insertGameSkillMappings();
+  } catch (error) {
+    console.error("❌ Error inserting default skills:", error);
+  }
+};
+
+// Insert game-skill mappings
+const insertGameSkillMappings = async () => {
+  try {
+    // Get game IDs
+    const games = await query("SELECT id, game_key FROM games");
+    const gameMap = {};
+    games.forEach(game => gameMap[game.game_key] = game.id);
+
+    // Get skill IDs
+    const skills = await query("SELECT id, skill_key FROM educational_skills");
+    const skillMap = {};
+    skills.forEach(skill => skillMap[skill.skill_key] = skill.id);
+
+    // Define mappings
+    const mappings = [
+      // Counting Game
+      { game_key: 'counting_game', skill_key: 'basic_addition', strength: 'primary' },
+      { game_key: 'counting_game', skill_key: 'pattern_recognition', strength: 'secondary' },
+      
+      // Shape Match Game
+      { game_key: 'shape_match_game', skill_key: 'shape_recognition', strength: 'primary' },
+      { game_key: 'shape_match_game', skill_key: 'memory_skills', strength: 'secondary' },
+      
+      // Color Quest Game
+      { game_key: 'color_quest_game', skill_key: 'color_recognition', strength: 'primary' },
+      { game_key: 'color_quest_game', skill_key: 'memory_skills', strength: 'secondary' },
+      
+      // Memory Match Game
+      { game_key: 'memory_match_game', skill_key: 'memory_skills', strength: 'primary' },
+      { game_key: 'memory_match_game', skill_key: 'pattern_recognition', strength: 'secondary' },
+      
+      // Animal Safari Game
+      { game_key: 'animal_safari_game', skill_key: 'memory_skills', strength: 'primary' },
+      
+      // Alphabet Race Game
+      { game_key: 'alphabet_race_game', skill_key: 'letter_recognition', strength: 'primary' },
+      { game_key: 'alphabet_race_game', skill_key: 'hand_eye_coordination', strength: 'secondary' },
+      
+      // Pro Racing Challenge
+      { game_key: 'pro_racing_challenge', skill_key: 'hand_eye_coordination', strength: 'primary' },
+      { game_key: 'pro_racing_challenge', skill_key: 'problem_solving', strength: 'secondary' },
+      
+      // Water Sort Puzzle
+      { game_key: 'water_sort_puzzle', skill_key: 'problem_solving', strength: 'primary' },
+      { game_key: 'water_sort_puzzle', skill_key: 'pattern_recognition', strength: 'secondary' }
+    ];
+
+    for (const mapping of mappings) {
+      const gameId = gameMap[mapping.game_key];
+      const skillId = skillMap[mapping.skill_key];
+      
+      if (gameId && skillId) {
+        await query(
+          `INSERT IGNORE INTO game_skills_mapping (game_id, skill_id, strength_level) 
+           VALUES (?, ?, ?)`,
+          [gameId, skillId, mapping.strength]
+        );
+      }
+    }
+    console.log("✅ Game-skill mappings inserted successfully!");
+  } catch (error) {
+    console.error("❌ Error inserting game-skill mappings:", error);
+  }
 };
 
 
@@ -2135,4 +2897,5 @@ module.exports = {
   createFamilyMembersTable,
   createFamilyPinSecurityTable,
   createFeedbackTable,
+  createGameTables
 };

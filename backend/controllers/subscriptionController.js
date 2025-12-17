@@ -42,15 +42,10 @@ class EnhancedSubscriptionController {
 const getCurrentSubscription = async (req, res) => {
   try {
     const userId = req.user.id;
-  
-    console.log('🔍 getCurrentSubscription called for user:', userId, {
-      is_family_member: req.user.is_family_member,
-      has_family_plan_access: req.user.has_family_plan_access
-    });
+
 
     // 🆕 CHECK FOR FAMILY PLAN ACCESS FIRST
     if (req.user.has_family_plan_access) {
-      console.log('🎯 User has family plan access, returning family plan data');
       
       const familyPlanData = {
         id: 'family_plan',
@@ -176,7 +171,6 @@ const getCurrentSubscription = async (req, res) => {
 
     // 🛡️ RESPONSE HANDLING
     if (!validSubscription) {
-      console.log('❌ No valid current subscription found for user:', userId);
       
       return res.status(200).json({
         success: true,

@@ -111,7 +111,6 @@ const saveUserInfo = async (req, res) => {
     const sendWelcomeEmailBackground = async (email, language) => {
       try {
         await sendWelcomeEmail(email, language);
-        // console.log(`✅ Welcome email sent to ${email}`);
       } catch (emailErr) {
         // console.error("⚠️ Failed to send welcome email:", emailErr);
         // Don't throw error - just log it
@@ -270,7 +269,6 @@ const sendWelcomeNotifications = async (userId, language) => {
       ]
     );
 
-    // console.log(`✅ Sent welcome notifications to user ${userId}`);
 
   } catch (error) {
     // console.error('Error sending welcome notifications:', error);
@@ -971,7 +969,6 @@ const createUser = async (req, res) => {
     const sendAccountCreatedEmailBackground = async (email, resetLink, language) => {
       try {
         await sendAccountCreatedEmail(email, resetLink, language);
-        console.log(`✅ Account creation email sent to ${email}`);
       } catch (emailErr) {
         console.error("⚠️ Failed to send account creation email:", emailErr);
         // Don't throw error - just log it
@@ -1109,7 +1106,6 @@ const sendRoleBasedNotifications = async (userId, role, language) => {
       );
     }
 
-    // console.log(`✅ Sent ${role}-specific notifications to user ${userId}`);
 
   } catch (error) {
     // console.error('Error sending role-based notifications:', error);

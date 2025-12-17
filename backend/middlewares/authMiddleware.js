@@ -79,17 +79,6 @@ const authMiddleware = async (req, res, next) => {
     decoded.email = session.email;
     decoded.role = session.user_role;
 
-    // DEBUG LOG
-    console.log('🔍 AUTH DEBUG for user:', session.user_id, {
-      has_family_member_id: !!session.family_member_id,
-      family_invitation_status: session.family_invitation_status,
-      family_member_active: session.family_member_active,
-      family_owner_id: session.family_owner_id,
-      dashboard_type: session.family_dashboard_type,
-      owner_plan_type: session.owner_plan_type,
-      owner_subscription_status: session.owner_subscription_status
-    });
-
     // Check if user is a family plan OWNER (has active family plan subscription)
     const isFamilyPlanOwner = session.plan_type === 'family' && 
                              session.subscription_status === 'active';
@@ -108,11 +97,6 @@ const authMiddleware = async (req, res, next) => {
         decoded.member_role = 'owner';
         decoded.dashboard_type = 'normal'; // Owners have normal dashboard
         decoded.has_family_plan_access = true;
-        
-        console.log('✅ User is FAMILY PLAN OWNER:', {
-          userId: decoded.id,
-          ownerId: decoded.family_owner_id
-        });
       } else {
         // User is an INVITED FAMILY MEMBER
         decoded.family_owner_id = session.family_owner_id;
@@ -121,13 +105,7 @@ const authMiddleware = async (req, res, next) => {
         decoded.has_family_plan_access = 
           session.owner_plan_type === 'family' && 
           session.owner_subscription_status === 'active';
-        
-        console.log('✅ User is INVITED FAMILY MEMBER:', {
-          userId: decoded.id,
-          ownerId: decoded.family_owner_id,
-          dashboard_type: decoded.dashboard_type,
-          member_role: decoded.member_role
-        });
+
         
         // SPECIAL HANDLING FOR INVITED FAMILY MEMBERS WITH KID DASHBOARD
         if (session.family_dashboard_type === 'kid') {
@@ -149,7 +127,6 @@ const authMiddleware = async (req, res, next) => {
     } else {
       decoded.is_family_member = false;
       decoded.has_family_plan_access = false;
-      console.log('❌ User is NOT in family:', { userId: decoded.id });
     }
 
     // FAMILY PLAN OWNERS and regular users check for profile selection
