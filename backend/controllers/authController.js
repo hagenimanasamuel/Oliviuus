@@ -247,7 +247,7 @@ const sendWelcomeNotifications = async (userId, language) => {
           language: language,
           tip_type: 'mobile_app'
         }),
-        "/download"
+        "/"
       ]
     );
 
@@ -265,7 +265,7 @@ const sendWelcomeNotifications = async (userId, language) => {
           language: language,
           tip_type: 'subscription_info'
         }),
-        "/subscriptions"
+        "/account/settings#subscription"
       ]
     );
 

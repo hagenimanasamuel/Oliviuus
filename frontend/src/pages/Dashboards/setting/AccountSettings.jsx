@@ -1,11 +1,12 @@
 // src/pages/account/AccountSettings.jsx
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { useSubscription } from "../../../context/SubscriptionContext";
 import api from "../../../api/axios";
 import { ArrowLeft, MoreHorizontal, Bell, Users, Shield, UserCog } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import clsx from "clsx";
 
 const AccountInfo = React.lazy(() => import("./tabs/AccountInfo"));
 const SecuritySettings = React.lazy(() => import("./tabs/SecuritySettings"));
@@ -27,16 +28,15 @@ export default function AccountSettings() {
   const [pendingInvitations, setPendingInvitations] = useState(0);
   const [familyMemberData, setFamilyMemberData] = useState(null);
   const [isFamilyMember, setIsFamilyMember] = useState(false);
-
-  const [tabs, setTabs] = useState([]);
-  const [visibleTabs, setVisibleTabs] = useState([]);
-  const [overflowTabs, setOverflowTabs] = useState([]);
   const [showMore, setShowMore] = useState(false);
 
+  const containerRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const moreButtonRef = useRef(null);
   const navigate = useNavigate();
-  const containerRef = React.useRef(null);
-  const moreButtonRef = React.useRef(null);
-  const dropdownRef = React.useRef(null);
+
+  const [visibleTabs, setVisibleTabs] = useState([]);
+  const [overflowTabs, setOverflowTabs] = useState([]);
 
   // Update URL hash whenever selectedTab changes
   useEffect(() => {
@@ -97,8 +97,8 @@ export default function AccountSettings() {
     };
   }, [showMore]);
 
-  // Build tabs list with proper parental controls logic
-  useEffect(() => {
+  // Memoize tabs based on user roles and status
+  const tabs = useMemo(() => {
     const baseTabs = [
       { id: "account", label: t("settings.tabs.account") },
       { id: "security", label: t("settings.tabs.security") },
@@ -169,61 +169,114 @@ export default function AccountSettings() {
       }
     }
 
-    setTabs(finalTabs);
+    return finalTabs;
   }, [user, currentSubscription, pendingInvitations, isFamilyMember, familyMemberData, isFamilyPlanAccess, t]);
 
-  // Measure overflow on resize
+  // Calculate visible vs overflow tabs
+  const calculateVisibleTabs = useCallback(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    const containerWidth = container.offsetWidth - 80; // Reserve space for "More" button
+
+    // Create a temporary container to measure tab widths
+    const tempContainer = document.createElement("div");
+    tempContainer.style.position = "absolute";
+    tempContainer.style.visibility = "hidden";
+    tempContainer.style.whiteSpace = "nowrap";
+
+    // Add each tab button to temp container for measurement
+    tabs.forEach((tab) => {
+      const tempBtn = document.createElement("button");
+      tempBtn.className = clsx(
+        "flex items-center gap-2 px-4 py-2 text-sm font-medium whitespace-nowrap transition"
+      );
+      
+      // Create icon if exists
+      if (tab.icon) {
+        const iconSpan = document.createElement("span");
+        iconSpan.innerHTML = '<svg width="14" height="14"></svg>';
+        tempBtn.appendChild(iconSpan);
+      }
+      
+      // Add label
+      const textSpan = document.createElement("span");
+      textSpan.textContent = tab.label;
+      tempBtn.appendChild(textSpan);
+      
+      // Add badge if exists
+      if (tab.badge) {
+        const badgeSpan = document.createElement("span");
+        badgeSpan.className = "absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center";
+        badgeSpan.textContent = tab.badge;
+        tempBtn.style.position = "relative";
+        tempBtn.appendChild(badgeSpan);
+      }
+      
+      tempContainer.appendChild(tempBtn);
+    });
+
+    document.body.appendChild(tempContainer);
+
+    const tabElements = tempContainer.children;
+    let usedWidth = 0;
+    const visible = [];
+    const overflow = [];
+
+    // Calculate which tabs fit
+    Array.from(tabElements).forEach((tabElement, index) => {
+      const tabWidth = tabElement.offsetWidth + 8; // Add margin
+      if (usedWidth + tabWidth < containerWidth) {
+        visible.push(tabs[index]);
+        usedWidth += tabWidth;
+      } else {
+        overflow.push(tabs[index]);
+      }
+    });
+
+    document.body.removeChild(tempContainer);
+
+    setVisibleTabs(visible);
+    setOverflowTabs(overflow);
+  }, [tabs]);
+
+  // Setup ResizeObserver for container
   useEffect(() => {
-    const handleResize = () => {
-      if (!containerRef.current) return;
-      const containerWidth = containerRef.current.offsetWidth;
-      let usedWidth = 0;
-      const newVisible = [];
-      const newOverflow = [];
+    if (!containerRef.current) return;
 
-      // Reset to measure all buttons
-      tabs.forEach((tab) => {
-        const btn = containerRef.current.querySelector(
-          `button[data-tab="${tab.id}"]`
-        );
-        if (!btn) return;
-        btn.style.display = "block";
-      });
+    const resizeObserver = new ResizeObserver(() => {
+      calculateVisibleTabs();
+    });
 
-      // Calculate visible tabs with space for "More" button
-      tabs.forEach((tab) => {
-        const btn = containerRef.current.querySelector(
-          `button[data-tab="${tab.id}"]`
-        );
-        if (!btn) return;
+    resizeObserver.observe(containerRef.current);
+    calculateVisibleTabs();
 
-        const btnWidth = btn.offsetWidth + 8;
-        if (usedWidth + btnWidth < containerWidth - 80) {
-          newVisible.push(tab);
-          usedWidth += btnWidth;
-        } else {
-          newOverflow.push(tab);
-        }
-      });
+    return () => resizeObserver.disconnect();
+  }, [calculateVisibleTabs]);
 
-      // Hide overflowed tabs
-      tabs.forEach((tab) => {
-        const btn = containerRef.current.querySelector(
-          `button[data-tab="${tab.id}"]`
-        );
-        if (!btn) return;
-        const isVisible = newVisible.find((t) => t.id === tab.id);
-        btn.style.display = isVisible ? "block" : "none";
-      });
-
-      setVisibleTabs(newVisible);
-      setOverflowTabs(newOverflow);
+  // Window resize fallback
+  useEffect(() => {
+    const handleWindowResize = () => {
+      calculateVisibleTabs();
     };
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [tabs]);
+    const debouncedResize = debounce(handleWindowResize, 100);
+    window.addEventListener("resize", debouncedResize);
+    return () => window.removeEventListener("resize", debouncedResize);
+  }, [calculateVisibleTabs]);
+
+  // Simple debounce utility
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
 
   // Show family member badge in account info
   const showFamilyMemberBadge = isFamilyMember && familyMemberData;
@@ -275,16 +328,17 @@ export default function AccountSettings() {
       {/* Sticky Tabs */}
       <div className="sticky top-0 bg-[#0d0d0d] z-20 border-b border-gray-700 mb-6">
         <div className="flex items-center relative" ref={containerRef}>
-          {tabs.map((tab) => (
+          {visibleTabs.map((tab) => (
             <button
               key={tab.id}
               data-tab={tab.id}
               onClick={() => setSelectedTab(tab.id)}
-              className={`px-4 py-2 text-sm font-medium transition whitespace-nowrap flex items-center gap-2 relative ${
+              className={clsx(
+                "px-4 py-2 text-sm font-medium transition whitespace-nowrap flex items-center gap-2 relative",
                 selectedTab === tab.id
                   ? "border-b-2 border-[#BC8BBC] text-white"
                   : "text-gray-400 hover:text-white"
-              }`}
+              )}
             >
               {tab.icon && tab.icon}
               {tab.label}
@@ -300,7 +354,7 @@ export default function AccountSettings() {
             <div className="ml-auto relative" ref={moreButtonRef}>
               <button
                 onClick={() => setShowMore(!showMore)}
-                className="p-2 rounded-full hover:bg-gray-800 transition flex items-center gap-1"
+                className="p-2 rounded-full hover:bg-gray-800 transition flex items-center gap-1 text-gray-400 hover:text-white"
               >
                 <MoreHorizontal size={20} />
                 <span>{t("settings.more")}</span>
@@ -317,11 +371,12 @@ export default function AccountSettings() {
                         setSelectedTab(tab.id);
                         setShowMore(false);
                       }}
-                      className={`block w-full text-left px-4 py-2 text-sm transition flex items-center gap-2 ${
+                      className={clsx(
+                        "block w-full text-left px-4 py-2 text-sm transition flex items-center gap-2",
                         selectedTab === tab.id
                           ? "bg-gray-800 text-white"
                           : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                      }`}
+                      )}
                     >
                       {tab.icon && tab.icon}
                       {tab.label}

@@ -1,5 +1,5 @@
 // src/pages/account/tabs/ParentalControls.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
 import { useAuth } from "../../../../context/AuthContext";
 import { useSubscription } from "../../../../context/SubscriptionContext";
 import api from "../../../../api/axios";
@@ -17,9 +17,16 @@ import {
   Edit3,
   RotateCcw,
   LogOut,
-  X
+  X,
+  MoreHorizontal,
+  Users
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import clsx from "clsx";
+
+// Import components
+const KidInsightsTab = React.lazy(() => import("./subscription/KidInsightsTab"));
+const SecurityLogsTab = React.lazy(() => import("./subscription/SecurityLogsTab"));
 
 // Custom Modal Component
 const MessageModal = ({ type, title, message, onClose, isVisible }) => {
@@ -113,13 +120,23 @@ const MessageModal = ({ type, title, message, onClose, isVisible }) => {
   );
 };
 
+// Load kid profiles function
+const loadKidProfilesFunction = async () => {
+  try {
+    const response = await api.get("/kids/profiles");
+    return response.data || [];
+  } catch (error) {
+    console.error("Error loading kid profiles:", error);
+    return [];
+  }
+};
+
 export default function ParentalControls({ user, isFamilyOwner, isFamilyMember, memberRole, familyMemberData }) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("pin");
   const [loading, setLoading] = useState(false);
   const [pinStatus, setPinStatus] = useState(null);
-  const [securityLogs, setSecurityLogs] = useState([]);
-  const [logsLoading, setLogsLoading] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   
   // PIN Management States
   const [currentPin, setCurrentPin] = useState(""); // For verifying existing PIN
@@ -136,12 +153,35 @@ export default function ParentalControls({ user, isFamilyOwner, isFamilyMember, 
     message: ""
   });
 
+  // Kid profiles state
+  const [kidProfiles, setKidProfiles] = useState([]);
+  const [visibleTabs, setVisibleTabs] = useState([]);
+  const [overflowTabs, setOverflowTabs] = useState([]);
+
+  const containerRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const moreButtonRef = useRef(null);
+
   const { currentSubscription, isFamilyPlanAccess } = useSubscription();
 
-  const tabs = [
-    { id: "pin", label: t('parentalControls.tabs.pinManagement'), icon: <Key size={16} /> },
-    { id: "logs", label: t('parentalControls.tabs.securityLogs'), icon: <History size={16} /> }
-  ];
+  // Memoize tabs configuration
+  const tabs = useMemo(() => {
+    const baseTabs = [
+      { id: "pin", label: t('parentalControls.tabs.pinManagement'), icon: Key },
+      { id: "logs", label: t('parentalControls.tabs.securityLogs'), icon: History }
+    ];
+    
+    // Add Kid Insights tab if we have profiles
+    if (kidProfiles.length > 0) {
+      baseTabs.push({ 
+        id: "insights", 
+        label: t('parentalControls.tabs.kidInsights'), 
+        icon: History 
+      });
+    }
+    
+    return baseTabs;
+  }, [t, kidProfiles.length]);
 
   // Enhanced role validation
   const canManagePins = (isFamilyOwner || (isFamilyMember && memberRole === 'parent')) && 
@@ -162,17 +202,131 @@ export default function ParentalControls({ user, isFamilyOwner, isFamilyMember, 
     setModal(prev => ({ ...prev, isVisible: false }));
   };
 
+  // Load data on component mount
   useEffect(() => {
-    if (canManagePins) {
-      loadPinStatus();
-    }
+    const loadData = async () => {
+      if (canManagePins) {
+        await loadPinStatus();
+        // Load kid profiles for insights tab
+        const profiles = await loadKidProfilesFunction();
+        setKidProfiles(profiles);
+      }
+    };
+    
+    loadData();
   }, [canManagePins]);
 
+  // Close dropdown when clicking outside
   useEffect(() => {
-    if (activeTab === "logs" && canManagePins) {
-      loadSecurityLogs();
-    }
-  }, [activeTab, canManagePins]);
+    const handleClickOutside = (e) => {
+      if (
+        showMore &&
+        moreButtonRef.current &&
+        !moreButtonRef.current.contains(e.target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target)
+      ) {
+        setShowMore(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showMore]);
+
+  // Calculate visible vs overflow tabs
+  const calculateVisibleTabs = useCallback(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    const containerWidth = container.offsetWidth - 80; // Reserve space for "More" button
+
+    // Create a temporary container to measure tab widths
+    const tempContainer = document.createElement("div");
+    tempContainer.style.position = "absolute";
+    tempContainer.style.visibility = "hidden";
+    tempContainer.style.whiteSpace = "nowrap";
+
+    // Add each tab button to temp container for measurement
+    tabs.forEach((tab) => {
+      const tempBtn = document.createElement("button");
+      tempBtn.className = clsx(
+        "flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap min-w-[140px] justify-center"
+      );
+      
+      // Add icon
+      const iconSpan = document.createElement("span");
+      iconSpan.innerHTML = '<svg width="16" height="16"></svg>';
+      tempBtn.appendChild(iconSpan);
+      
+      // Add label
+      const textSpan = document.createElement("span");
+      textSpan.textContent = tab.label;
+      tempBtn.appendChild(textSpan);
+      
+      tempContainer.appendChild(tempBtn);
+    });
+
+    document.body.appendChild(tempContainer);
+
+    const tabElements = tempContainer.children;
+    let usedWidth = 0;
+    const visible = [];
+    const overflow = [];
+
+    // Calculate which tabs fit
+    Array.from(tabElements).forEach((tabElement, index) => {
+      const tabWidth = tabElement.offsetWidth + 8; // Add margin
+      if (usedWidth + tabWidth < containerWidth) {
+        visible.push(tabs[index]);
+        usedWidth += tabWidth;
+      } else {
+        overflow.push(tabs[index]);
+      }
+    });
+
+    document.body.removeChild(tempContainer);
+
+    setVisibleTabs(visible);
+    setOverflowTabs(overflow);
+  }, [tabs]);
+
+  // Setup ResizeObserver for container
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      calculateVisibleTabs();
+    });
+
+    resizeObserver.observe(containerRef.current);
+    calculateVisibleTabs();
+
+    return () => resizeObserver.disconnect();
+  }, [calculateVisibleTabs]);
+
+  // Window resize fallback
+  useEffect(() => {
+    const handleWindowResize = () => {
+      calculateVisibleTabs();
+    };
+
+    const debouncedResize = debounce(handleWindowResize, 100);
+    window.addEventListener("resize", debouncedResize);
+    return () => window.removeEventListener("resize", debouncedResize);
+  }, [calculateVisibleTabs]);
+
+  // Simple debounce utility
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
 
   const loadPinStatus = async () => {
     if (!canManagePins) return;
@@ -186,21 +340,6 @@ export default function ParentalControls({ user, isFamilyOwner, isFamilyMember, 
       showMessage("error", t('parentalControls.errors.loadFailed'), t('parentalControls.errors.loadPinStatus'));
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadSecurityLogs = async () => {
-    if (!canManagePins) return;
-    
-    try {
-      setLogsLoading(true);
-      const response = await api.get("/family/security-logs");
-      setSecurityLogs(response.data.logs || []);
-    } catch (error) {
-      console.error("Error loading security logs:", error);
-      showMessage("error", t('parentalControls.errors.loadFailed'), t('parentalControls.errors.loadSecurityLogs'));
-    } finally {
-      setLogsLoading(false);
     }
   };
 
@@ -401,348 +540,381 @@ export default function ParentalControls({ user, isFamilyOwner, isFamilyMember, 
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="border-b border-gray-700 mb-6 sm:mb-8">
-          <div className="flex space-x-1 overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 text-sm font-medium rounded-t-lg transition-all duration-300 whitespace-nowrap min-w-[140px] text-center flex items-center justify-center gap-2 ${
-                  activeTab === tab.id
-                    ? "bg-[#BC8BBC] text-white shadow-lg transform scale-105"
-                    : "text-gray-400 hover:text-white hover:bg-gray-800 transform hover:scale-105"
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
+        {/* Enhanced Tab Navigation with Responsive Overflow */}
+        <div className="sticky top-0 bg-gray-800/50 backdrop-blur-sm z-10 border-b border-gray-700 mb-6">
+          <div className="flex items-center relative" ref={containerRef}>
+            {visibleTabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  data-tab={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={clsx(
+                    "px-4 py-3 text-sm font-medium rounded-t-lg transition-all duration-300 whitespace-nowrap flex items-center justify-center gap-2 min-w-[140px]",
+                    activeTab === tab.id
+                      ? "bg-[#BC8BBC] text-white shadow-lg"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700"
+                  )}
+                >
+                  <Icon size={16} />
+                  {tab.label}
+                </button>
+              );
+            })}
+
+            {overflowTabs.length > 0 && (
+              <div className="ml-auto relative" ref={moreButtonRef}>
+                <button
+                  onClick={() => setShowMore(!showMore)}
+                  className="p-2 rounded-lg hover:bg-gray-700 transition flex items-center gap-1 text-gray-400 hover:text-white"
+                >
+                  <MoreHorizontal size={20} />
+                  <span className="text-sm">{t('settings.more', 'More')}</span>
+                </button>
+
+                {showMore && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute right-0 mt-1 w-48 bg-gray-900 rounded-lg shadow-lg border border-gray-700 z-30"
+                  >
+                    {overflowTabs.map((tab) => {
+                      const Icon = tab.icon;
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => {
+                            setActiveTab(tab.id);
+                            setShowMore(false);
+                          }}
+                          className={clsx(
+                            "flex items-center gap-2 w-full text-left px-4 py-3 text-sm transition",
+                            activeTab === tab.id
+                              ? "bg-gray-800 text-white"
+                              : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                          )}
+                        >
+                          <Icon size={16} />
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Tab Content */}
         <div className="bg-gray-800/50 rounded-lg p-4 sm:p-6 border border-gray-700">
-          {/* PIN Management Tab */}
-          {activeTab === "pin" && (
-            <div className="space-y-6">
-              {/* Master PIN Section */}
-              <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-[#BC8BBC]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    {hasActivePin ? (
-                      <Lock className="text-[#BC8BBC]" size={32} />
-                    ) : (
-                      <Unlock className="text-[#BC8BBC]" size={32} />
-                    )}
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    {hasActivePin ? t('parentalControls.pinSection.activeTitle') : t('parentalControls.pinSection.setupTitle')}
-                  </h3>
-                  <p className="text-gray-400 text-sm max-w-md mx-auto">
-                    {hasActivePin 
-                      ? t('parentalControls.pinSection.activeDescription')
-                      : t('parentalControls.pinSection.setupDescription')
-                    }
-                  </p>
-                </div>
-
-                {/* PIN Status Display */}
-                {hasActivePin && verificationStep === "none" && (
-                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 mb-6">
-                    <p className="text-green-400 text-sm flex items-center gap-2 justify-center">
-                      <CheckCircle size={16} />
-                      {t('parentalControls.pinSection.activeStatus')}
+          <Suspense fallback={
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#BC8BBC]"></div>
+            </div>
+          }>
+            {/* PIN Management Tab */}
+            {activeTab === "pin" && (
+              <div className="space-y-6">
+                {/* Master PIN Section */}
+                <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-[#BC8BBC]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      {hasActivePin ? (
+                        <Lock className="text-[#BC8BBC]" size={32} />
+                      ) : (
+                        <Unlock className="text-[#BC8BBC]" size={32} />
+                      )}
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">
+                      {hasActivePin ? t('parentalControls.pinSection.activeTitle') : t('parentalControls.pinSection.setupTitle')}
+                    </h3>
+                    <p className="text-gray-400 text-sm max-w-md mx-auto">
+                      {hasActivePin 
+                        ? t('parentalControls.pinSection.activeDescription')
+                        : t('parentalControls.pinSection.setupDescription')
+                      }
                     </p>
                   </div>
-                )}
 
-                {/* Step 1: Initial State - No PIN verification in progress */}
-                {verificationStep === "none" && (
-                  <div className="max-w-md mx-auto space-y-4">
-                    {!hasActivePin ? (
-                      // First-time PIN setup
-                      <div className="space-y-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-3 text-center">
-                            {t('parentalControls.pinSection.createPin')}
-                          </label>
-                          <div className="relative">
-                            <input
-                              type={showNewPin ? "text" : "password"}
-                              value={newPin}
-                              onChange={(e) => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                              placeholder={t('parentalControls.pinSection.enterPinPlaceholder')}
-                              className="w-full px-6 py-4 bg-gray-800 border-2 border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#BC8BBC] focus:ring-0 text-center text-2xl tracking-widest font-semibold"
-                              maxLength={4}
-                              autoComplete="off"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowNewPin(!showNewPin)}
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                            >
-                              {showNewPin ? <EyeOff size={24} /> : <Eye size={24} />}
-                            </button>
+                  {/* PIN Status Display */}
+                  {hasActivePin && verificationStep === "none" && (
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 mb-6">
+                      <p className="text-green-400 text-sm flex items-center gap-2 justify-center">
+                        <CheckCircle size={16} />
+                        {t('parentalControls.pinSection.activeStatus')}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Step 1: Initial State - No PIN verification in progress */}
+                  {verificationStep === "none" && (
+                    <div className="max-w-md mx-auto space-y-4">
+                      {!hasActivePin ? (
+                        // First-time PIN setup
+                        <div className="space-y-6">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-3 text-center">
+                              {t('parentalControls.pinSection.createPin')}
+                            </label>
+                            <div className="relative">
+                              <input
+                                type={showNewPin ? "text" : "password"}
+                                value={newPin}
+                                onChange={(e) => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                placeholder={t('parentalControls.pinSection.enterPinPlaceholder')}
+                                className="w-full px-6 py-4 bg-gray-800 border-2 border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#BC8BBC] focus:ring-0 text-center text-2xl tracking-widest font-semibold"
+                                maxLength={4}
+                                autoComplete="off"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowNewPin(!showNewPin)}
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                              >
+                                {showNewPin ? <EyeOff size={24} /> : <Eye size={24} />}
+                              </button>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2 text-center">
+                              {newPin.length}/4 {t('parentalControls.pinSection.digits')}
+                            </p>
                           </div>
-                          <p className="text-xs text-gray-500 mt-2 text-center">
-                            {newPin.length}/4 {t('parentalControls.pinSection.digits')}
-                          </p>
-                        </div>
 
+                          <button
+                            onClick={handleSetNewPin}
+                            disabled={loading || newPin.length !== 4}
+                            className="w-full px-6 py-4 bg-[#BC8BBC] text-white rounded-xl font-semibold text-lg hover:bg-[#a87ba8] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                          >
+                            {loading ? (
+                              <RefreshCw size={20} className="animate-spin" />
+                            ) : (
+                              <Lock size={20} />
+                            )}
+                            {loading ? t('parentalControls.actions.settingPin') : t('parentalControls.actions.setMasterPin')}
+                          </button>
+                        </div>
+                      ) : (
+                        // PIN is active - show action buttons
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <button
+                            onClick={() => setVerificationStep("changing")}
+                            className="px-6 py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                          >
+                            <Edit3 size={20} />
+                            {t('parentalControls.actions.changePin')}
+                          </button>
+
+                          <button
+                            onClick={() => setVerificationStep("resetting")}
+                            className="px-6 py-4 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                          >
+                            <RotateCcw size={20} />
+                            {t('parentalControls.actions.resetPin')}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Step 2: PIN Verification Required */}
+                  {(verificationStep === "changing" || verificationStep === "resetting") && (
+                    <div className="max-w-sm mx-auto space-y-6">
+                      <div className="text-center">
+                        <h4 className="text-lg font-semibold text-white mb-2">
+                          {t('parentalControls.verification.title')}
+                        </h4>
+                        <p className="text-gray-400 text-sm">
+                          {t('parentalControls.verification.description')}
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-3 text-center">
+                          {t('parentalControls.verification.currentPin')}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showCurrentPin ? "text" : "password"}
+                            value={currentPin}
+                            onChange={(e) => setCurrentPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                            placeholder={t('parentalControls.verification.enterCurrentPin')}
+                            className="w-full px-6 py-4 bg-gray-800 border-2 border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#BC8BBC] focus:ring-0 text-center text-2xl tracking-widest font-semibold"
+                            maxLength={4}
+                            autoComplete="off"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowCurrentPin(!showCurrentPin)}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                          >
+                            {showCurrentPin ? <EyeOff size={24} /> : <Eye size={24} />}
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2 text-center">
+                          {currentPin.length}/4 {t('parentalControls.pinSection.digits')}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-3">
                         <button
-                          onClick={handleSetNewPin}
+                          onClick={verifyCurrentPin}
+                          disabled={verificationStep === "verifying" || currentPin.length !== 4}
+                          className="flex-1 px-6 py-4 bg-[#BC8BBC] text-white rounded-xl font-semibold hover:bg-[#a87ba8] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-3"
+                        >
+                          {verificationStep === "verifying" ? (
+                            <RefreshCw size={20} className="animate-spin" />
+                          ) : (
+                            <Key size={20} />
+                          )}
+                          {verificationStep === "verifying" ? t('parentalControls.actions.verifying') : t('parentalControls.actions.verifyPin')}
+                        </button>
+                        <button
+                          onClick={cancelVerification}
+                          className="px-6 py-4 bg-gray-600 text-white rounded-xl font-semibold hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-3"
+                        >
+                          <LogOut size={20} />
+                          {t('parentalControls.actions.cancel')}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3: PIN Verified - Show New PIN Input for Change */}
+                  {verificationStep === "verified" && (
+                    <div className="max-w-sm mx-auto space-y-6">
+                      <div className="text-center">
+                        <h4 className="text-lg font-semibold text-white mb-2">
+                          {t('parentalControls.newPin.title')}
+                        </h4>
+                        <p className="text-gray-400 text-sm">
+                          {t('parentalControls.newPin.description')}
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-3 text-center">
+                          {t('parentalControls.newPin.newPin')}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showNewPin ? "text" : "password"}
+                            value={newPin}
+                            onChange={(e) => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                            placeholder={t('parentalControls.newPin.enterNewPin')}
+                            className="w-full px-6 py-4 bg-gray-800 border-2 border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#BC8BBC] focus:ring-0 text-center text-2xl tracking-widest font-semibold"
+                            maxLength={4}
+                            autoComplete="off"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPin(!showNewPin)}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                          >
+                            {showNewPin ? <EyeOff size={24} /> : <Eye size={24} />}
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2 text-center">
+                          {newPin.length}/4 {t('parentalControls.pinSection.digits')}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleChangePin}
                           disabled={loading || newPin.length !== 4}
-                          className="w-full px-6 py-4 bg-[#BC8BBC] text-white rounded-xl font-semibold text-lg hover:bg-[#a87ba8] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                          className="flex-1 px-6 py-4 bg-[#BC8BBC] text-white rounded-xl font-semibold hover:bg-[#a87ba8] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-3"
                         >
                           {loading ? (
                             <RefreshCw size={20} className="animate-spin" />
                           ) : (
-                            <Lock size={20} />
+                            <Key size={20} />
                           )}
-                          {loading ? t('parentalControls.actions.settingPin') : t('parentalControls.actions.setMasterPin')}
+                          {loading ? t('parentalControls.actions.updating') : t('parentalControls.actions.updatePin')}
+                        </button>
+                        <button
+                          onClick={cancelVerification}
+                          className="px-6 py-4 bg-gray-600 text-white rounded-xl font-semibold hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-3"
+                        >
+                          <LogOut size={20} />
+                          {t('parentalControls.actions.cancel')}
                         </button>
                       </div>
-                    ) : (
-                      // PIN is active - show action buttons
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <button
-                          onClick={() => setVerificationStep("changing")}
-                          className="px-6 py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
-                        >
-                          <Edit3 size={20} />
-                          {t('parentalControls.actions.changePin')}
-                        </button>
-
-                        <button
-                          onClick={() => setVerificationStep("resetting")}
-                          className="px-6 py-4 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
-                        >
-                          <RotateCcw size={20} />
-                          {t('parentalControls.actions.resetPin')}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Step 2: PIN Verification Required */}
-                {(verificationStep === "changing" || verificationStep === "resetting") && (
-                  <div className="max-w-sm mx-auto space-y-6">
-                    <div className="text-center">
-                      <h4 className="text-lg font-semibold text-white mb-2">
-                        {t('parentalControls.verification.title')}
-                      </h4>
-                      <p className="text-gray-400 text-sm">
-                        {t('parentalControls.verification.description')}
-                      </p>
                     </div>
+                  )}
+                </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-3 text-center">
-                        {t('parentalControls.verification.currentPin')}
-                      </label>
-                      <div className="relative">
-                        <input
-                          type={showCurrentPin ? "text" : "password"}
-                          value={currentPin}
-                          onChange={(e) => setCurrentPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                          placeholder={t('parentalControls.verification.enterCurrentPin')}
-                          className="w-full px-6 py-4 bg-gray-800 border-2 border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#BC8BBC] focus:ring-0 text-center text-2xl tracking-widest font-semibold"
-                          maxLength={4}
-                          autoComplete="off"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowCurrentPin(!showCurrentPin)}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                        >
-                          {showCurrentPin ? <EyeOff size={24} /> : <Eye size={24} />}
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        {currentPin.length}/4 {t('parentalControls.pinSection.digits')}
-                      </p>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={verifyCurrentPin}
-                        disabled={verificationStep === "verifying" || currentPin.length !== 4}
-                        className="flex-1 px-6 py-4 bg-[#BC8BBC] text-white rounded-xl font-semibold hover:bg-[#a87ba8] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-3"
-                      >
-                        {verificationStep === "verifying" ? (
-                          <RefreshCw size={20} className="animate-spin" />
-                        ) : (
-                          <Key size={20} />
-                        )}
-                        {verificationStep === "verifying" ? t('parentalControls.actions.verifying') : t('parentalControls.actions.verifyPin')}
-                      </button>
-                      <button
-                        onClick={cancelVerification}
-                        className="px-6 py-4 bg-gray-600 text-white rounded-xl font-semibold hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-3"
-                      >
-                        <LogOut size={20} />
-                        {t('parentalControls.actions.cancel')}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 3: PIN Verified - Show New PIN Input for Change */}
-                {verificationStep === "verified" && (
-                  <div className="max-w-sm mx-auto space-y-6">
-                    <div className="text-center">
-                      <h4 className="text-lg font-semibold text-white mb-2">
-                        {t('parentalControls.newPin.title')}
-                      </h4>
-                      <p className="text-gray-400 text-sm">
-                        {t('parentalControls.newPin.description')}
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-3 text-center">
-                        {t('parentalControls.newPin.newPin')}
-                      </label>
-                      <div className="relative">
-                        <input
-                          type={showNewPin ? "text" : "password"}
-                          value={newPin}
-                          onChange={(e) => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                          placeholder={t('parentalControls.newPin.enterNewPin')}
-                          className="w-full px-6 py-4 bg-gray-800 border-2 border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#BC8BBC] focus:ring-0 text-center text-2xl tracking-widest font-semibold"
-                          maxLength={4}
-                          autoComplete="off"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowNewPin(!showNewPin)}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                        >
-                          {showNewPin ? <EyeOff size={24} /> : <Eye size={24} />}
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        {newPin.length}/4 {t('parentalControls.pinSection.digits')}
-                      </p>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleChangePin}
-                        disabled={loading || newPin.length !== 4}
-                        className="flex-1 px-6 py-4 bg-[#BC8BBC] text-white rounded-xl font-semibold hover:bg-[#a87ba8] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-3"
-                      >
-                        {loading ? (
-                          <RefreshCw size={20} className="animate-spin" />
-                        ) : (
-                          <Key size={20} />
-                        )}
-                        {loading ? t('parentalControls.actions.updating') : t('parentalControls.actions.updatePin')}
-                      </button>
-                      <button
-                        onClick={cancelVerification}
-                        className="px-6 py-4 bg-gray-600 text-white rounded-xl font-semibold hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-3"
-                      >
-                        <LogOut size={20} />
-                        {t('parentalControls.actions.cancel')}
-                      </button>
+                {/* Family Members Section */}
+                {pinStatus?.family_members && pinStatus.family_members.length > 0 && (
+                  <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <h3 className="text-lg font-semibold text-white mb-4">{t('parentalControls.familyMembers.title')}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {pinStatus.family_members.map((member) => (
+                        <div key={member.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium text-white truncate">{member.email}</h4>
+                            <span className="text-xs text-gray-400 capitalize">{t(`family.roles.${member.role}`, member.role)}</span>
+                          </div>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">{t('parentalControls.familyMembers.status')}:</span>
+                              <span className={`px-2 py-1 rounded-full text-xs ${
+                                member.is_active 
+                                  ? 'bg-green-500/20 text-green-400' 
+                                  : 'bg-gray-500/20 text-gray-400'
+                              }`}>
+                                {member.is_active ? t('parentalControls.familyMembers.active') : t('parentalControls.familyMembers.inactive')}
+                              </span>
+                            </div>
+                            {member.pin_security?.is_locked && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-400">{t('parentalControls.familyMembers.pinStatus')}:</span>
+                                <span className="text-xs px-2 py-1 rounded-full bg-red-500/20 text-red-400">
+                                  {t('parentalControls.familyMembers.locked')}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
               </div>
+            )}
 
-              {/* Family Members Section */}
-              {pinStatus?.family_members && pinStatus.family_members.length > 0 && (
-                <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
-                  <h3 className="text-lg font-semibold text-white mb-4">{t('parentalControls.familyMembers.title')}</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {pinStatus.family_members.map((member) => (
-                      <div key={member.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium text-white truncate">{member.email}</h4>
-                          <span className="text-xs text-gray-400 capitalize">{t(`family.roles.${member.role}`, member.role)}</span>
-                        </div>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-400">{t('parentalControls.familyMembers.status')}:</span>
-                            <span className={`px-2 py-1 rounded-full text-xs ${
-                              member.is_active 
-                                ? 'bg-green-500/20 text-green-400' 
-                                : 'bg-gray-500/20 text-gray-400'
-                            }`}>
-                              {member.is_active ? t('parentalControls.familyMembers.active') : t('parentalControls.familyMembers.inactive')}
-                            </span>
-                          </div>
-                          {member.pin_security?.is_locked && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-400">{t('parentalControls.familyMembers.pinStatus')}:</span>
-                              <span className="text-xs px-2 py-1 rounded-full bg-red-500/20 text-red-400">
-                                {t('parentalControls.familyMembers.locked')}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+            {/* Security Logs Tab - Using the new component */}
+            {activeTab === "logs" && (
+              <SecurityLogsTab
+                user={user}
+                isFamilyOwner={isFamilyOwner}
+                kidProfiles={kidProfiles}
+              />
+            )}
 
-          {/* Security Logs Tab */}
-          {activeTab === "logs" && (
-            <div className="space-y-6">
-              {logsLoading ? (
-                <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#BC8BBC]"></div>
+            {/* Kid Insights Tab */}
+            {activeTab === "insights" && kidProfiles.length > 0 && (
+              <KidInsightsTab
+                kidProfiles={kidProfiles}
+                user={user}
+                isFamilyOwner={isFamilyOwner}
+              />
+            )}
+
+            {/* Message when no kid profiles exist */}
+            {activeTab === "insights" && kidProfiles.length === 0 && (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users size={32} className="text-gray-500" />
                 </div>
-              ) : securityLogs.length > 0 ? (
-                <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gray-800 border-b border-gray-700">
-                        <tr>
-                          <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                            {t('parentalControls.securityLogs.action')}
-                          </th>
-                          <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                            {t('parentalControls.securityLogs.dateTime')}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-700">
-                        {securityLogs.map((log) => (
-                          <tr key={log.id} className="hover:bg-gray-800/50 transition-colors">
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm text-white capitalize">
-                                  {log.action.replace(/_/g, ' ')}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                              {new Date(log.created_at).toLocaleString()}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <History size={48} className="mx-auto text-gray-500 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-400 mb-2">{t('parentalControls.securityLogs.noLogs')}</h3>
-                  <p className="text-gray-500 text-sm">
-                    {t('parentalControls.securityLogs.noLogsDescription')}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+                <h4 className="text-lg font-medium text-gray-300 mb-2">
+                  No Kid Profiles Found
+                </h4>
+                <p className="text-gray-500 mb-4 max-w-md mx-auto">
+                  Create kid profiles in the Family Profiles section to view insights and analytics.
+                </p>
+              </div>
+            )}
+          </Suspense>
         </div>
       </div>
     </>

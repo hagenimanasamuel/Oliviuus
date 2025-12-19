@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  X, Home, Volume2, Volume1, VolumeX, Settings, Trophy, Heart,
-  SkipBack, SkipForward, Maximize2, Minimize2, Music, ChevronUp,
-  ChevronDown, Pause, Play, HelpCircle, RotateCcw, Zap, Clock,
-  Smartphone, Monitor, Gamepad2, Eye, EyeOff
+  X, Volume2, Volume1, VolumeX, Music, ChevronUp,
+  ChevronDown, Pause, Play, HelpCircle, RotateCcw, Clock,
+  Gamepad2, Eye, EyeOff, Trophy, Heart, Maximize2, Minimize2
 } from 'lucide-react';
+import api from '../../../../../../api/axios';
 
 // Import audio files directly
 import track1 from '../../../../../../../public/sound/kid_games/kid_games (1).mp3';
@@ -12,7 +12,7 @@ import track2 from '../../../../../../../public/sound/kid_games/kid_games (2).mp
 import track3 from '../../../../../../../public/sound/kid_games/kid_games (3).mp3';
 import track4 from '../../../../../../../public/sound/kid_games/kid_games (4).mp3';
 
-const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
+const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose, sessionId, onGameEvent }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [volume, setVolume] = useState(0.7);
@@ -25,7 +25,6 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
   const [tracks, setTracks] = useState([]);
   const [audioError, setAudioError] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [controlsTimeout, setControlsTimeout] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [gameStats, setGameStats] = useState({
@@ -33,12 +32,17 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
     questionsAnswered: 0,
     streak: 0
   });
+  const [lastScoreSent, setLastScoreSent] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState(null);
 
   // Refs
   const backgroundAudioRef = useRef(null);
   const gameContainerRef = useRef(null);
   const fullscreenRef = useRef(null);
   const userInteractedRef = useRef(false);
+  const timerRef = useRef(null);
+  const scoreDebounceRef = useRef(null);
 
   // Imported audio tracks
   const backgroundTracks = [track1, track2, track3, track4];
@@ -48,8 +52,6 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
     checkMobile();
     setupFullscreen();
     startGameTimer();
-
-    // Initialize audio
     initAudio();
 
     return () => {
@@ -76,6 +78,190 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Submit score to backend
+  const submitScoreToBackend = useCallback(async (newScore, level = 1, metrics = {}) => {
+    if (!sessionId) {
+      console.log('No session ID, skipping score submission');
+      return;
+    }
+
+    // Debounce score submissions to avoid too many API calls
+    if (scoreDebounceRef.current) {
+      clearTimeout(scoreDebounceRef.current);
+    }
+
+    scoreDebounceRef.current = setTimeout(async () => {
+      try {
+        const response = await api.post(`/games/kids/games/${gameId}/score`, {
+          session_id: sessionId,
+          score: newScore,
+          level: level,
+          moves: 0,
+          time_taken: gameStats.timePlayed,
+          accuracy: 100,
+          metrics: {
+            ...metrics,
+            hearts: hearts,
+            streak: gameStats.streak,
+            questions_answered: gameStats.questionsAnswered
+          }
+        });
+
+        if (response.data.success) {
+          setLastScoreSent(newScore);
+          console.log('Score submitted successfully:', response.data);
+        }
+      } catch (error) {
+        console.error('Failed to submit score:', error);
+        // Continue game even if score submission fails
+      }
+    }, 1000); // Debounce for 1 second
+  }, [sessionId, gameId, gameStats, hearts]);
+
+  // Save game progress to backend
+  const saveGameProgress = useCallback(async (saveState, level = 1) => {
+    if (!sessionId) {
+      console.log('No session ID, skipping progress save');
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      const response = await api.post(`/games/kids/games/${gameId}/save`, {
+        save_state: saveState,
+        level: level
+      });
+
+      if (response.data.success) {
+        setSaveMessage('Progress saved!');
+        setTimeout(() => setSaveMessage(null), 2000);
+        console.log('Game progress saved:', response.data);
+      }
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+      setSaveMessage('Failed to save progress');
+      setTimeout(() => setSaveMessage(null), 2000);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [sessionId, gameId]);
+
+  // Load game progress from backend
+  const loadGameProgress = useCallback(async () => {
+    if (!sessionId) {
+      console.log('No session ID, skipping progress load');
+      return;
+    }
+
+    try {
+      const response = await api.get(`/games/kids/games/${gameId}/progress`);
+      
+      if (response.data.success && response.data.has_progress) {
+        const progress = response.data.progress;
+        
+        // Update game state with loaded progress
+        if (progress.save_state) {
+          // Pass loaded progress to game component via onGameEvent
+          if (onGameEvent) {
+            onGameEvent({
+              type: 'loadProgress',
+              payload: progress.save_state
+            });
+          }
+          
+          if (progress.last_level_played) {
+            // You might want to set level here
+          }
+          
+          if (progress.highest_score) {
+            setScore(progress.highest_score);
+          }
+          
+          console.log('Game progress loaded:', progress);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load progress:', error);
+    }
+  }, [sessionId, gameId, onGameEvent]);
+
+  // Handle game events from the actual game component
+  const handleGameEvent = useCallback((event) => {
+    switch (event.type) {
+      case 'scoreUpdate':
+        const newScore = event.payload;
+        setScore(newScore);
+        
+        // Only submit if score increased significantly or is a high score
+        if (!lastScoreSent || newScore > lastScoreSent + 10) {
+          submitScoreToBackend(newScore, event.level || 1, event.metrics || {});
+        }
+        
+        setGameStats(prev => ({ 
+          ...prev, 
+          questionsAnswered: prev.questionsAnswered + 1 
+        }));
+        break;
+        
+      case 'heartsUpdate':
+        setHearts(event.payload);
+        break;
+        
+      case 'streakUpdate':
+        setGameStats(prev => ({ ...prev, streak: event.payload }));
+        break;
+        
+      case 'saveRequest':
+        saveGameProgress(event.payload, event.level || 1);
+        break;
+        
+      case 'levelComplete':
+        submitScoreToBackend(score, event.level, {
+          level_completed: true,
+          time_taken: event.timeTaken,
+          moves_used: event.movesUsed
+        });
+        break;
+        
+      default:
+        console.log('Unhandled game event:', event);
+    }
+  }, [lastScoreSent, score, submitScoreToBackend, saveGameProgress]);
+
+  // Load progress when component mounts
+  useEffect(() => {
+    loadGameProgress();
+  }, [loadGameProgress]);
+
+  // Auto-save progress periodically (every 30 seconds)
+  useEffect(() => {
+    const autoSaveInterval = setInterval(() => {
+      if (onGameEvent) {
+        onGameEvent({
+          type: 'autoSaveRequest',
+          payload: { timestamp: Date.now() }
+        });
+      }
+    }, 30000);
+
+    return () => clearInterval(autoSaveInterval);
+  }, [onGameEvent]);
+
+  useEffect(() => {
+  if (!sessionId) return;
+  
+  // Update session activity every 30 seconds
+  const activityInterval = setInterval(() => {
+    try {
+      api.post(`/games/kids/session/${sessionId}/activity`);
+    } catch (error) {
+      console.log('Failed to update session activity:', error);
+    }
+  }, 30000);
+  
+  return () => clearInterval(activityInterval);
+}, [sessionId]);
+
   // Professional audio initialization with imported files
   const initAudio = useCallback(async () => {
     try {
@@ -84,26 +270,17 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
       // Create audio element if not exists
       if (!backgroundAudioRef.current) {
         backgroundAudioRef.current = new Audio();
-
-        // Configure audio
         backgroundAudioRef.current.loop = true;
         backgroundAudioRef.current.volume = 0; // Start muted
         backgroundAudioRef.current.preload = 'metadata';
 
-        // Event listeners
         backgroundAudioRef.current.addEventListener('error', (e) => {
           console.error('Audio element error:', e);
-          console.error('Audio error details:', e.target.error);
-          console.error('Audio src:', e.target.src);
           setAudioError(true);
         });
 
         backgroundAudioRef.current.addEventListener('canplaythrough', () => {
           console.log('Audio can play through');
-        });
-
-        backgroundAudioRef.current.addEventListener('loadeddata', () => {
-          console.log('Audio data loaded');
         });
       }
 
@@ -119,17 +296,12 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
 
         console.log('Audio source set to:', initialTrack);
 
-        // Preload the audio (silently)
+        // Preload the audio
         try {
           await backgroundAudioRef.current.load();
           console.log('Audio preloaded successfully');
         } catch (loadError) {
           console.log('Audio preload error (non-critical):', loadError.message);
-        }
-
-        // Attempt to play (will succeed only after user interaction)
-        if (soundEnabled && isMusicPlaying) {
-          await attemptAudioPlay();
         }
       }
 
@@ -145,7 +317,6 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
     try {
       console.log('Attempting to play audio...');
 
-      // Wait a moment for audio to be ready
       if (backgroundAudioRef.current.readyState < 2) {
         console.log('Audio not loaded yet, waiting...');
         await new Promise(resolve => {
@@ -158,12 +329,10 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
         });
       }
 
-      // Set volume before playing
       backgroundAudioRef.current.volume = volume;
-
       console.log('Playing audio with volume:', volume);
+      
       const playPromise = backgroundAudioRef.current.play();
-
       if (playPromise !== undefined) {
         await playPromise;
         console.log('Audio playback started successfully');
@@ -171,11 +340,8 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
       }
     } catch (error) {
       console.log('Audio play attempt failed:', error.message);
-      console.log('Error name:', error.name);
-
       if (error.name === 'NotAllowedError') {
         console.log('Autoplay prevented - waiting for user interaction');
-        // This is normal, audio will play after user interaction
       } else if (error.name === 'NotSupportedError') {
         console.log('Audio format not supported');
         setAudioError(true);
@@ -190,7 +356,6 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
       console.log('User interaction detected, attempting to play audio...');
 
       if (backgroundAudioRef.current && soundEnabled && isMusicPlaying) {
-        // Reset and play
         backgroundAudioRef.current.currentTime = 0;
         backgroundAudioRef.current.volume = volume;
 
@@ -210,52 +375,8 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
     if (backgroundAudioRef.current) {
       const actualVolume = soundEnabled && isMusicPlaying ? volume : 0;
       backgroundAudioRef.current.volume = actualVolume;
-      console.log('Volume updated to:', actualVolume);
     }
   }, [volume, soundEnabled, isMusicPlaying]);
-
-  // Play random track
-  const playRandomTrack = useCallback(async () => {
-    if (tracks.length === 0 || !soundEnabled || !isMusicPlaying) return;
-
-    try {
-      const randomIndex = Math.floor(Math.random() * tracks.length);
-      const track = tracks[randomIndex];
-      setCurrentTrack(track);
-
-      if (backgroundAudioRef.current) {
-        backgroundAudioRef.current.src = track;
-        backgroundAudioRef.current.volume = volume;
-
-        // Only try to play if user has interacted
-        if (userInteractedRef.current) {
-          await backgroundAudioRef.current.play();
-        }
-      }
-    } catch (error) {
-      console.error('Error playing track:', error);
-    }
-  }, [tracks, soundEnabled, isMusicPlaying, volume]);
-
-  // Play next track
-  const playNextTrack = useCallback(() => {
-    if (tracks.length > 1) {
-      const currentIndex = tracks.indexOf(currentTrack);
-      const newTracks = [...tracks];
-      newTracks.splice(currentIndex, 1);
-      setTracks(newTracks);
-
-      if (newTracks.length > 0) {
-        playRandomTrack();
-      } else {
-        const shuffledTracks = [...backgroundTracks].sort(() => Math.random() - 0.5);
-        setTracks(shuffledTracks);
-        playRandomTrack();
-      }
-    } else {
-      playRandomTrack();
-    }
-  }, [tracks, currentTrack, playRandomTrack]);
 
   const setupFullscreen = () => {
     fullscreenRef.current = document.documentElement;
@@ -316,7 +437,11 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
   }, [isFullscreen]);
 
   const startGameTimer = () => {
-    const timer = setInterval(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    timerRef.current = setInterval(() => {
       if (!isPaused) {
         setGameStats(prev => ({
           ...prev,
@@ -324,37 +449,18 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
         }));
       }
     }, 1000);
-
-    return () => clearInterval(timer);
   };
-
-  const handleGameEvent = useCallback((event) => {
-    switch (event.type) {
-      case 'scoreUpdate':
-        setScore(event.payload);
-        setGameStats(prev => ({ ...prev, questionsAnswered: prev.questionsAnswered + 1 }));
-        break;
-      case 'heartsUpdate':
-        setHearts(event.payload);
-        break;
-      case 'streakUpdate':
-        setGameStats(prev => ({ ...prev, streak: event.payload }));
-        break;
-    }
-  }, []);
 
   const toggleMusic = () => {
     const newState = !isMusicPlaying;
     setIsMusicPlaying(newState);
 
     if (newState && backgroundAudioRef.current && soundEnabled) {
-      // Resume playback
       if (backgroundAudioRef.current.paused && userInteractedRef.current) {
         backgroundAudioRef.current.play();
       }
       backgroundAudioRef.current.volume = volume;
     } else if (backgroundAudioRef.current) {
-      // Mute music
       backgroundAudioRef.current.volume = 0;
     }
   };
@@ -386,7 +492,6 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
   const handleKeyDown = useCallback((e) => {
     e.stopPropagation();
 
-    // Record user interaction for audio
     if (!userInteractedRef.current) {
       handleUserInteraction();
     }
@@ -428,13 +533,19 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
       case 'c':
         setShowControls(!showControls);
         break;
+      case 's':
+        // Manual save shortcut
+        if (onGameEvent) {
+          onGameEvent({ type: 'saveRequest' });
+        }
+        break;
       case '0': case '1': case '2': case '3': case '4':
       case '5': case '6': case '7': case '8': case '9':
         const num = parseInt(e.key);
         handleVolumeChange(num / 10);
         break;
     }
-  }, [volume, isPaused, showHelp, showVolumeSlider, toggleFullscreen, onClose, handleUserInteraction]);
+  }, [volume, isPaused, showHelp, showVolumeSlider, toggleFullscreen, onClose, handleUserInteraction, onGameEvent]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -443,13 +554,33 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
 
   // Cleanup on unmount
   const cleanup = () => {
-    console.log('Cleaning up GamePlayer audio...');
+    console.log('Cleaning up GamePlayer...');
+    
+    // Save final progress before closing
+    if (onGameEvent) {
+      onGameEvent({ 
+        type: 'finalSave', 
+        payload: { 
+          score, 
+          timePlayed: gameStats.timePlayed,
+          questionsAnswered: gameStats.questionsAnswered 
+        } 
+      });
+    }
+    
     if (backgroundAudioRef.current) {
       backgroundAudioRef.current.pause();
       backgroundAudioRef.current.currentTime = 0;
       backgroundAudioRef.current.src = '';
     }
-    if (controlsTimeout) clearTimeout(controlsTimeout);
+    
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    
+    if (scoreDebounceRef.current) {
+      clearTimeout(scoreDebounceRef.current);
+    }
   };
 
   const formatTime = (seconds) => {
@@ -485,39 +616,20 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
     </button>
   );
 
-  // Audio status indicator
-  const AudioStatusIndicator = () => {
-    const audioIndicatorContent = () => {
-      if (!audioError && soundEnabled && isMusicPlaying && currentTrack) {
-        return (
-          <div className="flex items-center gap-2">
-            <div className="sound-wave">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <span className="text-xs text-gray-300">Music Playing</span>
-          </div>
-        );
-      }
-
-      if (audioError) {
-        return <span className="text-xs text-red-300">Audio Unavailable</span>;
-      }
-
-      if (!soundEnabled) {
-        return <span className="text-xs text-gray-300">Audio Muted</span>;
-      }
-
-      return null;
-    };
-
-    const content = audioIndicatorContent();
-    if (!content) return null;
-
+  // Save status indicator
+  const SaveStatusIndicator = () => {
+    if (!saveMessage) return null;
+    
     return (
-      <div className={`fixed ${isMobile ? 'top-16 left-4' : 'top-16 left-4'} z-40 px-3 py-1.5 bg-gradient-to-r from-[#4CAF50]/20 to-[#8BC34A]/20 backdrop-blur-sm border border-[#4CAF50]/30 rounded-lg transition-all duration-300 ${showControls ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'}`}>
-        {content}
+      <div className={`fixed ${isMobile ? 'top-16 right-4' : 'top-16 right-4'} z-40 px-3 py-1.5 bg-gradient-to-r ${isSaving ? 'from-[#FF9800]/20 to-[#FF5722]/20 border-[#FF9800]/30' : 'from-[#4CAF50]/20 to-[#8BC34A]/20 border-[#4CAF50]/30'} backdrop-blur-sm border rounded-lg transition-all duration-300 ${showControls ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
+        <div className="flex items-center gap-2">
+          {isSaving ? (
+            <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          )}
+          <span className="text-xs text-white">{saveMessage}</span>
+        </div>
       </div>
     );
   };
@@ -557,11 +669,11 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
       onClick={handleUserInteraction}
       onTouchStart={handleUserInteraction}
     >
-      {/* Control Toggle Button - Always Visible */}
+      {/* Control Toggle Button */}
       <ControlToggleButton />
-
-      {/* Audio Status Indicator */}
-      <AudioStatusIndicator />
+      
+      {/* Save Status Indicator */}
+      <SaveStatusIndicator />
 
       {/* Mobile Quick Controls */}
       {isMobile && <MobileQuickControls />}
@@ -665,7 +777,8 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
             <div className="w-full max-w-4xl p-1 md:p-2">
               {React.cloneElement(gameComponent, {
                 onGameEvent: handleGameEvent,
-                isFullscreen: true
+                isFullscreen: true,
+                isPaused: isPaused
               })}
             </div>
           </div>
@@ -751,6 +864,7 @@ const GamePlayer = ({ gameId, gameTitle, gameComponent, onClose }) => {
                   { key: 'M', label: 'Mute Sound' },
                   { key: 'Space', label: 'Pause/Play' },
                   { key: 'C', label: 'Toggle Controls' },
+                  { key: 'S', label: 'Save Progress' },
                   { key: '0-9', label: 'Volume Levels' },
                 ].map((item) => (
                   <div key={item.key} className="bg-[#1A1A2E]/50 rounded-lg p-2 md:p-3">

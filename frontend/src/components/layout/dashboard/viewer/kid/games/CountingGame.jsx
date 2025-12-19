@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trophy, Heart, Zap, Clock, Users, Star, Target, Medal, Volume2, VolumeX, Crown, SkipForward } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 const CountingGame = ({ onGameEvent, isFullscreen }) => {
+  const { t } = useTranslation(); // Initialize translation hook
+  
   const [gameMode, setGameMode] = useState('practice');
   const [level, setLevel] = useState(1);
   const [question, setQuestion] = useState({ a: 1, b: 1 });
@@ -46,13 +49,14 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
     { emoji: '🐼', name: 'Panda' }
   ];
 
+  // Translated funny messages
   const funnyMessages = [
-    "🎉 Awesome!",
-    "🚀 Great Job!",
-    "🌈 Perfect!",
-    "🎪 Super!",
-    "🧙‍♂️ Amazing!",
-    "🦸‍♂️ Excellent!"
+    t('countingGame.feedback.correct.awesome'),
+    t('countingGame.feedback.correct.greatJob'),
+    t('countingGame.feedback.correct.perfect'),
+    t('countingGame.feedback.correct.super'),
+    t('countingGame.feedback.correct.amazing'),
+    t('countingGame.feedback.correct.excellent')
   ];
 
   // Generate question - optimized for screen fit
@@ -135,6 +139,7 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
       setScore(newScore);
       setIsCorrect(true);
       
+      // Use translated funny message
       setFeedback(`${funnyMessages[Math.floor(Math.random() * funnyMessages.length)]} +${points}`);
       
       setStreak(s => s + 1);
@@ -147,13 +152,13 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
       if (streak + 1 >= 5) {
         const newLives = Math.min(lives + 1, 5);
         setLives(newLives);
-        setFeedback(prev => `${prev} 🏆 +1 Heart!`);
+        setFeedback(prev => `${prev} ${t('countingGame.feedback.bonusHeart')}`);
         onGameEvent?.({ type: 'heartsUpdate', payload: newLives });
       }
       
       if ((score + 1) % 5 === 0) {
         setLevel(l => l + 1);
-        setFeedback(prev => `${prev} 🚀 Level Up!`);
+        setFeedback(prev => `${prev} ${t('countingGame.feedback.levelUp')}`);
       } else {
         setTimeout(() => generateQuestion(level), 800);
       }
@@ -169,7 +174,7 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
       setLives(newLives);
       setIsCorrect(false);
       setStreak(0);
-      setFeedback(`❌ Try again! Answer: ${correct}`);
+      setFeedback(t('countingGame.feedback.incorrect', { answer: correct }));
       
       if (newLives <= 0) {
         setTimeout(() => setGameOver(true), 1200);
@@ -187,15 +192,15 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
     switch (type) {
       case 'extraTime':
         setTimeLeft(prev => prev + 10);
-        setFeedback("⏰ +10 seconds!");
+        setFeedback(t('countingGame.feedback.extraTime'));
         break;
       case 'skipQuestion':
         generateQuestion(level);
-        setFeedback("🚀 Skipped!");
+        setFeedback(t('countingGame.feedback.skipped'));
         break;
       case 'doublePoints':
         setScore(prev => prev + 50);
-        setFeedback("💰 +50 points!");
+        setFeedback(t('countingGame.feedback.doublePoints'));
         break;
     }
   };
@@ -236,25 +241,37 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
       <div className={`flex items-center justify-center ${isFullscreen ? 'h-full' : 'min-h-[400px]'} p-3 w-full`}>
         <div className="w-full bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-xl shadow-lg p-4 border border-[#FF5722]/30">
           <div className="text-4xl mb-3 text-center">🏆</div>
-          <h1 className="text-2xl font-bold text-white mb-2 text-center">Game Over!</h1>
-          <p className="text-gray-300 mb-4 text-sm text-center">You did great!</p>
+          <h1 className="text-2xl font-bold text-white mb-2 text-center">
+            {t('countingGame.gameOver.title')}
+          </h1>
+          <p className="text-gray-300 mb-4 text-sm text-center">
+            {t('countingGame.gameOver.subtitle')}
+          </p>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{score}</div>
-              <div className="text-gray-400 text-xs text-center">Score</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('countingGame.gameOver.score')}
+              </div>
             </div>
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{level}</div>
-              <div className="text-gray-400 text-xs text-center">Level</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('countingGame.gameOver.level')}
+              </div>
             </div>
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{streak}</div>
-              <div className="text-gray-400 text-xs text-center">Streak</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('countingGame.gameOver.streak')}
+              </div>
             </div>
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">Lvl {level}</div>
-              <div className="text-gray-400 text-xs text-center">Reached</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('countingGame.gameOver.reached')}
+              </div>
             </div>
           </div>
           
@@ -262,7 +279,7 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
             onClick={resetGame}
             className="w-full py-2.5 rounded-lg bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white font-bold hover:opacity-90 text-sm"
           >
-            🎮 Play Again
+            {t('countingGame.gameOver.playAgain')}
           </button>
         </div>
       </div>
@@ -274,7 +291,9 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
     return (
       <div className="flex items-center justify-center min-h-[300px] p-3 w-full">
         <div className="w-full bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-xl border border-[#FF5722]/30 p-4">
-          <h2 className="text-lg font-bold text-white mb-4 text-center">Pick Your Character!</h2>
+          <h2 className="text-lg font-bold text-white mb-4 text-center">
+            {t('countingGame.characterSelection.title')}
+          </h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
             {characters.map((char) => (
@@ -293,7 +312,7 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => setSelectedCharacter('🐱')}
             className="w-full py-2 rounded-lg bg-gradient-to-r from-[#4CAF50] to-[#8BC34A] text-white font-bold text-sm"
           >
-            Let's Play!
+            {t('countingGame.characterSelection.letsPlay')}
           </button>
         </div>
       </div>
@@ -334,13 +353,19 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
               <span className="text-lg">{selectedCharacter}</span>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-white">Counting Game</h1>
+              <h1 className="text-sm font-bold text-white">
+                {t('countingGame.gameHeader.title')}
+              </h1>
               <div className="flex items-center gap-1">
-                <span className="text-xs text-gray-400">Lvl {level}</span>
+                <span className="text-xs text-gray-400">
+                  {t('countingGame.gameHeader.level', { level })}
+                </span>
                 {streak > 0 && (
                   <>
                     <span className="text-gray-600">•</span>
-                    <span className="text-xs text-yellow-400">{streak}🔥</span>
+                    <span className="text-xs text-yellow-400">
+                      {t('countingGame.gameHeader.streak', { streak })}
+                    </span>
                   </>
                 )}
               </div>
@@ -357,6 +382,7 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="p-1.5 bg-[#1A1A2E] border border-[#FF5722]/20 rounded-lg hover:bg-[#FF5722]/10 transition-colors"
+              title={t('countingGame.buttons.toggleSound')}
             >
               {soundEnabled ? 
                 <Volume2 className="w-4 h-4 text-green-400" /> : 
@@ -372,21 +398,21 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => setGameMode('practice')}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold ${gameMode === 'practice' ? 'bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
           >
-            Practice
+            {t('countingGame.gameModes.practice')}
           </button>
           <button
             onClick={() => setGameMode('timed')}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold ${gameMode === 'timed' ? 'bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
           >
             <Clock className="inline w-3 h-3 mr-1" />
-            Timed
+            {t('countingGame.gameModes.timed')}
           </button>
           <button
             onClick={() => setGameMode('multiplayer')}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold ${gameMode === 'multiplayer' ? 'bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
           >
             <Users className="inline w-3 h-3 mr-1" />
-            Vs AI
+            {t('countingGame.gameModes.multiplayer')}
           </button>
         </div>
 
@@ -394,9 +420,11 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
         {gameMode === 'timed' && (
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-400">Time Left:</span>
+              <span className="text-xs text-gray-400">
+                {t('countingGame.timer.timeLeft')}
+              </span>
               <span className={`text-sm font-bold ${timeLeft <= 10 ? 'text-red-400' : 'text-green-400'}`}>
-                {timeLeft}s
+                {t('countingGame.timer.seconds', { time: timeLeft })}
               </span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-1.5">
@@ -416,7 +444,9 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
                 <span className="text-lg">{selectedCharacter}</span>
                 <span className="text-xs font-bold text-white">{score}</span>
               </div>
-              <span className="text-xs text-gray-400">vs</span>
+              <span className="text-xs text-gray-400">
+                {t('countingGame.gameHeader.vsAI')}
+              </span>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-white">{opponentScore}</span>
                 <span className="text-lg">🤖</span>
@@ -444,13 +474,17 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
               <div className="text-lg font-bold text-white mb-1">
                 {question.a} + {question.b} = ?
               </div>
-              <div className="text-xs text-gray-400">Count the items!</div>
+              <div className="text-xs text-gray-400">
+                {t('countingGame.countingArea.countItems')}
+              </div>
             </div>
             
             <div className="flex items-center justify-center gap-3">
               {/* First group */}
               <div className="text-center">
-                <div className="text-xs text-gray-400 mb-1">Group A</div>
+                <div className="text-xs text-gray-400 mb-1">
+                  {t('countingGame.countingArea.groupA')}
+                </div>
                 <div className="flex flex-wrap justify-center gap-1 max-w-[80px]">
                   {[...Array(Math.min(question.a, 8))].map((_, i) => (
                     <span key={i} className="text-sm">
@@ -464,7 +498,9 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
               
               {/* Second group */}
               <div className="text-center">
-                <div className="text-xs text-gray-400 mb-1">Group B</div>
+                <div className="text-xs text-gray-400 mb-1">
+                  {t('countingGame.countingArea.groupB')}
+                </div>
                 <div className="flex flex-wrap justify-center gap-1 max-w-[80px]">
                   {[...Array(Math.min(question.b, 8))].map((_, i) => (
                     <span key={i} className="text-sm">
@@ -484,13 +520,13 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
                 onClick={() => setSelectedInputMode('numbers')}
                 className={`flex-1 py-1.5 rounded text-xs ${selectedInputMode === 'numbers' ? 'bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
               >
-                🔢 Numbers
+                {t('countingGame.inputModes.numbers')}
               </button>
               <button
                 onClick={() => setSelectedInputMode('emoji')}
                 className={`flex-1 py-1.5 rounded text-xs ${selectedInputMode === 'emoji' ? 'bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
               >
-                😀 Emojis
+                {t('countingGame.inputModes.emoji')}
               </button>
             </div>
 
@@ -503,7 +539,7 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
                     type="number"
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="Type answer..."
+                    placeholder={t('countingGame.inputModes.placeholderNumbers')}
                     className="w-full px-3 py-2 text-lg text-center bg-[#16213E] border border-[#FF5722]/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#FF9800]"
                     autoFocus
                   />
@@ -516,7 +552,7 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
                   type="text"
                   value={emojiAnswer}
                   onChange={(e) => setEmojiAnswer(e.target.value.slice(0, 10))}
-                  placeholder="Draw emojis..."
+                  placeholder={t('countingGame.inputModes.placeholderEmoji')}
                   className="w-full px-3 py-2 text-center bg-[#16213E] border border-[#FF5722]/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#FF9800]"
                 />
               )}
@@ -532,7 +568,7 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
                   : 'bg-gradient-to-r from-[#4CAF50] to-[#8BC34A] hover:opacity-90'
               }`}
             >
-              🚀 SUBMIT ANSWER
+              {t('countingGame.inputModes.submit')}
             </button>
 
             {/* Quick Number Pad */}
@@ -550,7 +586,7 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
                 onClick={() => setAnswer("")}
                 className="p-1.5 bg-[#FF5722]/20 border border-[#FF5722]/30 rounded text-white text-sm col-span-2 hover:bg-[#FF5722]/30 transition-colors"
               >
-                Clear
+                {t('countingGame.numberPad.clear')}
               </button>
             </div>
           </div>
@@ -563,9 +599,11 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
             disabled={powerUps.extraTime <= 0 || gameMode !== 'timed'}
             className={`flex-1 p-2 rounded-lg border text-xs ${powerUps.extraTime <= 0 || gameMode !== 'timed' ? 'border-gray-600/30 text-gray-500' : 'border-[#4CAF50]/30 text-white hover:bg-[#4CAF50]/10 transition-colors'}`}
           >
-            <div className="text-sm">⏰</div>
-            <div>+10s</div>
-            <div className="text-xs text-gray-400">x{powerUps.extraTime}</div>
+            <div className="text-sm">{t('countingGame.powerUps.extraTime.label')}</div>
+            <div>{t('countingGame.powerUps.extraTime.name')}</div>
+            <div className="text-xs text-gray-400">
+              {t('countingGame.powerUps.extraTime.count', { count: powerUps.extraTime })}
+            </div>
           </button>
           
           <button
@@ -573,9 +611,11 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
             disabled={powerUps.skipQuestion <= 0}
             className={`flex-1 p-2 rounded-lg border text-xs ${powerUps.skipQuestion <= 0 ? 'border-gray-600/30 text-gray-500' : 'border-[#FF9800]/30 text-white hover:bg-[#FF9800]/10 transition-colors'}`}
           >
-            <div className="text-sm">🚀</div>
-            <div>Skip</div>
-            <div className="text-xs text-gray-400">x{powerUps.skipQuestion}</div>
+            <div className="text-sm">{t('countingGame.powerUps.skipQuestion.label')}</div>
+            <div>{t('countingGame.powerUps.skipQuestion.name')}</div>
+            <div className="text-xs text-gray-400">
+              {t('countingGame.powerUps.skipQuestion.count', { count: powerUps.skipQuestion })}
+            </div>
           </button>
           
           <button
@@ -583,9 +623,11 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
             disabled={powerUps.doublePoints <= 0}
             className={`flex-1 p-2 rounded-lg border text-xs ${powerUps.doublePoints <= 0 ? 'border-gray-600/30 text-gray-500' : 'border-[#9C27B0]/30 text-white hover:bg-[#9C27B0]/10 transition-colors'}`}
           >
-            <div className="text-sm">💰</div>
-            <div>2x</div>
-            <div className="text-xs text-gray-400">x{powerUps.doublePoints}</div>
+            <div className="text-sm">{t('countingGame.powerUps.doublePoints.label')}</div>
+            <div>{t('countingGame.powerUps.doublePoints.name')}</div>
+            <div className="text-xs text-gray-400">
+              {t('countingGame.powerUps.doublePoints.count', { count: powerUps.doublePoints })}
+            </div>
           </button>
         </div>
 
@@ -594,7 +636,11 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
           {showHint && (
             <div className="bg-gradient-to-r from-[#2196F3]/10 to-[#03A9F4]/10 rounded-lg p-2 text-center">
               <p className="text-xs text-gray-300">
-                💡 Hint: {question.a} + {question.b} = {question.a + question.b}
+                {t('countingGame.feedback.hint', { 
+                  a: question.a, 
+                  b: question.b, 
+                  sum: question.a + question.b 
+                })}
               </p>
             </div>
           )}
@@ -615,11 +661,11 @@ const CountingGame = ({ onGameEvent, isFullscreen }) => {
           <div className="grid grid-cols-2 gap-1 text-xs text-gray-500">
             <div className="flex items-center gap-1">
               <span>⏎</span>
-              <span>Enter to submit</span>
+              <span>{t('countingGame.instructions.enterSubmit')}</span>
             </div>
             <div className="flex items-center gap-1">
               <span>🏆</span>
-              <span>5-streak = heart</span>
+              <span>{t('countingGame.instructions.streakHeart')}</span>
             </div>
           </div>
         </div>

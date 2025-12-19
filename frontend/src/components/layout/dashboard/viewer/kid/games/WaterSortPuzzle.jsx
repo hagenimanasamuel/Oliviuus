@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { RotateCcw, Trophy, Sparkles, Droplets, RefreshCw, X, ArrowRight, HelpCircle, ChevronRight, ChevronLeft } from "lucide-react";
+import { useTranslation, Trans } from "react-i18next";
 
 const COLORS = [
   { name: "crimson", value: "#DC143C", shadow: "#8B0000", bubble: "#FF6B6B" },
@@ -11,6 +12,11 @@ const COLORS = [
 ];
 
 const TUBE_CAPACITY = 4;
+
+// LocalStorage keys
+const TUTORIAL_COMPLETED_KEY = 'water_sort_tutorial_completed';
+const CURRENT_LEVEL_KEY = 'water_sort_current_level';
+const HIGHEST_LEVEL_KEY = 'water_sort_highest_level';
 
 const generateLevel = (numColors, tubesPerColor) => {
   const colors = COLORS.slice(0, numColors);
@@ -47,7 +53,14 @@ const generateLevel = (numColors, tubesPerColor) => {
 };
 
 export default function WaterSortGame() {
-  const [level, setLevel] = useState(1);
+  const { t } = useTranslation();
+  
+  // Load initial state from localStorage
+  const [level, setLevel] = useState(() => {
+    const savedLevel = localStorage.getItem(CURRENT_LEVEL_KEY);
+    return savedLevel ? parseInt(savedLevel) : 1;
+  });
+  
   const [tubes, setTubes] = useState([]);
   const [selectedTube, setSelectedTube] = useState(null);
   const [moves, setMoves] = useState(0);
@@ -62,28 +75,30 @@ export default function WaterSortGame() {
   const [rippleEffect, setRippleEffect] = useState(null);
   
   // Tutorial state
-  const [showTutorial, setShowTutorial] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(() => {
+    const tutorialCompleted = localStorage.getItem(TUTORIAL_COMPLETED_KEY);
+    return tutorialCompleted !== 'true'; // Show tutorial if not completed
+  });
   const [tutorialStep, setTutorialStep] = useState(0);
   const [tutorialTubes, setTutorialTubes] = useState([]);
   const [tutorialSelectedTube, setTutorialSelectedTube] = useState(null);
   const [showTutorialHighlight, setShowTutorialHighlight] = useState(false);
+  const [loadingTutorialState, setLoadingTutorialState] = useState(false);
 
+  // Load highest level from localStorage
+  const [highestLevel, setHighestLevel] = useState(() => {
+    const savedHighest = localStorage.getItem(HIGHEST_LEVEL_KEY);
+    return savedHighest ? parseInt(savedHighest) : 1;
+  });
+
+  // Initialize tutorial or game level
   useEffect(() => {
-    if (showTutorial && tutorialStep === 0) {
-      // Create simple tutorial tubes for step 1
-      const tutorialSetup = [
-        [{ name: "ocean", value: "#1E90FF", shadow: "#00008B", bubble: "#4ECDC4" }],
-        [{ name: "ocean", value: "#1E90FF", shadow: "#00008B", bubble: "#4ECDC4" }],
-        [],
-        []
-      ];
-      setTutorialTubes(tutorialSetup);
-      setTutorialSelectedTube(null);
-      setShowTutorialHighlight(false);
-    } else if (!showTutorial) {
+    if (showTutorial) {
+      initializeTutorial();
+    } else {
       initLevel();
     }
-  }, [level, showTutorial]);
+  }, [showTutorial, level]);
 
   useEffect(() => {
     if (!showTutorial) {
@@ -101,6 +116,20 @@ export default function WaterSortGame() {
     setShowVictory(false);
     setHistory([]);
     setLiquidSplash([]);
+    setTutorialStep(0);
+  };
+
+  const initializeTutorial = () => {
+    // Create simple tutorial tubes for step 1
+    const tutorialSetup = [
+      [{ name: "ocean", value: "#1E90FF", shadow: "#00008B", bubble: "#4ECDC4" }],
+      [{ name: "ocean", value: "#1E90FF", shadow: "#00008B", bubble: "#4ECDC4" }],
+      [],
+      []
+    ];
+    setTutorialTubes(tutorialSetup);
+    setTutorialSelectedTube(null);
+    setShowTutorialHighlight(false);
     setTutorialStep(0);
   };
 
@@ -130,7 +159,23 @@ export default function WaterSortGame() {
     }
   };
 
-  // ========== MAIN GAME LOGIC (No highlighting) ==========
+  // Save current level to localStorage
+  const saveLevelToStorage = (newLevel) => {
+    localStorage.setItem(CURRENT_LEVEL_KEY, newLevel.toString());
+    
+    // Update highest level if needed
+    if (newLevel > highestLevel) {
+      setHighestLevel(newLevel);
+      localStorage.setItem(HIGHEST_LEVEL_KEY, newLevel.toString());
+    }
+  };
+
+  // Save tutorial completion to localStorage
+  const saveTutorialCompletion = () => {
+    localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
+  };
+
+  // ========== MAIN GAME LOGIC ==========
   const handleMainGameTubeClick = (index) => {
     if (isPouring || showVictory) return;
     
@@ -147,13 +192,13 @@ export default function WaterSortGame() {
     }
   };
 
-  // ========== TUTORIAL LOGIC (With highlighting) ==========
+  // ========== TUTORIAL LOGIC ==========
   const handleTutorialTubeClick = (index) => {
     if (isPouring) return;
     
     if (tutorialStep === 0) {
       // Step 1: Select first tube
-      if (index === 0) { // Only allow clicking tube 0
+      if (index === 0) {
         setTutorialSelectedTube(0);
         setTutorialStep(1);
         setShowTutorialHighlight(true);
@@ -161,14 +206,12 @@ export default function WaterSortGame() {
         setTimeout(() => setRippleEffect(null), 300);
       }
     } else if (tutorialStep === 1 && tutorialSelectedTube === 0) {
-      // Step 2: Pour to empty tube (only highlight empty tubes)
-      if (index === 2 || index === 3) { // Empty tubes in tutorial
+      // Step 2: Pour to empty tube
+      if (index === 2 || index === 3) {
         simulateTutorialPour(0, index);
         setTutorialStep(2);
         setShowTutorialHighlight(false);
       }
-    } else if (tutorialStep === 2) {
-      // Tutorial complete - do nothing here, wait for Next button
     }
   };
 
@@ -214,7 +257,6 @@ export default function WaterSortGame() {
       setPourAnimation({ active: false, from: null, to: null, color: null });
       setIsPouring(false);
       
-      // Add splash effect
       const newSplash = {
         id: Date.now(),
         from,
@@ -327,12 +369,14 @@ export default function WaterSortGame() {
   };
 
   const nextLevel = () => {
-    setLevel(level + 1);
+    const newLevel = level + 1;
+    setLevel(newLevel);
+    saveLevelToStorage(newLevel);
   };
 
   const skipTutorial = () => {
+    saveTutorialCompletion();
     setShowTutorial(false);
-    initLevel();
   };
 
   const nextTutorialStep = () => {
@@ -342,7 +386,8 @@ export default function WaterSortGame() {
         setShowTutorialHighlight(true);
       }
     } else {
-      skipTutorial();
+      saveTutorialCompletion();
+      setShowTutorial(false);
     }
   };
 
@@ -355,6 +400,12 @@ export default function WaterSortGame() {
         setShowTutorialHighlight(false);
       }
     }
+  };
+
+  const goBackToLevel = (targetLevel) => {
+    if (isPouring) return;
+    setLevel(targetLevel);
+    saveLevelToStorage(targetLevel);
   };
 
   const getTubePosition = (index) => {
@@ -374,17 +425,14 @@ export default function WaterSortGame() {
   const currentTubes = showTutorial ? tutorialTubes : tubes;
   const currentSelectedTube = showTutorial ? tutorialSelectedTube : selectedTube;
 
-  // In main game: NO highlighting of possible tubes
-  // In tutorial: Only highlight when tutorialStep === 1 and showTutorialHighlight is true
   const shouldHighlightTube = (index) => {
-    if (!showTutorial) return false; // No highlighting in main game
+    if (!showTutorial) return false;
     
     if (tutorialStep === 0 && index === 0) {
-      return true; // Highlight first tube for selection
+      return true;
     }
     
     if (tutorialStep === 1 && showTutorialHighlight && currentSelectedTube === 0) {
-      // Only highlight empty tubes (2 and 3) as possible targets
       return index === 2 || index === 3;
     }
     
@@ -397,47 +445,55 @@ export default function WaterSortGame() {
       {showTutorial && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-2xl border-2 border-[#00B4D8]/30 shadow-2xl p-6 animate-scaleIn relative">
-            {/* Close button */}
             <button
               onClick={skipTutorial}
               className="absolute top-4 right-4 p-2 bg-[#1A1A2E] border border-[#00B4D8]/30 rounded-lg hover:bg-[#16213E] transition-colors"
+              aria-label={t('waterSortGame.tutorial.skipTutorial')}
             >
               <X className="w-5 h-5 text-white" />
             </button>
             
-            {/* Tutorial Header */}
             <div className="text-center mb-6">
               <div className="inline-flex p-3 rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0077B6] mb-3">
                 <HelpCircle className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">How to Play Water Sort Puzzle</h3>
-              <p className="text-gray-300">Complete the tutorial to learn the game!</p>
+              <h3 className="text-2xl font-bold text-white mb-2">
+                {t('waterSortGame.tutorial.title')}
+              </h3>
+              <p className="text-gray-300">
+                {t('waterSortGame.tutorial.subtitle')}
+              </p>
               
-              {/* Progress dots */}
               <div className="flex justify-center gap-2 mt-4">
                 {[0, 1, 2].map((step) => (
                   <div
                     key={step}
                     className={`w-2 h-2 rounded-full ${tutorialStep >= step ? 'bg-[#00B4D8]' : 'bg-gray-600'}`}
+                    aria-label={`${t('waterSortGame.tutorial.progress')} ${step + 1}`}
                   />
                 ))}
               </div>
             </div>
             
-            {/* Tutorial Content */}
             <div className="min-h-[200px] flex flex-col justify-center">
               {tutorialStep === 0 && (
                 <div className="space-y-4">
-                  <p className="text-white text-lg font-semibold">🎯 Step 1: Select a Tube</p>
-                  <p className="text-white/90">Click on the blue tube (Tube #1) to select it.</p>
-                  <p className="text-white/80 text-sm">Selected tubes will glow yellow.</p>
+                  <p className="text-white text-lg font-semibold">
+                    {t('waterSortGame.tutorial.steps.step1.title')}
+                  </p>
+                  <p className="text-white/90">
+                    {t('waterSortGame.tutorial.steps.step1.description')}
+                  </p>
+                  <p className="text-white/80 text-sm">
+                    {t('waterSortGame.tutorial.steps.step1.hint')}
+                  </p>
                   <div className="flex items-center justify-center mt-4">
                     <div className="relative">
                       <div className="w-20 h-64 rounded-3xl border-4 border-yellow-400 bg-gradient-to-b from-white/10 to-white/5 shadow-2xl shadow-yellow-400/50 flex flex-col-reverse">
                         <div className="h-16 w-full rounded-t-2xl bg-gradient-to-b from-[#1E90FF] to-[#00008B]" />
                       </div>
                       <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-yellow-300 font-bold text-sm bg-black/50 px-3 py-1 rounded-full">
-                        👉 Click Tube #1
+                        {t('waterSortGame.tutorial.steps.step1.clickHint')}
                       </div>
                     </div>
                   </div>
@@ -446,16 +502,22 @@ export default function WaterSortGame() {
               
               {tutorialStep === 1 && (
                 <div className="space-y-4">
-                  <p className="text-white text-lg font-semibold">💧 Step 2: Pour to Empty Tube</p>
-                  <p className="text-white/90">Now click on an empty tube (Tube #3 or #4) to pour the selected liquid.</p>
-                  <p className="text-white/80 text-sm">Empty tubes are highlighted in green below.</p>
+                  <p className="text-white text-lg font-semibold">
+                    {t('waterSortGame.tutorial.steps.step2.title')}
+                  </p>
+                  <p className="text-white/90">
+                    {t('waterSortGame.tutorial.steps.step2.description')}
+                  </p>
+                  <p className="text-white/80 text-sm">
+                    {t('waterSortGame.tutorial.steps.step2.hint')}
+                  </p>
                   <div className="flex items-center justify-center mt-4 gap-6">
                     <div className="relative">
                       <div className="w-20 h-64 rounded-3xl border-4 border-yellow-400 bg-gradient-to-b from-white/10 to-white/5 shadow-2xl shadow-yellow-400/50 flex flex-col-reverse">
                         <div className="h-16 w-full rounded-t-2xl bg-gradient-to-b from-[#1E90FF] to-[#00008B]" />
                       </div>
                       <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-yellow-300 font-bold text-sm">
-                        Selected
+                        {t('waterSortGame.tutorial.steps.step2.selectedLabel')}
                       </div>
                     </div>
                     <ArrowRight className="text-white animate-pulse" size={32} />
@@ -464,7 +526,7 @@ export default function WaterSortGame() {
                         {/* Empty tube */}
                       </div>
                       <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-green-300 font-bold text-sm bg-black/50 px-3 py-1 rounded-full">
-                        👉 Click Here
+                        {t('waterSortGame.tutorial.steps.step2.clickHint')}
                       </div>
                     </div>
                   </div>
@@ -473,20 +535,27 @@ export default function WaterSortGame() {
               
               {tutorialStep === 2 && (
                 <div className="space-y-4">
-                  <p className="text-white text-lg font-semibold">✨ Great Job!</p>
-                  <p className="text-white/90">You've made your first move! Ready to play the real game?</p>
-                  <p className="text-white/80 text-sm">In the real game, you won't see hints - you'll need to figure it out yourself!</p>
+                  <p className="text-white text-lg font-semibold">
+                    {t('waterSortGame.tutorial.steps.step3.title')}
+                  </p>
+                  <p className="text-white/90">
+                    {t('waterSortGame.tutorial.steps.step3.description')}
+                  </p>
+                  <p className="text-white/80 text-sm">
+                    {t('waterSortGame.tutorial.steps.step3.hint')}
+                  </p>
                   <div className="flex flex-col items-center justify-center mt-4 gap-4">
                     <div className="bg-gradient-to-r from-[#00B4D8] to-[#0077B6] p-6 rounded-lg shadow-2xl">
                       <span className="text-4xl">🎮</span>
                     </div>
-                    <p className="text-white/70 text-sm">No more highlighting in the real game. Use your logic!</p>
+                    <p className="text-white/70 text-sm">
+                      {t('waterSortGame.tutorial.steps.step3.noHints')}
+                    </p>
                   </div>
                 </div>
               )}
             </div>
             
-            {/* Tutorial Navigation */}
             <div className="flex gap-3 mt-8">
               <button
                 onClick={prevTutorialStep}
@@ -494,19 +563,100 @@ export default function WaterSortGame() {
                 className="flex-1 py-2.5 bg-[#1A1A2E] border border-[#00B4D8]/30 text-white rounded-lg hover:bg-[#16213E] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <ChevronLeft size={18} />
-                Previous
+                {t('waterSortGame.tutorial.previous')}
               </button>
               <button
                 onClick={nextTutorialStep}
                 className="flex-1 py-2.5 bg-gradient-to-r from-[#00B4D8] to-[#0077B6] text-white font-bold rounded-lg hover:opacity-90 flex items-center justify-center gap-2"
               >
-                {tutorialStep === 2 ? 'Start Real Game' : 'Next'}
+                {tutorialStep === 2 
+                  ? t('waterSortGame.tutorial.startRealGame') 
+                  : t('waterSortGame.tutorial.next')}
                 <ChevronRight size={18} />
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Level Selector Modal */}
+      <div className="absolute top-4 right-4 z-10">
+        <button
+          onClick={() => {
+            const modal = document.getElementById('levelSelectorModal');
+            if (modal) modal.showModal();
+          }}
+          className="bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white px-4 py-2 rounded-full font-bold hover:opacity-90 shadow-lg flex items-center gap-2"
+        >
+          <span>📊</span>
+          <span>{t('waterSortGame.levelSelector.open')}</span>
+        </button>
+      </div>
+
+      {/* Level Selector Dialog */}
+      <dialog id="levelSelectorModal" className="bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-2xl border-2 border-[#FF5722]/30 shadow-2xl p-6 max-w-md w-full">
+        <div className="text-center mb-6">
+          <h3 className="text-2xl font-bold text-white mb-2">
+            {t('waterSortGame.levelSelector.title')}
+          </h3>
+          <p className="text-gray-300">
+            {t('waterSortGame.levelSelector.subtitle')}
+          </p>
+        </div>
+
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-white">{t('waterSortGame.levelSelector.currentLevel')}:</span>
+            <span className="text-yellow-300 font-bold text-lg">Level {level}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-white">{t('waterSortGame.levelSelector.highestReached')}:</span>
+            <span className="text-green-300 font-bold text-lg">Level {highestLevel}</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-5 gap-2 mb-6 max-h-60 overflow-y-auto">
+          {[...Array(Math.max(highestLevel, 10))].map((_, i) => {
+            const levelNum = i + 1;
+            const isCurrent = levelNum === level;
+            const isUnlocked = levelNum <= highestLevel;
+            
+            return (
+              <button
+                key={levelNum}
+                onClick={() => {
+                  if (isUnlocked && !isPouring) {
+                    goBackToLevel(levelNum);
+                    document.getElementById('levelSelectorModal').close();
+                  }
+                }}
+                disabled={!isUnlocked || isPouring}
+                className={`h-12 rounded-lg flex flex-col items-center justify-center transition-all ${
+                  isCurrent 
+                    ? 'bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white shadow-lg' 
+                    : isUnlocked
+                    ? 'bg-white/10 text-white hover:bg-white/20'
+                    : 'bg-gray-800/50 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                <span className="text-sm font-bold">{levelNum}</span>
+                {isCurrent && (
+                  <div className="w-1 h-1 bg-white rounded-full mt-1" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => document.getElementById('levelSelectorModal').close()}
+            className="flex-1 py-2.5 bg-[#1A1A2E] border border-[#FF5722]/30 text-white rounded-lg hover:bg-[#16213E]"
+          >
+            {t('waterSortGame.levelSelector.close')}
+          </button>
+        </div>
+      </dialog>
 
       {/* Animated background bubbles */}
       <div className="absolute inset-0 overflow-hidden">
@@ -522,6 +672,7 @@ export default function WaterSortGame() {
               animationDelay: Math.random() * 5 + "s",
               animationDuration: Math.random() * 8 + 8 + "s",
             }}
+            aria-label={t('waterSortGame.animations.float')}
           />
         ))}
       </div>
@@ -541,6 +692,7 @@ export default function WaterSortGame() {
                 top: "50%",
                 animationDelay: i * 0.1 + "s",
               }}
+              aria-label={t('waterSortGame.animations.droplet')}
             />
           ))}
         </div>
@@ -559,6 +711,7 @@ export default function WaterSortGame() {
               top: "40%",
               borderRadius: "15px 15px 5px 5px",
             }}
+            aria-label={t('waterSortGame.animations.pour')}
           />
         </div>
       )}
@@ -568,11 +721,11 @@ export default function WaterSortGame() {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Droplets className="text-white/80 animate-pulse" size={32} />
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-2xl tracking-tight">
-            Water Sort Puzzle
+            {t('waterSortGame.header.title')}
           </h1>
           {showTutorial && (
             <span className="px-3 py-1 bg-gradient-to-r from-[#00B4D8] to-[#0077B6] text-white text-sm font-bold rounded-full">
-              Tutorial
+              {t('waterSortGame.header.tutorialBadge')}
             </span>
           )}
         </div>
@@ -580,13 +733,25 @@ export default function WaterSortGame() {
           <div className="bg-white/10 backdrop-blur-sm px-4 md:px-6 py-2 rounded-full border border-white/20 flex items-center gap-2">
             <span className="text-yellow-300">🏆</span>
             <span className="font-semibold">
-              {showTutorial ? 'Tutorial' : `Level ${level}`}
+              {showTutorial 
+                ? t('waterSortGame.header.tutorialBadge')
+                : t('waterSortGame.header.level', { level })}
             </span>
           </div>
           <div className="bg-white/10 backdrop-blur-sm px-4 md:px-6 py-2 rounded-full border border-white/20 flex items-center gap-2">
             <span className="text-blue-300">↻</span>
-            <span className="font-semibold">Moves: {showTutorial ? tutorialStep : moves}</span>
+            <span className="font-semibold">
+              {t('waterSortGame.header.moves', { moves: showTutorial ? tutorialStep : moves })}
+            </span>
           </div>
+          {!showTutorial && (
+            <div className="bg-white/10 backdrop-blur-sm px-4 md:px-6 py-2 rounded-full border border-white/20 flex items-center gap-2">
+              <span className="text-green-300">⭐</span>
+              <span className="font-semibold">
+                {t('waterSortGame.header.highestLevel', { highestLevel })}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -601,21 +766,20 @@ export default function WaterSortGame() {
           
           return (
             <div key={i} className="relative">
-              {/* Tube number */}
               <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-white/70 text-sm font-semibold">
-                #{i + 1}
+                {t('waterSortGame.tube.label', { number: i + 1 })}
               </div>
 
-              {/* Ripple effect */}
               {hasRipple && (
                 <div className="absolute inset-0 pointer-events-none">
                   <div className={`absolute inset-0 rounded-3xl animate-ripple ${
                     rippleEffect.type === 'select' ? 'bg-yellow-400/40' : 'bg-blue-400/40'
-                  }`} />
+                  }`} 
+                  aria-label={t('waterSortGame.animations.ripple')}
+                  />
                 </div>
               )}
 
-              {/* Particles */}
               {hasParticles && (
                 <div className="absolute inset-0 pointer-events-none">
                   {[...Array(12)].map((_, pi) => (
@@ -628,29 +792,26 @@ export default function WaterSortGame() {
                         animationDelay: Math.random() * 0.5 + "s",
                       }}
                       size={16}
+                      aria-label={t('waterSortGame.animations.sparkle')}
                     />
                   ))}
                 </div>
               )}
               
-              {/* Tube container */}
               <div
                 onClick={() => handleTubeClick(i)}
                 className={`relative cursor-pointer transition-all duration-300 ${
                   isSelected ? "transform scale-110 -translate-y-2 md:-translate-y-4" : ""
                 } ${shouldHighlight ? "transform scale-105" : ""}`}
               >
-                {/* Glow effect - ONLY for selected tube */}
                 {isSelected && (
                   <div className="absolute inset-0 rounded-3xl blur-xl bg-yellow-400/50 animate-pulse-glow" />
                 )}
                 
-                {/* Highlight effect - ONLY in tutorial and only for specific tubes */}
                 {shouldHighlight && (
                   <div className="absolute inset-0 rounded-3xl blur-xl bg-green-400/50 animate-pulse-glow" />
                 )}
                 
-                {/* Tube */}
                 <div
                   className={`relative w-16 md:w-20 h-48 md:h-64 rounded-3xl flex flex-col-reverse overflow-hidden transition-all duration-300 ${
                     isSelected
@@ -666,7 +827,6 @@ export default function WaterSortGame() {
                     backdropFilter: "blur(10px)",
                   }}
                 >
-                  {/* Liquid wave effect on top */}
                   {tube.length > 0 && (
                     <div className="absolute top-0 left-0 right-0 h-2 overflow-hidden">
                       <div 
@@ -678,7 +838,6 @@ export default function WaterSortGame() {
                     </div>
                   )}
 
-                  {/* Layer slots - always show 4 slots */}
                   {[...Array(TUBE_CAPACITY)].map((_, slotIdx) => {
                     const color = tube[slotIdx];
                     const isEmpty = !color;
@@ -699,25 +858,22 @@ export default function WaterSortGame() {
                           animationDelay: slotIdx * 0.1 + "s",
                         }}
                       >
-                        {/* Empty slot indicator */}
                         {isEmpty && (
                           <div className="absolute inset-0 flex items-center justify-center opacity-20">
                             <div className="w-6 md:w-8 h-0.5 bg-white rounded-full" />
                           </div>
                         )}
                         
-                        {/* Liquid effects */}
                         {!isEmpty && (
                           <>
-                            {/* Liquid shine */}
                             <div
                               className="absolute inset-0 opacity-40 animate-shine"
                               style={{
                                 background: "linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)",
                               }}
+                              aria-label={t('waterSortGame.animations.shine')}
                             />
                             
-                            {/* Surface reflection on top layer */}
                             {isTopLayer && (
                               <div
                                 className="absolute top-0 left-0 right-0 h-2 opacity-60"
@@ -727,7 +883,6 @@ export default function WaterSortGame() {
                               />
                             )}
                             
-                            {/* Bubbles */}
                             {[...Array(3)].map((_, bi) => (
                               <div
                                 key={bi}
@@ -740,6 +895,7 @@ export default function WaterSortGame() {
                                   animationDelay: Math.random() * 2 + "s",
                                   animationDuration: Math.random() * 3 + 2 + "s",
                                 }}
+                                aria-label={t('waterSortGame.animations.bubble')}
                               />
                             ))}
                           </>
@@ -748,11 +904,12 @@ export default function WaterSortGame() {
                     );
                   })}
                   
-                  {/* Completion crown - ONLY in main game */}
                   {isCompleted && (
                     <div className="absolute -top-2 -right-2 z-10">
                       <div className="animate-bounce">
-                        <Trophy className="text-yellow-300" size={20} />
+                        <Trophy className="text-yellow-300" size={20} 
+                          aria-label={t('waterSortGame.tube.completionCrown')}
+                        />
                       </div>
                     </div>
                   )}
@@ -772,7 +929,7 @@ export default function WaterSortGame() {
             className="bg-white/20 hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm text-white px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold flex items-center gap-2 transition-all transform hover:scale-105 border border-white/30 shadow-xl"
           >
             <RotateCcw size={18} />
-            Undo
+            {t('waterSortGame.controls.undo')}
           </button>
         )}
         <button
@@ -781,14 +938,16 @@ export default function WaterSortGame() {
           className="bg-white/20 hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm text-white px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold flex items-center gap-2 transition-all transform hover:scale-105 border border-white/30 shadow-xl"
         >
           <RefreshCw size={18} />
-          {showTutorial ? 'Restart Tutorial' : 'Restart Level'}
+          {showTutorial 
+            ? t('waterSortGame.controls.restartTutorial')
+            : t('waterSortGame.controls.restartLevel')}
         </button>
         {showTutorial && (
           <button
             onClick={skipTutorial}
             className="bg-gradient-to-r from-[#00B4D8] to-[#0077B6] text-white px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold hover:opacity-90 transition-all transform hover:scale-105 shadow-xl"
           >
-            Skip Tutorial
+            {t('waterSortGame.tutorial.skipTutorial')}
           </button>
         )}
       </div>
@@ -798,19 +957,23 @@ export default function WaterSortGame() {
         {showTutorial ? (
           <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-white/20">
             <p className="font-bold text-white mb-1">
-              {tutorialStep === 0 && "🎯 Click on Tube #1 (highlighted in yellow)"}
-              {tutorialStep === 1 && "💧 Now click on an empty tube (highlighted in green)"}
-              {tutorialStep === 2 && "✨ Tutorial complete! Ready for the real challenge?"}
+              {tutorialStep === 0 && t('waterSortGame.instructions.tutorial.step0')}
+              {tutorialStep === 1 && t('waterSortGame.instructions.tutorial.step1')}
+              {tutorialStep === 2 && t('waterSortGame.instructions.tutorial.step2')}
             </p>
             <p className="text-xs text-white/50">
-              {tutorialStep < 2 ? "Follow the highlighted tubes" : "No hints in the real game!"}
+              {tutorialStep < 2 
+                ? t('waterSortGame.instructions.tutorial.followHints')
+                : t('waterSortGame.instructions.tutorial.noHints')}
             </p>
           </div>
         ) : (
           <>
-            <p className="font-bold text-white">💡 Sort colors into matching tubes!</p>
+            <p className="font-bold text-white">
+              {t('waterSortGame.instructions.mainGame.title')}
+            </p>
             <p className="text-xs mt-1 text-white/50">
-              Click a tube to select, then click another to pour • No hints in real game!
+              {t('waterSortGame.instructions.mainGame.description')}
             </p>
           </>
         )}
@@ -830,22 +993,28 @@ export default function WaterSortGame() {
                 />
               ))}
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4">Level Complete!</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4">
+              {t('waterSortGame.victory.title')}
+            </h2>
             <p className="text-xl md:text-2xl text-white/90 mb-6 md:mb-8">
-              Completed in <span className="font-bold text-yellow-300">{moves}</span> moves
+              <Trans 
+                i18nKey="waterSortGame.victory.completedIn"
+                values={{ moves }}
+                components={{ 1: <span className="font-bold text-yellow-300" /> }}
+              />
             </p>
             <div className="flex flex-col md:flex-row gap-3 md:gap-6">
               <button
                 onClick={reset}
                 className="bg-white/20 text-white px-6 md:px-8 py-3 rounded-full font-bold hover:bg-white/30 transition-all transform hover:scale-105 shadow-xl"
               >
-                Play Again
+                {t('waterSortGame.controls.playAgain')}
               </button>
               <button
                 onClick={nextLevel}
                 className="bg-white text-purple-600 px-6 md:px-10 py-3 rounded-full font-bold hover:bg-yellow-300 transition-all transform hover:scale-105 shadow-2xl"
               >
-                Next Level →
+                {t('waterSortGame.controls.nextLevel')}
               </button>
             </div>
           </div>

@@ -1773,6 +1773,7 @@
     }
   },
   "common": {
+    "years": "years",
     "yes": "Yes",
     "no": "No",
     "cancel": "Cancel",
@@ -1810,7 +1811,8 @@
     },
     "tabs": {
       "pinManagement": "PIN Management",
-      "securityLogs": "Security Logs"
+      "securityLogs": "Security Logs",
+      "kidInsights": "Kid Insights"
     },
     "pinSection": {
       "activeTitle": "Master PIN Active",
@@ -1894,6 +1896,278 @@
       "success": "Success",
       "error": "Error",
       "warning": "Warning"
+    }
+  },
+  "kidInsights": {
+    "title": "Child Activity Insights",
+    "subtitle": "Comprehensive analytics and insights about your child's digital activities",
+    "export": "Export PDF",
+    "refreshData": "Refresh Data",
+    "loading": "Loading...",
+    "unknownKid": "Unknown Kid",
+    "years": "years",
+    "timeframes": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    },
+    "modes": {
+      "overview": "Overview",
+      "gaming": "Gaming",
+      "content": "Content",
+      "learning": "Learning",
+      "screentime": "Screen Time",
+      "behavior": "Behavior",
+      "comparative": "Comparative"
+    },
+    "stats": {
+      "totalPlaytime": "Total Playtime",
+      "totalEngagement": "Total Engagement",
+      "learningProgress": "Learning Progress",
+      "contentWatched": "Content Watched",
+      "screenTimeHealth": "Screen Time Health",
+      "sessions": "sessions",
+      "skillsImproved": "skills improved",
+      "watchTime": "watch time",
+      "compliant": "compliant",
+      "totalGamingTime": "Total Gaming Time",
+      "gamesPlayed": "Games Played",
+      "plays": "plays",
+      "averageScore": "Average Score",
+      "highScores": "high scores",
+      "engagementRate": "Engagement Rate",
+      "productivity": "Productivity",
+      "points": "points",
+      "favoriteGame": "Favorite Game",
+      "noData": "No data yet",
+      "topSkill": "Top Skill",
+      "improvement": "improvement",
+      "productivityScore": "Productivity Score",
+      "completionRate": "Completion Rate",
+      "averageCompletion": "Average content completion",
+      "favoriteCategory": "Favorite Category",
+      "ofWatchTime": "of watch time",
+      "engagementScore": "Engagement Score",
+      "contentInteraction": "Content interaction quality",
+      "skillsImproved": "Skills Improved",
+      "avgImprovement": "avg improvement",
+      "learningTime": "Learning Time",
+      "overTimeframe": "Over",
+      "gamesCompleted": "Games Completed",
+      "educationalGames": "Educational games",
+      "learningScore": "Learning Score",
+      "overallProgress": "Overall progress",
+      "totalScreenTime": "Total Screen Time",
+      "total": "total",
+      "dailyAverage": "Daily Average",
+      "perDayAverage": "Per day average",
+      "complianceRate": "Compliance Rate",
+      "rulesFollowed": "Rules followed",
+      "peakUsage": "Peak Usage",
+      "focusLevel": "Focus Level",
+      "taskCompletion": "Task completion ability",
+      "persistence": "Persistence",
+      "sessionIndicator": "Session length indicator",
+      "ruleCompliance": "Rule Compliance",
+      "followingRestrictions": "Following restrictions",
+      "curiosity": "Curiosity",
+      "varietySeeking": "Variety seeking",
+      "averageSessionLength": "Average session length",
+      "mostWatchedDay": "Most watched day",
+      "preferredContentType": "Preferred content type",
+      "timeLimitCompliance": "Time limit compliance",
+      "ruleViolations": "Rule violations",
+      "times": "times",
+      "currentLevel": "Current Level"
+    },
+    "charts": {
+      "activityDistribution": "Activity Distribution",
+      "timeSpentDescription": "How time is spent across activities",
+      "skillDevelopment": "Skill Development",
+      "progressDescription": "Progress across different skill categories",
+      "skillScore": "Skill Score",
+      "gamesDistribution": "Games Distribution",
+      "mostPlayedGames": "Most played games by session count",
+      "plays": "plays",
+      "ofSessions": "of sessions",
+      "skillProgress": "Skill Progress",
+      "improvementOverTime": "Improvement over selected period",
+      "improvementPercentage": "Improvement %",
+      "improvement": "Improvement",
+      "skillBreakdown": "Skill Breakdown",
+      "games": "games",
+      "total": "Total Screen Time",
+      "gaming": "Gaming Time",
+      "content": "Content Time",
+      "contentCategories": "Content Categories",
+      "watchDistribution": "Distribution of watched content by category",
+      "watchCount": "Watch Count",
+      "skillRadar": "Skill Development Radar",
+      "skillProgressAreas": "Progress across different skill areas",
+      "skillLevel": "Skill Level",
+      "screenTimeTrends": "Screen Time Trends",
+      "dailyScreenTime": "Daily screen time over",
+      "activityBreakdown": "Activity Breakdown",
+      "screenTimeDistribution": "How screen time is distributed",
+      "behaviorProfile": "Behavior Profile",
+      "behaviorTraits": "Behavioral traits and patterns",
+      "behaviorScore": "Behavior Score"
+    },
+    "categories": {
+      "gaming": "Gaming",
+      "content": "Content",
+      "learning": "Learning",
+      "other": "Other"
+    },
+    "sections": {
+      "recentActivity": "Recent Activity",
+      "recentGamingSessions": "Recent Gaming Sessions",
+      "latestGameplay": "Latest gameplay activity",
+      "recentAchievements": "Recent Achievements",
+      "milestonesReached": "Milestones and accomplishments",
+      "recommendations": "Recommendations",
+      "personalizedSuggestions": "Personalized suggestions based on activity",
+      "suggestion": "Suggestion",
+      "tryNewActivities": "Consider trying new activities",
+      "importantAlerts": "Important Alerts",
+      "areasRequiringAttention": "Areas requiring attention",
+      "checkSettings": "Check settings for more details",
+      "watchTimePatterns": "Watch Time Patterns",
+      "dailyViewingHabits": "Daily viewing habits and patterns",
+      "watchPatterns": "Watch Patterns",
+      "strengths": "Strengths",
+      "excelAreas": "Areas where your child excels",
+      "skill": "Skill",
+      "strongPerformance": "Strong performance in this area",
+      "areasImprovement": "Areas for Improvement",
+      "needsPractice": "Skills that need more practice",
+      "needsPracticeArea": "Needs more practice in this area",
+      "timeRestrictions": "Time Restrictions",
+      "positivePatterns": "Positive Patterns",
+      "healthyBehavior": "Healthy behavior observed",
+      "areasMonitor": "Areas to Monitor",
+      "behaviorPatternsWatch": "Behavior patterns to watch",
+      "compareBenchmarks": "Compare with other children and benchmarks",
+      "comparativeAnalysis": "Comparative Analysis Coming Soon",
+      "comparativeDescription": "This feature is currently in development. Soon you'll be able to compare your child's activity with age-group averages and sibling performance.",
+      "compareFeatures": "What You'll Be Able To Compare"
+    },
+    "timeOfDay": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening",
+      "night": "Night"
+    },
+    "levels": {
+      "high": "High",
+      "medium": "Medium"
+    },
+    "behavior": {
+      "consistentSchedule": "Consistent Schedule",
+      "goodRoutine": "Regular activity patterns show good routine habits",
+      "goodFocus": "Good Focus",
+      "completesTasks": "Completes tasks without excessive distraction",
+      "variedInterests": "Varied Interests",
+      "exploresContent": "Explores different types of content and activities",
+      "lateSessions": "Late Sessions",
+      "bedtimeActivity": "Some activity occurs close to bedtime",
+      "restrictionAttempts": "Restriction Attempts",
+      "accessRestricted": "Occasional attempts to access restricted content",
+      "extendedSessions": "Extended Sessions",
+      "exceedsDuration": "Some gaming sessions exceed recommended duration"
+    },
+    "comparison": {
+      "vsAverage": "vs Average",
+      "ageGroup": "Age group comparison",
+      "vsSiblings": "vs Siblings",
+      "familyComparison": "Family comparison",
+      "progress": "Progress",
+      "growthTime": "Growth over time",
+      "gamingPerformance": "Gaming Performance",
+      "gamingMetrics": "Scores, completion rates, play time",
+      "learningProgress": "Learning Progress",
+      "skillComparison": "Skill development compared to peers",
+      "screenTimeHabits": "Screen Time Habits",
+      "usageComparison": "Daily usage compared to recommendations"
+    },
+    "status": {
+      "comingSoon": "Coming soon"
+    },
+    "achievements": {
+      "firstGame": "First Game Completed!",
+      "completedFirstGame": "Completed their first educational game",
+      "streak": "3-Day Streak!",
+      "played3Days": "Played educational games for 3 consecutive days",
+      "skillMaster": "Skill Master",
+      "improvedSkill": "Improved a skill by 25% or more"
+    },
+    "recommendations": {
+      "title": "Insights & Recommendations",
+      "basedOnActivity": "Based on recent gaming activity and progress",
+      "strengths": "Strengths",
+      "highEngagement": "High engagement rate - kid is actively learning",
+      "goodEngagement": "Good engagement - consistent learning habits",
+      "opportunities": "Opportunities",
+      "moreVariety": "Try different game categories for broader skill development",
+      "continueVariety": "Good variety - continue exploring different games",
+      "suggestions": "Suggestions",
+      "tryNewSkills": "Try games focusing on different educational skills",
+      "continueTopSkill": "Continue developing the top skill with related games"
+    },
+    "pdf": {
+      "title": "Oliviuus Kid Insights",
+      "reportFor": "Report for",
+      "timeframe": "Timeframe",
+      "generated": "Generated",
+      "exportError": "Failed to export PDF. Please try again.",
+      "sections": {
+        "overview": "📊 Overview",
+        "gaming": "🎮 Gaming Insights",
+        "content": "🎬 Content Insights",
+        "learning": "🧠 Learning Insights",
+        "screentime": "⏰ Screen Time Insights",
+        "recommendations": "💡 Recommendations",
+        "alerts": "🚨 Important Alerts",
+        "summary": "📝 Summary"
+      },
+      "totalEngagement": "Total Engagement",
+      "totalSessions": "Total Sessions",
+      "learningScore": "Learning Score",
+      "productivityScore": "Productivity Score",
+      "gamesPlayed": "Games Played",
+      "totalGamingTime": "Total Gaming Time",
+      "averageSession": "Average Session",
+      "minutes": "minutes",
+      "mostPlayedGames": "Most Played Games",
+      "plays": "plays",
+      "contentWatched": "Content Watched",
+      "totalWatchTime": "Total Watch Time",
+      "completionRate": "Completion Rate",
+      "engagementScore": "Engagement Score",
+      "topCategories": "Top Categories",
+      "items": "items",
+      "skillsImproved": "Skills Improved",
+      "averageImprovement": "Average Improvement",
+      "totalLearningTime": "Total Learning Time",
+      "gamesCompleted": "Games Completed",
+      "strengths": "Strengths",
+      "totalScreenTime": "Total Screen Time",
+      "dailyAverage": "Daily Average",
+      "gaming": "Gaming",
+      "content": "Content",
+      "other": "Other",
+      "suggestion": "Suggestion",
+      "reportGeneratedFor": "Report generated for",
+      "timePeriod": "Time period",
+      "overallEngagement": "Overall engagement",
+      "learningProgress": "Learning progress",
+      "footer": {
+        "company": "Oliviuus - Child Activity Insights Report",
+        "page": "Page",
+        "of": "of"
+      },
+      "years": "years"
     }
   },
   "familyProfiles": {
@@ -2296,7 +2570,29 @@
     },
     "pinModal": {
       "title": "Verify PIN to Exit Kid Mode",
-      "description": "Enter your family PIN to exit kid mode and return to parent dashboard"
+      "description": "Enter your family PIN to exit kid mode and return to parent dashboard",
+      "incorrectPin": "Incorrect PIN. Please try again.",
+      "verificationFailed": "PIN verification failed. Please try again.",
+      "enterPin": "Enter 4-digit PIN",
+      "digits": "digits",
+      "clear": "Clear",
+      "cancel": "Cancel",
+      "verifying": "Verifying...",
+      "verify": "Verify PIN",
+      "securityNote": "For security, all PIN attempts are logged",
+      "attempts": "Attempts: {{count}}",
+      "lastAttempt": "Last attempt",
+      "errors": {
+        "invalidLength": "PIN must be 4 digits",
+        "incorrectPin": "Incorrect PIN",
+        "verificationFailed": "Verification failed"
+      },
+      "securityWarning": {
+        "title": "Security Alert",
+        "twoAttempts": "Multiple incorrect PIN attempts detected. This attempt will be logged.",
+        "threeAttempts": "Multiple failed attempts detected. Parent will be notified.",
+        "multipleAttempts": "{{count}} failed attempts detected. Security alert has been sent to parent."
+      }
     }
   },
   "pinModal": {
@@ -2522,28 +2818,1548 @@
     }
   },
   "games": {
+    "play": "Play",
+    "title": "Kids Games",
+    "subtitle": "{{count}} fun learning games available",
+    "noGames": "No Games Available",
+    "noGamesDesc": "Check back later for new games!",
+    "refresh": "Refresh Games",
+    "playNow": "🎮 Play Now",
+    "back": "Back",
+    "skill": "Skill",
+    "type": "Type",
+    "age": "Age",
+    "skills": "Skills",
+    "loading": "Loading Games...",
+    "loadingDesc": "Fetching fun learning games for you",
+    "categories": {
+      "Math": "Math",
+      "Puzzles": "Puzzles",
+      "Colors": "Colors",
+      "Memory": "Memory",
+      "Science": "Science",
+      "Language": "Language",
+      "Racing": "Racing",
+      "Logic": "Logic",
+      "Action": "Action",
+      "Educational": "Educational"
+    },
+    "gameDetails": {
+      "counting_adventure": "Counting Adventure",
+      "counting_desc": "Learn addition with fun visuals",
+      "shape_match": "Shape Match",
+      "shape_desc": "Match shapes and patterns",
+      "color_quest": "Color Quest",
+      "color_desc": "Learn colors through games",
+      "memory_match": "Memory Match",
+      "memory_desc": "Improve memory skills",
+      "animal_safari": "Animal Safari",
+      "animal_desc": "Learn about animals",
+      "alphabet_race": "Alphabet Race",
+      "alphabet_desc": "Learn letters while racing",
+      "pro_racing": "Pro Racing Challenge",
+      "pro_racing_desc": "Race through traffic and collect power-ups",
+      "water_sort": "Water Sort Puzzle",
+      "water_sort_desc": "Sort colorful water in tubes"
+    }
+  },
+  "gamePlayer": {
+    "exit": "Exit",
+    "exitGame": "Exit Game",
+    "resume": "Resume",
+    "pause": "Pause",
+    "fullscreen": "Fullscreen",
+    "exitFS": "Exit FS",
+    "controls": "Controls",
+    "volume": "Volume",
+    "musicPlaying": "Music Playing",
+    "audioUnavailable": "Audio Unavailable",
+    "audioMuted": "Audio Muted",
+    "gotIt": "Got it!",
+    "score": "Score",
+    "time": "Time",
+    "hearts": "Hearts",
+    "shortcuts": {
+      "esc": "ESC",
+      "escape": "Exit Game",
+      "f": "F",
+      "fullscreenKey": "Fullscreen",
+      "m": "M",
+      "mute": "Mute Sound",
+      "space": "Space",
+      "pausePlay": "Pause/Play",
+      "c": "C",
+      "toggleControls": "Toggle Controls",
+      "s": "S",
+      "saveProgress": "Save Progress",
+      "zeroNine": "0-9",
+      "volumeLevels": "Volume Levels"
+    }
+  },
+  "proRacingChallenge": {
     "seo": {
-      "title": "Kids Games - Coming Soon",
-      "description": "Fun and educational games for kids will be available soon!"
+      "title": "Pro Racing Challenge - High Speed Car Game",
+      "description": "Dodge traffic, collect power-ups, and use shields in this intense pro racing challenge game!"
     },
-    "header": {
-      "title": "Games Zone",
-      "subtitle": "Fun Games Will Be Here Soon! 🎮",
-      "description": "We're working on bringing you amazing, kid-friendly games that are both fun and educational. Stay tuned for exciting updates!"
+    "game": {
+      "title": "PRO RACER",
+      "level": "L{{level}}",
+      "score": "{{score}}",
+      "startButton": "🚀 START RACE",
+      "restartButton": "🏎️ RACE AGAIN",
+      "gameOver": {
+        "title": "RACE COMPLETE!",
+        "newHighScore": "🥇 NEW HIGH SCORE!",
+        "highScore": "🥈 HIGH: {{score}}"
+      },
+      "instructions": {
+        "tapLanes": "Tap lanes to move",
+        "shieldButton": "Tap SHIELD button",
+        "touchHint": "Tap L1/L2/L3 to switch lanes • Tap SHIELD for protection"
+      },
+      "controls": {
+        "lane": "L{{lane}}",
+        "up": "↑ UP",
+        "down": "↓ DOWN",
+        "shield": "SHIELD ({{charges}})",
+        "shieldCooldown": "⏳",
+        "recharging": "Shield Recharging..."
+      },
+      "powerUps": {
+        "shieldCharge": "🛡️ +1 Shield Charge!",
+        "autoShield": "🛡️ Auto Shield!",
+        "slowMotion": "🐌 Slow Motion!",
+        "speedBoost": "⚡ Speed Boost!",
+        "shieldActive": "🛡️ Shield Active (7s)!",
+        "roadColor": "⭐ New Road Color!",
+        "roadGlow": "🌟 Road Glow!"
+      },
+      "collision": {
+        "crash": "Crash! Tap to restart"
+      }
     },
-    "features": {
-      "title": "What's Coming?",
-      "funEducational": "Fun Educational Games",
-      "puzzles": "Brain-Teasing Puzzles",
-      "skillBuilding": "Skill-Building Activities",
-      "safeContent": "Safe & Kid-Friendly Content"
+    "tutorial": {
+      "title": "SHIELD SYSTEM",
+      "description": "Start with 3 charges",
+      "features": {
+        "shield": "• 🛡️ = 7 second shield",
+        "collect": "• Collect for more charges (max 5)"
+      }
     },
-    "construction": {
-      "title": "Under Construction",
-      "description": "We're building an amazing collection of games for kids! Check back soon for fun, educational, and exciting games that will make learning fun! ✨"
+    "ui": {
+      "score": "SCORE: {{score}}",
+      "level": "LVL {{level}}",
+      "shieldCharges": "×{{charges}}",
+      "cooldown": "SHIELD CD",
+      "powerUpTimer": "{{icon}} {{time}}s"
+    },
+    "messages": {
+      "shieldReady": "Shield ready (Q key)",
+      "shieldActive": "Shield active!",
+      "shieldCooldown": "Shield on cooldown",
+      "collectible": "Collect {{item}}"
+    }
+  },
+  "countingGame": {
+    "seo": {
+      "title": "Counting Game - Kids Math Adventure",
+      "description": "Fun counting game for kids with multiple modes, characters, and power-ups to learn math through play!"
+    },
+    "gameOver": {
+      "title": "Game Over!",
+      "subtitle": "You did great!",
+      "score": "Score",
+      "level": "Level",
+      "streak": "Streak",
+      "reached": "Reached",
+      "playAgain": "🎮 Play Again"
+    },
+    "characterSelection": {
+      "title": "Pick Your Character!",
+      "letsPlay": "Let's Play!"
+    },
+    "gameModes": {
+      "practice": "Practice",
+      "timed": "Timed",
+      "multiplayer": "Vs AI"
+    },
+    "gameHeader": {
+      "title": "Counting Game",
+      "level": "Lvl {{level}}",
+      "streak": "{{streak}}🔥",
+      "vsAI": "vs"
+    },
+    "timer": {
+      "timeLeft": "Time Left:",
+      "seconds": "{{time}}s"
+    },
+    "countingArea": {
+      "countItems": "Count the items!",
+      "groupA": "Group A",
+      "groupB": "Group B"
+    },
+    "inputModes": {
+      "numbers": "🔢 Numbers",
+      "emoji": "😀 Emojis",
+      "placeholderNumbers": "Type answer...",
+      "placeholderEmoji": "Draw emojis...",
+      "submit": "🚀 SUBMIT ANSWER"
+    },
+    "numberPad": {
+      "clear": "Clear"
+    },
+    "powerUps": {
+      "extraTime": {
+        "label": "⏰",
+        "name": "+10s",
+        "count": "x{{count}}"
+      },
+      "skipQuestion": {
+        "label": "🚀",
+        "name": "Skip",
+        "count": "x{{count}}"
+      },
+      "doublePoints": {
+        "label": "💰",
+        "name": "2x",
+        "count": "x{{count}}"
+      }
+    },
+    "feedback": {
+      "hint": "💡 Hint: {{a}} + {{b}} = {{sum}}",
+      "correct": {
+        "awesome": "🎉 Awesome!",
+        "greatJob": "🚀 Great Job!",
+        "perfect": "🌈 Perfect!",
+        "super": "🎪 Super!",
+        "amazing": "🧙‍♂️ Amazing!",
+        "excellent": "🦸‍♂️ Excellent!"
+      },
+      "incorrect": "❌ Try again! Answer: {{answer}}",
+      "bonusHeart": "🏆 +1 Heart!",
+      "levelUp": "🚀 Level Up!",
+      "extraTime": "⏰ +10 seconds!",
+      "skipped": "🚀 Skipped!",
+      "doublePoints": "💰 +50 points!"
+    },
+    "instructions": {
+      "enterSubmit": "⏎ Enter to submit",
+      "streakHeart": "🏆 5-streak = heart"
     },
     "buttons": {
-      "comingSoon": "Coming Soon!"
+      "toggleSound": "Toggle sound",
+      "playAgain": "Play Again"
+    },
+    "errors": {
+      "emptyAnswer": "Please enter an answer!"
+    }
+  },
+  "waterSortGame": {
+    "seo": {
+      "title": "Water Sort Puzzle - Liquid Sorting Game",
+      "description": "Challenge your brain with this colorful water sorting puzzle game. Sort liquids into matching tubes!"
+    },
+    "loading": "Loading Water Sort Game...",
+    "levelSelector": {
+      "open": "Levels",
+      "title": "Select Level",
+      "subtitle": "Choose a level to play",
+      "currentLevel": "Current Level",
+      "highestReached": "Highest Reached",
+      "close": "Close"
+    },
+    "tutorial": {
+      "title": "How to Play Water Sort Puzzle",
+      "subtitle": "Complete the tutorial to learn the game!",
+      "skipTutorial": "Skip Tutorial",
+      "startRealGame": "Start Real Game",
+      "next": "Next",
+      "previous": "Previous",
+      "progress": "Progress",
+      "steps": {
+        "step1": {
+          "title": "🎯 Step 1: Select a Tube",
+          "description": "Click on the blue tube (Tube #1) to select it.",
+          "hint": "Selected tubes will glow yellow.",
+          "clickHint": "👉 Click Tube #1"
+        },
+        "step2": {
+          "title": "💧 Step 2: Pour to Empty Tube",
+          "description": "Now click on an empty tube (Tube #3 or #4) to pour the selected liquid.",
+          "hint": "Empty tubes are highlighted in green below.",
+          "selectedLabel": "Selected",
+          "clickHint": "👉 Click Here"
+        },
+        "step3": {
+          "title": "✨ Great Job!",
+          "description": "You've made your first move! Ready to play the real game?",
+          "hint": "In the real game, you won't see hints - you'll need to figure it out yourself!",
+          "noHints": "No more highlighting in the real game. Use your logic!"
+        }
+      }
+    },
+    "header": {
+      "title": "Water Sort Puzzle",
+      "tutorialBadge": "Tutorial",
+      "level": "Level {{level}}",
+      "moves": "Moves: {{moves}}",
+      "highestLevel": "Highest: {{highestLevel}}"
+    },
+    "controls": {
+      "undo": "Undo",
+      "restartTutorial": "Restart Tutorial",
+      "restartLevel": "Restart Level",
+      "playAgain": "Play Again",
+      "nextLevel": "Next Level →"
+    },
+    "instructions": {
+      "tutorial": {
+        "step0": "🎯 Click on Tube #1 (highlighted in yellow)",
+        "step1": "💧 Now click on an empty tube (highlighted in green)",
+        "step2": "✨ Tutorial complete! Ready for the real challenge?",
+        "followHints": "Follow the highlighted tubes",
+        "noHints": "No hints in the real game!"
+      },
+      "mainGame": {
+        "title": "💡 Sort colors into matching tubes!",
+        "description": "Click a tube to select, then click another to pour • No hints in real game!"
+      }
+    },
+    "victory": {
+      "title": "Level Complete!",
+      "completedIn": "Completed in <1>{{moves}}</1> moves",
+      "playAgain": "Play Again",
+      "nextLevel": "Next Level →"
+    },
+    "tube": {
+      "label": "Tube #{{number}}",
+      "selected": "Selected",
+      "completionCrown": "Completion crown"
+    },
+    "animations": {
+      "float": "Floating animation",
+      "pour": "Pouring animation",
+      "droplet": "Droplet animation",
+      "ripple": "Ripple effect",
+      "sparkle": "Sparkle animation",
+      "liquidShake": "Liquid shaking",
+      "bubble": "Bubble animation",
+      "shine": "Shine effect",
+      "pulseGlow": "Pulse glow animation"
+    }
+  },
+  "colorQuestGame": {
+    "seo": {
+      "title": "Color Quest - Kids Color Learning Game",
+      "description": "Fun color identification, mixing, sorting, and painting game for kids to learn colors through interactive play!"
+    },
+    "gameOver": {
+      "title": "Color Quest Complete!",
+      "subtitle": "You're a color master!",
+      "score": "Score",
+      "level": "Level",
+      "streak": "Streak",
+      "playAgain": "🎨 Play Again"
+    },
+    "gameHeader": {
+      "title": "Color Quest",
+      "level": "Lvl {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "identify": "Identify",
+      "mix": "Mix",
+      "sort": "Sort",
+      "paint": "Paint"
+    },
+    "timer": {
+      "timeLeft": "Time Left:",
+      "seconds": "{{time}}s"
+    },
+    "questions": {
+      "identify": {
+        "default": "What color is this?",
+        "colorSample": "Color Sample"
+      },
+      "mix": {
+        "default": "What do {{color1}} and {{color2}} make?",
+        "resultUnknown": "?"
+      },
+      "sort": {
+        "default": "Find all {{color}} items!"
+      },
+      "paint": {
+        "default": "Paint with {{color}}!",
+        "paintBucket": "Paint Bucket",
+        "colorDrops": "Color Drops"
+      }
+    },
+    "feedback": {
+      "correct": {
+        "colorGenius": "🎨 Color Genius!",
+        "perfectMatch": "🌈 Perfect Match!",
+        "youreRainbow": "✨ You're a Rainbow!",
+        "masterPainter": "🖌️ Master Painter!",
+        "colorWizard": "🌟 Color Wizard!",
+        "bullseye": "🎯 Bullseye!"
+      },
+      "incorrect": {
+        "tryAgain": "❌ Try again!",
+        "identifyHint": "It's {{color}}!",
+        "mixHint": "Try another color!"
+      },
+      "bonusHeart": "💖 +1 Heart!",
+      "levelUp": "🚀 Level Up!"
+    },
+    "buttons": {
+      "toggleSound": "Toggle sound",
+      "newColor": "🔄 New Color",
+      "easier": "⬇️ Easier",
+      "harder": "⬆️ Harder",
+      "playAgain": "Play Again"
+    },
+    "labels": {
+      "colorSample": "Color Sample",
+      "colorPalette": "Color Palette:",
+      "lives": "Lives",
+      "score": "Score",
+      "time": "Time",
+      "mixFormula": "{{color1}} + {{color2}} = {{result}}",
+      "result": "Result"
+    },
+    "colors": {
+      "red": "Red",
+      "blue": "Blue",
+      "yellow": "Yellow",
+      "green": "Green",
+      "purple": "Purple",
+      "orange": "Orange",
+      "pink": "Pink",
+      "brown": "Brown",
+      "lightBlue": "Light Blue"
+    },
+    "instructions": {
+      "identifyMode": "Click on the color that matches the sample",
+      "mixMode": "Select the color that results from mixing",
+      "sortMode": "Tap on items that match the target color",
+      "paintMode": "Choose the color drop that matches the paint bucket"
+    },
+    "characters": {
+      "arty": {
+        "emoji": "🎨",
+        "name": "Arty"
+      },
+      "rainbow": {
+        "emoji": "🦄",
+        "name": "Rainbow"
+      },
+      "inky": {
+        "emoji": "🐙",
+        "name": "Inky"
+      },
+      "peacock": {
+        "emoji": "🦚",
+        "name": "Peacock"
+      }
+    }
+  },
+  "animalSafariGame": {
+    "seo": {
+      "title": "Animal Safari - Kids Wildlife Exploration Game",
+      "description": "Explore habitats, find animals, and learn wildlife facts in this interactive safari adventure game for kids!"
+    },
+    "gameOver": {
+      "title": "Safari Complete!",
+      "subtitle": "You found {{count}} animals!",
+      "score": "Score",
+      "level": "Level",
+      "photos": "Photos",
+      "animalsFound": "Animals You Found:",
+      "startNewSafari": "🦁 Start New Safari"
+    },
+    "gameHeader": {
+      "title": "Animal Safari",
+      "level": "Lvl {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "explore": "Explore",
+      "quiz": "Quiz",
+      "timed": "Timed"
+    },
+    "timer": {
+      "timeLeft": "Time Left:",
+      "seconds": "{{time}}s"
+    },
+    "habitat": {
+      "currentHabitat": "Current Habitat:",
+      "animalsFound": "Animals Found:",
+      "savannah": {
+        "name": "Savannah",
+        "description": "Hot grassland with few trees"
+      },
+      "jungle": {
+        "name": "Jungle",
+        "description": "Rainforest with many trees and vines"
+      },
+      "ocean": {
+        "name": "Ocean",
+        "description": "Deep blue sea with coral reefs"
+      },
+      "arctic": {
+        "name": "Arctic",
+        "description": "Cold ice and snow land"
+      }
+    },
+    "animalAnnouncement": {
+      "findThisAnimal": "Find This Animal:",
+      "repeatInstructions": "Repeat instructions",
+      "sayAnimalName": "Say animal name",
+      "stopListening": "Stop listening",
+      "hint": "💡 Hint: {{hint}}"
+    },
+    "questions": {
+      "sound": "What sound does a {{animal}} make?",
+      "fact": "Which fact is true about {{animal}}s?",
+      "name": "What animal makes this sound: \"{{sound}}\"?",
+      "instructions": "Click or say the answer"
+    },
+    "feedback": {
+      "correct": {
+        "greatSpot": "🎯 Great Spot! You found it!",
+        "animalFound": "📸 Animal Found! Excellent!",
+        "safariSuccess": "🦁 Safari Success! Amazing!",
+        "wildDiscovery": "🌟 Wild Discovery! Perfect!",
+        "natureExplorer": "🎪 Nature Explorer! Wonderful!",
+        "wildlifePro": "🏆 Wildlife Pro! Fantastic!"
+      },
+      "incorrect": {
+        "wrongAnimal": "❌ That's a {{animal}}. Find the {{targetAnimal}}!",
+        "tryAgainHint": "❌ Try again! Hint: {{hint}}",
+        "itsAnimal": "❌ It's the {{animal}}! {{sound}}",
+        "answerIs": "❌ The answer is {{animal}}: {{answer}}"
+      },
+      "listening": "🎤 Listening... Say the animal name!",
+      "microphoneError": "❌ Microphone not available. Please click instead.",
+      "voiceNotHeard": "❌ I didn't hear \"{{animal}}\". Try again!",
+      "bonusHeart": "💖 +1 Heart!",
+      "levelUp": "🚀 Safari Adventure Complete! Next habitat...",
+      "welcomeHabitat": "Welcome to the {{habitat}}! Find the {{animal}}. {{hint}}. Look for {{emoji}}"
+    },
+    "powerUps": {
+      "binoculars": {
+        "name": "Binoculars",
+        "description": "Reveal animals briefly",
+        "feedback": "🔍 Binoculars reveal hidden animals!"
+      },
+      "camera": {
+        "name": "Camera",
+        "description": "Auto-find one animal",
+        "feedback": "📸 Camera snap! Found an animal!"
+      },
+      "map": {
+        "name": "Map",
+        "description": "Discover new habitat",
+        "feedback": "🗺️ Map discovered new habitat!"
+      },
+      "hint": {
+        "name": "Hint",
+        "description": "Get a hint",
+        "feedback": "💡 Hint: {{hint}}"
+      },
+      "voiceHelp": {
+        "name": "Voice Help",
+        "description": "Voice assistance",
+        "feedback": "🔊 Voice help activated!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Toggle sound",
+      "voiceOn": "Voice On",
+      "voiceOff": "Voice Off",
+      "soundOn": "Sound On",
+      "soundOff": "Sound Off",
+      "newSafari": "Start New Safari"
+    },
+    "labels": {
+      "findTheseAnimals": "Find These Animals:",
+      "recentPhotos": "Recent Photos:",
+      "explorationComplete": "Explore the {{habitat}}! Find {{count}} animals.",
+      "movementControls": "Movement Controls",
+      "habitatDecorations": "Habitat decorations"
+    },
+    "instructions": {
+      "sayAnimalNames": "🎤 Say animal names",
+      "findAnnouncedAnimal": "💡 Find the announced animal",
+      "turnOnVoice": "🔊 Turn on voice for help",
+      "findInOrder": "🏆 Find animals in order"
+    },
+    "animals": {
+      "lion": {
+        "name": "Lion",
+        "sound": "Roar!",
+        "hint": "King of the jungle, has a big mane",
+        "voice": "I am a lion! I roar loudly!"
+      },
+      "elephant": {
+        "name": "Elephant",
+        "sound": "Trumpet!",
+        "hint": "Big gray animal with a long trunk",
+        "voice": "I am an elephant! I have a long trunk!"
+      },
+      "giraffe": {
+        "name": "Giraffe",
+        "sound": "Moo!",
+        "hint": "Very tall with a long neck",
+        "voice": "I am a giraffe! I am the tallest animal!"
+      },
+      "zebra": {
+        "name": "Zebra",
+        "sound": "Bray!",
+        "hint": "Black and white stripes",
+        "voice": "I am a zebra! I have black and white stripes!"
+      },
+      "hippo": {
+        "name": "Hippo",
+        "sound": "Grunt!",
+        "hint": "Big and lives in water",
+        "voice": "I am a hippo! I love water!"
+      },
+      "monkey": {
+        "name": "Monkey",
+        "sound": "Chatter!",
+        "hint": "Climbs trees and loves bananas",
+        "voice": "I am a monkey! I love to climb!"
+      },
+      "parrot": {
+        "name": "Parrot",
+        "sound": "Squawk!",
+        "hint": "Colorful bird that can talk",
+        "voice": "I am a parrot! I can talk like you!"
+      },
+      "tiger": {
+        "name": "Tiger",
+        "sound": "Growl!",
+        "hint": "Big cat with orange and black stripes",
+        "voice": "I am a tiger! I have beautiful stripes!"
+      },
+      "snake": {
+        "name": "Snake",
+        "sound": "Hiss!",
+        "hint": "Long and slithers on the ground",
+        "voice": "I am a snake! I slither on the ground!"
+      },
+      "sloth": {
+        "name": "Sloth",
+        "sound": "...",
+        "hint": "Very slow and hangs from trees",
+        "voice": "I am a sloth! I move very slowly!"
+      },
+      "whale": {
+        "name": "Whale",
+        "sound": "Sing!",
+        "hint": "Biggest animal in the ocean",
+        "voice": "I am a whale! I am very big!"
+      },
+      "dolphin": {
+        "name": "Dolphin",
+        "sound": "Click!",
+        "hint": "Smart and jumps out of water",
+        "voice": "I am a dolphin! I am very smart!"
+      },
+      "shark": {
+        "name": "Shark",
+        "sound": "...",
+        "hint": "Has sharp teeth and fins",
+        "voice": "I am a shark! I have sharp teeth!"
+      },
+      "turtle": {
+        "name": "Turtle",
+        "sound": "...",
+        "hint": "Has a hard shell on its back",
+        "voice": "I am a turtle! I carry my house on my back!"
+      },
+      "squid": {
+        "name": "Squid",
+        "sound": "...",
+        "hint": "Has tentacles and ink",
+        "voice": "I am a squid! I have eight arms!"
+      },
+      "penguin": {
+        "name": "Penguin",
+        "sound": "Honk!",
+        "hint": "Bird that swims but cannot fly",
+        "voice": "I am a penguin! I waddle when I walk!"
+      },
+      "polarBear": {
+        "name": "Polar Bear",
+        "sound": "Growl!",
+        "hint": "Big white bear in the snow",
+        "voice": "I am a polar bear! I love the cold!"
+      },
+      "seal": {
+        "name": "Seal",
+        "sound": "Bark!",
+        "hint": "Swims and barks like a dog",
+        "voice": "I am a seal! I can hold my breath a long time!"
+      },
+      "arcticFox": {
+        "name": "Arctic Fox",
+        "sound": "Yip!",
+        "hint": "Small fox with white fur",
+        "voice": "I am an arctic fox! My fur turns white in winter!"
+      },
+      "wolf": {
+        "name": "Wolf",
+        "sound": "Howl!",
+        "hint": "Looks like a big dog, howls at moon",
+        "voice": "I am a wolf! I howl at the moon!"
+      }
+    },
+    "characters": {
+      "leo": {
+        "emoji": "🦁",
+        "name": "Leo",
+        "voice": "I am Leo the Lion! Let's find animals!"
+      },
+      "ellie": {
+        "emoji": "🐘",
+        "name": "Ellie",
+        "voice": "I am Ellie the Elephant! Ready for safari!"
+      },
+      "gigi": {
+        "emoji": "🦒",
+        "name": "Gigi",
+        "voice": "I am Gigi the Giraffe! Let's explore!"
+      },
+      "momo": {
+        "emoji": "🐒",
+        "name": "Momo",
+        "voice": "I am Momo the Monkey! Time for adventure!"
+      }
+    }
+  },
+  "shapeMatchGame": {
+    "seo": {
+      "title": "Shape Match - Kids Shape Recognition Game",
+      "description": "Fun shape matching, pattern recognition, and memory game for kids to learn shapes through interactive play!"
+    },
+    "gameOver": {
+      "title": "Game Complete!",
+      "subtitle": "You matched {{count}} shapes!",
+      "score": "Score",
+      "level": "Level",
+      "matched": "Matched",
+      "playAgain": "🔄 Play Again"
+    },
+    "gameHeader": {
+      "title": "Shape Match",
+      "level": "Lvl {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "practice": "Practice",
+      "timed": "Timed",
+      "pattern": "Pattern",
+      "multiplayer": "Multiplayer"
+    },
+    "timer": {
+      "timeLeft": "Time Left:",
+      "seconds": "{{time}}s"
+    },
+    "patternMode": {
+      "matchPattern": "Match this pattern:",
+      "instructions": "Click shapes in the target pattern order!"
+    },
+    "stats": {
+      "matches": "Matches:",
+      "moves": "Moves:",
+      "lives": "Lives",
+      "streak": "Streak"
+    },
+    "instructions": {
+      "practiceTimed": "Find matching shape pairs!",
+      "pattern": "Click shapes in the target pattern order!",
+      "selected": "Selected shape",
+      "matched": "Matched shape",
+      "hidden": "Hidden shape"
+    },
+    "feedback": {
+      "correct": {
+        "perfectMatch": "🎉 Perfect Match!",
+        "shapeMaster": "🌟 Shape Master!",
+        "awesome": "✨ Awesome!",
+        "superFind": "🎪 Super Find!",
+        "patternPro": "🧩 Pattern Pro!",
+        "bullseye": "🎯 Bullseye!"
+      },
+      "incorrect": "❌ Try again!",
+      "bonusHeart": "🏆 +1 Heart!",
+      "levelUp": "🚀 Level Up!"
+    },
+    "powerUps": {
+      "reveal": {
+        "name": "Reveal",
+        "description": "Show all shapes briefly",
+        "feedback": "🔍 Hint activated!",
+        "key": "H = Hint"
+      },
+      "shuffle": {
+        "name": "Shuffle",
+        "description": "Shuffle the board",
+        "feedback": "🌀 Board shuffled!",
+        "key": "R = Shuffle"
+      },
+      "extraTime": {
+        "name": "+15s",
+        "description": "Add 15 seconds (Timed mode only)",
+        "feedback": "⏰ +15 seconds!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Toggle sound",
+      "playAgain": "Play Again",
+      "usePowerUp": "Use {{powerUp}}"
+    },
+    "labels": {
+      "shapeBoard": "Shape Board",
+      "progress": "Progress",
+      "controlsInfo": "Controls Info",
+      "keyboardShortcuts": "Keyboard Shortcuts"
+    },
+    "shapes": {
+      "triangle": {
+        "emoji": "🔺",
+        "name": "Triangle",
+        "color": "#FF6B6B"
+      },
+      "circle": {
+        "emoji": "🔵",
+        "name": "Circle",
+        "color": "#4ECDC4"
+      },
+      "square": {
+        "emoji": "🟦",
+        "name": "Square",
+        "color": "#45B7D1"
+      },
+      "star": {
+        "emoji": "⭐",
+        "name": "Star",
+        "color": "#FFD166"
+      },
+      "heart": {
+        "emoji": "❤️",
+        "name": "Heart",
+        "color": "#FF6B9D"
+      },
+      "diamond": {
+        "emoji": "🔶",
+        "name": "Diamond",
+        "color": "#A13E97"
+      },
+      "moon": {
+        "emoji": "🌙",
+        "name": "Moon",
+        "color": "#96CEB4"
+      },
+      "zap": {
+        "emoji": "⚡",
+        "name": "Zap",
+        "color": "#FFE066"
+      }
+    },
+    "characters": {
+      "foxy": {
+        "emoji": "🦊",
+        "name": "Foxy"
+      },
+      "panda": {
+        "emoji": "🐼",
+        "name": "Panda"
+      },
+      "leo": {
+        "emoji": "🦁",
+        "name": "Leo"
+      },
+      "koala": {
+        "emoji": "🐨",
+        "name": "Koala"
+      }
+    },
+    "keyboard": {
+      "hint": "H = Hint",
+      "shuffle": "R = Shuffle",
+      "streak": "3-streak"
+    }
+  },
+  "memoryMatchGame": {
+    "seo": {
+      "title": "Memory Match - Kids Memory Card Game",
+      "description": "Improve memory skills with matching card games featuring animals, fruits, vehicles, and shapes. Fun brain training for kids!"
+    },
+    "gameOver": {
+      "title": "Memory Game Over!",
+      "subtitle": "You found {{count}} pairs!",
+      "score": "Score",
+      "level": "Level",
+      "moves": "Moves",
+      "playAgain": "🧠 Play Again"
+    },
+    "gameHeader": {
+      "title": "Memory Match",
+      "level": "Lvl {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "practice": "Practice",
+      "timed": "Timed"
+    },
+    "themes": {
+      "animals": "Animals",
+      "fruits": "Fruits",
+      "vehicles": "Vehicles",
+      "shapes": "Shapes"
+    },
+    "timer": {
+      "timeLeft": "Time Left:",
+      "seconds": "{{time}}s"
+    },
+    "stats": {
+      "moves": "Moves:",
+      "pairs": "Pairs:",
+      "lives": "Lives",
+      "progress": "Progress",
+      "gridSize": "{{size}}x{{size}} Grid"
+    },
+    "gameBoard": {
+      "themeMemory": "{{theme}} Memory",
+      "findMatchingPairs": "Find matching {{theme}} pairs!"
+    },
+    "feedback": {
+      "correct": {
+        "memoryMaster": "🧠 Memory Master!",
+        "superMatch": "🌟 Super Match!",
+        "perfectRecall": "🎯 Perfect Recall!",
+        "amazingMemory": "✨ Amazing Memory!",
+        "brainPower": "🏆 Brain Power!",
+        "matchFound": "🎉 Match Found!"
+      },
+      "incorrect": {
+        "notMatch": "❌ Not a match! Try again!",
+        "rememberBetter": "❌ Try to remember better! -1 Heart"
+      },
+      "bonusHeart": "💖 +1 Heart!",
+      "levelUp": "🚀 Level Up!"
+    },
+    "buttons": {
+      "toggleSound": "Toggle sound",
+      "showAllCards": "Show All Cards",
+      "reset": "Reset",
+      "playAgain": "Play Again",
+      "startGame": "Start Game"
+    },
+    "controls": {
+      "showHint": "Show all cards briefly",
+      "restartBoard": "Restart current board"
+    },
+    "cards": {
+      "hidden": "?",
+      "unknown": "Hidden card"
+    },
+    "instructions": {
+      "rememberPositions": "🧠 Remember card positions",
+      "clickMatchingCards": "🎯 Click two matching cards",
+      "fewerMovesMorePoints": "🚀 Fewer moves = more points",
+      "completePairsToLevelUp": "🏆 Complete all pairs to level up"
+    },
+    "themesDetails": {
+      "animals": {
+        "cat": {
+          "emoji": "🐱",
+          "name": "Cat"
+        },
+        "dog": {
+          "emoji": "🐶",
+          "name": "Dog"
+        },
+        "lion": {
+          "emoji": "🦁",
+          "name": "Lion"
+        },
+        "tiger": {
+          "emoji": "🐯",
+          "name": "Tiger"
+        },
+        "fox": {
+          "emoji": "🦊",
+          "name": "Fox"
+        },
+        "panda": {
+          "emoji": "🐼",
+          "name": "Panda"
+        },
+        "koala": {
+          "emoji": "🐨",
+          "name": "Koala"
+        },
+        "unicorn": {
+          "emoji": "🦄",
+          "name": "Unicorn"
+        },
+        "frog": {
+          "emoji": "🐸",
+          "name": "Frog"
+        },
+        "octopus": {
+          "emoji": "🐙",
+          "name": "Octopus"
+        }
+      },
+      "fruits": {
+        "apple": {
+          "emoji": "🍎",
+          "name": "Apple"
+        },
+        "banana": {
+          "emoji": "🍌",
+          "name": "Banana"
+        },
+        "grapes": {
+          "emoji": "🍇",
+          "name": "Grapes"
+        },
+        "strawberry": {
+          "emoji": "🍓",
+          "name": "Strawberry"
+        },
+        "orange": {
+          "emoji": "🍊",
+          "name": "Orange"
+        },
+        "pineapple": {
+          "emoji": "🍍",
+          "name": "Pineapple"
+        },
+        "mango": {
+          "emoji": "🥭",
+          "name": "Mango"
+        },
+        "watermelon": {
+          "emoji": "🍉",
+          "name": "Watermelon"
+        },
+        "cherry": {
+          "emoji": "🍒",
+          "name": "Cherry"
+        },
+        "kiwi": {
+          "emoji": "🥝",
+          "name": "Kiwi"
+        }
+      },
+      "vehicles": {
+        "car": {
+          "emoji": "🚗",
+          "name": "Car"
+        },
+        "bus": {
+          "emoji": "🚌",
+          "name": "Bus"
+        },
+        "airplane": {
+          "emoji": "✈️",
+          "name": "Airplane"
+        },
+        "train": {
+          "emoji": "🚂",
+          "name": "Train"
+        },
+        "helicopter": {
+          "emoji": "🚁",
+          "name": "Helicopter"
+        },
+        "ship": {
+          "emoji": "🚢",
+          "name": "Ship"
+        },
+        "rocket": {
+          "emoji": "🚀",
+          "name": "Rocket"
+        },
+        "ufo": {
+          "emoji": "🛸",
+          "name": "UFO"
+        },
+        "tractor": {
+          "emoji": "🚜",
+          "name": "Tractor"
+        },
+        "raceCar": {
+          "emoji": "🏎️",
+          "name": "Race Car"
+        }
+      },
+      "shapes": {
+        "triangle": {
+          "emoji": "🔺",
+          "name": "Triangle"
+        },
+        "circle": {
+          "emoji": "🔵",
+          "name": "Circle"
+        },
+        "square": {
+          "emoji": "🟦",
+          "name": "Square"
+        },
+        "star": {
+          "emoji": "⭐",
+          "name": "Star"
+        },
+        "heart": {
+          "emoji": "❤️",
+          "name": "Heart"
+        },
+        "diamond": {
+          "emoji": "🔶",
+          "name": "Diamond"
+        },
+        "moon": {
+          "emoji": "🌙",
+          "name": "Moon"
+        },
+        "lightning": {
+          "emoji": "⚡",
+          "name": "Lightning"
+        },
+        "snowflake": {
+          "emoji": "❄️",
+          "name": "Snowflake"
+        },
+        "balloon": {
+          "emoji": "🎈",
+          "name": "Balloon"
+        }
+      }
+    },
+    "characters": {
+      "brainy": {
+        "emoji": "🧠",
+        "name": "Brainy"
+      },
+      "wiseOwl": {
+        "emoji": "🦉",
+        "name": "Wise Owl"
+      },
+      "elephant": {
+        "emoji": "🐘",
+        "name": "Elephant"
+      },
+      "butterfly": {
+        "emoji": "🦋",
+        "name": "Butterfly"
+      }
+    }
+  },
+  "alphabetRaceGame": {
+    "seo": {
+      "title": "Alphabet Race - Kids Letter Learning Game",
+      "description": "Race through the alphabet, learn letter sounds, and practice spelling in this exciting educational game for kids!"
+    },
+    "gameOver": {
+      "opponentWon": "Race Complete!",
+      "playerWon": "Alphabet Adventure Over!",
+      "raceLost": "The opponent won the race!",
+      "raceWon": "You raced through the alphabet!",
+      "greatLearning": "Great learning!",
+      "score": "Score",
+      "level": "Level",
+      "bestStreak": "Best Streak",
+      "lettersLearned": "Letters Learned:",
+      "playAgain": "🚀 Play Again"
+    },
+    "gameHeader": {
+      "title": "Alphabet Race",
+      "level": "Lvl {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "letters": "Letters",
+      "race": "Race",
+      "spelling": "Spelling",
+      "timed": "Timed"
+    },
+    "timer": {
+      "timeLeft": "Time Left:",
+      "seconds": "{{time}}s"
+    },
+    "voiceControls": {
+      "repeatInstructions": "Repeat instructions",
+      "startVoiceInput": "Start voice input",
+      "stopListening": "Stop listening",
+      "speak": "Speak",
+      "listening": "Listening...",
+      "listeningPrompt": "🎤 Listening... Speak now!",
+      "microphoneError": "❌ Microphone not available. Please type instead.",
+      "voiceNotHeard": "❌ I didn't hear \"{{letter}}\". Try again!"
+    },
+    "practiceLetters": {
+      "title": "Practice These Letters:"
+    },
+    "letterRecognition": {
+      "clickOrSay": "Click or say the letter {{letter}}",
+      "firstMistake": "That's {{letter}}. Try again! Hint: {{hint}}",
+      "secondMistake": "Phonics: {{phonics}}",
+      "thirdMistake": "It's {{letter}} for \"{{example}}\" {{penalty}}",
+      "correct": {
+        "excellent": "🎯 Excellent! Letter expert!",
+        "perfect": "🌟 Perfect! Alphabet ace!",
+        "amazing": "✨ Amazing! You got it!",
+        "fantastic": "🏆 Fantastic! Phonics pro!",
+        "superb": "🚀 Superb! Letter rocket!",
+        "greatJob": "🎉 Correct! Great job!"
+      }
+    },
+    "raceMode": {
+      "typeOrSay": "Type or say the next letter:",
+      "nextLetter": "Type letter or use microphone...",
+      "correct": "✅ {{letter}} correct! +{{points}}",
+      "firstMistake": "❌ Try {{target}}. You pressed {{pressed}}",
+      "secondMistake": "❌ It's {{target}}, not {{pressed}} -1 Heart",
+      "raceComplete": "You won the race! Great job!",
+      "nextLevel": "🚀 You won the race! Next level..."
+    },
+    "spellingMode": {
+      "title": "Spell the word:",
+      "currentWord": "You typed:",
+      "startTyping": "Start typing...",
+      "clear": "Clear",
+      "checkSpelling": "Check Spelling",
+      "instructions": "Type or say the word: {{hint}}",
+      "firstMistake": "❌ Try again! Hint: {{hint}}",
+      "secondMistake": "❌ The word starts with {{firstLetter}} and has {{length}} letters",
+      "thirdMistake": "❌ It's spelled \"{{word}}\" {{emoji}} -1 Heart",
+      "correct": "✅ Perfect spelling! \"{{word}}\" {{emoji}} +{{points}}",
+      "bonusHeart": "💖 +1 Heart!"
+    },
+    "powerUps": {
+      "hint": {
+        "name": "Hint",
+        "description": "Get a hint",
+        "feedback": "💡 Hint: {{hint}}"
+      },
+      "voiceHelp": {
+        "name": "Voice Help",
+        "description": "Voice assistance",
+        "feedback": "🔊 Voice help activated!"
+      },
+      "boost": {
+        "name": "Boost",
+        "description": "Speed boost in race mode",
+        "feedback": "🚀 Speed boost! +2 positions!"
+      },
+      "shield": {
+        "name": "Shield",
+        "description": "Extra heart",
+        "feedback": "🛡️ Shield activated! +1 Heart!"
+      },
+      "slowOpponent": {
+        "name": "Slow",
+        "description": "Slow down opponent in race mode",
+        "feedback": "🐢 Opponent slowed down!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Toggle sound",
+      "soundOn": "Sound On",
+      "soundOff": "Sound Off",
+      "voiceOn": "Voice On",
+      "voiceOff": "Voice Off",
+      "repeat": "Repeat",
+      "playAgain": "Play Again"
+    },
+    "instructions": {
+      "useVoice": "🎤 Use voice to say letters",
+      "hintsAfterMistakes": "💡 Hints after mistakes",
+      "turnOnVoice": "🔊 Turn on voice for help",
+      "practiceLetters": "🏆 Practice custom letters"
+    },
+    "letterSounds": {
+      "A": {
+        "sound": "Apple - /æ/",
+        "example": "A is for Apple",
+        "phonics": "Short A like in \"cat\""
+      },
+      "B": {
+        "sound": "Ball - /b/",
+        "example": "B is for Ball",
+        "phonics": "Buh sound"
+      },
+      "C": {
+        "sound": "Cat - /k/ or /s/",
+        "example": "C is for Cat",
+        "phonics": "Can be hard C (cat) or soft C (cent)"
+      },
+      "D": {
+        "sound": "Dog - /d/",
+        "example": "D is for Dog",
+        "phonics": "Duh sound"
+      },
+      "E": {
+        "sound": "Egg - /ɛ/",
+        "example": "E is for Egg",
+        "phonics": "Short E like in \"bed\""
+      },
+      "F": {
+        "sound": "Fish - /f/",
+        "example": "F is for Fish",
+        "phonics": "Fff sound"
+      },
+      "G": {
+        "sound": "Goat - /g/",
+        "example": "G is for Goat",
+        "phonics": "Can be hard G (goat) or soft G (giraffe)"
+      },
+      "H": {
+        "sound": "Hat - /h/",
+        "example": "H is for Hat",
+        "phonics": "Huh sound"
+      },
+      "I": {
+        "sound": "Igloo - /ɪ/",
+        "example": "I is for Igloo",
+        "phonics": "Short I like in \"pig\""
+      },
+      "J": {
+        "sound": "Jump - /dʒ/",
+        "example": "J is for Jump",
+        "phonics": "Juh sound"
+      },
+      "K": {
+        "sound": "Kite - /k/",
+        "example": "K is for Kite",
+        "phonics": "Kuh sound"
+      },
+      "L": {
+        "sound": "Lion - /l/",
+        "example": "L is for Lion",
+        "phonics": "Lll sound"
+      },
+      "M": {
+        "sound": "Monkey - /m/",
+        "example": "M is for Monkey",
+        "phonics": "Mmm sound"
+      },
+      "N": {
+        "sound": "Nest - /n/",
+        "example": "N is for Nest",
+        "phonics": "Nnn sound"
+      },
+      "O": {
+        "sound": "Octopus - /ɒ/",
+        "example": "O is for Octopus",
+        "phonics": "Short O like in \"dog\""
+      },
+      "P": {
+        "sound": "Pig - /p/",
+        "example": "P is for Pig",
+        "phonics": "Puh sound"
+      },
+      "Q": {
+        "sound": "Queen - /kw/",
+        "example": "Q is for Queen",
+        "phonics": "Q is always followed by U"
+      },
+      "R": {
+        "sound": "Rabbit - /r/",
+        "example": "R is for Rabbit",
+        "phonics": "Rrr sound"
+      },
+      "S": {
+        "sound": "Snake - /s/",
+        "example": "S is for Snake",
+        "phonics": "Sss sound"
+      },
+      "T": {
+        "sound": "Tiger - /t/",
+        "example": "T is for Tiger",
+        "phonics": "Tuh sound"
+      },
+      "U": {
+        "sound": "Umbrella - /ʌ/",
+        "example": "U is for Umbrella",
+        "phonics": "Short U like in \"cup\""
+      },
+      "V": {
+        "sound": "Van - /v/",
+        "example": "V is for Van",
+        "phonics": "Vvv sound"
+      },
+      "W": {
+        "sound": "Water - /w/",
+        "example": "W is for Water",
+        "phonics": "Wuh sound"
+      },
+      "X": {
+        "sound": "Fox - /ks/",
+        "example": "X is for Fox",
+        "phonics": "Ending sound like in \"box\""
+      },
+      "Y": {
+        "sound": "Yellow - /j/",
+        "example": "Y is for Yellow",
+        "phonics": "Yuh sound"
+      },
+      "Z": {
+        "sound": "Zebra - /z/",
+        "example": "Z is for Zebra",
+        "phonics": "Zzz sound like a bee"
+      }
+    },
+    "words": {
+      "CAT": {
+        "hint": "A furry pet that says meow",
+        "emoji": "🐱"
+      },
+      "DOG": {
+        "hint": "A furry pet that barks",
+        "emoji": "🐶"
+      },
+      "SUN": {
+        "hint": "Bright star in the sky",
+        "emoji": "☀️"
+      },
+      "MOON": {
+        "hint": "Shines at night",
+        "emoji": "🌙"
+      },
+      "STAR": {
+        "hint": "Twinkles in the sky",
+        "emoji": "⭐"
+      },
+      "FISH": {
+        "hint": "Swims in water",
+        "emoji": "🐟"
+      },
+      "BIRD": {
+        "hint": "Flies in the sky",
+        "emoji": "🐦"
+      },
+      "TREE": {
+        "hint": "Has leaves and branches",
+        "emoji": "🌳"
+      },
+      "BOOK": {
+        "hint": "You read it",
+        "emoji": "📚"
+      },
+      "BALL": {
+        "hint": "You bounce it",
+        "emoji": "⚽"
+      },
+      "CAKE": {
+        "hint": "Sweet dessert for birthdays",
+        "emoji": "🎂"
+      },
+      "RAIN": {
+        "hint": "Falls from clouds",
+        "emoji": "🌧️"
+      },
+      "SNOW": {
+        "hint": "White and cold",
+        "emoji": "❄️"
+      },
+      "FIRE": {
+        "hint": "Hot and orange",
+        "emoji": "🔥"
+      },
+      "WATER": {
+        "hint": "You drink it",
+        "emoji": "💧"
+      },
+      "HOUSE": {
+        "hint": "Where you live",
+        "emoji": "🏠"
+      },
+      "CAR": {
+        "hint": "Drives on roads",
+        "emoji": "🚗"
+      },
+      "BOAT": {
+        "hint": "Floats on water",
+        "emoji": "🛶"
+      },
+      "PLANE": {
+        "hint": "Flies in the sky",
+        "emoji": "✈️"
+      },
+      "TRAIN": {
+        "hint": "Choo choo!",
+        "emoji": "🚂"
+      },
+      "APPLE": {
+        "hint": "Red fruit",
+        "emoji": "🍎"
+      },
+      "BEAR": {
+        "hint": "Big furry animal",
+        "emoji": "🐻"
+      },
+      "DUCK": {
+        "hint": "Says quack",
+        "emoji": "🦆"
+      },
+      "EGG": {
+        "hint": "Comes from chickens",
+        "emoji": "🥚"
+      },
+      "FROG": {
+        "hint": "Jumps and says ribbit",
+        "emoji": "🐸"
+      },
+      "GOAT": {
+        "hint": "Farm animal with horns",
+        "emoji": "🐐"
+      },
+      "HAT": {
+        "hint": "You wear it on your head",
+        "emoji": "🧢"
+      },
+      "ICE": {
+        "hint": "Frozen water",
+        "emoji": "🧊"
+      },
+      "JUMP": {
+        "hint": "You do this up and down",
+        "emoji": "🦘"
+      },
+      "KITE": {
+        "hint": "Flies in the wind",
+        "emoji": "🪁"
+      }
+    },
+    "characters": {
+      "raceCar": {
+        "emoji": "🚗",
+        "name": "Race Car",
+        "voice": "vroom vroom!"
+      },
+      "train": {
+        "emoji": "🚂",
+        "name": "Train",
+        "voice": "choo choo!"
+      },
+      "rocket": {
+        "emoji": "🚀",
+        "name": "Rocket",
+        "voice": "3, 2, 1, blast off!"
+      },
+      "unicorn": {
+        "emoji": "🦄",
+        "name": "Unicorn",
+        "voice": "neigh! magic!"
+      }
     }
   },
   "kidLanding": {
@@ -4123,5 +5939,239 @@
       "title": "Payment & Billing Support",
       "subtitle": "Need help with mobile money payments, billing questions, or payment security? Our support team is here to help."
     }
+  },
+  "kidsInsights": {
+    "title": "Kids Insights",
+    "subtitle": "Track your child's learning progress and gaming activity",
+    "selectChild": "Select Child",
+    "yearsOld": "years old",
+    "loadingInsights": "Loading insights...",
+    "errorTitle": "Error Loading Insights",
+    "retry": "Try Again",
+    "totalPlayTime": "Total Play Time",
+    "gamesPlayed": "Games Played",
+    "skillImprovement": "Skill Improvement",
+    "achievements": "Achievements",
+    "skillsProgress": "Skills Progress",
+    "recentAchievements": "Recent Achievements",
+    "recentActivity": "Recent Activity",
+    "recommendations": "Learning Recommendations",
+    "favoriteGames": "Favorite Games",
+    "exportReport": "Export Report",
+    "timeRanges": {
+      "day": "Today",
+      "week": "This Week",
+      "month": "This Month"
+    },
+    "improvement": "Improvement",
+    "gamesPlayedCount": "Games Played",
+    "lastAssessed": "Last Assessed",
+    "notYet": "Not yet",
+    "recommendedGames": "Recommended Games",
+    "duration": "Duration",
+    "device": "Device",
+    "lastScore": "Last Score",
+    "sessions": "sessions",
+    "noSkillsData": "No skill data available",
+    "noSkillsDescription": "Your child hasn't played enough games to track skill progress",
+    "noAchievements": "No achievements yet",
+    "noAchievementsDescription": "Achievements will appear as your child plays games",
+    "noActivity": "No recent activity",
+    "noActivityDescription": "Game sessions will appear here when your child plays",
+    "accessRestricted": {
+      "title": "Access Restricted",
+      "description": "You need to be a family plan owner to view kids insights."
+    },
+    "errors": {
+      "fetchChildren": "Failed to load children profiles",
+      "fetchInsights": "Failed to load insights data",
+      "exportFailed": "Failed to export report"
+    }
+  },
+  "securityLogs": {
+    "title": "Security Logs & Activity Monitoring",
+    "filters": "Filters",
+    "allKids": "All Kids",
+    "refresh": "Refresh",
+    "export": {
+      "format": "Format:",
+      "export": "Export",
+      "exporting": "Exporting...",
+      "pdfTooltip": "PDF Professional Report",
+      "csvTooltip": "CSV Data File",
+      "jsonTooltip": "JSON Data File"
+    },
+    "exportSuccess": {
+      "pdf": "PDF report generated successfully!"
+    },
+    "exportError": "Failed to export activity logs. Please try again.",
+    "exportFormats": {
+      "pdf": {
+        "title": "PDF Professional Report",
+        "description": "Professional report with Oliviuus branding, summary, charts, and detailed logs. Best for presentations and reports."
+      },
+      "csv": {
+        "title": "CSV Data File",
+        "description": "Spreadsheet format for data analysis in Excel, Google Sheets, or data processing tools."
+      },
+      "json": {
+        "title": "JSON Data File",
+        "description": "Structured data format for developers and programmers. Includes metadata and organized data."
+      }
+    },
+    "timeRanges": {
+      "7days": "Last 7 days",
+      "30days": "Last 30 days",
+      "90days": "Last 90 days"
+    },
+    "filterLabels": {
+      "activityType": "Activity Type",
+      "status": "Status",
+      "deviceType": "Device Type"
+    },
+    "filterOptions": {
+      "allTypes": "All Types",
+      "allStatus": "All Status",
+      "allDevices": "All Devices"
+    },
+    "activityTypes": {
+      "content_view": "Content View",
+      "content_attempt": "Content Attempt",
+      "search": "Search",
+      "time_limit": "Time Limit",
+      "pin_entry": "PIN Entry",
+      "mode_switch": "Mode Switch"
+    },
+    "status": {
+      "allowed": "Allowed",
+      "blocked": "Blocked"
+    },
+    "deviceTypes": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "tablet": "Tablet",
+      "smarttv": "Smart TV"
+    },
+    "stats": {
+      "totalKids": "Total Kids",
+      "todayActivities": "Today's Activities",
+      "blocked": "blocked",
+      "pendingAlerts": "Pending Alerts",
+      "timeLimitWarnings": "Time Limit Warnings",
+      "blockRate": "Block Rate",
+      "mostActiveTime": "Most Active Time",
+      "mostActiveKid": "Most Active Kid",
+      "outOf": "out of",
+      "activities": "activities",
+      "noData": "No data",
+      "peakActivityHour": "Peak activity hour"
+    },
+    "sections": {
+      "activitySummary": "Activity Summary",
+      "activityByType": "Activity by Type",
+      "detailedLogs": "Detailed Activity Logs",
+      "logsDescription": "All activities by your kids"
+    },
+    "summary": {
+      "totalActivities": "Total Activities",
+      "allowedActivities": "Allowed Activities",
+      "blockedActivities": "Blocked Activities",
+      "allowed": "Allowed",
+      "blocked": "Blocked"
+    },
+    "tableHeaders": {
+      "kid": "Kid",
+      "activity": "Activity",
+      "status": "Status",
+      "details": "Details",
+      "time": "Time"
+    },
+    "kidInitial": "K",
+    "unknownKid": "Unknown Kid",
+    "totalLogs": "Total",
+    "logs": "logs",
+    "noLogs": {
+      "title": "No activity logs found",
+      "description": "Activities will appear here when your kids use the platform"
+    },
+    "pdf": {
+      "title": "Oliviuus Security Report",
+      "subtitle": "Professional Child Activity & Security Analysis",
+      "reportGenerated": "Report Generated",
+      "reportFor": "Report For",
+      "timePeriod": "Time Period",
+      "sections": {
+        "executiveSummary": "📊 Executive Summary",
+        "activitySummary": "📈 Activity Summary",
+        "mostActiveKid": "👑 Most Active Kid",
+        "detailedLogs": "📋 Detailed Activity Logs",
+        "recommendations": "💡 Security Recommendations"
+      },
+      "totalKidsMonitored": "Total Kids Monitored",
+      "todaysActivities": "Today's Activities",
+      "activitiesBlocked": "Activities Blocked",
+      "pendingAlerts": "Pending Alerts",
+      "timeLimitWarnings": "Time Limit Warnings",
+      "totalActivities": "Total Activities",
+      "allowedActivities": "Allowed Activities",
+      "blockedActivities": "Blocked Activities",
+      "blockRate": "Block Rate",
+      "peakActivityHour": "Peak Activity Hour",
+      "kidName": "Kid Name",
+      "activityCount": "Activity Count",
+      "averageDaily": "Average Daily Activities",
+      "unknownKid": "Unknown Kid",
+      "allowed": "Allowed",
+      "blocked": "Blocked",
+      "tableHeaders": {
+        "kid": "Kid",
+        "activity": "Activity",
+        "status": "Status",
+        "details": "Details",
+        "date": "Date"
+      },
+      "recommendations": {
+        "reviewLogs": "Regularly review activity logs for unusual patterns",
+        "updateRestrictions": "Update content restrictions based on blocked activities",
+        "monitorPeakHours": "Monitor peak activity hours for time management",
+        "educateKids": "Educate children about digital safety based on blocked attempts",
+        "adjustSettings": "Adjust parental controls based on activity patterns"
+      },
+      "footer": {
+        "confidential": "CONFIDENTIAL - For authorized use only",
+        "oliviuus": "Oliviuus Child Security Platform",
+        "page": "Page",
+        "of": "of"
+      },
+      "noData": "No data"
+    }
+  },
+  "download": {
+    "title": "Downloads",
+    "subtitle": "Download your favorite content and watch offline anytime, anywhere",
+    "progress": "Development Progress",
+    "comingSoon": {
+      "title": "Downloads Coming Soon!",
+      "message": "We're excited to announce that the download feature is currently in development. Soon you'll be able to save content for offline viewing!",
+      "hd": "HD & 4K Quality Downloads",
+      "unlimited": "Unlimited Downloads",
+      "expire": "No Expiry Dates",
+      "sync": "Cross-Device Sync"
+    },
+    "features": {
+      "offline": "Watch Offline",
+      "offlineDesc": "Download your favorite shows and movies to watch without internet",
+      "mobile": "Mobile Friendly",
+      "mobileDesc": "Download content to your phone for on-the-go viewing",
+      "tablet": "Tablet Optimized",
+      "tabletDesc": "Perfect viewing experience on tablets",
+      "computer": "Computer Ready",
+      "computerDesc": "Download to your computer for big-screen enjoyment"
+    },
+    "buttons": {
+      "home": "Back to Home",
+      "check": "Check for Updates"
+    },
+    "footer": "Download feature expected to launch Soon. Stay tuned for updates!"
   }
 }

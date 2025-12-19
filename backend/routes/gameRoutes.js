@@ -14,6 +14,7 @@ const {
   loadGameProgress,
   getKidGameHistory,
   getAvailableGames,
+  updateSessionActivity,
   
   // Parent Analytics
   getKidGameAnalytics
@@ -61,6 +62,7 @@ router.post("/kids/games/:gameId/start", startGameSession);
 router.post("/kids/games/:gameId/score", submitGameScore);
 router.post("/kids/games/:gameId/save", saveGameProgress);
 router.get("/kids/games/:gameId/progress", loadGameProgress);
+router.post("/kids/session/:sessionId/activity", authMiddleware, kidSessionAuth, updateSessionActivity);
 
 // Game history
 router.get("/kids/history", getKidGameHistory);

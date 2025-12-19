@@ -26,10 +26,12 @@
     "google-auth-library": "^10.5.0",
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
     "mysql2": "^3.14.3",
     "ngrok": "^5.0.0-beta.2",
     "node-cache": "^5.1.2",
     "nodemailer": "^7.0.5",
+    "pdfkit": "^0.17.2",
     "pm2": "^6.0.13",
     "sequelize": "^6.37.7"
   },

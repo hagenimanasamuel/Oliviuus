@@ -223,7 +223,7 @@ export default function FamilyMembersTab({ familyMembers, onUpdate, currentSubsc
             <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-700 text-gray-300 text-sm font-medium">
               <Users size={14} className="mr-1" />
               {currentMemberCount}/{maxMembers}
-              {maxMembers > 1 && ` • ${remainingInvites} ${t('familyProfiles.membersTab.left')}`}
+              {maxMembers > 1}
             </span>
           </div>
           <p className="text-gray-400 text-sm">

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Bell, X, Sparkles, ExternalLink, CheckCircle, Circle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import api from "../../../../../api/axios";
 
 const NotificationDropdown = ({
   notifications,
@@ -19,6 +20,7 @@ const NotificationDropdown = ({
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const notificationsRef = useRef(null);
   const dropdownRef = useRef(null);
+  const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
 
   const sortedNotifications = [...notifications].sort((a, b) => {
     if (a.status === 'unread' && b.status !== 'unread') return -1;
@@ -26,20 +28,117 @@ const NotificationDropdown = ({
     return new Date(b.created_at) - new Date(a.created_at);
   });
 
+  // Enhanced handleBellClick with auto-mark-as-read
   const handleBellClick = async () => {
     const wasOpen = notificationsOpen;
     setNotificationsOpen(!wasOpen);
 
     if (!wasOpen) {
+      // Fetch new notifications
       onRefresh();
+      
+      // Mark all as read after a short delay when opening
+      setTimeout(() => {
+        markAllAsReadOnOpen();
+      }, 100);
     }
   };
 
-  const handleNotificationClick = async (notification) => {
-    if (notification.action_url) {
-      navigate(notification.action_url);
+  // Function to mark all notifications as read when dropdown opens
+  const markAllAsReadOnOpen = async () => {
+    // Only mark as read if there are unread notifications
+    const hasUnread = notifications.some(notif => notif.status === 'unread');
+    
+    if (hasUnread && !isMarkingAsRead) {
+      setIsMarkingAsRead(true);
+      try {
+        const response = await api.put('/notifications/read-all');
+        if (response.data.success) {
+          // Trigger refresh to update the UI with read status
+          onRefresh();
+          
+          // Add visual feedback
+          const bellBtn = notificationsRef.current?.querySelector('button');
+          if (bellBtn) {
+            bellBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+              bellBtn.style.transform = 'scale(1)';
+            }, 150);
+          }
+        }
+      } catch (error) {
+        console.error('Error marking all as read:', error);
+        // Don't show error to user for this auto-action
+      } finally {
+        setIsMarkingAsRead(false);
+      }
     }
-    setNotificationsOpen(false);
+  };
+
+  // Enhanced handleNotificationClick with immediate read status update
+  const handleNotificationClick = async (notification) => {
+    // Mark as read immediately if unread
+    if (notification.status === 'unread') {
+      try {
+        const response = await api.put(`/notifications/${notification.id}/read`);
+        if (response.data.success) {
+          // Trigger refresh to update the UI
+          onRefresh();
+          
+          // Add ripple effect similar to NotificationModal
+          const notificationElement = dropdownRef.current?.querySelector(`[data-notification-id="${notification.id}"]`);
+          if (notificationElement) {
+            const ripple = document.createElement('span');
+            const rect = notificationElement.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = rect.width / 2;
+            const y = rect.height / 2;
+            
+            ripple.style.cssText = `
+              position: absolute;
+              border-radius: 50%;
+              background: rgba(188, 139, 188, 0.3);
+              transform: scale(0);
+              animation: ripple-animation-dropdown 400ms linear;
+              width: ${size}px;
+              height: ${size}px;
+              left: ${x - size/2}px;
+              top: ${y - size/2}px;
+              pointer-events: none;
+              z-index: 1;
+            `;
+            
+            notificationElement.style.position = 'relative';
+            notificationElement.style.overflow = 'hidden';
+            notificationElement.appendChild(ripple);
+            
+            setTimeout(() => {
+              ripple.remove();
+            }, 400);
+          }
+        }
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+      }
+    }
+
+    // Handle navigation
+    if (notification.action_url) {
+      setTimeout(() => {
+        navigate(notification.action_url);
+        setNotificationsOpen(false);
+      }, 200);
+    } else {
+      // Close dropdown after a delay if no navigation
+      setTimeout(() => {
+        setNotificationsOpen(false);
+      }, 300);
+    }
+
+    // Call original onNotificationClick if provided
+    if (onNotificationClick) {
+      onNotificationClick(notification);
+    }
   };
 
   const formatTime = (dateString) => {
@@ -90,12 +189,11 @@ const NotificationDropdown = ({
 
   const getNotificationBackground = (notification) => {
     if (notification.status === 'unread') {
-      return 'bg-gradient-to-r from-[#BC8BBC]/10 to-transparent border-l-4 border-[#BC8BBC]';
+      return 'bg-gradient-to-r from-[#BC8BBC]/10 via-[#BC8BBC]/5 to-transparent border-l-4 border-[#BC8BBC]';
     }
     return 'bg-gradient-to-r from-[#BC8BBC]/5 to-transparent';
   };
 
-  // Enhanced positioning - Always centered on mobile
   const getDropdownPosition = () => {
     if (!responsive) {
       return "right-0";
@@ -104,17 +202,14 @@ const NotificationDropdown = ({
     const viewportWidth = window.innerWidth;
     
     if (viewportWidth < 768) {
-      // On mobile: ALWAYS centered with safe margins
       return "left-1/2 transform -translate-x-1/2 mx-auto";
     } else if (viewportWidth < 1024) {
-      // On tablet: ensure it doesn't shrink and stays visible
       if (align === "left") {
         return "left-0";
       } else {
         return "right-0";
       }
     } else {
-      // On desktop: use preferred alignment
       if (align === "left") {
         return "left-0";
       } else {
@@ -123,23 +218,18 @@ const NotificationDropdown = ({
     }
   };
 
-  // Enhanced responsive width - Perfect fit for mobile
   const getDropdownWidth = () => {
     if (!responsive) return "w-96 min-w-96";
 
     const viewportWidth = window.innerWidth;
     
     if (viewportWidth < 640) {
-      // Perfect fit for mobile with safe margins
       return "w-[calc(100vw-2rem)] max-w-sm";
     } else if (viewportWidth < 768) {
-      // Good fit for small tablets
       return "w-[calc(100vw-3rem)] max-w-md";
     } else if (viewportWidth < 1024) {
-      // Standard for larger tablets
       return "w-80 min-w-80";
     } else {
-      // Standard width on desktop
       return "w-96 min-w-96";
     }
   };
@@ -155,10 +245,8 @@ const NotificationDropdown = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Update position when window resizes
   useEffect(() => {
     const handleResize = () => {
-      // Force re-render to update positioning
       if (notificationsOpen) {
         setNotificationsOpen(false);
         setTimeout(() => setNotificationsOpen(true), 10);
@@ -169,11 +257,31 @@ const NotificationDropdown = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [notificationsOpen]);
 
+  // Add CSS for ripple animation
+  useEffect(() => {
+    if (notificationsOpen) {
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes ripple-animation-dropdown {
+          to {
+            transform: scale(4);
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      return () => {
+        document.head.removeChild(style);
+      };
+    }
+  }, [notificationsOpen]);
+
   return (
     <div ref={notificationsRef} className="relative flex-shrink-0">
       <button 
         onClick={handleBellClick}
-        disabled={loading}
+        disabled={loading || isMarkingAsRead}
         className="p-2 text-gray-300 hover:text-white transition-colors duration-200 hover:bg-gray-800/50 rounded-lg relative group flex-shrink-0"
       >
         <Bell size={20} className={`group-hover:text-[#BC8BBC] transition-colors ${loading ? "animate-pulse" : ""}`} />
@@ -181,15 +289,16 @@ const NotificationDropdown = ({
         {apiError && (
           <span className="absolute -top-0.5 -right-0.5 bg-yellow-500 rounded-full w-1.5 h-1.5 animate-ping"></span>
         )}
+        {isMarkingAsRead && (
+          <span className="absolute -top-0.5 -right-0.5 bg-[#BC8BBC] rounded-full w-1.5 h-1.5 animate-ping"></span>
+        )}
       </button>
 
-      {/* Enhanced Notifications Dropdown - Perfectly Centered on Mobile */}
       {notificationsOpen && (
         <div 
           ref={dropdownRef}
           className={`fixed sm:absolute ${getDropdownPosition()} top-16 sm:top-12 ${getDropdownWidth()} bg-gray-800/95 backdrop-blur-xl border border-gray-600/50 rounded-2xl shadow-2xl overflow-hidden z-50`}
           style={{
-            // Ensure perfect centering on mobile
             maxWidth: 'calc(100vw - 2rem)'
           }}
         >
@@ -197,7 +306,7 @@ const NotificationDropdown = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="p-2 bg-[#BC8BBC]/10 rounded-lg flex-shrink-0">
-                  <Bell size={20} className="text-[#BC8BBC]" />
+                  <Bell size={20} className={`text-[#BC8BBC] ${isMarkingAsRead ? "animate-pulse" : ""}`} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-bold text-white text-lg truncate">{t('notification.dropdown.title')}</h3>
@@ -206,17 +315,22 @@ const NotificationDropdown = ({
                       ? t('notification.dropdown.unreadCount', { count: unreadCount })
                       : t('notification.dropdown.allCaughtUp')
                     }
+                    {isMarkingAsRead && (
+                      <span className="text-[#BC8BBC] ml-2 animate-pulse">
+                        • {t('notification.status.markingAsRead')}
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button 
                   onClick={onRefresh}
-                  disabled={loading}
+                  disabled={loading || isMarkingAsRead}
                   className="p-2 text-gray-400 hover:text-[#BC8BBC] transition-colors disabled:opacity-50 rounded-lg hover:bg-gray-700/50 flex-shrink-0"
                   title={t('notification.dropdown.refresh')}
                 >
-                  <Sparkles size={16} />
+                  <Sparkles size={16} className={loading ? "animate-spin" : ""} />
                 </button>
               </div>
             </div>
@@ -237,7 +351,8 @@ const NotificationDropdown = ({
                 <p className="text-gray-400 text-xs sm:text-sm mb-4 px-2">{t('notification.dropdown.unableToLoad')}</p>
                 <button 
                   onClick={onRefresh}
-                  className="px-4 py-2 text-sm text-[#BC8BBC] hover:text-white hover:bg-[#BC8BBC] transition-all duration-200 rounded-lg border border-[#BC8BBC] font-medium"
+                  disabled={isMarkingAsRead}
+                  className="px-4 py-2 text-sm text-[#BC8BBC] hover:text-white hover:bg-[#BC8BBC] transition-all duration-200 rounded-lg border border-[#BC8BBC] font-medium disabled:opacity-50"
                 >
                   {t('notification.dropdown.tryAgain')}
                 </button>
@@ -257,6 +372,7 @@ const NotificationDropdown = ({
                     sortedNotifications.map((notification) => (
                       <div 
                         key={notification.id}
+                        data-notification-id={notification.id}
                         className={`group p-4 transition-all duration-300 cursor-pointer hover:scale-[1.02] ${getNotificationBackground(notification)} border-b border-gray-700/30 last:border-b-0`}
                         onClick={() => handleNotificationClick(notification)}
                       >
@@ -289,7 +405,7 @@ const NotificationDropdown = ({
                               </span>
                               <span className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${
                                 notification.status === 'unread' 
-                                  ? 'text-[#BC8BBC] bg-[#BC8BBC]/10' 
+                                  ? 'text-[#BC8BBC] bg-[#BC8BBC]/10 animate-pulse' 
                                   : 'text-green-400 bg-green-400/10'
                               }`}>
                                 {notification.status === 'read' 

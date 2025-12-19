@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trophy, Heart, Clock, Volume2, VolumeX, Brain, Star, Zap, RotateCw, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
+  const { t } = useTranslation(); // Initialize translation hook
+  
   const [gameMode, setGameMode] = useState('animals');
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
@@ -28,72 +31,82 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
 
   const themes = {
     animals: {
-      name: 'Animals',
+      name: t('memoryMatchGame.themes.animals'),
       cards: [
-        { id: 1, emoji: '🐱', name: 'Cat' },
-        { id: 2, emoji: '🐶', name: 'Dog' },
-        { id: 3, emoji: '🦁', name: 'Lion' },
-        { id: 4, emoji: '🐯', name: 'Tiger' },
-        { id: 5, emoji: '🦊', name: 'Fox' },
-        { id: 6, emoji: '🐼', name: 'Panda' },
-        { id: 7, emoji: '🐨', name: 'Koala' },
-        { id: 8, emoji: '🦄', name: 'Unicorn' },
-        { id: 9, emoji: '🐸', name: 'Frog' },
-        { id: 10, emoji: '🐙', name: 'Octopus' },
+        { id: 1, emoji: t('memoryMatchGame.themesDetails.animals.cat.emoji'), name: t('memoryMatchGame.themesDetails.animals.cat.name') },
+        { id: 2, emoji: t('memoryMatchGame.themesDetails.animals.dog.emoji'), name: t('memoryMatchGame.themesDetails.animals.dog.name') },
+        { id: 3, emoji: t('memoryMatchGame.themesDetails.animals.lion.emoji'), name: t('memoryMatchGame.themesDetails.animals.lion.name') },
+        { id: 4, emoji: t('memoryMatchGame.themesDetails.animals.tiger.emoji'), name: t('memoryMatchGame.themesDetails.animals.tiger.name') },
+        { id: 5, emoji: t('memoryMatchGame.themesDetails.animals.fox.emoji'), name: t('memoryMatchGame.themesDetails.animals.fox.name') },
+        { id: 6, emoji: t('memoryMatchGame.themesDetails.animals.panda.emoji'), name: t('memoryMatchGame.themesDetails.animals.panda.name') },
+        { id: 7, emoji: t('memoryMatchGame.themesDetails.animals.koala.emoji'), name: t('memoryMatchGame.themesDetails.animals.koala.name') },
+        { id: 8, emoji: t('memoryMatchGame.themesDetails.animals.unicorn.emoji'), name: t('memoryMatchGame.themesDetails.animals.unicorn.name') },
+        { id: 9, emoji: t('memoryMatchGame.themesDetails.animals.frog.emoji'), name: t('memoryMatchGame.themesDetails.animals.frog.name') },
+        { id: 10, emoji: t('memoryMatchGame.themesDetails.animals.octopus.emoji'), name: t('memoryMatchGame.themesDetails.animals.octopus.name') },
       ]
     },
     fruits: {
-      name: 'Fruits',
+      name: t('memoryMatchGame.themes.fruits'),
       cards: [
-        { id: 1, emoji: '🍎', name: 'Apple' },
-        { id: 2, emoji: '🍌', name: 'Banana' },
-        { id: 3, emoji: '🍇', name: 'Grapes' },
-        { id: 4, emoji: '🍓', name: 'Strawberry' },
-        { id: 5, emoji: '🍊', name: 'Orange' },
-        { id: 6, emoji: '🍍', name: 'Pineapple' },
-        { id: 7, emoji: '🥭', name: 'Mango' },
-        { id: 8, emoji: '🍉', name: 'Watermelon' },
-        { id: 9, emoji: '🍒', name: 'Cherry' },
-        { id: 10, emoji: '🥝', name: 'Kiwi' },
+        { id: 1, emoji: t('memoryMatchGame.themesDetails.fruits.apple.emoji'), name: t('memoryMatchGame.themesDetails.fruits.apple.name') },
+        { id: 2, emoji: t('memoryMatchGame.themesDetails.fruits.banana.emoji'), name: t('memoryMatchGame.themesDetails.fruits.banana.name') },
+        { id: 3, emoji: t('memoryMatchGame.themesDetails.fruits.grapes.emoji'), name: t('memoryMatchGame.themesDetails.fruits.grapes.name') },
+        { id: 4, emoji: t('memoryMatchGame.themesDetails.fruits.strawberry.emoji'), name: t('memoryMatchGame.themesDetails.fruits.strawberry.name') },
+        { id: 5, emoji: t('memoryMatchGame.themesDetails.fruits.orange.emoji'), name: t('memoryMatchGame.themesDetails.fruits.orange.name') },
+        { id: 6, emoji: t('memoryMatchGame.themesDetails.fruits.pineapple.emoji'), name: t('memoryMatchGame.themesDetails.fruits.pineapple.name') },
+        { id: 7, emoji: t('memoryMatchGame.themesDetails.fruits.mango.emoji'), name: t('memoryMatchGame.themesDetails.fruits.mango.name') },
+        { id: 8, emoji: t('memoryMatchGame.themesDetails.fruits.watermelon.emoji'), name: t('memoryMatchGame.themesDetails.fruits.watermelon.name') },
+        { id: 9, emoji: t('memoryMatchGame.themesDetails.fruits.cherry.emoji'), name: t('memoryMatchGame.themesDetails.fruits.cherry.name') },
+        { id: 10, emoji: t('memoryMatchGame.themesDetails.fruits.kiwi.emoji'), name: t('memoryMatchGame.themesDetails.fruits.kiwi.name') },
       ]
     },
     vehicles: {
-      name: 'Vehicles',
+      name: t('memoryMatchGame.themes.vehicles'),
       cards: [
-        { id: 1, emoji: '🚗', name: 'Car' },
-        { id: 2, emoji: '🚌', name: 'Bus' },
-        { id: 3, emoji: '✈️', name: 'Airplane' },
-        { id: 4, emoji: '🚂', name: 'Train' },
-        { id: 5, emoji: '🚁', name: 'Helicopter' },
-        { id: 6, emoji: '🚢', name: 'Ship' },
-        { id: 7, emoji: '🚀', name: 'Rocket' },
-        { id: 8, emoji: '🛸', name: 'UFO' },
-        { id: 9, emoji: '🚜', name: 'Tractor' },
-        { id: 10, emoji: '🏎️', name: 'Race Car' },
+        { id: 1, emoji: t('memoryMatchGame.themesDetails.vehicles.car.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.car.name') },
+        { id: 2, emoji: t('memoryMatchGame.themesDetails.vehicles.bus.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.bus.name') },
+        { id: 3, emoji: t('memoryMatchGame.themesDetails.vehicles.airplane.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.airplane.name') },
+        { id: 4, emoji: t('memoryMatchGame.themesDetails.vehicles.train.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.train.name') },
+        { id: 5, emoji: t('memoryMatchGame.themesDetails.vehicles.helicopter.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.helicopter.name') },
+        { id: 6, emoji: t('memoryMatchGame.themesDetails.vehicles.ship.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.ship.name') },
+        { id: 7, emoji: t('memoryMatchGame.themesDetails.vehicles.rocket.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.rocket.name') },
+        { id: 8, emoji: t('memoryMatchGame.themesDetails.vehicles.ufo.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.ufo.name') },
+        { id: 9, emoji: t('memoryMatchGame.themesDetails.vehicles.tractor.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.tractor.name') },
+        { id: 10, emoji: t('memoryMatchGame.themesDetails.vehicles.raceCar.emoji'), name: t('memoryMatchGame.themesDetails.vehicles.raceCar.name') },
       ]
     },
     shapes: {
-      name: 'Shapes',
+      name: t('memoryMatchGame.themes.shapes'),
       cards: [
-        { id: 1, emoji: '🔺', name: 'Triangle' },
-        { id: 2, emoji: '🔵', name: 'Circle' },
-        { id: 3, emoji: '🟦', name: 'Square' },
-        { id: 4, emoji: '⭐', name: 'Star' },
-        { id: 5, emoji: '❤️', name: 'Heart' },
-        { id: 6, emoji: '🔶', name: 'Diamond' },
-        { id: 7, emoji: '🌙', name: 'Moon' },
-        { id: 8, emoji: '⚡', name: 'Lightning' },
-        { id: 9, emoji: '❄️', name: 'Snowflake' },
-        { id: 10, emoji: '🎈', name: 'Balloon' },
+        { id: 1, emoji: t('memoryMatchGame.themesDetails.shapes.triangle.emoji'), name: t('memoryMatchGame.themesDetails.shapes.triangle.name') },
+        { id: 2, emoji: t('memoryMatchGame.themesDetails.shapes.circle.emoji'), name: t('memoryMatchGame.themesDetails.shapes.circle.name') },
+        { id: 3, emoji: t('memoryMatchGame.themesDetails.shapes.square.emoji'), name: t('memoryMatchGame.themesDetails.shapes.square.name') },
+        { id: 4, emoji: t('memoryMatchGame.themesDetails.shapes.star.emoji'), name: t('memoryMatchGame.themesDetails.shapes.star.name') },
+        { id: 5, emoji: t('memoryMatchGame.themesDetails.shapes.heart.emoji'), name: t('memoryMatchGame.themesDetails.shapes.heart.name') },
+        { id: 6, emoji: t('memoryMatchGame.themesDetails.shapes.diamond.emoji'), name: t('memoryMatchGame.themesDetails.shapes.diamond.name') },
+        { id: 7, emoji: t('memoryMatchGame.themesDetails.shapes.moon.emoji'), name: t('memoryMatchGame.themesDetails.shapes.moon.name') },
+        { id: 8, emoji: t('memoryMatchGame.themesDetails.shapes.lightning.emoji'), name: t('memoryMatchGame.themesDetails.shapes.lightning.name') },
+        { id: 9, emoji: t('memoryMatchGame.themesDetails.shapes.snowflake.emoji'), name: t('memoryMatchGame.themesDetails.shapes.snowflake.name') },
+        { id: 10, emoji: t('memoryMatchGame.themesDetails.shapes.balloon.emoji'), name: t('memoryMatchGame.themesDetails.shapes.balloon.name') },
       ]
     }
   };
 
   const characters = [
-    { emoji: '🧠', name: 'Brainy' },
-    { emoji: '🦉', name: 'Wise Owl' },
-    { emoji: '🐘', name: 'Elephant' },
-    { emoji: '🦋', name: 'Butterfly' }
+    { emoji: '🧠', name: t('memoryMatchGame.characters.brainy.name') },
+    { emoji: '🦉', name: t('memoryMatchGame.characters.wiseOwl.name') },
+    { emoji: '🐘', name: t('memoryMatchGame.characters.elephant.name') },
+    { emoji: '🦋', name: t('memoryMatchGame.characters.butterfly.name') }
+  ];
+
+  // Translated funny messages
+  const funnyMessages = [
+    t('memoryMatchGame.feedback.correct.memoryMaster'),
+    t('memoryMatchGame.feedback.correct.superMatch'),
+    t('memoryMatchGame.feedback.correct.perfectRecall'),
+    t('memoryMatchGame.feedback.correct.amazingMemory'),
+    t('memoryMatchGame.feedback.correct.brainPower'),
+    t('memoryMatchGame.feedback.correct.matchFound')
   ];
 
   // Initialize game board
@@ -191,15 +204,6 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
         setTimeout(() => setShowConfetti(false), 1000);
       }
       
-      const funnyMessages = [
-        "🧠 Memory Master!",
-        "🌟 Super Match!",
-        "🎯 Perfect Recall!",
-        "✨ Amazing Memory!",
-        "🏆 Brain Power!",
-        "🎉 Match Found!"
-      ];
-      
       setFeedback(`${funnyMessages[Math.floor(Math.random() * funnyMessages.length)]} +${points}`);
       
       // Check if level complete
@@ -222,7 +226,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
       if (level >= 3 && moves % 5 === 0 && flippedCards.length === 2) {
         const newLives = lives - 1;
         setLives(newLives);
-        setFeedback("❌ Try to remember better! -1 Heart");
+        setFeedback(t('memoryMatchGame.feedback.incorrect.rememberBetter'));
         
         if (newLives <= 0) {
           setTimeout(() => setGameOver(true), 1200);
@@ -230,7 +234,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
         
         onGameEvent?.({ type: 'heartsUpdate', payload: newLives });
       } else {
-        setFeedback("❌ Not a match! Try again!");
+        setFeedback(t('memoryMatchGame.feedback.incorrect.notMatch'));
       }
     }
     
@@ -242,7 +246,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
     if (streak + 1 >= 5) {
       const newLives = Math.min(lives + 1, 5);
       setLives(newLives);
-      setFeedback(prev => `${prev} 💖 +1 Heart!`);
+      setFeedback(prev => `${prev} ${t('memoryMatchGame.feedback.bonusHeart')}`);
       onGameEvent?.({ type: 'heartsUpdate', payload: newLives });
     }
     
@@ -256,7 +260,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
       }
       
       setLevel(prev => prev + 1);
-      setFeedback("🚀 Level Up!");
+      setFeedback(t('memoryMatchGame.feedback.levelUp'));
       initializeGame();
     }, 1500);
   };
@@ -309,21 +313,31 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
       <div className={`flex items-center justify-center ${isFullscreen ? 'h-full' : 'min-h-[400px]'} p-3 w-full`}>
         <div className="w-full bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-xl shadow-lg p-4 border border-[#8B5CF6]/30">
           <div className="text-4xl mb-3 text-center">🧠</div>
-          <h1 className="text-2xl font-bold text-white mb-2 text-center">Memory Game Over!</h1>
-          <p className="text-gray-300 mb-4 text-sm text-center">You found {matchedPairs.length / 2} pairs!</p>
+          <h1 className="text-2xl font-bold text-white mb-2 text-center">
+            {t('memoryMatchGame.gameOver.title')}
+          </h1>
+          <p className="text-gray-300 mb-4 text-sm text-center">
+            {t('memoryMatchGame.gameOver.subtitle', { count: matchedPairs.length / 2 })}
+          </p>
           
           <div className="grid grid-cols-3 gap-2 mb-4">
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{score}</div>
-              <div className="text-gray-400 text-xs text-center">Score</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('memoryMatchGame.gameOver.score')}
+              </div>
             </div>
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{level}</div>
-              <div className="text-gray-400 text-xs text-center">Level</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('memoryMatchGame.gameOver.level')}
+              </div>
             </div>
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{moves}</div>
-              <div className="text-gray-400 text-xs text-center">Moves</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('memoryMatchGame.gameOver.moves')}
+              </div>
             </div>
           </div>
           
@@ -331,7 +345,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
             onClick={resetGame}
             className="w-full py-2.5 rounded-lg bg-gradient-to-r from-[#8B5CF6] to-[#6366F1] text-white font-bold hover:opacity-90 text-sm"
           >
-            🧠 Play Again
+            {t('memoryMatchGame.gameOver.playAgain')}
           </button>
         </div>
       </div>
@@ -370,13 +384,19 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
               <span className="text-lg">{selectedCharacter}</span>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-white">Memory Match</h1>
+              <h1 className="text-sm font-bold text-white">
+                {t('memoryMatchGame.gameHeader.title')}
+              </h1>
               <div className="flex items-center gap-1">
-                <span className="text-xs text-gray-400">Lvl {level}</span>
+                <span className="text-xs text-gray-400">
+                  {t('memoryMatchGame.gameHeader.level', { level })}
+                </span>
                 {streak > 0 && (
                   <>
                     <span className="text-gray-600">•</span>
-                    <span className="text-xs text-yellow-400">{streak}🔥</span>
+                    <span className="text-xs text-yellow-400">
+                      {t('memoryMatchGame.gameHeader.streak', { streak })}
+                    </span>
                   </>
                 )}
               </div>
@@ -393,6 +413,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="p-1.5 bg-[#1A1A2E] border border-[#8B5CF6]/20 rounded-lg hover:bg-[#8B5CF6]/10 transition-colors"
+              title={t('memoryMatchGame.buttons.toggleSound')}
             >
               {soundEnabled ? 
                 <Volume2 className="w-4 h-4 text-green-400" /> : 
@@ -409,14 +430,14 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
               onClick={() => setGameMode('animals')}
               className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold ${gameMode === 'animals' ? 'bg-gradient-to-r from-[#8B5CF6] to-[#6366F1] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
             >
-              Practice
+              {t('memoryMatchGame.gameModes.practice')}
             </button>
             <button
               onClick={() => { setGameMode('timed'); setTimeLeft(90); }}
               className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold ${gameMode === 'timed' ? 'bg-gradient-to-r from-[#8B5CF6] to-[#6366F1] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
             >
               <Clock className="inline w-3 h-3 mr-1" />
-              Timed
+              {t('memoryMatchGame.gameModes.timed')}
             </button>
           </div>
           
@@ -437,9 +458,11 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
         {gameMode === 'timed' && (
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-400">Time Left:</span>
+              <span className="text-xs text-gray-400">
+                {t('memoryMatchGame.timer.timeLeft')}
+              </span>
               <span className={`text-sm font-bold ${timeLeft <= 20 ? 'text-red-400' : 'text-green-400'}`}>
-                {timeLeft}s
+                {t('memoryMatchGame.timer.seconds', { time: timeLeft })}
               </span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-1.5">
@@ -458,6 +481,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
               <Heart
                 key={i}
                 className={`w-4 h-4 ${i < lives ? 'text-red-400 fill-red-400' : 'text-gray-600'}`}
+                aria-label={`${t('memoryMatchGame.stats.lives')} ${i + 1}`}
               />
             ))}
           </div>
@@ -465,12 +489,12 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1">
               <Brain className="w-3 h-3 text-purple-400" />
-              <span className="text-gray-400">Moves:</span>
+              <span className="text-gray-400">{t('memoryMatchGame.stats.moves')}</span>
               <span className="font-bold text-white">{moves}</span>
             </div>
             <div className="flex items-center gap-1">
               <Star className="w-3 h-3 text-yellow-400" />
-              <span className="text-gray-400">Pairs:</span>
+              <span className="text-gray-400">{t('memoryMatchGame.stats.pairs')}</span>
               <span className="font-bold text-white">{matchedPairs.length / 2}/{cards.length / 2}</span>
             </div>
           </div>
@@ -480,10 +504,12 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
         <div className="mb-3 flex justify-center">
           <div className="text-center mb-2 w-full">
             <div className="text-sm text-gray-400">
-              {themes[gameTheme].name} Memory • {difficulty}x{difficulty} Grid
+              {t('memoryMatchGame.gameBoard.themeMemory', { theme: themes[gameTheme].name })}
+              {' • '}
+              {t('memoryMatchGame.stats.gridSize', { size: difficulty })}
             </div>
             <div className="text-xs text-gray-500">
-              Find matching {themes[gameTheme].name.toLowerCase()} pairs!
+              {t('memoryMatchGame.gameBoard.findMatchingPairs', { theme: themes[gameTheme].name.toLowerCase() })}
             </div>
           </div>
         </div>
@@ -512,6 +538,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
                   minHeight: '45px',
                   minWidth: '45px'
                 }}
+                aria-label={card.flipped || card.matched || showAllCards ? card.name : t('memoryMatchGame.cards.unknown')}
               >
                 {card.flipped || card.matched || showAllCards ? (
                   <div className="flex flex-col items-center">
@@ -519,7 +546,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
                     <span className="text-[8px] md:text-[10px] text-white/70 mt-0.5">{card.name}</span>
                   </div>
                 ) : (
-                  <div className="text-lg">?</div>
+                  <div className="text-lg">{t('memoryMatchGame.cards.hidden')}</div>
                 )}
               </button>
             ))}
@@ -531,16 +558,18 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
           <button
             onClick={showHint}
             className="flex-1 py-2 rounded-lg bg-gradient-to-r from-[#8B5CF6] to-[#6366F1] text-white text-sm font-bold flex items-center justify-center gap-1 hover:opacity-90"
+            title={t('memoryMatchGame.controls.showHint')}
           >
             <Eye className="w-4 h-4" />
-            Show All Cards
+            {t('memoryMatchGame.buttons.showAllCards')}
           </button>
           <button
             onClick={initializeGame}
             className="px-3 py-2 rounded-lg bg-[#1A1A2E] border border-gray-700 text-gray-400 text-sm flex items-center justify-center gap-1 hover:text-white hover:border-gray-600"
+            title={t('memoryMatchGame.controls.restartBoard')}
           >
             <RotateCw className="w-4 h-4" />
-            Reset
+            {t('memoryMatchGame.buttons.reset')}
           </button>
         </div>
 
@@ -558,7 +587,7 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
         {/* Progress Bar */}
         <div className="mb-2">
           <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>Progress</span>
+            <span>{t('memoryMatchGame.stats.progress')}</span>
             <span>{Math.round((matchedPairs.length / cards.length) * 100)}%</span>
           </div>
           <div className="w-full bg-gray-700 rounded-full h-2">
@@ -574,19 +603,19 @@ const MemoryMatchGame = ({ onGameEvent, isFullscreen }) => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-gray-500">
             <div className="flex items-center gap-1">
               <span className="text-lg">🧠</span>
-              <span>Remember card positions</span>
+              <span>{t('memoryMatchGame.instructions.rememberPositions')}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-lg">🎯</span>
-              <span>Click two matching cards</span>
+              <span>{t('memoryMatchGame.instructions.clickMatchingCards')}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-lg">🚀</span>
-              <span>Fewer moves = more points</span>
+              <span>{t('memoryMatchGame.instructions.fewerMovesMorePoints')}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-lg">🏆</span>
-              <span>Complete all pairs to level up</span>
+              <span>{t('memoryMatchGame.instructions.completePairsToLevelUp')}</span>
             </div>
           </div>
         </div>

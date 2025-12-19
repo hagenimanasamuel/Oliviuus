@@ -701,7 +701,7 @@
     "title": "Gucunga Ibyemezo",
     "allContacts": "Ibyemezo Byose",
     "submissionError": "Ntibyakunze kohereza ubutumwa. Wongere ugerageze.",
-    "exportError": "Ntibyakunze soza ibyemezo.",
+    "exportError": "Ntibyakunze bika ibyemezo.",
     "filters": {
       "search": "Shakisha ibyemezo...",
       "allStatus": "Imimerere Yose",
@@ -1766,6 +1766,7 @@
     }
   },
   "common": {
+    "years": "imyaka",
     "yes": "Yego",
     "no": "Oya",
     "cancel": "Kureka",
@@ -1798,12 +1799,13 @@
       "description": "Ugomba kuba Nyir’umuryango cyangwa Umubyeyi ufite ifatabuguzi ry'umuryango ikora kugira ngo ubone igenzura ry’ababyeyi."
     },
     "roles": {
-      "familyOwner": "Nyir’umuryango",
+      "familyOwner": "Nyir'umuryango",
       "familyParent": "Umubyeyi w'umuryango"
     },
     "tabs": {
       "pinManagement": "Gucunga PIN",
-      "securityLogs": "Ibarura ry’Umutekano"
+      "securityLogs": "Ibarura ry'Umutekano",
+      "kidInsights": "Isesengura ry'Abana"
     },
     "pinSection": {
       "activeTitle": "Master PIN Ikora",
@@ -1897,6 +1899,278 @@
       "unknownEmail": "Imeyili itazwi",
       "noEmail": "Nta imeyili",
       "noDate": "Nta tariki"
+    }
+  },
+  "kidInsights": {
+    "title": "Amakuru Y'Umwana",
+    "subtitle": "Reba iterambere, igenamigambi ry'umukino, n'ibisobanuro by'imyigishirize",
+    "export": "bika PDF",
+    "refreshData": "Ongera Urebe Amakuru",
+    "loading": "Birakora...",
+    "unknownKid": "Umwana Utazwi",
+    "years": "imyaka",
+    "timeframes": {
+      "day": "Uyu munsi",
+      "week": "Iyi cyumweru",
+      "month": "Uku kwezi",
+      "year": "Uyu mwaka"
+    },
+    "modes": {
+      "overview": "Incamake",
+      "gaming": "Imikino",
+      "content": "Ibirimo",
+      "learning": "Kwiga",
+      "screentime": "Igihe cyo Kureba",
+      "behavior": "Imikorere",
+      "comparative": "Gusanisha"
+    },
+    "stats": {
+      "totalPlaytime": "Igihe Cyose cy'Umukino",
+      "totalEngagement": "Ubusanzwe Bwo Gukoresha",
+      "learningProgress": "Iterambere ry'Ubwenge",
+      "contentWatched": "Ibirimo Byarebwe",
+      "screenTimeHealth": "Ubuzima bw'Igihe cyo Kureba",
+      "sessions": "isiganwa",
+      "skillsImproved": "ubuhanga buhagije",
+      "watchTime": "igihe cyo kureba",
+      "compliant": "byakurikijwe",
+      "totalGamingTime": "Igihe Cyose cy'Umukino",
+      "gamesPlayed": "Imikino Yakiriwe",
+      "plays": "imikino",
+      "averageScore": "Inyungu Rusange",
+      "highScores": "ibyiza bya nyuma",
+      "engagementRate": "Ingano yo Gukoresha",
+      "productivity": "Ubukorane",
+      "points": "amapointe",
+      "favoriteGame": "Umukino Ukunzwe",
+      "noData": "Nta makuru ahari",
+      "topSkill": "Ubuhanga Bw'Ingiro",
+      "improvement": "iterambere",
+      "productivityScore": "Inyungu yo Gukora",
+      "completionRate": "Ingano yo Kurangiza",
+      "averageCompletion": "Ubushobozi bwa rusange bwo kurangiza",
+      "favoriteCategory": "Icyiciro Cyakunzwe",
+      "ofWatchTime": "by'igihe cyo kureba",
+      "engagementScore": "Inyungu yo Gukoresha",
+      "contentInteraction": "Ubushobozi bwo gufatanya n'ibirimo",
+      "skillsImproved": "Ubuhanga Buhagije",
+      "avgImprovement": "iterambere rusange",
+      "learningTime": "Igihe cyo Kwiga",
+      "overTimeframe": "Kuri",
+      "gamesCompleted": "Imikino Yarangiye",
+      "educationalGames": "imikino yimyigishirize",
+      "learningScore": "Inyungu yo Kwiga",
+      "overallProgress": "iterambere rusange",
+      "totalScreenTime": "Igihe Cyose cyo Kureba",
+      "total": "cyose",
+      "dailyAverage": "Ubushobozi bwa buri munsi",
+      "perDayAverage": "Ubushobozi bwa buri munsi",
+      "complianceRate": "Ingano yo Kurangiza",
+      "rulesFollowed": "amategeko yakurikijwe",
+      "peakUsage": "Gukoresha Bikabije",
+      "focusLevel": "Umutwe wo Gukora",
+      "taskCompletion": "Ubushobozi bwo kurangiza inshingano",
+      "persistence": "Kwihangana",
+      "sessionIndicator": "Ikimenyetso cy'igihe cy'isiganwa",
+      "ruleCompliance": "Kurangiza Amategeko",
+      "followingRestrictions": "Kurikiza Ibibujijwe",
+      "curiosity": "Kwishimira",
+      "varietySeeking": "Gushaka ibinyuranye",
+      "averageSessionLength": "impuzandengo",
+      "mostWatchedDay": "Umunsi urebwa cyane",
+      "preferredContentType": "Uruhuza rwakunzwe",
+      "timeLimitCompliance": "Kurangiza igihe cyagenwe",
+      "ruleViolations": "Kudakurikiza amategeko",
+      "times": "inshuro",
+      "currentLevel": "Urwego"
+    },
+    "charts": {
+      "activityDistribution": "Gutanga Ibikorwa",
+      "timeSpentDescription": "Uburyo igihe cyakoreshejwe mu bikorwa",
+      "skillDevelopment": "Iterambere ry'Ubuhanga",
+      "progressDescription": "Iterambere mu byiciro bitandukanye by'ubuhanga",
+      "skillScore": "Inyungu y'Ubuhanga",
+      "gamesDistribution": "Gutanga Imikino",
+      "mostPlayedGames": "Imikino yakiriwe cyane ku bushobozi bw'isiganwa",
+      "plays": "imikino",
+      "ofSessions": "by'isiganwa",
+      "skillProgress": "Iterambere ry'Ubuhanga",
+      "improvementOverTime": "Iterambere kuri igihe cyahiswemo",
+      "improvementPercentage": "Iterambere %",
+      "improvement": "Iterambere",
+      "skillBreakdown": "Gutandukanya Ubuhanga",
+      "games": "imikino",
+      "total": "Igihe Cyose cyo Kureba",
+      "gaming": "Igihe cy'Umukino",
+      "content": "Igihe cyo Kureba Ibirimo",
+      "contentCategories": "Ibyiciro by'Ibirimo",
+      "watchDistribution": "Gutanga ibirimo byarebwe ku byiciro",
+      "watchCount": "Umubare wo Kureba",
+      "skillRadar": "Radari yo Kwimenyereza Ubuhanga",
+      "skillProgressAreas": "Iterambere mu byiciro bitandukanye by'ubuhanga",
+      "skillLevel": "Urwego rw'Ubuhanga",
+      "screenTimeTrends": "Imikorere y'Igihe cyo Kureba",
+      "dailyScreenTime": "Igihe cyo kureba buri munsi kuri",
+      "activityBreakdown": "Gutandukanya Ibikorwa",
+      "screenTimeDistribution": "Uburyo igihe cyo kureba cyatanzwe",
+      "behaviorProfile": "Imikorere y'Umuntu",
+      "behaviorTraits": "Imikorere n'imikorere",
+      "behaviorScore": "Inyungu y'Imikorere"
+    },
+    "categories": {
+      "gaming": "Imikino",
+      "content": "Ibirimo",
+      "learning": "Kwiga",
+      "other": "Ibirindi"
+    },
+    "sections": {
+      "recentActivity": "Ibikorwa Bigeze",
+      "recentGamingSessions": "Isiganwa ry'Umukino Rigeze",
+      "latestGameplay": "Ibikorwa bya vuba by'umukino",
+      "recentAchievements": "Ibikorwa Byagezweho Bigeze",
+      "milestonesReached": "Ibikorwa n'ibyagezweho",
+      "recommendations": "Inama",
+      "personalizedSuggestions": "Inama zihariye zishingiye ku bikorwa",
+      "suggestion": "Inama",
+      "tryNewActivities": "Gerageza gukora ibikorwa bishya",
+      "importantAlerts": "Amatangazo Akomeye",
+      "areasRequiringAttention": "Ahari ukeneye gutegerezwa",
+      "checkSettings": "Reba ibisabwa kugirango ubone ibisobanuro byinshi",
+      "watchTimePatterns": "Imikorere y'Igihe cyo Kureba",
+      "dailyViewingHabits": "Imikorere y'umunsi yo kureba n'imikorere",
+      "watchPatterns": "Imikorere yo Kureba",
+      "strengths": "Imbaraga",
+      "excelAreas": "Ahari umwana akora neza",
+      "skill": "Ubuhanga",
+      "strongPerformance": "Gukora neza muri iki gice",
+      "areasImprovement": "Ahari Hagenewe Iterambere",
+      "needsPractice": "Ubuhanga bukeneye kwimenyereza byinshi",
+      "needsPracticeArea": "Bikeneye kwimenyereza byinshi muri iki gice",
+      "timeRestrictions": "Amabujije y'Igihe",
+      "positivePatterns": "Imikorere Myiza",
+      "healthyBehavior": "Imikorere myiza yabonetse",
+      "areasMonitor": "Ahari Hagenewo Kureba",
+      "behaviorPatternsWatch": "Imikorere igenewe kureba",
+      "compareBenchmarks": "Sanisha n'abandi bana n'ibipimo",
+      "comparativeAnalysis": "Gusanisha Ibisobanuro Bizaza",
+      "comparativeDescription": "Iki gice gikiri mu iterambere. Vuba uzashobora gusanisha ibikorwa by'umwana wawe n'ibipimo by'urwego rw'imfura n'ubushobozi bwa mbere.",
+      "compareFeatures": "Ibigomba Gusanishwa"
+    },
+    "timeOfDay": {
+      "morning": "Mu gitondo",
+      "afternoon": "Ku gicamunsi",
+      "evening": "Nijoro",
+      "night": "Nijoro"
+    },
+    "levels": {
+      "high": "Hejuru",
+      "medium": "Hagati"
+    },
+    "behavior": {
+      "consistentSchedule": "Gahunda Ihuje",
+      "goodRoutine": "Imikorere ihuje iranga imikorere myiza",
+      "goodFocus": "Gutegereza Neza",
+      "completesTasks": "Arangiza inshingano atarakoresha igihe kinini",
+      "variedInterests": "Ibyifuzo Byinyuranye",
+      "exploresContent": "Asuzuma ibinyuranye by'ibirimo n'ibikorwa",
+      "lateSessions": "Isiganwa Ryijoro",
+      "bedtimeActivity": "Hari ibikorwa bibaho hafi y'igihe cyo kuryama",
+      "restrictionAttempts": "Kugerageza Kujya mu Bujuje",
+      "accessRestricted": "Kugerageza gushaka ibirimo bijuje gusa",
+      "extendedSessions": "Isiganwa Rirenga",
+      "exceedsDuration": "Hari isiganwa ry'umukino rirenze igihe cyagenwe"
+    },
+    "comparison": {
+      "vsAverage": "gusanisha n'ubushobozi bwa rusange",
+      "ageGroup": "Gusanisha n'urwego rw'imfura",
+      "vsSiblings": "gusanisha n'abavandimwe",
+      "familyComparison": "Gusanisha mu muryango",
+      "progress": "Iterambere",
+      "growthTime": "Kura kuri igihe",
+      "gamingPerformance": "Ubushobozi bw'Umukino",
+      "gamingMetrics": "Amapointe, ingano yo kurangiza, igihe cy'umukino",
+      "learningProgress": "Iterambere ry'Ubwenge",
+      "skillComparison": "Iterambere ry'ubuhanga gusanishwa n'abandi",
+      "screenTimeHabits": "Imikorere y'Igihe cyo Kureba",
+      "usageComparison": "Gukoresha buri munsi gusanishwa n'ibisubizo"
+    },
+    "status": {
+      "comingSoon": "Biza vuba"
+    },
+    "achievements": {
+      "firstGame": "Umukino wa Mbere Warangiwe!",
+      "completedFirstGame": "Yarangije umukino wa mbere w'imyigishirize",
+      "streak": "Iminsi 3 Ihuje!",
+      "played3Days": "Yakiriye imikino y'imyigishirize kuminsi 3 ihuje",
+      "skillMaster": "Umuhanzi w'Ubuhanga",
+      "improvedSkill": "Yahagije ubuhanga kuri 25% cyangwa byinshi"
+    },
+    "recommendations": {
+      "title": "Ibisobanuro & Inama",
+      "basedOnActivity": "Bishingiye ku bikorwa bya vuba by'umukino n'iterambere",
+      "strengths": "Imbaraga",
+      "highEngagement": "Ingano yo gukoresha hejuru - umwana ari mu kwiga",
+      "goodEngagement": "Gukoresha neza - imikorere ihuje yo kwiga",
+      "opportunities": "Amahirwe",
+      "moreVariety": "Gerageza ibyiciro bitandukanye by'umukino kugirango ufate iterambere ry'ubuhanga",
+      "continueVariety": "Ibyinyuranye byiza - komeza gushakisha imikino itandukanye",
+      "suggestions": "Inama",
+      "tryNewSkills": "Gerageza imikino ishingiye ku buhanga butandukanye bw'imyigishirize",
+      "continueTopSkill": "Komeza guhanga ubuhanga bw'ingiro ukoresheje imikino ihuriyeho"
+    },
+    "pdf": {
+      "title": "Oliviuus (Amakuru Y'Umwana)",
+      "reportFor": "Raporo ya",
+      "timeframe": "Igihe",
+      "generated": "Yakozwe",
+      "exportError": "Ntibyakunze kubika PDF. Ongera ugerageze.",
+      "sections": {
+        "overview": "📊 Incamake",
+        "gaming": "🎮 Ibisobanuro by'Umukino",
+        "content": "🎬 Ibisobanuro by'Ibirimo",
+        "learning": "🧠 Ibisobanuro byo Kwiga",
+        "screentime": "⏰ Ibisobanuro by'Igihe cyo Kureba",
+        "recommendations": "💡 Inama",
+        "alerts": "🚨 Amatangazo Akomeye",
+        "summary": "📝 Incamake"
+      },
+      "totalEngagement": "Ubusanzwe Bwo Gukoresha",
+      "totalSessions": "Isiganwa Ryose",
+      "learningScore": "Inyungu yo Kwiga",
+      "productivityScore": "Inyungu yo Gukora",
+      "gamesPlayed": "Imikino Yakiriwe",
+      "totalGamingTime": "Igihe Cyose cy'Umukino",
+      "averageSession": "Isiganwa Rusange",
+      "minutes": "iminota",
+      "mostPlayedGames": "Imikino Yakiriwe Cyane",
+      "plays": "imikino",
+      "contentWatched": "Ibirimo Byarebwe",
+      "totalWatchTime": "Igihe Cyose cyo Kureba",
+      "completionRate": "Ingano yo Kurangiza",
+      "engagementScore": "Inyungu yo Gukoresha",
+      "topCategories": "Ibyiciro by'Ingiro",
+      "items": "ibintu",
+      "skillsImproved": "Ubuhanga Buhagije",
+      "averageImprovement": "Iterambere Rusange",
+      "totalLearningTime": "Igihe Cyose cyo Kwiga",
+      "gamesCompleted": "Imikino Yarangiye",
+      "strengths": "Imbaraga",
+      "totalScreenTime": "Igihe Cyose cyo Kureba",
+      "dailyAverage": "Ubushobozi bwa buri munsi",
+      "gaming": "Umukino",
+      "content": "Ibirimo",
+      "other": "Ibirindi",
+      "suggestion": "Inama",
+      "reportGeneratedFor": "Raporo yakozwe ya",
+      "timePeriod": "Igihe",
+      "overallEngagement": "Ubusanzwe bwo gukoresha",
+      "learningProgress": "Iterambere ry'ubwenge",
+      "footer": {
+        "company": "Oliviuus - Raporo y'Ibisobanuro by'Ibikorwa by'Umwana",
+        "page": "Ipaji",
+        "of": "ya"
+      },
+      "years": "imyaka"
     }
   },
   "familyProfiles": {
@@ -2299,7 +2573,29 @@
     },
     "pinModal": {
       "title": "Emeza PIN kugira ngo usohoke muri Kid Mode",
-      "description": "Injiza PIN y'umuryango kugira ngo usohoke muri kid mode usubire kuri dashboard y'ababyeyi"
+      "description": "Injiza PIN y'umuryango kugira ngo usohoke muri kid mode usubire kuri dashboard y'ababyeyi",
+      "incorrectPin": "PIN winjije si yo. Ongera ugerageze.",
+      "verificationFailed": "Kugenzura PIN byanze. Ongera ugerageze.",
+      "enterPin": "Injiza PIN y'imibare 4",
+      "digits": "imibare",
+      "clear": "Siba",
+      "cancel": "Hagarika",
+      "verifying": "Birimo kugenzurwa...",
+      "verify": "Genzura PIN",
+      "securityNote": "Kubw’umutekano, buri gerageza rya PIN rirandikwa",
+      "attempts": "Inshuro wagerageje: {{count}}",
+      "lastAttempt": "Igerageza rya nyuma",
+      "errors": {
+        "invalidLength": "PIN igomba kuba imibare 4",
+        "incorrectPin": "PIN si yo",
+        "verificationFailed": "Kugenzura byanze"
+      },
+      "securityWarning": {
+        "title": "Impuruza y’Umutekano",
+        "twoAttempts": "Hagaragaye kugerageza PIN nabi inshuro nyinshi. Iri gerageza rirandikwa.",
+        "threeAttempts": "Hagaragaye kugerageza kunanirwa inshuro nyinshi. Umubyeyi aramenyeshwa.",
+        "multipleAttempts": "Hagaragaye kugerageza kunanirwa inshuro {{count}}. Impuruza y’umutekano yohererejwe umubyeyi."
+      }
     }
   },
   "pinModal": {
@@ -2525,28 +2821,1548 @@
     }
   },
   "games": {
+    "play": "Kina",
+    "title": "Imikino y'Abana",
+    "subtitle": "Hari imikino {{count}} yo kwiga ishimishije",
+    "noGames": "Nta Mikino Ihari",
+    "noGamesDesc": "Garuka nyuma urebe niba hari imikino mishya!",
+    "refresh": "Ongera Ugenzure Imikino",
+    "playNow": "🎮 Kina Ubu",
+    "back": "Subira Inyuma",
+    "skill": "Ubuhanga",
+    "type": "Ubwoko",
+    "age": "Imyaka",
+    "skills": "Ubumenyi",
+    "loading": "Imikino Irimo Gupakirwa...",
+    "loadingDesc": "Turimo gushaka imikino ishimishije yo kwiga",
+    "categories": {
+      "Math": "Imibare",
+      "Puzzles": "Ibisakuzo",
+      "Colors": "Amabara",
+      "Memory": "Kwibuka",
+      "Science": "Ubumenyi",
+      "Language": "Ururimi",
+      "Racing": "Isiganwa",
+      "Logic": "Gutegereza",
+      "Action": "Igikorwa",
+      "Educational": "Kwiga"
+    },
+    "gameDetails": {
+      "counting_adventure": "Umukino wo Kubara",
+      "counting_desc": "Wiga kongera imibare ukoresheje amashusho",
+      "shape_match": "Guhuza Imiterere",
+      "shape_desc": "Huza imiterere n'ibishushanyo",
+      "color_quest": "Umukino w'Amabara",
+      "color_desc": "Wiga amabara binyuze mu mikino",
+      "memory_match": "Kwibuka",
+      "memory_desc": "Ongera ubushobozi bwo kwibuka",
+      "animal_safari": "Umukino w'Inyamaswa",
+      "animal_desc": "Wiga inyamaswa zitandukanye",
+      "alphabet_race": "Isiganwa ry'Inyuguti",
+      "alphabet_desc": "Wiga inyuguti uri mu isiganwa",
+      "pro_racing": "Isiganwa Rikomeye",
+      "pro_racing_desc": "Sigana mu muhanda ukusanye imbaraga",
+      "water_sort": "Gutondeka Amabara",
+      "water_sort_desc": "Tandukanya amazi y'amabara mu miyoboro"
+    }
+  },
+  "gamePlayer": {
+    "exit": "Sohoka",
+    "exitGame": "Sohoka mu Mukino",
+    "resume": "Komeza",
+    "pause": "Hagarika",
+    "fullscreen": "Ecran Yose",
+    "exitFS": "Sohoka muri Ecran Yose",
+    "controls": "Amabwiriza",
+    "volume": "Ijwi",
+    "musicPlaying": "Umuziki Uri Gucurangwa",
+    "audioUnavailable": "Ijwi Ntiriboneka",
+    "audioMuted": "Ijwi Ryahagaritswe",
+    "gotIt": "Nabimenye!",
+    "score": "Amanota",
+    "time": "Igihe",
+    "hearts": "Umutima",
+    "shortcuts": {
+      "esc": "ESC",
+      "escape": "Sohoka mu Mukino",
+      "f": "F",
+      "fullscreenKey": "Ecran Yose",
+      "m": "M",
+      "mute": "Hagarika Ijwi",
+      "space": "Space",
+      "pausePlay": "Hagarika/Kina",
+      "c": "C",
+      "toggleControls": "Erekana/Hisha Amabwiriza",
+      "s": "S",
+      "saveProgress": "Bika Aho Wageze",
+      "zeroNine": "0-9",
+      "volumeLevels": "Urwego rw'Ijwi"
+    }
+  },
+  "proRacingChallenge": {
     "seo": {
-      "title": "Imikino y'Abana - Vuba Bidatinze",
-      "description": "Imikino y'abana ishimishije kandi yigisha iri mu nzira! Vuba Bidatinze."
+      "title": "Isiganwa Rikomeye - Umukino w’Imodoka ku Muvuduko Mwinshi",
+      "description": "Irinde imodoka mu muhanda, ukusanye power-ups, ukoreshe shield muri uyu mukino ukomeye wo gusiganwa!"
     },
-    "header": {
-      "title": "Agace k'Imikino",
-      "subtitle": "Imikino Ishimishije Iri Hafi Hano! 🎮",
-      "description": "Turimo gukora imikino myiza, y’abana, ishimishije kandi yigisha. Komeza ube hafi kugira ngo ubone amakuru mashya!"
+    "game": {
+      "title": "UMUSIGANWA W'UMUHANGA",
+      "level": "L{{level}}",
+      "score": "{{score}}",
+      "startButton": "🚀 TANGIRA ISIGANWA",
+      "restartButton": "🏎️ ONGERA USIGANE",
+      "gameOver": {
+        "title": "ISIGANWA KIRARANGIYE!",
+        "newHighScore": "🥇 AMANOTA MASHYA YO HEJURU!",
+        "highScore": "🥈 HEJURU: {{score}}"
+      },
+      "instructions": {
+        "tapLanes": "Kanda ku mirongo uhindure inzira",
+        "shieldButton": "Kanda buto ya SHIELD",
+        "touchHint": "Kanda L1/L2/L3 uhindure inzira • Kanda SHIELD wirinde"
+      },
+      "controls": {
+        "lane": "L{{lane}}",
+        "up": "↑ HEJURU",
+        "down": "↓ HEPFO",
+        "shield": "SHIELD ({{charges}})",
+        "shieldCooldown": "⏳",
+        "recharging": "Shield irimo kwiyongera..."
+      },
+      "powerUps": {
+        "shieldCharge": "🛡️ +1 Shield!",
+        "autoShield": "🛡️ Shield Yikora!",
+        "slowMotion": "🐌 Kugabanya Umuvuduko!",
+        "speedBoost": "⚡ Kongera Umuvuduko!",
+        "shieldActive": "🛡️ Shield Ikora (7s)!",
+        "roadColor": "⭐ Ibara Rishya ry'Umuhanda!",
+        "roadGlow": "🌟 Umuhanda Urabagirana!"
+      },
+      "collision": {
+        "crash": "Wagonze! Kanda wongere utangire"
+      }
     },
-    "features": {
-      "title": "Ibirimo Kuza?",
-      "funEducational": "Imikino Ishimishije kandi Yigisha",
-      "puzzles": "Udukino Dutera Gutekereza",
-      "skillBuilding": "Ibikorwa byubaka Ubumenyi",
-      "safeContent": "Ibikurikiranwa kandi Bibereye Abana"
+    "tutorial": {
+      "title": "UBURYO BWA SHIELD",
+      "description": "Utangira ufite charges 3",
+      "features": {
+        "shield": "• 🛡️ = Shield y'amasegonda 7",
+        "collect": "• Kusanya wongere charges (ntarengwa 5)"
+      }
     },
-    "construction": {
-      "title": "Mu Kubakwa",
-      "description": "Turimo kubaka urutonde rw’imikino y'abana! Subira vuba urebe imikino ishimishije, iyigisha, kandi ituma kwiga birushaho kuba byiza! ✨"
+    "ui": {
+      "score": "AMANOTA: {{score}}",
+      "level": "URWEGO {{level}}",
+      "shieldCharges": "×{{charges}}",
+      "cooldown": "SHIELD CD",
+      "powerUpTimer": "{{icon}} {{time}}s"
+    },
+    "messages": {
+      "shieldReady": "Shield yiteguye (Q)",
+      "shieldActive": "Shield iri gukora!",
+      "shieldCooldown": "Shield iracyari muri cooldown",
+      "collectible": "Kusanya {{item}}"
+    }
+  },
+  "countingGame": {
+    "seo": {
+      "title": "Umukino wo Kubara - Urugendo rw'Imibare ku Bana",
+      "description": "Umukino wo kubara ushimishije ku bana ufite uburyo bwinshi, abakinnyi, n'ibikoresho byongera imbaraga bigafasha kwiga imibare binyuze mu gukina!"
+    },
+    "gameOver": {
+      "title": "Umukino Urarangiye!",
+      "subtitle": "Witwaye neza!",
+      "score": "Amanota",
+      "level": "Urwego",
+      "streak": "Uruhererekane",
+      "reached": "Wageze kuri",
+      "playAgain": "🎮 Ongera Ukine"
+    },
+    "characterSelection": {
+      "title": "Hitamo Umukinnyi!",
+      "letsPlay": "Reka Dukine!"
+    },
+    "gameModes": {
+      "practice": "Imyitozo",
+      "timed": "Ifite Igihe",
+      "multiplayer": "Kurwanya AI"
+    },
+    "gameHeader": {
+      "title": "Umukino wo Kubara",
+      "level": "Urwego {{level}}",
+      "streak": "{{streak}}🔥",
+      "vsAI": "vs"
+    },
+    "timer": {
+      "timeLeft": "Igihe Gisigaye:",
+      "seconds": "{{time}}s"
+    },
+    "countingArea": {
+      "countItems": "Bara ibintu!",
+      "groupA": "Itsinda A",
+      "groupB": "Itsinda B"
+    },
+    "inputModes": {
+      "numbers": "🔢 Imibare",
+      "emoji": "😀 Emojis",
+      "placeholderNumbers": "Andika igisubizo...",
+      "placeholderEmoji": "Shushanya emojis...",
+      "submit": "🚀 OHEREZA IGISUBIZO"
+    },
+    "numberPad": {
+      "clear": "Siba"
+    },
+    "powerUps": {
+      "extraTime": {
+        "label": "⏰",
+        "name": "+10s",
+        "count": "x{{count}}"
+      },
+      "skipQuestion": {
+        "label": "🚀",
+        "name": "Simbuka",
+        "count": "x{{count}}"
+      },
+      "doublePoints": {
+        "label": "💰",
+        "name": "2x",
+        "count": "x{{count}}"
+      }
+    },
+    "feedback": {
+      "hint": "💡 Inama: {{a}} + {{b}} = {{sum}}",
+      "correct": {
+        "awesome": "🎉 Biratangaje!",
+        "greatJob": "🚀 Wakoze neza!",
+        "perfect": "🌈 Biratunganye!",
+        "super": "🎪 Byiza cyane!",
+        "amazing": "🧙‍♂️ Biratangaje cyane!",
+        "excellent": "🦸‍♂️ Byiza rwose!"
+      },
+      "incorrect": "❌ Ongera ugerageze! Igisubizo: {{answer}}",
+      "bonusHeart": "🏆 +1 Umutima!",
+      "levelUp": "🚀 Wageze ku Rwego Rushya!",
+      "extraTime": "⏰ +Amasegonda 10!",
+      "skipped": "🚀 Byasimbutse!",
+      "doublePoints": "💰 +Amanota 50!"
+    },
+    "instructions": {
+      "enterSubmit": "⏎ Kanda Enter wohereze",
+      "streakHeart": "🏆 Uruhererekane 5 = umutima"
     },
     "buttons": {
-      "comingSoon": "Vuba Bidatinze!"
+      "toggleSound": "Fungura/Funga amajwi",
+      "playAgain": "Ongera Ukine"
+    },
+    "errors": {
+      "emptyAnswer": "Nyamuneka andika igisubizo!"
+    }
+  },
+  "waterSortGame": {
+    "seo": {
+      "title": "Gutandukanya Amazi - Umukino wo Gutondeka Amazi",
+      "description": "Hugura ubwenge bwawe ukoresheje uyu mukino w'amabara wo gutandukanya amazi. Tandukanya amazi mu miyoboro ihuye!"
+    },
+    "loading": "Loading...",
+    "levelSelector": {
+      "open": "Urwego",
+      "title": "Hitamo Urwego",
+      "subtitle": "Hitamo urwego rwo gukinira",
+      "currentLevel": "Urwego Uheruka",
+      "highestReached": "Urwego Rwasumbirijweho",
+      "close": "Funga"
+    },
+    "tutorial": {
+      "title": "Uburyo bwo Gukina Gutandukanya Amazi",
+      "subtitle": "Kurangiza inyigisho bigufasha gusobanukirwa umukino!",
+      "skipTutorial": "Simbuka Inyigisho",
+      "startRealGame": "Tangira Umukino nyawo",
+      "next": "Komeza",
+      "previous": "Subira Inyuma",
+      "progress": "Aho ugeze",
+      "steps": {
+        "step1": {
+          "title": "🎯 Intambwe ya 1: Hitamo Umuyoboro",
+          "description": "Kanda ku muyoboro w'ubururu (Umuyoboro #1) kuwuhitamo.",
+          "hint": "Imiyoboro wahisemo izaka mu ibara ry'umuhondo.",
+          "clickHint": "👉 Kanda Umuyoboro #1"
+        },
+        "step2": {
+          "title": "💧 Intambwe ya 2: Suka mu Muyoboro Wusa",
+          "description": "Noneho kanda ku muyoboro wusa (Umuyoboro #3 cyangwa #4) usuke amazi wahisemo.",
+          "hint": "Imiyoboro yusa irangwa n'ibara ry'icyatsi hasi.",
+          "selectedLabel": "Wahisemo",
+          "clickHint": "👉 Kanda Aha"
+        },
+        "step3": {
+          "title": "✨ Wakoze Neza!",
+          "description": "Wakoze intambwe yawe ya mbere! Witeguye gukina umukino nyawo?",
+          "hint": "Mu mukino nyawo ntuzabona inama—ugomba gukoresha ubwenge bwawe!",
+          "noHints": "Nta kugaragaza mu mukino nyawo. Koresha gutekereza!"
+        }
+      }
+    },
+    "header": {
+      "title": "Gutandukanya Amazi",
+      "tutorialBadge": "Inyigisho",
+      "level": "Urwego {{level}}",
+      "moves": "Imyitwarire: {{moves}}",
+      "highestLevel": "Ruruta Byose: {{highestLevel}}"
+    },
+    "controls": {
+      "undo": "Subiza Inyuma",
+      "restartTutorial": "Ongera Utangire Inyigisho",
+      "restartLevel": "Ongera Utangire Urwego",
+      "playAgain": "Ongera Ukine",
+      "nextLevel": "Urwego Rukurikira →"
+    },
+    "instructions": {
+      "tutorial": {
+        "step0": "🎯 Kanda ku Muyoboro #1 (ugaragazwa mu muhondo)",
+        "step1": "💧 Noneho kanda ku muyoboro wusa (ugaragazwa mu cyatsi)",
+        "step2": "✨ Inyigisho zirarangiye! Witeguye ikibazo nyacyo?",
+        "followHints": "Kurikiza imiyoboro igaragazwa",
+        "noHints": "Nta nama mu mukino nyawo!"
+      },
+      "mainGame": {
+        "title": "💡 Tandukanya amabara mu miyoboro ihuye!",
+        "description": "Kanda umuyoboro uhitemo, hanyuma ukande undi usuke • Nta nama mu mukino nyawo!"
+      }
+    },
+    "victory": {
+      "title": "Urwego Rwarangiye!",
+      "completedIn": "Warangije mu myitwarire <1>{{moves}}</1>",
+      "playAgain": "Ongera Ukine",
+      "nextLevel": "Urwego Rukurikira →"
+    },
+    "tube": {
+      "label": "Umuyoboro #{{number}}",
+      "selected": "Wahisemo",
+      "completionCrown": "Ikamba ryo kurangiza"
+    },
+    "animations": {
+      "float": "Animation yo kureremba",
+      "pour": "Animation yo gusuka",
+      "droplet": "Animation y'igitonyanga",
+      "ripple": "Ingaruka z'amazi",
+      "sparkle": "Animation y'urumuri",
+      "liquidShake": "Kunyeganyeza amazi",
+      "bubble": "Animation y'utuvubu",
+      "shine": "Ingaruka yo kumurika",
+      "pulseGlow": "Animation yo kumurika bisubiramo"
+    }
+  },
+  "colorQuestGame": {
+    "seo": {
+      "title": "Umukino wamabara - Umukino wo Kwiga Amabara ku Bana",
+      "description": "Umukino ushimishije wo kumenya, kuvanga, gutondeka no gusiga amabara ufasha abana kwiga amabara binyuze mu gukina!"
+    },
+    "gameOver": {
+      "title": "Umukino wamabara Rwarangiye!",
+      "subtitle": "Uri umuhanga mu mabara!",
+      "score": "Amanota",
+      "level": "Urwego",
+      "streak": "Uruhererekane",
+      "playAgain": "🎨 Ongera Ukine"
+    },
+    "gameHeader": {
+      "title": "Umukino wamabara",
+      "level": "Urwego {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "identify": "Menya",
+      "mix": "Vanga",
+      "sort": "Tondeka",
+      "paint": "Siga Irangi"
+    },
+    "timer": {
+      "timeLeft": "Igihe Gisigaye:",
+      "seconds": "{{time}}s"
+    },
+    "questions": {
+      "identify": {
+        "default": "Iri ni irihe bara?",
+        "colorSample": "Icyitegererezo cy'Ibara"
+      },
+      "mix": {
+        "default": "{{color1}} na {{color2}} bivamo iki?",
+        "resultUnknown": "?"
+      },
+      "sort": {
+        "default": "Shakisha ibintu byose bya {{color}}!"
+      },
+      "paint": {
+        "default": "Siga ukoresheje {{color}}!",
+        "paintBucket": "Indobo y'Irangi",
+        "colorDrops": "Utudomo tw'Amabara"
+      }
+    },
+    "feedback": {
+      "correct": {
+        "colorGenius": "🎨 Umunyamabara!",
+        "perfectMatch": "🌈 Birahura neza!",
+        "youreRainbow": "✨ Uri Umukororombya!",
+        "masterPainter": "🖌️ Umusizi w'Amabara!",
+        "colorWizard": "🌟 Umurozi w'Amabara!",
+        "bullseye": "🎯 Wahise Ubyibona!"
+      },
+      "incorrect": {
+        "tryAgain": "❌ Ongera ugerageze!",
+        "identifyHint": "Ni {{color}}!",
+        "mixHint": "Gerageza irindi bara!"
+      },
+      "bonusHeart": "💖 +1 Umutima!",
+      "levelUp": "🚀 Wageze ku Rwego Rushya!"
+    },
+    "buttons": {
+      "toggleSound": "Fungura/Funga amajwi",
+      "newColor": "🔄 Ibara Rishya",
+      "easier": "⬇️ Byoroshye",
+      "harder": "⬆️ Birakomeye",
+      "playAgain": "Ongera Ukine"
+    },
+    "labels": {
+      "colorSample": "Icyitegererezo cy'Ibara",
+      "colorPalette": "Icyegeranyo cy'Amabara:",
+      "lives": "Imitima",
+      "score": "Amanota",
+      "time": "Igihe",
+      "mixFormula": "{{color1}} + {{color2}} = {{result}}",
+      "result": "Ibisohotse"
+    },
+    "colors": {
+      "red": "Umutuku",
+      "blue": "Ubururu",
+      "yellow": "Umuhondo",
+      "green": "Icyatsi",
+      "purple": "Umutuku wijimye",
+      "orange": "Icunga",
+      "pink": "Umutuku weruruka",
+      "brown": "Ikigina",
+      "lightBlue": "Ubururu bweruruka"
+    },
+    "instructions": {
+      "identifyMode": "Kanda ku bara rihuye n'icyitegererezo",
+      "mixMode": "Hitamo ibara riva mu kuvanga",
+      "sortMode": "Kanda ku bintu bihuye n'ibara wasabwe",
+      "paintMode": "Hitamo utudomo tw'irangi duhuye n'indobo"
+    },
+    "characters": {
+      "arty": {
+        "emoji": "🎨",
+        "name": "Arty"
+      },
+      "rainbow": {
+        "emoji": "🦄",
+        "name": "Rainbow"
+      },
+      "inky": {
+        "emoji": "🐙",
+        "name": "Inky"
+      },
+      "peacock": {
+        "emoji": "🦚",
+        "name": "Peacock"
+      }
+    }
+  },
+  "animalSafariGame": {
+    "seo": {
+      "title": "Urusafari rw'inyamaswa - Umukino wo gushakisha inyamaswa kubana",
+      "description": "Shakisha ahantu, shakisha inyamaswa, no kumenya iby'imikino y'inyamaswa muri iyi nzira y'urusafari y'abana!"
+    },
+    "gameOver": {
+      "title": "Urusafari rwarangije!",
+      "subtitle": "Wasanganye inyamaswa {{count}}!",
+      "score": "Amanota",
+      "level": "Urwego",
+      "photos": "Amafoto",
+      "animalsFound": "Inyamaswa wasanganye:",
+      "startNewSafari": "🦁 Tangira urusafari rushya"
+    },
+    "gameHeader": {
+      "title": "Urusafari rw'Inyamaswa",
+      "level": "Urwego {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "explore": "Shakisha",
+      "quiz": "Ikibazo",
+      "timed": "Kugabanya igihe"
+    },
+    "timer": {
+      "timeLeft": "Igihe gisigaye:",
+      "seconds": "{{time}}s"
+    },
+    "habitat": {
+      "currentHabitat": "Aho uri:",
+      "animalsFound": "Inyamaswa zasanganywe:",
+      "savannah": {
+        "name": "Savani",
+        "description": "Ubutaka bw'uburiri bwo hepfo butagira ibiti byinshi"
+      },
+      "jungle": {
+        "name": "Ishyamba",
+        "description": "Ishyamba ry'imvura ririmo ibiti byinshi n'imizuzi"
+      },
+      "ocean": {
+        "name": "Inyanja",
+        "description": "Inyanja nini n'ikibaya cy'inkoranyamazi"
+      },
+      "arctic": {
+        "name": "Arigitike",
+        "description": "Ubutaka bw'ubusenge n'umusenyi"
+      }
+    },
+    "animalAnnouncement": {
+      "findThisAnimal": "Shakisha iyi nyamaswa:",
+      "repeatInstructions": "Subiramo ibyifuzo",
+      "sayAnimalName": "Vuga izina ry'inyamaswa",
+      "stopListening": "Hagarika guhamagara",
+      "hint": "💡 Inkomoko: {{hint}}"
+    },
+    "questions": {
+      "sound": "Iyi nyamaswa {{animal}} ivuga iki?",
+      "fact": "Ni iyihe nyakuri kuri {{animal}}?",
+      "name": "Ni iyihe nyamaswa ivuga nka: \"{{sound}}\"?",
+      "instructions": "Kanda cyangwa vuga igisubizo"
+    },
+    "feedback": {
+      "correct": {
+        "greatSpot": "🎯 Gukora neza! Wayisanganye!",
+        "animalFound": "📸 Inyamaswa yasanwe! Byiza cyane!",
+        "safariSuccess": "🦁 Urusafari rwakozwe! Bitangaje!",
+        "wildDiscovery": "🌟 Gushakisha inyamaswa! Byiza!",
+        "natureExplorer": "🎪 Umushakisha w'ibidukikije! Ni byiza!",
+        "wildlifePro": "🏆 Umukinnyi w'inyamaswa! Ni byiza!"
+      },
+      "incorrect": {
+        "wrongAnimal": "❌ Iyo ni {{animal}}. Shakisha {{targetAnimal}}!",
+        "tryAgainHint": "❌ Gerageza nanone! Inkomoko: {{hint}}",
+        "itsAnimal": "❌ Ni {{animal}}! {{sound}}",
+        "answerIs": "❌ Igisubizo ni {{animal}}: {{answer}}"
+      },
+      "listening": "🎤 Ndakumvira... Vuga izina ry'inyamaswa!",
+      "microphoneError": "❌ Mikorofoni ntabwo ihari. Nyamuneka kanda.",
+      "voiceNotHeard": "❌ Sinigeze kumva \"{{animal}}\". Gerageza nanone!",
+      "bonusHeart": "💖 +1 Umutima!",
+      "levelUp": "🚀 Urusafari rwarangije! Ahandi hantu...",
+      "welcomeHabitat": "Murakaza neza muri {{habitat}}! Shakisha {{animal}}. {{hint}}. Rondere {{emoji}}"
+    },
+    "powerUps": {
+      "binoculars": {
+        "name": "Inyoni z'amabuye",
+        "description": "Sobanura inyamaswa mu gihe gito",
+        "feedback": "🔍 Inyoni z'amabuye zerekana inyamaswa!"
+      },
+      "camera": {
+        "name": "Kamera",
+        "description": "Shakisha inyamaswa imwe",
+        "feedback": "📸 Kamera yafashe! Wasanganye inyamaswa!"
+      },
+      "map": {
+        "name": "Ikarita",
+        "description": "Shakisha ahandi hantu",
+        "feedback": "🗺️ Ikarita yasanze ahandi hantu!"
+      },
+      "hint": {
+        "name": "Inkomoko",
+        "description": "Fata inkomoko",
+        "feedback": "💡 Inkomoko: {{hint}}"
+      },
+      "voiceHelp": {
+        "name": "Ubutabazi bwijwi",
+        "description": "Ubutabazi bwijwi",
+        "feedback": "🔊 Ubutabazi bwijwi bwashizweho!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Hindura ijwi",
+      "voiceOn": "Ijwi Ririho",
+      "voiceOff": "Ijwi Ryahagaritswe",
+      "soundOn": "Ijwi Ririho",
+      "soundOff": "Ijwi Ryahagaritswe",
+      "newSafari": "Tangira urusafari rushya"
+    },
+    "labels": {
+      "findTheseAnimals": "Shakisha izi nyamaswa:",
+      "recentPhotos": "Amafoto mashya:",
+      "explorationComplete": "Shakisha {{habitat}}! Shakisha inyamaswa {{count}}.",
+      "movementControls": "Kubigenza",
+      "habitatDecorations": "Imitako y'ahantu"
+    },
+    "instructions": {
+      "sayAnimalNames": "🎤 Vuga amazina y'inyamaswa",
+      "findAnnouncedAnimal": "💡 Shakisha inyamaswa yavuzwe",
+      "turnOnVoice": "🔊 Zanika ijwi kubafasha",
+      "findInOrder": "🏆 Shakisha inyamaswa ukurikije urutonde"
+    },
+    "animals": {
+      "lion": {
+        "name": "Intare",
+        "sound": "Kurira!",
+        "hint": "Umwami w'ishyamba, afite umusatsi muremure",
+        "voice": "Ndi intare! Ndakurira cyane!"
+      },
+      "elephant": {
+        "name": "Inzovu",
+        "sound": "Kurira!",
+        "hint": "Inyamaswa nini ifite umuzingo muremure",
+        "voice": "Ndi inzovu! Mfite umuzingo muremure!"
+      },
+      "giraffe": {
+        "name": "Twiga",
+        "sound": "Kurira!",
+        "hint": "Ni muremure cyane afite ijosi rirerire",
+        "voice": "Ndi twiga! Ni muremure cyane!"
+      },
+      "zebra": {
+        "name": "Impongo",
+        "sound": "Kurira!",
+        "hint": "Ifite amabara y'umweru n'umukara",
+        "voice": "Ndi impongo! Mfite amabara y'umweru n'umukara!"
+      },
+      "hippo": {
+        "name": "Imvubu",
+        "sound": "Kurira!",
+        "hint": "Inini kandi ihaba mu mazi",
+        "voice": "Ndi imvubu! Nkunda amazi!"
+      },
+      "monkey": {
+        "name": "Inkende",
+        "sound": "Kuvuga!",
+        "hint": "Irahagara kandi ikunda ibitoki",
+        "voice": "Ndi inkende! Nkunda guhagara!"
+      },
+      "parrot": {
+        "name": "Inkoko y'uburiri",
+        "sound": "Kuvuga!",
+        "hint": "Inyoni y'amabara ikunda kuvuga",
+        "voice": "Ndi inkoko y'uburiri! Nashobora kuvuga nka we!"
+      },
+      "tiger": {
+        "name": "Tigeri",
+        "sound": "Kurira!",
+        "hint": "Inyamaswa nini ifite amabara y'umuhondo n'umukara",
+        "voice": "Ndi tigeri! Mfite amabara meza!"
+      },
+      "snake": {
+        "name": "Zoka",
+        "sound": "Kuvuga!",
+        "hint": "Ni ndende kandi ihaguruka hasi",
+        "voice": "Ndi zoka! Ndagenda hasi!"
+      },
+      "sloth": {
+        "name": "Inyamaswa z'ishyamba",
+        "sound": "...",
+        "hint": "Ni buhoro cyane kandi zihagaze ku biti",
+        "voice": "Ndi inyamaswa z'ishyamba! Ndagenda buhoro!"
+      },
+      "whale": {
+        "name": "Ifi rinini",
+        "sound": "Kurira!",
+        "hint": "Inyamaswa nini mu nyanja",
+        "voice": "Ndi ifi rinini! Ni nini cyane!"
+      },
+      "dolphin": {
+        "name": "Dolfini",
+        "sound": "Kuvuga!",
+        "hint": "Ni nyabwenge kandi irahagarika",
+        "voice": "Ndi dolfini! Ni nyabwenge cyane!"
+      },
+      "shark": {
+        "name": "Shaki",
+        "sound": "...",
+        "hint": "Ifite amenyo akaze n'amabara",
+        "voice": "Ndi shaki! Mfite amenyo akaze!"
+      },
+      "turtle": {
+        "name": "Ikamba",
+        "sound": "...",
+        "hint": "Ifite urusika rukomeye ku mugongo",
+        "voice": "Ndi ikamba! Mfite inzu ku mugongo!"
+      },
+      "squid": {
+        "name": "Sikidi",
+        "sound": "...",
+        "hint": "Ifite amaboko n'inki",
+        "voice": "Ndi sikidi! Mfite amaboko umunani!"
+      },
+      "penguin": {
+        "name": "Pengwini",
+        "sound": "Kurira!",
+        "hint": "Inyoni yogosha ariko idashobora kubuka",
+        "voice": "Ndi pengwini! Ndagenda buhoro!"
+      },
+      "polarBear": {
+        "name": "Doli bere",
+        "sound": "Kurira!",
+        "hint": "Inyamaswa nini z'umweru mu musenyi",
+        "voice": "Ndi doli bere! Nkunda ubukonje!"
+      },
+      "seal": {
+        "name": "Ifi rya se",
+        "sound": "Kurira!",
+        "hint": "Irogosha kandi iravuga nka imbwa",
+        "voice": "Ndi ifi rya se! Nshobora guhagarika umwuka!"
+      },
+      "arcticFox": {
+        "name": "Inyamaswa z'umweru",
+        "sound": "Kurira!",
+        "hint": "Inyamaswa nto z'umweru",
+        "voice": "Ndi inyamaswa z'umweru! Umusatsi wanjye uba umweru!"
+      },
+      "wolf": {
+        "name": "Imbwa y'ishyamba",
+        "sound": "Kurira!",
+        "hint": "Imenyerera nka imbwa, ikurira ku mezi",
+        "voice": "Ndi imbwa y'ishyamba! Ndagenda ku mezi!"
+      }
+    },
+    "characters": {
+      "leo": {
+        "emoji": "🦁",
+        "name": "Leo",
+        "voice": "Ndi Leo Intare! Reka dusanganye inyamaswa!"
+      },
+      "ellie": {
+        "emoji": "🐘",
+        "name": "Ellie",
+        "voice": "Ndi Ellie Inzovu! Twiteguye urusafari!"
+      },
+      "gigi": {
+        "emoji": "🦒",
+        "name": "Gigi",
+        "voice": "Ndi Gigi Twiga! Reka dusanganye!"
+      },
+      "momo": {
+        "emoji": "🐒",
+        "name": "Momo",
+        "voice": "Ndi Momo Inkende! Igihe cyo gusangana!"
+      }
+    }
+  },
+  "shapeMatchGame": {
+    "seo": {
+      "title": "Shape Match - Umukino wo Kumenya Imiterere ku Bana",
+      "description": "Umukino ushimishije wo guhuza imiterere, kwibuka no kumenya patterns ku bana!"
+    },
+    "gameOver": {
+      "title": "Umukino Warangiye!",
+      "subtitle": "Wahuje imiterere {{count}}!",
+      "score": "Amanota",
+      "level": "Urwego",
+      "matched": "Byahuye",
+      "playAgain": "🔄 Ongera Ukine"
+    },
+    "gameHeader": {
+      "title": "Shape Match",
+      "level": "Urwego {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "practice": "Imyitozo",
+      "timed": "Ku Gihe",
+      "pattern": "Pattern",
+      "multiplayer": "Abakinnyi benshi"
+    },
+    "timer": {
+      "timeLeft": "Igihe Gisigaye:",
+      "seconds": "{{time}}s"
+    },
+    "patternMode": {
+      "matchPattern": "Huje iyi pattern:",
+      "instructions": "Kanda ku miterere mu buryo bwa pattern!"
+    },
+    "stats": {
+      "matches": "Byahuye:",
+      "moves": "Imikino:",
+      "lives": "Ubuzima",
+      "streak": "Uko bigenda"
+    },
+    "instructions": {
+      "practiceTimed": "Shaka imiterere ihuye!",
+      "pattern": "Kanda ku miterere mu buryo bwa pattern!",
+      "selected": "Imiterere yahiswemo",
+      "matched": "Imiterere ihuye",
+      "hidden": "Imiterere ihishe"
+    },
+    "feedback": {
+      "correct": {
+        "perfectMatch": "🎉 Byahuye neza!",
+        "shapeMaster": "🌟 Umwami w’Imiterere!",
+        "awesome": "✨ Birakomeye!",
+        "superFind": "🎪 Ibyiza byo Kubona!",
+        "patternPro": "🧩 Umuhanga muri Pattern!",
+        "bullseye": "🎯 Intoki neza!"
+      },
+      "incorrect": "❌ Ongera ugerageze!",
+      "bonusHeart": "🏆 +1 Umutima!",
+      "levelUp": "🚀 Urwego Rushya!"
+    },
+    "powerUps": {
+      "reveal": {
+        "name": "Erekana",
+        "description": "Erekana imiterere yose by’igihe gito",
+        "feedback": "🔍 Inama yashyizweho!",
+        "key": "H = Inama"
+      },
+      "shuffle": {
+        "name": "Vanga",
+        "description": "Vanga urubaho",
+        "feedback": "🌀 Urubaho rwavangwe!",
+        "key": "R = Vanga"
+      },
+      "extraTime": {
+        "name": "+15s",
+        "description": "Ongeraho amasegonda 15 (Ku gihe gusa)",
+        "feedback": "⏰ +15s!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Hindura amajwi",
+      "playAgain": "Ongera Ukine",
+      "usePowerUp": "Koresha {{powerUp}}"
+    },
+    "labels": {
+      "shapeBoard": "Urubaho rw’Imiterere",
+      "progress": "Uko bimeze",
+      "controlsInfo": "Amabwiriza yo Gukoresha",
+      "keyboardShortcuts": "Amakeyi yihuse"
+    },
+    "shapes": {
+      "triangle": {
+        "emoji": "🔺",
+        "name": "Trangle",
+        "color": "#FF6B6B"
+      },
+      "circle": {
+        "emoji": "🔵",
+        "name": "Uruziga",
+        "color": "#4ECDC4"
+      },
+      "square": {
+        "emoji": "🟦",
+        "name": "Karito",
+        "color": "#45B7D1"
+      },
+      "star": {
+        "emoji": "⭐",
+        "name": "Inyenyeri",
+        "color": "#FFD166"
+      },
+      "heart": {
+        "emoji": "❤️",
+        "name": "Umutima",
+        "color": "#FF6B9D"
+      },
+      "diamond": {
+        "emoji": "🔶",
+        "name": "Diamond",
+        "color": "#A13E97"
+      },
+      "moon": {
+        "emoji": "🌙",
+        "name": "Ukwezi",
+        "color": "#96CEB4"
+      },
+      "zap": {
+        "emoji": "⚡",
+        "name": "Umuriro",
+        "color": "#FFE066"
+      }
+    },
+    "characters": {
+      "foxy": {
+        "emoji": "🦊",
+        "name": "Foxy"
+      },
+      "panda": {
+        "emoji": "🐼",
+        "name": "Panda"
+      },
+      "leo": {
+        "emoji": "🦁",
+        "name": "Leo"
+      },
+      "koala": {
+        "emoji": "🐨",
+        "name": "Koala"
+      }
+    },
+    "keyboard": {
+      "hint": "H = Inama",
+      "shuffle": "R = Vanga",
+      "streak": "3-uko bigenda"
+    }
+  },
+  "memoryMatchGame": {
+    "seo": {
+      "title": "Memory Match - Umukino w'Ibikoresho byo Kwibuka ku Bana",
+      "description": "Ongera ubushobozi bwo kwibuka ukoresheje umukino wo guhuza amakarita y’inyamaswa, imbuto, imodoka, n’imiterere. Umukino w’ubwonko ku bana!"
+    },
+    "gameOver": {
+      "title": "Umukino w'Ibuka Warangiye!",
+      "subtitle": "Wabonye pairs {{count}}!",
+      "score": "Amanota",
+      "level": "Urwego",
+      "moves": "Imikino",
+      "playAgain": "🧠 Ongera Ukine"
+    },
+    "gameHeader": {
+      "title": "Memory Match",
+      "level": "Urwego {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "practice": "Imyitozo",
+      "timed": "Ku Gihe"
+    },
+    "themes": {
+      "animals": "Inyamaswa",
+      "fruits": "Imbuto",
+      "vehicles": "Ibinyabiziga",
+      "shapes": "Imiterere"
+    },
+    "timer": {
+      "timeLeft": "Igihe Gisigaye:",
+      "seconds": "{{time}}s"
+    },
+    "stats": {
+      "moves": "Imikino:",
+      "pairs": "pairs:",
+      "lives": "Ubuzima",
+      "progress": "Uko bimeze",
+      "gridSize": "Urutonde rwa {{size}}x{{size}}"
+    },
+    "gameBoard": {
+      "themeMemory": "Kwibuka ku {{theme}}",
+      "findMatchingPairs": "Shaka izihuje {{theme}}!"
+    },
+    "feedback": {
+      "correct": {
+        "memoryMaster": "🧠 Umwami wo Kwibuka!",
+        "superMatch": "🌟 Irahuye Neza!",
+        "perfectRecall": "🎯 Kwibuka neza!",
+        "amazingMemory": "✨ Ubwenge Bukomeye!",
+        "brainPower": "🏆 Imbaraga z'Ubwonko!",
+        "matchFound": "🎉 icyo bihuye cyirabonetse!"
+      },
+      "incorrect": {
+        "notMatch": "❌ Ntibihuye! Ongera ugerageze!",
+        "rememberBetter": "❌ Gerageza kwibuka neza! -1 Umutima"
+      },
+      "bonusHeart": "💖 +1 Umutima!",
+      "levelUp": "🚀 Urwego Rushya!"
+    },
+    "buttons": {
+      "toggleSound": "Hindura amajwi",
+      "showAllCards": "Erekana amakarita yose",
+      "reset": "Sangira",
+      "playAgain": "Ongera Ukine",
+      "startGame": "Tangira Umukino"
+    },
+    "controls": {
+      "showHint": "Erekana amakarita yose by'igihe gito",
+      "restartBoard": "Subira ku rutonde rwa none"
+    },
+    "cards": {
+      "hidden": "?",
+      "unknown": "Ikarita Yihishe"
+    },
+    "instructions": {
+      "rememberPositions": "🧠 Ibuka aho amakarita ari",
+      "clickMatchingCards": "🎯 Kanda ku makarita abiri ahuye",
+      "fewerMovesMorePoints": "🚀 Imikino mike = amanota menshi",
+      "completePairsToLevelUp": "🏆 Wuzuza pairs zose kugirango utere urwego"
+    },
+    "themesDetails": {
+      "animals": {
+        "cat": {
+          "emoji": "🐱",
+          "name": "Injangwe"
+        },
+        "dog": {
+          "emoji": "🐶",
+          "name": "Imbwa"
+        },
+        "lion": {
+          "emoji": "🦁",
+          "name": "Intare"
+        },
+        "tiger": {
+          "emoji": "🐯",
+          "name": "Intare y'ishyamba"
+        },
+        "fox": {
+          "emoji": "🦊",
+          "name": "Injangwe"
+        },
+        "panda": {
+          "emoji": "🐼",
+          "name": "Panda"
+        },
+        "koala": {
+          "emoji": "🐨",
+          "name": "Koala"
+        },
+        "unicorn": {
+          "emoji": "🦄",
+          "name": "Unicorn"
+        },
+        "frog": {
+          "emoji": "🐸",
+          "name": "Inyoni"
+        },
+        "octopus": {
+          "emoji": "🐙",
+          "name": "Inkombe"
+        }
+      },
+      "fruits": {
+        "apple": {
+          "emoji": "🍎",
+          "name": "Pome"
+        },
+        "banana": {
+          "emoji": "🍌",
+          "name": "Umuneke"
+        },
+        "grapes": {
+          "emoji": "🍇",
+          "name": "Inzabibu"
+        },
+        "strawberry": {
+          "emoji": "🍓",
+          "name": "Inyeri"
+        },
+        "orange": {
+          "emoji": "🍊",
+          "name": "Ironji"
+        },
+        "pineapple": {
+          "emoji": "🍍",
+          "name": "Inanasi"
+        },
+        "mango": {
+          "emoji": "🥭",
+          "name": "Umwembe"
+        },
+        "watermelon": {
+          "emoji": "🍉",
+          "name": "watermelon"
+        },
+        "cherry": {
+          "emoji": "🍒",
+          "name": "Cherry"
+        },
+        "kiwi": {
+          "emoji": "🥝",
+          "name": "Kiwi"
+        }
+      },
+      "vehicles": {
+        "car": {
+          "emoji": "🚗",
+          "name": "Imodoka"
+        },
+        "bus": {
+          "emoji": "🚌",
+          "name": "Bisi"
+        },
+        "airplane": {
+          "emoji": "✈️",
+          "name": "Indege"
+        },
+        "train": {
+          "emoji": "🚂",
+          "name": "Gare"
+        },
+        "helicopter": {
+          "emoji": "🚁",
+          "name": "Helikopta"
+        },
+        "ship": {
+          "emoji": "🚢",
+          "name": "Ubwato"
+        },
+        "rocket": {
+          "emoji": "🚀",
+          "name": "Rokete"
+        },
+        "ufo": {
+          "emoji": "🛸",
+          "name": "UFO"
+        },
+        "tractor": {
+          "emoji": "🚜",
+          "name": "Traktori"
+        },
+        "raceCar": {
+          "emoji": "🏎️",
+          "name": "Imodoka y’imirwano"
+        }
+      },
+      "shapes": {
+        "triangle": {
+          "emoji": "🔺",
+          "name": "Trangle"
+        },
+        "circle": {
+          "emoji": "🔵",
+          "name": "Uruziga"
+        },
+        "square": {
+          "emoji": "🟦",
+          "name": "Karito"
+        },
+        "star": {
+          "emoji": "⭐",
+          "name": "Inyenyeri"
+        },
+        "heart": {
+          "emoji": "❤️",
+          "name": "Umutima"
+        },
+        "diamond": {
+          "emoji": "🔶",
+          "name": "Diamond"
+        },
+        "moon": {
+          "emoji": "🌙",
+          "name": "Ukwezi"
+        },
+        "lightning": {
+          "emoji": "⚡",
+          "name": "Umuriro"
+        },
+        "snowflake": {
+          "emoji": "❄️",
+          "name": "Urubura"
+        },
+        "balloon": {
+          "emoji": "🎈",
+          "name": "Umupira"
+        }
+      }
+    },
+    "characters": {
+      "brainy": {
+        "emoji": "🧠",
+        "name": "Ubwenge"
+      },
+      "wiseOwl": {
+        "emoji": "🦉",
+        "name": "Inyoni Y'Ubwenge"
+      },
+      "elephant": {
+        "emoji": "🐘",
+        "name": "Inyamaswa"
+      },
+      "butterfly": {
+        "emoji": "🦋",
+        "name": "Icyorori"
+      }
+    }
+  },
+  "alphabetRaceGame": {
+    "seo": {
+      "title": "Alphabet Race - Umukino wo Kwiga Inyuguti",
+      "description": "Ihute muri alphabet, wige amajwi y'inyuguti, unavugire imibare muri uyu mukino w'imibereho w'abana!"
+    },
+    "gameOver": {
+      "opponentWon": "Ihutiwe!",
+      "playerWon": "Urukurikirane rwa Alphabet Rwarangiye!",
+      "raceLost": "Uwabigenje yatsinze ihuti!",
+      "raceWon": "Wihutishije muri alphabet!",
+      "greatLearning": "Kwiga neza!",
+      "score": "Amarangamutima",
+      "level": "Urwego",
+      "bestStreak": "Ihuti nziza",
+      "lettersLearned": "Inyuguti Wize:",
+      "playAgain": "🚀 Kina Nanone"
+    },
+    "gameHeader": {
+      "title": "Alphabet Race",
+      "level": "Urwego {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "letters": "Inyuguti",
+      "race": "Ihuti",
+      "spelling": "Gukomatanya",
+      "timed": "Igihanagwe"
+    },
+    "timer": {
+      "timeLeft": "Igihe Gisigaye:",
+      "seconds": "{{time}}s"
+    },
+    "voiceControls": {
+      "repeatInstructions": "Subiramo amabwiriza",
+      "startVoiceInput": "Tangira gukoresha ijwi",
+      "stopListening": "Hagarika gutega amatwi",
+      "speak": "Vuga",
+      "listening": "Ndatega amatwi...",
+      "listeningPrompt": "🎤 Ndatega amatwi... Vuga nonaha!",
+      "microphoneError": "❌ Mikorofoni ntabwo ibaho. Usabwe ubonyeho.",
+      "voiceNotHeard": "❌ Sinareme \"{{letter}}\". Gerageza nanone!"
+    },
+    "practiceLetters": {
+      "title": "Subiramo Izi Nyuguti:"
+    },
+    "letterRecognition": {
+      "clickOrSay": "Kanda cyangwa uvuge inyuguti {{letter}}",
+      "firstMistake": "Iyo ni {{letter}}. Gerageza nanone! Inama: {{hint}}",
+      "secondMistake": "Fonetiki: {{phonics}}",
+      "thirdMistake": "Ni {{letter}} kuri \"{{example}}\" {{penalty}}",
+      "correct": {
+        "excellent": "🎯 Ni byiza cyane! Umuhanga w'inyuguti!",
+        "perfect": "🌟 Byuzuye! Alphabet ace!",
+        "amazing": "✨ Bitangaje! Wabishyizeho!",
+        "fantastic": "🏆 Birakomeye! Phonics pro!",
+        "superb": "🚀 Byiza cyane! Rocket y'inyuguti!",
+        "greatJob": "🎉 Byakunze! Akazi neza!"
+      }
+    },
+    "raceMode": {
+      "typeOrSay": "Andika cyangwa uvuge inyuguti ikurikira:",
+      "nextLetter": "Andika inyuguti cyangwa ukoreshe mikorofoni...",
+      "correct": "✅ {{letter}} byakunze! +{{points}}",
+      "firstMistake": "❌ Gerageza {{target}}. Wanditse {{pressed}}",
+      "secondMistake": "❌ Ni {{target}}, si {{pressed}} -1 Umutima",
+      "raceComplete": "Watsinze ihuti! Akazi neza!",
+      "nextLevel": "🚀 Watsinze ihuti! Urwego rukurikira..."
+    },
+    "spellingMode": {
+      "title": "Komatanya ijambo:",
+      "currentWord": "Wanditse:",
+      "startTyping": "Tangira kwandika...",
+      "clear": "Sukura",
+      "checkSpelling": "Gerageza Gukomatanya",
+      "instructions": "Andika cyangwa uvuge ijambo: {{hint}}",
+      "firstMistake": "❌ Gerageza nanone! Inama: {{hint}}",
+      "secondMistake": "❌ Ijambo ritangirira na {{firstLetter}} kandi rifite {{length}} inyuguti",
+      "thirdMistake": "❌ Bikomatanywa \"{{word}}\" {{emoji}} -1 Umutima",
+      "correct": "✅ Gukomatanya byuzuye! \"{{word}}\" {{emoji}} +{{points}}",
+      "bonusHeart": "💖 +1 Umutima!"
+    },
+    "powerUps": {
+      "hint": {
+        "name": "Inama",
+        "description": "Fata inama",
+        "feedback": "💡 Inama: {{hint}}"
+      },
+      "voiceHelp": {
+        "name": "Umutabazi w'Ijwi",
+        "description": "Umutabazi w'ijwi",
+        "feedback": "🔊 Umutabazi w'ijwi wakozwe!"
+      },
+      "boost": {
+        "name": "Boost",
+        "description": "Ihuti rihuta mu mihuti",
+        "feedback": "🚀 Boost y'ihuti! +2 aho uhagaze!"
+      },
+      "shield": {
+        "name": "Shield",
+        "description": "Umutima wongeweho",
+        "feedback": "🛡️ Shield yakozwe! +1 Umutima!"
+      },
+      "slowOpponent": {
+        "name": "Guhagarika",
+        "description": "Hagarika uwabigenje mu mihuti",
+        "feedback": "🐢 Uwabigenje wahagaritswe!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Hindura amajwi",
+      "soundOn": "Amajwi Yakozwe",
+      "soundOff": "Amajwi Yahagaritswe",
+      "voiceOn": "Ijwi Rikozwe",
+      "voiceOff": "Ijwi Ryahagaritswe",
+      "repeat": "Subiramo",
+      "playAgain": "Kina Nanone"
+    },
+    "instructions": {
+      "useVoice": "🎤 Koresha ijwi kuvuga inyuguti",
+      "hintsAfterMistakes": "💡 Inama nyuma y'amakosa",
+      "turnOnVoice": "🔊 Zarura ijwi kugirango ubone umutabazi",
+      "practiceLetters": "🏆 Subiramo inyuguti z'imitunganyirize"
+    },
+    "letterSounds": {
+      "A": {
+        "sound": "Apple - /æ/",
+        "example": "A ni kuri Apple",
+        "phonics": "A Nto nka mu \"cat\""
+      },
+      "B": {
+        "sound": "Ball - /b/",
+        "example": "B ni kuri Ball",
+        "phonics": "Ijwi rya Buh"
+      },
+      "C": {
+        "sound": "Cat - /k/ cyangwa /s/",
+        "example": "C ni kuri Cat",
+        "phonics": "Ishobora kuba C ikomeye (cat) cyangwa C yoroshye (cent)"
+      },
+      "D": {
+        "sound": "Dog - /d/",
+        "example": "D ni kuri Dog",
+        "phonics": "Ijwi rya Duh"
+      },
+      "E": {
+        "sound": "Egg - /ɛ/",
+        "example": "E ni kuri Egg",
+        "phonics": "E Nto nka mu \"bed\""
+      },
+      "F": {
+        "sound": "Fish - /f/",
+        "example": "F ni kuri Fish",
+        "phonics": "Ijwi rya Fff"
+      },
+      "G": {
+        "sound": "Goat - /g/",
+        "example": "G ni kuri Goat",
+        "phonics": "Ishobora kuba G ikomeye (goat) cyangwa G yoroshye (giraffe)"
+      },
+      "H": {
+        "sound": "Hat - /h/",
+        "example": "H ni kuri Hat",
+        "phonics": "Ijwi rya Huh"
+      },
+      "I": {
+        "sound": "Igloo - /ɪ/",
+        "example": "I ni kuri Igloo",
+        "phonics": "I Nto nka mu \"pig\""
+      },
+      "J": {
+        "sound": "Jump - /dʒ/",
+        "example": "J ni kuri Jump",
+        "phonics": "Ijwi rya Juh"
+      },
+      "K": {
+        "sound": "Kite - /k/",
+        "example": "K ni kuri Kite",
+        "phonics": "Ijwi rya Kuh"
+      },
+      "L": {
+        "sound": "Lion - /l/",
+        "example": "L ni kuri Lion",
+        "phonics": "Ijwi rya Lll"
+      },
+      "M": {
+        "sound": "Monkey - /m/",
+        "example": "M ni kuri Monkey",
+        "phonics": "Ijwi rya Mmm"
+      },
+      "N": {
+        "sound": "Nest - /n/",
+        "example": "N ni kuri Nest",
+        "phonics": "Ijwi rya Nnn"
+      },
+      "O": {
+        "sound": "Octopus - /ɒ/",
+        "example": "O ni kuri Octopus",
+        "phonics": "O Nto nka mu \"dog\""
+      },
+      "P": {
+        "sound": "Pig - /p/",
+        "example": "P ni kuri Pig",
+        "phonics": "Ijwi rya Puh"
+      },
+      "Q": {
+        "sound": "Queen - /kw/",
+        "example": "Q ni kuri Queen",
+        "phonics": "Q iba ikurikiranye na U buri gihe"
+      },
+      "R": {
+        "sound": "Rabbit - /r/",
+        "example": "R ni kuri Rabbit",
+        "phonics": "Ijwi rya Rrr"
+      },
+      "S": {
+        "sound": "Snake - /s/",
+        "example": "S ni kuri Snake",
+        "phonics": "Ijwi rya Sss"
+      },
+      "T": {
+        "sound": "Tiger - /t/",
+        "example": "T ni kuri Tiger",
+        "phonics": "Ijwi rya Tuh"
+      },
+      "U": {
+        "sound": "Umbrella - /ʌ/",
+        "example": "U ni kuri Umbrella",
+        "phonics": "U Nto nka mu \"cup\""
+      },
+      "V": {
+        "sound": "Van - /v/",
+        "example": "V ni kuri Van",
+        "phonics": "Ijwi rya Vvv"
+      },
+      "W": {
+        "sound": "Water - /w/",
+        "example": "W ni kuri Water",
+        "phonics": "Ijwi rya Wuh"
+      },
+      "X": {
+        "sound": "Fox - /ks/",
+        "example": "X ni kuri Fox",
+        "phonics": "Ijwi ryo kurangirira nka mu \"box\""
+      },
+      "Y": {
+        "sound": "Yellow - /j/",
+        "example": "Y ni kuri Yellow",
+        "phonics": "Ijwi rya Yuh"
+      },
+      "Z": {
+        "sound": "Zebra - /z/",
+        "example": "Z ni kuri Zebra",
+        "phonics": "Ijwi rya Zzz nka uruyuki"
+      }
+    },
+    "words": {
+      "CAT": {
+        "hint": "Inyamaswa ifite ubwoya ivuga meow",
+        "emoji": "🐱"
+      },
+      "DOG": {
+        "hint": "Inyamaswa ifite ubwoya igakoma",
+        "emoji": "🐶"
+      },
+      "SUN": {
+        "hint": "Inyenyeri irakaza mu kirere",
+        "emoji": "☀️"
+      },
+      "MOON": {
+        "hint": "Irakaza nijoro",
+        "emoji": "🌙"
+      },
+      "STAR": {
+        "hint": "Irakaka mu kirere",
+        "emoji": "⭐"
+      },
+      "FISH": {
+        "hint": "Iyohereza mu mazi",
+        "emoji": "🐟"
+      },
+      "BIRD": {
+        "hint": "Ihunga mu kirere",
+        "emoji": "🐦"
+      },
+      "TREE": {
+        "hint": "Ifite amababi n'amagiti",
+        "emoji": "🌳"
+      },
+      "BOOK": {
+        "hint": "Uyigisoma",
+        "emoji": "📚"
+      },
+      "BALL": {
+        "hint": "Uyikinamira",
+        "emoji": "⚽"
+      },
+      "CAKE": {
+        "hint": "Ifunguro ry'ibyokurya ry'imikino",
+        "emoji": "🎂"
+      },
+      "RAIN": {
+        "hint": "Imana imvura",
+        "emoji": "🌧️"
+      },
+      "SNOW": {
+        "hint": "Icyera n'igicye",
+        "emoji": "❄️"
+      },
+      "FIRE": {
+        "hint": "Icyatsi n'icyatsi",
+        "emoji": "🔥"
+      },
+      "WATER": {
+        "hint": "Uyinywa",
+        "emoji": "💧"
+      },
+      "HOUSE": {
+        "hint": "Aho utuye",
+        "emoji": "🏠"
+      },
+      "CAR": {
+        "hint": "Iyohereza ku nzira",
+        "emoji": "🚗"
+      },
+      "BOAT": {
+        "hint": "Iyohereza ku mazi",
+        "emoji": "🛶"
+      },
+      "PLANE": {
+        "hint": "Ihunga mu kirere",
+        "emoji": "✈️"
+      },
+      "TRAIN": {
+        "hint": "Choo choo!",
+        "emoji": "🚂"
+      },
+      "APPLE": {
+        "hint": "Ibitoki by'umutuku",
+        "emoji": "🍎"
+      },
+      "BEAR": {
+        "hint": "Inyamaswa nini ifite ubwoya",
+        "emoji": "🐻"
+      },
+      "DUCK": {
+        "hint": "Ishira amajwi quack",
+        "emoji": "🦆"
+      },
+      "EGG": {
+        "hint": "Ava mu inkoko",
+        "emoji": "🥚"
+      },
+      "FROG": {
+        "hint": "Igasimbuka kandi ishira ribbit",
+        "emoji": "🐸"
+      },
+      "GOAT": {
+        "hint": "Inyamaswa y'ubuhinzi ifite amahwa",
+        "emoji": "🐐"
+      },
+      "HAT": {
+        "hint": "Uyambara ku mutwe",
+        "emoji": "🧢"
+      },
+      "ICE": {
+        "hint": "Amazi yabije",
+        "emoji": "🧊"
+      },
+      "JUMP": {
+        "hint": "Ukora ibi hejuru na hasi",
+        "emoji": "🦘"
+      },
+      "KITE": {
+        "hint": "Ihunga mu muyaga",
+        "emoji": "🪁"
+      }
+    },
+    "characters": {
+      "raceCar": {
+        "emoji": "🚗",
+        "name": "Modoka yo Gukina",
+        "voice": "vroom vroom!"
+      },
+      "train": {
+        "emoji": "🚂",
+        "name": "Gari Moshi",
+        "voice": "choo choo!"
+      },
+      "rocket": {
+        "emoji": "🚀",
+        "name": "Roketi",
+        "voice": "3, 2, 1, gutangira!"
+      },
+      "unicorn": {
+        "emoji": "🦄",
+        "name": "Unikore",
+        "voice": "neigh! ubumaji!"
+      }
     }
   },
   "kidLanding": {
@@ -4126,5 +5942,191 @@
       "title": "Inkunga ku bwishyu n'ibyo kwishyura",
       "subtitle": "Ukeneye ubufasha kuri Mobile Money, ibibazo by'ubwishyu, cyangwa umutekano? Itsinda ryacu riri hano kugufasha."
     }
+  },
+  "securityLogs": {
+    "title": "Amakuru yo Kureba no Kurinda",
+    "filters": "Imyitozo",
+    "allKids": "Abana Bose",
+    "refresh": "Ongera Urebe",
+    "export": {
+      "format": "Uburyo:",
+      "export": "Bika",
+      "exporting": "Kubika...",
+      "pdfTooltip": "Raporo ya PDF",
+      "csvTooltip": "Ifishi ya CSV",
+      "jsonTooltip": "Ifishi ya JSON"
+    },
+    "exportSuccess": {
+      "pdf": "Raporo ya PDF yakozwe neza!"
+    },
+    "exportError": "Ntibyakunze kubika amakuru. Ongera ugerageze.",
+    "exportFormats": {
+      "pdf": {
+        "title": "Raporo ya PDF",
+        "description": "Raporo y'abakora mubiro hamwe n'ikimenyetso cya Oliviuus, incamake, amakarita, n'amakuru yuzuye. Ni byiza kugirango utangire amakuru cyangwa raporo."
+      },
+      "csv": {
+        "title": "Ifishi ya CSV",
+        "description": "Uburyo bwo gushyiramo amakuru mu buryo bw'urupapuro rw'ibikorwa bwa Excel, Google Sheets, cyangwa ibikoresho byo gucunga amakuru."
+      },
+      "json": {
+        "title": "Ifishi ya JSON",
+        "description": "Uburyo bwo gushyiramo amakuru kuri ba programeri. Iri hamwe n'amakuru y'ikimenyetso n'amakuru yateguwe."
+      }
+    },
+    "timeRanges": {
+      "7days": "Iminsi 7 Ishize",
+      "30days": "Iminsi 30 Ishize",
+      "90days": "Iminsi 90 Ishize"
+    },
+    "filterLabels": {
+      "activityType": "Uruhuza rw'Ibikorwa",
+      "status": "Imimerere",
+      "deviceType": "Uruhuza rw'Ikoresha"
+    },
+    "filterOptions": {
+      "allTypes": "Ibyiciro Byose",
+      "allStatus": "Imimerere Yose",
+      "allDevices": "Ibikoresho Byose"
+    },
+    "activityTypes": {
+      "content_view": "Kureba Ibirimo",
+      "content_attempt": "Kugerageza Kubona Ibirimo",
+      "search": "Gushaka",
+      "time_limit": "Igihe Cyagenwe",
+      "pin_entry": "Gushyiramo PIN",
+      "mode_switch": "Guhindura Uburyo"
+    },
+    "status": {
+      "allowed": "Byemewe",
+      "blocked": "byahagaritswe"
+    },
+    "deviceTypes": {
+      "web": "Urubuga",
+      "mobile": "Mudasobwa",
+      "tablet": "Tabuleti",
+      "smarttv": "Televiziyo Nziza"
+    },
+    "stats": {
+      "totalKids": "Abana Bose",
+      "todayActivities": "Ibikorwa by'Uyu munsi",
+      "blocked": "byahagaritswe",
+      "pendingAlerts": "Amatangazo Ariho",
+      "timeLimitWarnings": "Ibyerekezo by'Igihe",
+      "blockRate": "Ingano yo Kuzuza",
+      "mostActiveTime": "Igihe Abikora Cyane",
+      "mostActiveKid": "Umwana Ukora Cyane",
+      "outOf": "bya",
+      "activities": "ibikorwa",
+      "noData": "Nta makuru",
+      "peakActivityHour": "Igihe cy'ibikorwa bikabije"
+    },
+    "sections": {
+      "activitySummary": "Incamake y'Ibikorwa",
+      "activityByType": "Ibikorwa ku Buryo",
+      "detailedLogs": "Amakuru Yuzuye y'Ibikorwa",
+      "logsDescription": "Ibikorwa byose by'abana bawe"
+    },
+    "summary": {
+      "totalActivities": "Ibikorwa Byose",
+      "allowedActivities": "Ibikorwa Byemewe",
+      "blockedActivities": "Ibikorwa byahagaritswe",
+      "allowed": "Byemewe",
+      "blocked": "byahagaritswe"
+    },
+    "tableHeaders": {
+      "kid": "Umwana",
+      "activity": "Igikorwa",
+      "status": "Imimerere",
+      "details": "Ibisobanuro",
+      "time": "Igihe"
+    },
+    "kidInitial": "U",
+    "unknownKid": "Umwana Utazwi",
+    "totalLogs": "Byose",
+    "logs": "amakuru",
+    "noLogs": {
+      "title": "Nta makuru y'ibikorwa yabonetse",
+      "description": "Amakuru azagaragara aha iyo abana bawe bakoresheje urubuga"
+    },
+    "pdf": {
+      "title": "Raporo yo Kurinda Oliviuus",
+      "subtitle": "Igisubizo cy'Igikorwa cy'Umwana no Kurinda",
+      "reportGenerated": "Raporo Yakozwe",
+      "reportFor": "Raporo Kwa",
+      "timePeriod": "Igihe",
+      "sections": {
+        "executiveSummary": "📊 Incamake",
+        "activitySummary": "📈 Incamake y'Ibikorwa",
+        "mostActiveKid": "👑 Umwana Ukora Cyane",
+        "detailedLogs": "📋 Amakuru Yuzuye y'Ibikorwa",
+        "recommendations": "💡 Inama zo Kurinda"
+      },
+      "totalKidsMonitored": "Abana Barebwa Bose",
+      "todaysActivities": "Ibikorwa by'Uyu munsi",
+      "activitiesBlocked": "Ibikorwa byahagaritswe",
+      "pendingAlerts": "Amatangazo Ariho",
+      "timeLimitWarnings": "Ibyerekezo by'Igihe",
+      "totalActivities": "Ibikorwa Byose",
+      "allowedActivities": "Ibikorwa Byemewe",
+      "blockedActivities": "Ibikorwa byahagaritswe",
+      "blockRate": "Ingano yo Kuzuza",
+      "peakActivityHour": "Igihe cy'ibikorwa bikabije",
+      "kidName": "Izina ry'Umwana",
+      "activityCount": "Umubare w'Ibikorwa",
+      "averageDaily": "Ibikorwa bya rusange bya buri munsi",
+      "unknownKid": "Umwana Utazwi",
+      "allowed": "Byemewe",
+      "blocked": "Yahagaritswe",
+      "tableHeaders": {
+        "kid": "Umwana",
+        "activity": "Igikorwa",
+        "status": "Imimerere",
+        "details": "Ibisobanuro",
+        "date": "Itariki"
+      },
+      "recommendations": {
+        "reviewLogs": "Reba amakuru y'ibikorwa buri gihe kugirango ubone imikorere idasanzwe",
+        "updateRestrictions": "Hindura ibibujijwe ku birimo ushingiye ku bikorwa byahagaritswe",
+        "monitorPeakHours": "Reba amasaha y'ibikorwa bikabije kugirango ukoreshe neza igihe",
+        "educateKids": "Erekana abana umutekano wa dijitali ushingiye ku bikorwa byahagaritswe",
+        "adjustSettings": "Hindura ibisabwa by'ababyeyi ushingiye ku mikorere y'ibikorwa"
+      },
+      "footer": {
+        "confidential": "Icyizere - Kubakoresha bemewe gusa",
+        "oliviuus": "Oliviuus Urubuga rwo Kurinda Abana",
+        "page": "Ipaji",
+        "of": "ya"
+      },
+      "noData": "Nta makuru"
+    }
+  },
+  "download": {
+    "title": "Kubika",
+    "subtitle": "kubika ibyo ukunda ukabireba hatari interineti, aho ariho hose",
+    "progress": "Iterambere ry'ubukorikori",
+    "comingSoon": {
+      "title": "kubika Bizaza Vuba!",
+      "message": "Turishimye kubamenyesha ko Uburyo bwo kubika buri gutunganywa. Vuba uzashobora kubika ibintu ubirebe hatari interineti!",
+      "hd": "kubika HD & 4K",
+      "unlimited": "kubika ibintu byinshi",
+      "expire": "Nta minsi yo kurangira",
+      "sync": "Kuzana ku ibikoresho byose"
+    },
+    "features": {
+      "offline": "kubika hatari interineti",
+      "offlineDesc": "kubika ibyo ukunda ugakomeza kubireba hatari interineti",
+      "mobile": "kubika kuri mudasobwa",
+      "mobileDesc": "kubika ibintu kuri telefone",
+      "tablet": "kubika kuri tabuleti",
+      "tabletDesc": "kubika kuri tabuleti bifite ubwiza bwo kureba",
+      "computer": "kubika kuri mudasobwa",
+      "computerDesc": "kubika kuri mudasobwa ukareba ku nkuru nini"
+    },
+    "buttons": {
+      "home": "Subira mu Ntangiriro",
+      "check": "Reba Amakuru Mashya"
+    },
+    "footer": "Uburyo Bwo kubika buzaza Vuba."
   }
 }

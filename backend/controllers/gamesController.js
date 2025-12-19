@@ -8,29 +8,49 @@ const generateSessionId = () => {
 
 // Helper to resolve kid identity (supports both kid types)
 const resolveKidIdentity = (req) => {
-  const { kid_profile, user } = req;
-  
-  if (!kid_profile) {
-    throw new Error('No kid profile found in request');
-  }
+  try {
+    const { kid_profile, user } = req;
 
-  // Family member kid with own account
-  if (kid_profile.is_family_member) {
+    if (!kid_profile) {
+      // Check if it's a family member kid
+      if (req.user && req.user.id) {
+        return {
+          user_id: req.user.id,
+          kid_profile_id: null,
+          family_member_id: null,
+          identity_type: 'user'
+        };
+      }
+
+      throw new Error('No kid profile or user found in request');
+    }
+
+    // Family member kid with own account
+    if (kid_profile.is_family_member) {
+      return {
+        user_id: kid_profile.user_id || null,
+        kid_profile_id: null,
+        family_member_id: kid_profile.id,
+        identity_type: 'family_member_kid'
+      };
+    }
+
+    // Regular kid profile (under parent account)
     return {
-      user_id: user.id,
+      user_id: null,
+      kid_profile_id: kid_profile.id,
+      family_member_id: null,
+      identity_type: 'kid_profile'
+    };
+  } catch (error) {
+    console.error('Error resolving kid identity:', error);
+    return {
+      user_id: null,
       kid_profile_id: null,
-      family_member_id: kid_profile.id,
-      identity_type: 'family_member_kid'
+      family_member_id: null,
+      identity_type: 'unknown'
     };
   }
-  
-  // Regular kid profile (under parent account)
-  return {
-    user_id: null,
-    kid_profile_id: kid_profile.id,
-    family_member_id: null,
-    identity_type: 'kid_profile'
-  };
 };
 
 // ============================
@@ -41,36 +61,36 @@ const resolveKidIdentity = (req) => {
 const getAllGames = async (req, res) => {
   try {
     const { category, is_active, age_min, age_max, search } = req.query;
-    
+
     let whereClause = 'WHERE 1=1';
     const params = [];
-    
+
     if (category) {
       whereClause += ' AND category = ?';
       params.push(category);
     }
-    
+
     if (is_active !== undefined) {
       whereClause += ' AND is_active = ?';
       params.push(is_active === 'true');
     }
-    
+
     if (age_min) {
       whereClause += ' AND age_maximum >= ?';
       params.push(parseInt(age_min));
     }
-    
+
     if (age_max) {
       whereClause += ' AND age_minimum <= ?';
       params.push(parseInt(age_max));
     }
-    
+
     if (search) {
       whereClause += ' AND (title LIKE ? OR description LIKE ?)';
       const searchTerm = `%${search}%`;
       params.push(searchTerm, searchTerm);
     }
-    
+
     const games = await query(
       `SELECT g.*, 
               COUNT(DISTINCT gs.skill_id) as skills_count,
@@ -83,7 +103,7 @@ const getAllGames = async (req, res) => {
        ORDER BY g.sort_order, g.title`,
       params
     );
-    
+
     // Parse JSON fields
     const formattedGames = games.map(game => ({
       ...game,
@@ -91,13 +111,13 @@ const getAllGames = async (req, res) => {
       skills_count: game.skills_count || 0,
       skill_names: game.skill_names ? game.skill_names.split(',') : []
     }));
-    
+
     res.json({
       success: true,
       games: formattedGames,
       total: formattedGames.length
     });
-    
+
   } catch (error) {
     console.error('Error getting all games:', error);
     res.status(500).json({
@@ -111,7 +131,7 @@ const getAllGames = async (req, res) => {
 const getGameById = async (req, res) => {
   try {
     const { gameId } = req.params;
-    
+
     const games = await query(
       `SELECT g.*, 
               COUNT(DISTINCT gp.id) as total_players,
@@ -124,16 +144,16 @@ const getGameById = async (req, res) => {
        GROUP BY g.id`,
       [gameId]
     );
-    
+
     if (games.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Game not found'
       });
     }
-    
+
     const game = games[0];
-    
+
     // Get game skills
     const skills = await query(
       `SELECT es.*, gsm.strength_level
@@ -143,13 +163,13 @@ const getGameById = async (req, res) => {
        ORDER BY gsm.strength_level`,
       [gameId]
     );
-    
+
     // Get total sessions
     const sessions = await query(
       'SELECT COUNT(*) as total_sessions FROM game_sessions WHERE game_id = ?',
       [gameId]
     );
-    
+
     const result = {
       ...game,
       metadata: game.metadata ? JSON.parse(game.metadata) : {},
@@ -161,12 +181,12 @@ const getGameById = async (req, res) => {
         high_score: game.high_score || 0
       }
     };
-    
+
     res.json({
       success: true,
       game: result
     });
-    
+
   } catch (error) {
     console.error('Error getting game by ID:', error);
     res.status(500).json({
@@ -193,7 +213,7 @@ const createGame = async (req, res) => {
       skills, // Array of skill IDs
       sort_order
     } = req.body;
-    
+
     // Validation
     if (!game_key || !title || !description || !category) {
       return res.status(400).json({
@@ -201,23 +221,23 @@ const createGame = async (req, res) => {
         error: 'Missing required fields: game_key, title, description, category'
       });
     }
-    
+
     // Check if game_key already exists
     const existing = await query(
       'SELECT id FROM games WHERE game_key = ?',
       [game_key]
     );
-    
+
     if (existing.length > 0) {
       return res.status(400).json({
         success: false,
         error: 'Game key already exists'
       });
     }
-    
+
     // Start transaction
     await query('START TRANSACTION');
-    
+
     // Insert game
     const gameResult = await query(
       `INSERT INTO games (
@@ -238,9 +258,9 @@ const createGame = async (req, res) => {
         sort_order || 0
       ]
     );
-    
+
     const gameId = gameResult.insertId;
-    
+
     // Link skills if provided
     if (skills && Array.isArray(skills) && skills.length > 0) {
       // Validate skills exist
@@ -249,9 +269,9 @@ const createGame = async (req, res) => {
         `SELECT id FROM educational_skills WHERE id IN (${placeholders})`,
         skills
       );
-      
+
       const validSkillIds = validSkills.map(s => s.id);
-      
+
       if (validSkillIds.length > 0) {
         const skillValues = validSkillIds.map(skill_id => [gameId, skill_id]);
         await query(
@@ -260,19 +280,19 @@ const createGame = async (req, res) => {
         );
       }
     }
-    
+
     // Commit transaction
     await query('COMMIT');
-    
+
     // Fetch created game
     const game = await getGameByIdHelper(gameId);
-    
+
     res.status(201).json({
       success: true,
       message: 'Game created successfully',
       game
     });
-    
+
   } catch (error) {
     await query('ROLLBACK');
     console.error('Error creating game:', error);
@@ -288,34 +308,34 @@ const updateGame = async (req, res) => {
   try {
     const { gameId } = req.params;
     const updateData = req.body;
-    
+
     // Check if game exists
     const existingGame = await query(
       'SELECT id FROM games WHERE id = ?',
       [gameId]
     );
-    
+
     if (existingGame.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Game not found'
       });
     }
-    
+
     // Build dynamic update query
     const allowedFields = [
       'title', 'description', 'icon_emoji', 'color_gradient',
       'category', 'age_minimum', 'age_maximum', 'game_component',
       'metadata', 'is_active', 'sort_order'
     ];
-    
+
     const setClauses = [];
     const values = [];
-    
+
     Object.keys(updateData).forEach(field => {
       if (allowedFields.includes(field) && updateData[field] !== undefined) {
         setClauses.push(`${field} = ?`);
-        
+
         // Handle special fields
         if (field === 'metadata' && updateData[field]) {
           values.push(JSON.stringify(updateData[field]));
@@ -326,37 +346,37 @@ const updateGame = async (req, res) => {
         }
       }
     });
-    
+
     if (setClauses.length === 0) {
       return res.status(400).json({
         success: false,
         error: 'No valid fields to update'
       });
     }
-    
+
     // Add updated_at
     setClauses.push('updated_at = NOW()');
     values.push(gameId);
-    
+
     // Start transaction
     await query('START TRANSACTION');
-    
+
     // Update game
     const updateQuery = `UPDATE games SET ${setClauses.join(', ')} WHERE id = ?`;
     await query(updateQuery, values);
-    
+
     // Handle skills update if provided
     if (updateData.skills !== undefined) {
       // Delete existing mappings
       await query('DELETE FROM game_skills_mapping WHERE game_id = ?', [gameId]);
-      
+
       // Insert new mappings if skills array is provided
       if (Array.isArray(updateData.skills) && updateData.skills.length > 0) {
         const validSkills = await query(
           `SELECT id FROM educational_skills WHERE id IN (${updateData.skills.map(() => '?').join(',')})`,
           updateData.skills
         );
-        
+
         if (validSkills.length > 0) {
           const skillValues = validSkills.map(s => [gameId, s.id]);
           await query(
@@ -366,19 +386,19 @@ const updateGame = async (req, res) => {
         }
       }
     }
-    
+
     // Commit transaction
     await query('COMMIT');
-    
+
     // Fetch updated game
     const game = await getGameByIdHelper(gameId);
-    
+
     res.json({
       success: true,
       message: 'Game updated successfully',
       game
     });
-    
+
   } catch (error) {
     await query('ROLLBACK');
     console.error('Error updating game:', error);
@@ -393,18 +413,18 @@ const updateGame = async (req, res) => {
 const deleteGame = async (req, res) => {
   try {
     const { gameId } = req.params;
-    
+
     // Soft delete - mark as inactive
     await query(
       'UPDATE games SET is_active = FALSE, updated_at = NOW() WHERE id = ?',
       [gameId]
     );
-    
+
     res.json({
       success: true,
       message: 'Game deleted successfully'
     });
-    
+
   } catch (error) {
     console.error('Error deleting game:', error);
     res.status(500).json({
@@ -425,45 +445,48 @@ const startGameSession = async (req, res) => {
     const identity = resolveKidIdentity(req);
     const device_type = req.device_info?.device_type || 'web';
     const session_id = generateSessionId();
-    
+
     // Check if game exists and is active
     const game = await query(
       'SELECT id, title FROM games WHERE id = ? AND is_active = TRUE',
       [gameId]
     );
-    
+
     if (game.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Game not found or inactive'
       });
     }
-    
+
     // Start transaction
     await query('START TRANSACTION');
-    
-    // Create game session
+
+    // Create game session - using ACTUAL columns from your schema
     const sessionResult = await query(
       `INSERT INTO game_sessions (
         user_id, kid_profile_id, family_member_id,
-        game_id, session_id, device_type
-      ) VALUES (?, ?, ?, ?, ?, ?)`,
+        game_id, session_id, device_type,
+        start_time, ip_address, user_agent
+      ) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?)`,
       [
         identity.user_id,
         identity.kid_profile_id,
         identity.family_member_id,
         gameId,
         session_id,
-        device_type
+        device_type,
+        req.ip || null,
+        req.headers['user-agent'] || null
       ]
     );
-    
+
     const sessionId = sessionResult.insertId;
-    
-    // Get or create game progress
+
+    // Check if game progress exists, if not, create it
     let progressQuery;
     let progressParams;
-    
+
     if (identity.user_id) {
       progressQuery = 'SELECT id FROM game_progress WHERE user_id = ? AND game_id = ?';
       progressParams = [identity.user_id, gameId];
@@ -474,33 +497,51 @@ const startGameSession = async (req, res) => {
       progressQuery = 'SELECT id FROM game_progress WHERE family_member_id = ? AND game_id = ?';
       progressParams = [identity.family_member_id, gameId];
     }
-    
+
     const existingProgress = await query(progressQuery, progressParams);
-    
+
     if (existingProgress.length === 0) {
       // Create new progress entry
-      await query(
-        `INSERT INTO game_progress (
-          user_id, kid_profile_id, family_member_id, game_id, times_played
-        ) VALUES (?, ?, ?, ?, 1)`,
-        [
-          identity.user_id,
-          identity.kid_profile_id,
-          identity.family_member_id,
-          gameId
-        ]
-      );
+      let insertProgressQuery;
+      let insertProgressValues;
+
+      if (identity.user_id) {
+        insertProgressQuery = `
+          INSERT INTO game_progress (
+            user_id, game_id, times_played, last_played
+          ) VALUES (?, ?, 1, NOW())
+        `;
+        insertProgressValues = [identity.user_id, gameId];
+      } else if (identity.kid_profile_id) {
+        insertProgressQuery = `
+          INSERT INTO game_progress (
+            kid_profile_id, game_id, times_played, last_played
+          ) VALUES (?, ?, 1, NOW())
+        `;
+        insertProgressValues = [identity.kid_profile_id, gameId];
+      } else if (identity.family_member_id) {
+        insertProgressQuery = `
+          INSERT INTO game_progress (
+            family_member_id, game_id, times_played, last_played
+          ) VALUES (?, ?, 1, NOW())
+        `;
+        insertProgressValues = [identity.family_member_id, gameId];
+      }
+
+      if (insertProgressQuery) {
+        await query(insertProgressQuery, insertProgressValues);
+      }
     } else {
       // Increment times played
       await query(
-        'UPDATE game_progress SET times_played = times_played + 1 WHERE id = ?',
+        'UPDATE game_progress SET times_played = times_played + 1, last_played = NOW() WHERE id = ?',
         [existingProgress[0].id]
       );
     }
-    
+
     // Commit transaction
     await query('COMMIT');
-    
+
     res.json({
       success: true,
       message: 'Game session started',
@@ -511,13 +552,14 @@ const startGameSession = async (req, res) => {
         game_title: game[0].title
       }
     });
-    
+
   } catch (error) {
     await query('ROLLBACK');
     console.error('Error starting game session:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to start game session'
+      error: 'Failed to start game session',
+      details: error.message
     });
   }
 };
@@ -528,7 +570,7 @@ const submitGameScore = async (req, res) => {
     const { gameId } = req.params;
     const { session_id, score, level, moves, time_taken, accuracy, metrics } = req.body;
     const identity = resolveKidIdentity(req);
-    
+
     // Validate required fields
     if (!session_id || score === undefined) {
       return res.status(400).json({
@@ -536,33 +578,62 @@ const submitGameScore = async (req, res) => {
         error: 'Missing required fields: session_id, score'
       });
     }
-    
+
     // Get session
     const session = await query(
       'SELECT id FROM game_sessions WHERE session_id = ? AND game_id = ?',
       [session_id, gameId]
     );
-    
+
     if (session.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Game session not found'
       });
     }
-    
+
     const sessionId = session[0].id;
-    
+
     // Start transaction
     await query('START TRANSACTION');
-    
+
+    // Get current high score BEFORE inserting new score
+    let currentHighScore = 0;
+    let progressId = null;
+
+    // Get game progress to check current high score
+    let progressQuery;
+    let progressParams;
+
+    if (identity.user_id) {
+      progressQuery = 'SELECT id, highest_score FROM game_progress WHERE user_id = ? AND game_id = ?';
+      progressParams = [identity.user_id, gameId];
+    } else if (identity.kid_profile_id) {
+      progressQuery = 'SELECT id, highest_score FROM game_progress WHERE kid_profile_id = ? AND game_id = ?';
+      progressParams = [identity.kid_profile_id, gameId];
+    } else if (identity.family_member_id) {
+      progressQuery = 'SELECT id, highest_score FROM game_progress WHERE family_member_id = ? AND game_id = ?';
+      progressParams = [identity.family_member_id, gameId];
+    }
+
+    if (progressQuery) {
+      const progress = await query(progressQuery, progressParams);
+
+      if (progress.length > 0) {
+        currentHighScore = progress[0].highest_score || 0;
+        progressId = progress[0].id;
+      }
+    }
+
     // Submit score
     const scoreResult = await query(
       `INSERT INTO game_scores (
         user_id, kid_profile_id, family_member_id,
         game_id, session_id, score_value,
         level, moves_count, time_taken_seconds,
-        accuracy_percentage, metrics_json
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        accuracy_percentage, metrics_json,
+        is_high_score
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         identity.user_id,
         identity.kid_profile_id,
@@ -574,97 +645,138 @@ const submitGameScore = async (req, res) => {
         parseInt(moves) || 0,
         parseInt(time_taken) || 0,
         parseFloat(accuracy) || 0,
-        metrics ? JSON.stringify(metrics) : null
+        metrics ? JSON.stringify(metrics) : null,
+        score > currentHighScore // Set is_high_score based on comparison
       ]
     );
-    
+
     // Update game progress
-    let progressQuery;
-    let progressParams;
-    
-    if (identity.user_id) {
-      progressQuery = 'SELECT id, highest_score FROM game_progress WHERE user_id = ? AND game_id = ?';
-      progressParams = [identity.user_id, gameId];
-    } else if (identity.kid_profile_id) {
-      progressQuery = 'SELECT id, highest_score FROM game_progress WHERE kid_profile_id = ? AND game_id = ?';
-      progressParams = [identity.kid_profile_id, gameId];
-    } else if (identity.family_member_id) {
-      progressQuery = 'SELECT id, highest_score FROM game_progress WHERE family_member_id = ? AND game_id = ?';
-      progressParams = [identity.family_member_id, gameId];
-    }
-    
-    const progress = await query(progressQuery, progressParams);
-    
-    if (progress.length > 0) {
-      const currentHighScore = progress[0].highest_score || 0;
-      
+    if (progressId) {
       // Update if this is a high score
       if (score > currentHighScore) {
         await query(
           'UPDATE game_progress SET highest_score = ?, last_played = NOW() WHERE id = ?',
-          [score, progress[0].id]
-        );
-        
-        // Mark as high score in scores table
-        await query(
-          'UPDATE game_scores SET is_high_score = TRUE WHERE id = ?',
-          [scoreResult.insertId]
+          [score, progressId]
         );
       }
-      
+
       // Update total playtime
       await query(
         'UPDATE game_progress SET total_playtime_seconds = total_playtime_seconds + ? WHERE id = ?',
-        [time_taken || 0, progress[0].id]
+        [time_taken || 0, progressId]
       );
-      
+
       // Update levels completed if applicable
       if (level && level > 0) {
-        const currentLevel = await query(
+        const currentLevelResult = await query(
           'SELECT last_level_played FROM game_progress WHERE id = ?',
-          [progress[0].id]
+          [progressId]
         );
-        
-        const currentLevelValue = currentLevel[0]?.last_level_played || 0;
+
+        const currentLevelValue = currentLevelResult[0]?.last_level_played || 0;
         if (level > currentLevelValue) {
           await query(
             'UPDATE game_progress SET last_level_played = ?, levels_completed = ? WHERE id = ?',
-            [level, level, progress[0].id]
+            [level, level, progressId]
           );
         }
       }
+    } else {
+      // Create new progress record if it doesn't exist
+      let insertProgressQuery;
+      let insertProgressValues;
+
+      if (identity.user_id) {
+        insertProgressQuery = `
+          INSERT INTO game_progress (
+            user_id, game_id, highest_score, total_playtime_seconds,
+            levels_completed, times_played, last_level_played, last_played
+          ) VALUES (?, ?, ?, ?, ?, 1, ?, NOW())
+        `;
+        insertProgressValues = [
+          identity.user_id,
+          gameId,
+          score,
+          time_taken || 0,
+          level || 1,
+          level || 1
+        ];
+      } else if (identity.kid_profile_id) {
+        insertProgressQuery = `
+          INSERT INTO game_progress (
+            kid_profile_id, game_id, highest_score, total_playtime_seconds,
+            levels_completed, times_played, last_level_played, last_played
+          ) VALUES (?, ?, ?, ?, ?, 1, ?, NOW())
+        `;
+        insertProgressValues = [
+          identity.kid_profile_id,
+          gameId,
+          score,
+          time_taken || 0,
+          level || 1,
+          level || 1
+        ];
+      } else if (identity.family_member_id) {
+        insertProgressQuery = `
+          INSERT INTO game_progress (
+            family_member_id, game_id, highest_score, total_playtime_seconds,
+            levels_completed, times_played, last_level_played, last_played
+          ) VALUES (?, ?, ?, ?, ?, 1, ?, NOW())
+        `;
+        insertProgressValues = [
+          identity.family_member_id,
+          gameId,
+          score,
+          time_taken || 0,
+          level || 1,
+          level || 1
+        ];
+      }
+
+      if (insertProgressQuery) {
+        await query(insertProgressQuery, insertProgressValues);
+      }
     }
-    
+
     // Update session end time and duration
     if (time_taken) {
       await query(
-        'UPDATE game_sessions SET duration_seconds = ?, end_time = NOW() WHERE id = ?',
+        'UPDATE game_sessions SET duration_seconds = duration_seconds + ?, end_time = NOW() WHERE id = ?',
         [time_taken, sessionId]
       );
+    } else {
+      // Just update end time
+      await query(
+        'UPDATE game_sessions SET end_time = NOW() WHERE id = ?',
+        [sessionId]
+      );
     }
-    
+
     // Check for achievements
     await checkAchievements(identity, gameId, score, level);
-    
+
     // Update skill progress
     await updateSkillProgress(identity, gameId, score, metrics);
-    
+
     // Commit transaction
     await query('COMMIT');
-    
+
     res.json({
       success: true,
       message: 'Score submitted successfully',
       score_id: scoreResult.insertId,
-      is_high_score: score > currentHighScore
+      is_high_score: score > currentHighScore,
+      current_score: score,
+      previous_high_score: currentHighScore
     });
-    
+
   } catch (error) {
     await query('ROLLBACK');
     console.error('Error submitting score:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to submit score'
+      error: 'Failed to submit score',
+      details: error.message
     });
   }
 };
@@ -675,18 +787,18 @@ const saveGameProgress = async (req, res) => {
     const { gameId } = req.params;
     const { save_state, level } = req.body;
     const identity = resolveKidIdentity(req);
-    
+
     if (!save_state) {
       return res.status(400).json({
         success: false,
         error: 'Missing save_state'
       });
     }
-    
+
     // Get or create progress record
     let progressQuery;
     let progressParams;
-    
+
     if (identity.user_id) {
       progressQuery = 'SELECT id FROM game_progress WHERE user_id = ? AND game_id = ?';
       progressParams = [identity.user_id, gameId];
@@ -697,43 +809,84 @@ const saveGameProgress = async (req, res) => {
       progressQuery = 'SELECT id FROM game_progress WHERE family_member_id = ? AND game_id = ?';
       progressParams = [identity.family_member_id, gameId];
     }
-    
+
     const progress = await query(progressQuery, progressParams);
-    
+
     if (progress.length === 0) {
       // Create new progress with save state
-      await query(
-        `INSERT INTO game_progress (
-          user_id, kid_profile_id, family_member_id,
-          game_id, save_state, last_level_played
-        ) VALUES (?, ?, ?, ?, ?, ?)`,
-        [
-          identity.user_id,
-          identity.kid_profile_id,
-          identity.family_member_id,
-          gameId,
-          JSON.stringify(save_state),
-          parseInt(level) || 1
-        ]
-      );
+      let insertQuery;
+      let insertValues;
+
+      if (identity.user_id) {
+        insertQuery = `
+          INSERT INTO game_progress (
+            user_id, game_id, save_state, last_level_played, last_played
+          ) VALUES (?, ?, ?, ?, NOW())
+        `;
+        insertValues = [identity.user_id, gameId, JSON.stringify(save_state), parseInt(level) || 1];
+      } else if (identity.kid_profile_id) {
+        insertQuery = `
+          INSERT INTO game_progress (
+            kid_profile_id, game_id, save_state, last_level_played, last_played
+          ) VALUES (?, ?, ?, ?, NOW())
+        `;
+        insertValues = [identity.kid_profile_id, gameId, JSON.stringify(save_state), parseInt(level) || 1];
+      } else if (identity.family_member_id) {
+        insertQuery = `
+          INSERT INTO game_progress (
+            family_member_id, game_id, save_state, last_level_played, last_played
+          ) VALUES (?, ?, ?, ?, NOW())
+        `;
+        insertValues = [identity.family_member_id, gameId, JSON.stringify(save_state), parseInt(level) || 1];
+      }
+
+      if (insertQuery) {
+        await query(insertQuery, insertValues);
+      }
     } else {
       // Update existing progress
       await query(
-        'UPDATE game_progress SET save_state = ?, last_level_played = ?, updated_at = NOW() WHERE id = ?',
+        'UPDATE game_progress SET save_state = ?, last_level_played = ?, last_played = NOW() WHERE id = ?',
         [JSON.stringify(save_state), parseInt(level) || 1, progress[0].id]
       );
     }
-    
+
     res.json({
       success: true,
       message: 'Game progress saved'
     });
-    
+
   } catch (error) {
     console.error('Error saving game progress:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to save game progress'
+      error: 'Failed to save game progress',
+      details: error.message
+    });
+  }
+};
+
+// Update session activity (can be called periodically)
+const updateSessionActivity = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    // Just update the updated_at timestamp
+    await query(
+      'UPDATE game_sessions SET updated_at = NOW() WHERE session_id = ?',
+      [sessionId]
+    );
+    
+    res.json({
+      success: true,
+      message: 'Session activity updated'
+    });
+    
+  } catch (error) {
+    console.error('Error updating session activity:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update session activity'
     });
   }
 };
@@ -743,10 +896,10 @@ const loadGameProgress = async (req, res) => {
   try {
     const { gameId } = req.params;
     const identity = resolveKidIdentity(req);
-    
+
     let progressQuery;
     let progressParams;
-    
+
     if (identity.user_id) {
       progressQuery = 'SELECT * FROM game_progress WHERE user_id = ? AND game_id = ?';
       progressParams = [identity.user_id, gameId];
@@ -757,9 +910,9 @@ const loadGameProgress = async (req, res) => {
       progressQuery = 'SELECT * FROM game_progress WHERE family_member_id = ? AND game_id = ?';
       progressParams = [identity.family_member_id, gameId];
     }
-    
+
     const progress = await query(progressQuery, progressParams);
-    
+
     if (progress.length === 0) {
       return res.json({
         success: true,
@@ -767,28 +920,30 @@ const loadGameProgress = async (req, res) => {
         progress: null
       });
     }
-    
+
     const progressData = progress[0];
-    
-    // Parse JSON fields
+
+    // Parse JSON fields (if they exist)
     const result = {
       ...progressData,
       save_state: progressData.save_state ? JSON.parse(progressData.save_state) : null,
       unlocked_features: progressData.unlocked_features ? JSON.parse(progressData.unlocked_features) : null,
-      achievements_json: progressData.achievements_json ? JSON.parse(progressData.achievements_json) : null
+      achievements_json: progressData.achievements_json ? JSON.parse(progressData.achievements_json) : null,
+      metadata: progressData.metadata ? JSON.parse(progressData.metadata) : null
     };
-    
+
     res.json({
       success: true,
       has_progress: true,
       progress: result
     });
-    
+
   } catch (error) {
     console.error('Error loading game progress:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to load game progress'
+      error: 'Failed to load game progress',
+      details: error.message
     });
   }
 };
@@ -798,10 +953,10 @@ const getKidGameHistory = async (req, res) => {
   try {
     const identity = resolveKidIdentity(req);
     const { limit = 20, offset = 0 } = req.query;
-    
+
     let historyQuery;
     let queryParams = [];
-    
+
     if (identity.user_id) {
       historyQuery = `
         SELECT gs.*, g.title, g.icon_emoji, g.category,
@@ -842,13 +997,13 @@ const getKidGameHistory = async (req, res) => {
       `;
       queryParams = [identity.family_member_id, parseInt(limit), parseInt(offset)];
     }
-    
+
     const history = await query(historyQuery, queryParams);
-    
+
     // Get total count
     let countQuery;
     let countParams;
-    
+
     if (identity.user_id) {
       countQuery = 'SELECT COUNT(*) as total FROM game_sessions WHERE user_id = ?';
       countParams = [identity.user_id];
@@ -859,10 +1014,10 @@ const getKidGameHistory = async (req, res) => {
       countQuery = 'SELECT COUNT(*) as total FROM game_sessions WHERE family_member_id = ?';
       countParams = [identity.family_member_id];
     }
-    
+
     const countResult = await query(countQuery, countParams);
     const total = countResult[0]?.total || 0;
-    
+
     res.json({
       success: true,
       history: history,
@@ -873,7 +1028,7 @@ const getKidGameHistory = async (req, res) => {
         has_more: (parseInt(offset) + history.length) < total
       }
     });
-    
+
   } catch (error) {
     console.error('Error getting game history:', error);
     res.status(500).json({
@@ -888,7 +1043,7 @@ const getAvailableGames = async (req, res) => {
   try {
     const identity = resolveKidIdentity(req);
     const { category, skill } = req.query;
-    
+
     // Get kid's age from profile
     let kidAge = 5; // Default age
     if (req.kid_profile.max_age_rating) {
@@ -898,20 +1053,20 @@ const getAvailableGames = async (req, res) => {
         kidAge = parseInt(ageMatch[1]);
       }
     }
-    
+
     let whereClause = 'WHERE g.is_active = TRUE';
     const params = [];
-    
+
     // Age filter
     whereClause += ' AND g.age_minimum <= ? AND g.age_maximum >= ?';
     params.push(kidAge, kidAge);
-    
+
     // Category filter
     if (category) {
       whereClause += ' AND g.category = ?';
       params.push(category);
     }
-    
+
     // Skill filter
     let joinClause = '';
     if (skill) {
@@ -919,7 +1074,7 @@ const getAvailableGames = async (req, res) => {
       whereClause += ' AND es.skill_key = ?';
       params.push(skill);
     }
-    
+
     const games = await query(
       `SELECT DISTINCT g.*, 
               (SELECT COUNT(*) FROM game_skills_mapping WHERE game_id = g.id) as skills_count
@@ -929,19 +1084,19 @@ const getAvailableGames = async (req, res) => {
        ORDER BY g.sort_order, g.title`,
       params
     );
-    
+
     // Parse JSON fields
     const formattedGames = games.map(game => ({
       ...game,
       metadata: game.metadata ? JSON.parse(game.metadata) : {}
     }));
-    
+
     // Get kid's progress for each game
     const gameIds = formattedGames.map(g => g.id);
     if (gameIds.length > 0) {
       let progressQuery;
       let progressParams;
-      
+
       if (identity.user_id) {
         progressQuery = `SELECT * FROM game_progress WHERE user_id = ? AND game_id IN (${gameIds.map(() => '?').join(',')})`;
         progressParams = [identity.user_id, ...gameIds];
@@ -952,10 +1107,10 @@ const getAvailableGames = async (req, res) => {
         progressQuery = `SELECT * FROM game_progress WHERE family_member_id = ? AND game_id IN (${gameIds.map(() => '?').join(',')})`;
         progressParams = [identity.family_member_id, ...gameIds];
       }
-      
+
       if (progressQuery) {
         const progress = await query(progressQuery, progressParams);
-        
+
         // Map progress to games
         const progressMap = {};
         progress.forEach(p => {
@@ -966,19 +1121,19 @@ const getAvailableGames = async (req, res) => {
             last_played: p.last_played
           };
         });
-        
+
         formattedGames.forEach(game => {
           game.progress = progressMap[game.id] || null;
         });
       }
     }
-    
+
     res.json({
       success: true,
       games: formattedGames,
       total: formattedGames.length
     });
-    
+
   } catch (error) {
     console.error('Error getting available games:', error);
     res.status(500).json({
@@ -997,28 +1152,28 @@ const getKidGameAnalytics = async (req, res) => {
   try {
     const { kidId } = req.params;
     const { timeframe = 'week' } = req.query;
-    
+
     // Verify parent has access to this kid
     const parentId = req.user.id;
-    
+
     // Check if kid belongs to parent
     const kidCheck = await query(
       `SELECT id FROM kids_profiles 
        WHERE id = ? AND parent_user_id = ?`,
       [kidId, parentId]
     );
-    
+
     if (kidCheck.length === 0) {
       return res.status(403).json({
         success: false,
         error: 'Access denied to this kid profile'
       });
     }
-    
+
     // Calculate date range
     let dateRange;
     const now = new Date();
-    
+
     switch (timeframe) {
       case 'day':
         dateRange = new Date(now.setDate(now.getDate() - 1));
@@ -1032,7 +1187,7 @@ const getKidGameAnalytics = async (req, res) => {
       default:
         dateRange = new Date(now.setDate(now.getDate() - 7));
     }
-    
+
     // Get game sessions
     const sessions = await query(
       `SELECT gs.*, g.title, g.category, g.icon_emoji
@@ -1042,7 +1197,7 @@ const getKidGameAnalytics = async (req, res) => {
        ORDER BY gs.start_time DESC`,
       [kidId, dateRange]
     );
-    
+
     // Get scores
     const scores = await query(
       `SELECT gsc.*, g.title
@@ -1053,7 +1208,7 @@ const getKidGameAnalytics = async (req, res) => {
        LIMIT 50`,
       [kidId, dateRange]
     );
-    
+
     // Get progress
     const progress = await query(
       `SELECT gp.*, g.title
@@ -1063,12 +1218,12 @@ const getKidGameAnalytics = async (req, res) => {
        ORDER BY gp.last_played DESC`,
       [kidId]
     );
-    
+
     // Calculate statistics
     const totalPlaytime = sessions.reduce((sum, session) => sum + (session.duration_seconds || 0), 0);
     const gamesPlayed = [...new Set(sessions.map(s => s.game_id))].length;
     const totalSessions = sessions.length;
-    
+
     // Most played games
     const gamePlayCount = {};
     sessions.forEach(session => {
@@ -1082,11 +1237,11 @@ const getKidGameAnalytics = async (req, res) => {
       }
       gamePlayCount[session.game_id].count++;
     });
-    
+
     const mostPlayedGames = Object.values(gamePlayCount)
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
-    
+
     // Skill improvements
     const skillProgress = await query(
       `SELECT esp.*, es.name, es.category, es.icon_emoji
@@ -1095,7 +1250,7 @@ const getKidGameAnalytics = async (req, res) => {
        WHERE esp.kid_profile_id = ?`,
       [kidId]
     );
-    
+
     res.json({
       success: true,
       analytics: {
@@ -1111,7 +1266,7 @@ const getKidGameAnalytics = async (req, res) => {
         game_progress: progress
       }
     });
-    
+
   } catch (error) {
     console.error('Error getting kid game analytics:', error);
     res.status(500).json({
@@ -1137,11 +1292,11 @@ const getGameByIdHelper = async (gameId) => {
      GROUP BY g.id`,
     [gameId]
   );
-  
+
   if (games.length === 0) return null;
-  
+
   const game = games[0];
-  
+
   // Get detailed skills
   const skills = await query(
     `SELECT es.*, gsm.strength_level
@@ -1150,7 +1305,7 @@ const getGameByIdHelper = async (gameId) => {
      WHERE gsm.game_id = ?`,
     [gameId]
   );
-  
+
   return {
     ...game,
     metadata: game.metadata ? JSON.parse(game.metadata) : {},
@@ -1164,7 +1319,7 @@ const checkAchievements = async (identity, gameId, score, level) => {
   // Achievement logic based on score, level, etc.
   // This is a simplified version - expand as needed
   const achievements = [];
-  
+
   // Example: Score-based achievement
   if (score >= 1000) {
     achievements.push({
@@ -1177,7 +1332,7 @@ const checkAchievements = async (identity, gameId, score, level) => {
       rarity: 'uncommon'
     });
   }
-  
+
   // Level-based achievement
   if (level >= 10) {
     achievements.push({
@@ -1190,7 +1345,7 @@ const checkAchievements = async (identity, gameId, score, level) => {
       rarity: 'common'
     });
   }
-  
+
   // Save achievements if any unlocked
   if (achievements.length > 0) {
     for (const achievement of achievements) {
@@ -1203,10 +1358,10 @@ const checkAchievements = async (identity, gameId, score, level) => {
            (kid_profile_id = ?) OR 
            (family_member_id = ?)
          )`,
-        [gameId, achievement.achievement_key, 
-         identity.user_id, identity.kid_profile_id, identity.family_member_id]
+        [gameId, achievement.achievement_key,
+          identity.user_id, identity.kid_profile_id, identity.family_member_id]
       );
-      
+
       if (existing.length === 0) {
         await query(
           `INSERT INTO game_achievements (
@@ -1244,14 +1399,14 @@ const updateSkillProgress = async (identity, gameId, score, metrics) => {
      WHERE gsm.game_id = ?`,
     [gameId]
   );
-  
+
   for (const skill of skills) {
     // Calculate improvement (simplified - adjust based on your logic)
     const improvement = Math.min(10, Math.floor(score / 100));
-    
+
     let progressQuery;
     let progressParams;
-    
+
     if (identity.user_id) {
       progressQuery = 'SELECT * FROM kids_skill_progress WHERE user_id = ? AND skill_id = ?';
       progressParams = [identity.user_id, skill.skill_id];
@@ -1261,15 +1416,15 @@ const updateSkillProgress = async (identity, gameId, score, metrics) => {
     } else {
       continue; // Family member kids might not have skill progress
     }
-    
+
     const existingProgress = await query(progressQuery, progressParams);
-    
+
     if (existingProgress.length > 0) {
       // Update existing progress
       const currentScore = existingProgress[0].current_score || 0;
       const newScore = currentScore + improvement;
       const improvementPct = ((newScore - (existingProgress[0].baseline_score || 0)) / 100) * 100;
-      
+
       await query(
         `UPDATE kids_skill_progress 
          SET current_score = ?, improvement_percentage = ?, 
@@ -1307,7 +1462,7 @@ module.exports = {
   createGame,
   updateGame,
   deleteGame,
-  
+
   // Kid Game Play
   startGameSession,
   submitGameScore,
@@ -1315,10 +1470,11 @@ module.exports = {
   loadGameProgress,
   getKidGameHistory,
   getAvailableGames,
-  
+  updateSessionActivity,
+
   // Parent Analytics
   getKidGameAnalytics,
-  
+
   // Helper (for internal use)
   resolveKidIdentity
 };

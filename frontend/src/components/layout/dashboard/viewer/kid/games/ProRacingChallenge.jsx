@@ -1,7 +1,10 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Heart, Trophy, Zap, Shield, ChevronUp } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
+  const { t } = useTranslation();
+  
   const canvasRef = useRef(null);
   const [gameState, setGameState] = useState("menu");
   const [score, setScore] = useState(0);
@@ -92,28 +95,28 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
           switch(pu.type) {
             case "SHIELD_CHARGE":
               setShieldCharges(prevCharges => Math.min(5, prevCharges + 1));
-              setMessage("🛡️ +1 Shield Charge!");
+              setMessage(t('proRacingChallenge.game.powerUps.shieldCharge'));
               setTimeout(() => setMessage(""), 1000);
               break;
             case "SHIELD":
               setInvincible(true);
               setActivePowerUp("SHIELD");
               setPowerUpTimer(POWER_UP_TYPES.SHIELD.duration);
-              setMessage("🛡️ Auto Shield!");
+              setMessage(t('proRacingChallenge.game.powerUps.autoShield'));
               setTimeout(() => setMessage(""), 1000);
               break;
             case "SLOW":
               setGameSpeed(prev => Math.max(initialSpeed, prev * 0.7));
               setActivePowerUp("SLOW");
               setPowerUpTimer(POWER_UP_TYPES.SLOW.duration);
-              setMessage("🐌 Slow Motion!");
+              setMessage(t('proRacingChallenge.game.powerUps.slowMotion'));
               setTimeout(() => setMessage(""), 1000);
               break;
             case "SPEED":
               setGameSpeed(prev => Math.min(maxSpeed, prev * 1.3));
               setActivePowerUp("SPEED");
               setPowerUpTimer(POWER_UP_TYPES.SPEED.duration);
-              setMessage("⚡ Speed Boost!");
+              setMessage(t('proRacingChallenge.game.powerUps.speedBoost'));
               setTimeout(() => setMessage(""), 1000);
               break;
           }
@@ -182,7 +185,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
         setHighScore(score);
         localStorage.setItem("racingHighScore", score.toString());
       }
-      setMessage("Crash! Tap to restart");
+      setMessage(t('proRacingChallenge.game.collision.crash'));
     }
    
     // Increase score for survival
@@ -198,15 +201,15 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
     // Special effects at milestones
     if (score >= 500 && !specialEffects.roadColor) {
       setSpecialEffects(prev => ({ ...prev, roadColor: "#1A1A2E" }));
-      setMessage("⭐ New Road Color!");
+      setMessage(t('proRacingChallenge.game.powerUps.roadColor'));
       setTimeout(() => setMessage(""), 1500);
     }
     if (score >= 1500 && !specialEffects.glow) {
       setSpecialEffects(prev => ({ ...prev, glow: true }));
-      setMessage("🌟 Road Glow!");
+      setMessage(t('proRacingChallenge.game.powerUps.roadGlow'));
       setTimeout(() => setMessage(""), 1500);
     }
-  }, [gameState, playerCar, activePowerUp, powerUpTimer, shieldCharges, invincible, score, level, gameSpeed, highScore, road.height, specialEffects, initialSpeed, maxSpeed]);
+  }, [gameState, playerCar, activePowerUp, powerUpTimer, shieldCharges, invincible, score, level, gameSpeed, highScore, road.height, specialEffects, initialSpeed, maxSpeed, t]);
 
   // Shield activation function
   const activateShield = useCallback(() => {
@@ -222,7 +225,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
     setActivePowerUp("SHIELD");
     setPowerUpTimer(420); // 7 seconds at 60fps
     
-    setMessage("🛡️ Shield Active (7s)!");
+    setMessage(t('proRacingChallenge.game.powerUps.shieldActive'));
    
     // Visual effect ends quickly
     setTimeout(() => {
@@ -234,7 +237,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
       setShieldCooldown(false);
     }, 1200);
     
-  }, [gameState, shieldCooldown, shieldCharges]);
+  }, [gameState, shieldCooldown, shieldCharges, t]);
 
   // Smart obstacle spawning algorithm
   const spawnEnemy = useCallback(() => {
@@ -631,10 +634,10 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
       ctx.fillStyle = "rgba(255,255,255,0.9)";
       ctx.font = "bold 20px Arial";
       ctx.textAlign = "left";
-      ctx.fillText(`SCORE: ${Math.floor(score).toLocaleString()}`, 8, 28);
+      ctx.fillText(t('proRacingChallenge.ui.score', { score: Math.floor(score).toLocaleString() }), 8, 28);
      
       ctx.fillStyle = "#00FF88";
-      ctx.fillText(`LVL ${level}`, road.width - 80, 28);
+      ctx.fillText(t('proRacingChallenge.ui.level', { level }), road.width - 80, 28);
       
       // Shield charges display
       ctx.textAlign = "left";
@@ -651,7 +654,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
       
       ctx.fillStyle = "#FFFF00";
       ctx.font = "bold 16px Arial";
-      ctx.fillText(`×${shieldCharges}`, 135, 48);
+      ctx.fillText(t('proRacingChallenge.ui.shieldCharges', { charges: shieldCharges }), 135, 48);
      
       // Cooldown indicator
       if (shieldCooldown) {
@@ -660,7 +663,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
         ctx.fillStyle = "rgba(100,100,100,0.9)";
         ctx.font = "bold 14px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("SHIELD CD", road.width/2, 42);
+        ctx.fillText(t('proRacingChallenge.ui.cooldown'), road.width/2, 42);
       }
      
       // Active power-up timer
@@ -673,7 +676,10 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
           ctx.shadowBlur = 10;
           ctx.font = "bold 16px Arial";
           ctx.textAlign = "center";
-          ctx.fillText(`${type.icon} ${timeLeft}s`, road.width/2, 28);
+          ctx.fillText(t('proRacingChallenge.ui.powerUpTimer', { 
+            icon: type.icon, 
+            time: timeLeft 
+          }), road.width/2, 28);
           ctx.shadowBlur = 0;
         }
       }
@@ -709,7 +715,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [gameState, updateGame, spawnEnemy, spawnPowerUp, level, gameSpeed, road.width, road.height, score, shieldCharges, activePowerUp, powerUpTimer, playerCar, invincible, isShielded, shieldCooldown]);
+  }, [gameState, updateGame, spawnEnemy, spawnPowerUp, level, gameSpeed, road.width, road.height, score, shieldCharges, activePowerUp, powerUpTimer, playerCar, invincible, isShielded, shieldCooldown, t]);
 
   // Initialize game
   useEffect(() => {
@@ -845,9 +851,13 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
               <span className="text-base">🏎️</span>
             </div>
             <div>
-              <h1 className="text-sm font-black text-white tracking-tight">PRO RACER</h1>
+              <h1 className="text-sm font-black text-white tracking-tight">
+                {t('proRacingChallenge.game.title')}
+              </h1>
               <div className="flex items-center gap-1 text-xs">
-                <span className="text-gray-300">L{level}</span>
+                <span className="text-gray-300">
+                  {t('proRacingChallenge.game.level', { level })}
+                </span>
                 <span className="text-[#FFFF00] font-bold">🛡️{shieldCharges}</span>
               </div>
             </div>
@@ -864,7 +874,9 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
             <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 px-3 py-1.5 rounded-lg shadow-lg border border-yellow-400/50">
               <div className="flex items-center gap-1">
                 <Trophy className="w-4 h-4 text-yellow-300" />
-                <span className="text-white font-black text-sm">{Math.floor(score).toLocaleString()}</span>
+                <span className="text-white font-black text-sm">
+                  {t('proRacingChallenge.game.score', { score: Math.floor(score).toLocaleString() })}
+                </span>
               </div>
             </div>
           </div>
@@ -890,20 +902,28 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
                 {gameState === "menu" ? (
                   <>
                     <div className="text-4xl mb-2 animate-bounce">🏎️</div>
-                    <h2 className="text-xl font-black text-white mb-2 tracking-wide">PRO RACER</h2>
-                    <p className="text-gray-200 text-sm mb-4 text-center px-4">Tap lanes to move • Tap SHIELD button</p>
+                    <h2 className="text-xl font-black text-white mb-2 tracking-wide">
+                      {t('proRacingChallenge.game.title')}
+                    </h2>
+                    <p className="text-gray-200 text-sm mb-4 text-center px-4">
+                      {t('proRacingChallenge.game.instructions.tapLanes')} • {t('proRacingChallenge.game.instructions.shieldButton')}
+                    </p>
                    
                     <div className="bg-gradient-to-r from-[#FFFF00]/20 to-yellow-900/30 p-3 rounded-xl mb-4 border border-[#FFFF00]/40">
                       <div className="flex items-center gap-2 mb-2">
                         <Shield className="w-5 h-5 text-[#FFFF00]" />
                         <div>
-                          <h3 className="text-sm font-black text-white">SHIELD SYSTEM</h3>
-                          <div className="text-yellow-100 text-xs">Start with 3 charges</div>
+                          <h3 className="text-sm font-black text-white">
+                            {t('proRacingChallenge.tutorial.title')}
+                          </h3>
+                          <div className="text-yellow-100 text-xs">
+                            {t('proRacingChallenge.tutorial.description')}
+                          </div>
                         </div>
                       </div>
                       <div className="text-xs text-gray-200 space-y-1">
-                        <div>• 🛡️ = 7 second shield</div>
-                        <div>• Collect for more charges (max 5)</div>
+                        <div>{t('proRacingChallenge.tutorial.features.shield')}</div>
+                        <div>{t('proRacingChallenge.tutorial.features.collect')}</div>
                       </div>
                     </div>
                    
@@ -911,17 +931,24 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
                       onClick={startGame}
                       className="py-3 px-8 text-base rounded-xl bg-gradient-to-r from-[#FF0000] to-[#FF8800] text-white font-black shadow-lg active:scale-95 transition-transform duration-150"
                     >
-                      🚀 START RACE
+                      {t('proRacingChallenge.game.startButton')}
                     </button>
                   </>
                 ) : (
                   <>
                     <div className="text-4xl mb-2">🏁</div>
-                    <h2 className="text-xl font-black text-white mb-2">RACE COMPLETE!</h2>
-                    <p className="text-lg text-gray-200 mb-2">{Math.floor(score).toLocaleString()}</p>
+                    <h2 className="text-xl font-black text-white mb-2">
+                      {t('proRacingChallenge.game.gameOver.title')}
+                    </h2>
+                    <p className="text-lg text-gray-200 mb-2">
+                      {t('proRacingChallenge.game.score', { score: Math.floor(score).toLocaleString() })}
+                    </p>
                     {score > 0 && (
                       <p className={`text-sm mb-4 font-black ${score >= highScore ? 'text-yellow-400 animate-pulse' : 'text-yellow-300'}`}>
-                        {score >= highScore ? "🥇 NEW HIGH SCORE!" : `🥈 HIGH: ${Math.floor(highScore).toLocaleString()}`}
+                        {score >= highScore 
+                          ? t('proRacingChallenge.game.gameOver.newHighScore') 
+                          : t('proRacingChallenge.game.gameOver.highScore', { score: Math.floor(highScore).toLocaleString() })
+                        }
                       </p>
                     )}
                    
@@ -929,7 +956,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
                       onClick={startGame}
                       className="py-3 px-8 text-base rounded-xl bg-gradient-to-r from-[#FF0000] to-[#FF8800] text-white font-black shadow-lg active:scale-95 transition-transform duration-150"
                     >
-                      🏎️ RACE AGAIN
+                      {t('proRacingChallenge.game.restartButton')}
                     </button>
                   </>
                 )}
@@ -975,7 +1002,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
                       : 'bg-[#1A1A2E]/80 border border-gray-600/50 text-gray-300 active:bg-[#FF0000]/30 active:border-[#FF0000]/50'
                   }`}
                 >
-                  L{lane + 1}
+                  {t('proRacingChallenge.game.controls.lane', { lane: lane + 1 })}
                 </button>
               ))}
             </div>
@@ -991,8 +1018,12 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
               } ${isShielded ? 'animate-pulse' : ''}`}
             >
               <Shield className="w-5 h-5" />
-              SHIELD ({shieldCharges})
-              {shieldCooldown && <span className="text-xs ml-1">⏳</span>}
+              {t('proRacingChallenge.game.controls.shield', { charges: shieldCharges })}
+              {shieldCooldown && (
+                <span className="text-xs ml-1">
+                  {t('proRacingChallenge.game.controls.shieldCooldown')}
+                </span>
+              )}
             </button>
            
             {/* Vertical Movement - COMPACT */}
@@ -1014,7 +1045,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
                 }}
                 className="py-3 rounded-lg bg-[#1A1A2E]/80 border border-blue-600/50 text-blue-300 text-sm font-bold active:bg-blue-900/40"
               >
-                ↑ UP
+                {t('proRacingChallenge.game.controls.up')}
               </button>
               <button
                 onTouchStart={(e) => {
@@ -1033,7 +1064,7 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
                 }}
                 className="py-3 rounded-lg bg-[#1A1A2E]/80 border border-blue-600/50 text-blue-300 text-sm font-bold active:bg-blue-900/40"
               >
-                ↓ DOWN
+                {t('proRacingChallenge.game.controls.down')}
               </button>
             </div>
           </div>
@@ -1057,14 +1088,16 @@ export default function ProRacingChallenge({ onGameEvent, isFullscreen }) {
             <div className="bg-gray-800/50 p-2 rounded-lg text-center mt-2">
               <div className="flex items-center justify-center gap-1">
                 <div className="w-2 h-2 bg-yellow-500 rounded-full animate-spin"></div>
-                <span className="font-bold text-yellow-300 text-xs">Shield Recharging...</span>
+                <span className="font-bold text-yellow-300 text-xs">
+                  {t('proRacingChallenge.game.controls.recharging')}
+                </span>
               </div>
             </div>
           )}
          
           {/* Touch Hint */}
           <div className="text-center text-xs text-gray-500 mt-2">
-            Tap L1/L2/L3 to switch lanes • Tap SHIELD for protection
+            {t('proRacingChallenge.game.instructions.touchHint')}
           </div>
         </div>
       </div>

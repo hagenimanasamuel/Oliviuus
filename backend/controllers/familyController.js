@@ -1054,7 +1054,7 @@ const sendInvitationAcceptedNotification = async (familyOwnerId, memberUserId) =
                     action: 'joined_family',
                     timestamp: new Date().toISOString()
                 }),
-                "/account/family"
+                "/account/settings#profiles"
             ]
         );
     } catch (error) {

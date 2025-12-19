@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { Gamepad2, Loader2 } from 'lucide-react';
+import { Gamepad2, Loader2, Globe } from 'lucide-react'; // Added Globe icon
 import GamePlayer from '../../../../components/layout/dashboard/viewer/kid/games/GamePlayer';
 import CountingGame from '../../../../components/layout/dashboard/viewer/kid/games/CountingGame';
 import "../../../../components/layout/dashboard/viewer/kid/games/games.css";
@@ -12,6 +12,69 @@ import AlphabetRaceGame from '../../../../components/layout/dashboard/viewer/kid
 import ProRacingChallenge from '../../../../components/layout/dashboard/viewer/kid/games/ProRacingChallenge';
 import WaterSortPuzzle from '../../../../components/layout/dashboard/viewer/kid/games/WaterSortPuzzle';
 import api from '../../../../api/axios';
+
+// Import i18n
+import { useTranslation } from 'react-i18next';
+
+// Language selector component
+const LanguageSelector = () => {
+  const { i18n } = useTranslation();
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+    { code: 'rw', name: 'Kinyarwanda', flag: '🇷🇼' },
+    { code: 'sw', name: 'Swahili', flag: '🇹🇿' }
+  ];
+
+  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+    setShowDropdown(false);
+    // Save language preference to user profile if needed
+    localStorage.setItem('preferredLanguage', lng);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setShowDropdown(!showDropdown)}
+        className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#FF5722]/20 to-[#FF9800]/20 backdrop-blur-sm border border-[#FF5722]/30 rounded-lg hover:from-[#FF5722]/30 hover:to-[#FF9800]/30 transition-all"
+        aria-label="Change language"
+      >
+        <Globe className="w-4 h-4 text-white" />
+        <span className="text-white text-sm font-medium">{currentLanguage.flag} {currentLanguage.code.toUpperCase()}</span>
+      </button>
+
+      {showDropdown && (
+        <div className="absolute right-0 mt-2 w-48 bg-gradient-to-br from-[#1A1A2E] to-[#16213E] border border-[#FF5722]/40 rounded-xl shadow-2xl backdrop-blur-lg z-50 overflow-hidden">
+          {languages.map((language) => (
+            <button
+              key={language.code}
+              onClick={() => changeLanguage(language.code)}
+              className={`w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-[#FF5722]/10 transition-all ${
+                i18n.language === language.code ? 'bg-[#FF5722]/20 text-white' : 'text-gray-300'
+              }`}
+            >
+              <span className="text-lg">{language.flag}</span>
+              <div className="flex flex-col">
+                <span className="font-medium text-white">{language.name}</span>
+                <span className="text-xs text-gray-400">{language.code.toUpperCase()}</span>
+              </div>
+              {i18n.language === language.code && (
+                <div className="ml-auto w-2 h-2 bg-gradient-to-r from-[#FF5722] to-[#FF9800] rounded-full"></div>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // Component mapping for game_key to component
 const GAME_COMPONENTS = {
@@ -25,6 +88,42 @@ const GAME_COMPONENTS = {
   'water_sort_puzzle': WaterSortPuzzle,
 };
 
+// Game translation mapping
+const GAME_TRANSLATIONS = {
+  'counting_game': {
+    title: 'games.gameDetails.counting_adventure',
+    description: 'games.gameDetails.counting_desc'
+  },
+  'shape_match_game': {
+    title: 'games.gameDetails.shape_match',
+    description: 'games.gameDetails.shape_desc'
+  },
+  'color_quest_game': {
+    title: 'games.gameDetails.color_quest',
+    description: 'games.gameDetails.color_desc'
+  },
+  'memory_match_game': {
+    title: 'games.gameDetails.memory_match',
+    description: 'games.gameDetails.memory_desc'
+  },
+  'animal_safari_game': {
+    title: 'games.gameDetails.animal_safari',
+    description: 'games.gameDetails.animal_desc'
+  },
+  'alphabet_race_game': {
+    title: 'games.gameDetails.alphabet_race',
+    description: 'games.gameDetails.alphabet_desc'
+  },
+  'pro_racing_challenge': {
+    title: 'games.gameDetails.pro_racing',
+    description: 'games.gameDetails.pro_racing_desc'
+  },
+  'water_sort_puzzle': {
+    title: 'games.gameDetails.water_sort',
+    description: 'games.gameDetails.water_sort_desc'
+  }
+};
+
 export default function KidGamesPage() {
   const [selectedGame, setSelectedGame] = useState(null);
   const [activeGame, setActiveGame] = useState(null);
@@ -32,15 +131,18 @@ export default function KidGamesPage() {
   const [loading, setLoading] = useState(true);
   const [sessionId, setSessionId] = useState(null);
   const [usingOfflineGames, setUsingOfflineGames] = useState(false);
+  
+  // Initialize translation
+  const { t, i18n } = useTranslation();
 
-  // Static games fallback - ALL ARE ACTIVE
+  // Static games fallback - ALL ARE ACTIVE with translations
   const getStaticGames = () => {
-    return [
+    const staticGamesData = [
       {
         id: 1,
         game_key: 'counting_game',
-        title: "Counting Adventure",
-        description: "Learn addition with fun visuals",
+        title: t('games.gameDetails.counting_adventure'),
+        description: t('games.gameDetails.counting_desc'),
         icon: "🎮",
         color: "from-[#FF5722] to-[#FF9800]",
         component: <CountingGame />,
@@ -53,8 +155,8 @@ export default function KidGamesPage() {
       {
         id: 2,
         game_key: 'shape_match_game',
-        title: "Shape Match",
-        description: "Match shapes and patterns",
+        title: t('games.gameDetails.shape_match'),
+        description: t('games.gameDetails.shape_desc'),
         icon: "🔺",
         color: "from-[#2196F3] to-[#03A9F4]",
         component: <ShapeMatchGame />,
@@ -67,8 +169,8 @@ export default function KidGamesPage() {
       {
         id: 3,
         game_key: 'color_quest_game',
-        title: "Color Quest",
-        description: "Learn colors through games",
+        title: t('games.gameDetails.color_quest'),
+        description: t('games.gameDetails.color_desc'),
         icon: "🎨",
         color: "from-[#9C27B0] to-[#E91E63]",
         component: <ColorQuestGame />,
@@ -81,8 +183,8 @@ export default function KidGamesPage() {
       {
         id: 4,
         game_key: 'memory_match_game',
-        title: "Memory Match",
-        description: "Improve memory skills",
+        title: t('games.gameDetails.memory_match'),
+        description: t('games.gameDetails.memory_desc'),
         icon: "🧠",
         color: "from-[#4CAF50] to-[#8BC34A]",
         component: <MemoryMatchGame />,
@@ -95,8 +197,8 @@ export default function KidGamesPage() {
       {
         id: 5,
         game_key: 'animal_safari_game',
-        title: "Animal Safari",
-        description: "Learn about animals",
+        title: t('games.gameDetails.animal_safari'),
+        description: t('games.gameDetails.animal_desc'),
         icon: "🦁",
         color: "from-[#FF9800] to-[#FFC107]",
         component: <AnimalSafariGame />,
@@ -109,8 +211,8 @@ export default function KidGamesPage() {
       {
         id: 6,
         game_key: 'alphabet_race_game',
-        title: "Alphabet Race",
-        description: "Learn letters while racing",
+        title: t('games.gameDetails.alphabet_race'),
+        description: t('games.gameDetails.alphabet_desc'),
         icon: "🚗",
         color: "from-[#3F51B5] to-[#2196F3]",
         component: <AlphabetRaceGame />,
@@ -123,8 +225,8 @@ export default function KidGamesPage() {
       {
         id: 7,
         game_key: 'pro_racing_challenge',
-        title: "Pro Racing Challenge",
-        description: "Race through traffic and collect power-ups",
+        title: t('games.gameDetails.pro_racing'),
+        description: t('games.gameDetails.pro_racing_desc'),
         icon: "🏎️",
         color: "from-[#FF0000] to-[#FF8800]",
         component: <ProRacingChallenge />,
@@ -137,8 +239,8 @@ export default function KidGamesPage() {
       {
         id: 8,
         game_key: 'water_sort_puzzle',
-        title: "Water Sort Puzzle",
-        description: "Sort colorful water in tubes",
+        title: t('games.gameDetails.water_sort'),
+        description: t('games.gameDetails.water_sort_desc'),
         icon: "💧",
         color: "from-[#2196F3] to-[#03A9F4]",
         component: <WaterSortPuzzle />,
@@ -149,6 +251,8 @@ export default function KidGamesPage() {
         skills_count: 2
       }
     ];
+    
+    return staticGamesData;
   };
 
   // Fetch available games from backend
@@ -163,20 +267,25 @@ export default function KidGamesPage() {
       if (response.data.success) {
         const gamesFromDb = response.data.games || [];
         
-        // Transform DB games to frontend format
+        // Transform DB games to frontend format with translations
         const transformedGames = gamesFromDb.map(game => {
           const gameKey = game.game_key || game.key;
           const GameComponent = GAME_COMPONENTS[gameKey];
           
+          // Get translated title and description
+          const gameTranslations = GAME_TRANSLATIONS[gameKey] || {};
+          const gameTitle = gameTranslations.title ? t(gameTranslations.title) : game.title;
+          const gameDescription = gameTranslations.description ? t(gameTranslations.description) : game.description;
+          
           return {
             id: game.id,
             game_key: gameKey,
-            title: game.title,
-            description: game.description,
+            title: gameTitle,
+            description: gameDescription,
             icon: game.icon_emoji || '🎮',
             color: game.color_gradient || 'from-[#FF5722] to-[#FF9800]',
             component: GameComponent ? <GameComponent /> : null,
-            category: game.category || 'Educational',
+            category: t(`games.categories.${game.category}`) || game.category,
             age_minimum: game.age_minimum,
             age_maximum: game.age_maximum,
             metadata: game.metadata || {},
@@ -203,9 +312,10 @@ export default function KidGamesPage() {
     }
   };
 
+  // Refetch games when language changes
   useEffect(() => {
     fetchAvailableGames();
-  }, []);
+  }, [i18n.language]); // Re-fetch when language changes
 
   const handleGameSelect = async (game) => {
     if (!game.is_active) return;
@@ -282,8 +392,8 @@ export default function KidGamesPage() {
     <div className="min-h-screen bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E] flex items-center justify-center">
       <div className="text-center">
         <Loader2 className="w-12 h-12 text-[#FF5722] animate-spin mx-auto mb-4" />
-        <h2 className="text-xl text-white font-semibold">Loading Games...</h2>
-        <p className="text-gray-400 mt-2">Fetching fun learning games for you</p>
+        <h2 className="text-xl text-white font-semibold">{t('games.loading')}</h2>
+        <p className="text-gray-400 mt-2">{t('games.loadingDesc')}</p>
       </div>
     </div>
   );
@@ -293,8 +403,9 @@ export default function KidGamesPage() {
   return (
     <>
       <Helmet>
-        <title>Kids Games</title>
-        <meta name="description" content="Fun learning games for kids" />
+        <title>{t('games.title')} - Oliviuus</title>
+        <meta name="description" content={t('games.gameDetails.counting_desc')} />
+        <html lang={i18n.language} />
       </Helmet>
 
       {/* Game Player - Fullscreen */}
@@ -326,20 +437,20 @@ export default function KidGamesPage() {
 
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">Skill:</span>
+                <span className="text-gray-400">{t('games.skill')}:</span>
                 <span className="text-white">{selectedGame.category}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">Type:</span>
+                <span className="text-gray-400">{t('games.type')}:</span>
                 <span className="text-white">Educational</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">Age:</span>
-                <span className="text-white">{selectedGame.age_minimum || 3}-{selectedGame.age_maximum || 8} years</span>
+                <span className="text-gray-400">{t('games.age')}:</span>
+                <span className="text-white">{selectedGame.age_minimum || 3}-{selectedGame.age_maximum || 8} {t('common.years')}</span>
               </div>
               {selectedGame.skills_count > 0 && (
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Skills:</span>
+                  <span className="text-gray-400">{t('games.skills')}:</span>
                   <span className="text-white">{selectedGame.skills_count}</span>
                 </div>
               )}
@@ -353,13 +464,13 @@ export default function KidGamesPage() {
                 }}
                 className="flex-1 py-2.5 bg-[#1A1A2E] border border-[#FF5722]/30 text-white rounded-lg hover:bg-[#16213E] text-sm"
               >
-                Back
+                {t('games.back')}
               </button>
               <button
                 onClick={handlePlayGame}
                 className="flex-1 py-2.5 bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white font-bold rounded-lg hover:opacity-90 text-sm"
               >
-                🎮 Play Now
+                {t('games.playNow')}
               </button>
             </div>
           </div>
@@ -376,12 +487,22 @@ export default function KidGamesPage() {
                 <Gamepad2 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Kids Games</h1>
+                <h1 className="text-2xl font-bold text-white">{t('games.title')}</h1>
                 <p className="text-gray-400 text-sm">
-                  {games.length} fun learning games available
+                  {t('games.subtitle', { count: games.length })}
                 </p>
               </div>
             </div>
+            
+            {/* Language Selector */}
+            <div className="hidden sm:block">
+              <LanguageSelector />
+            </div>
+          </div>
+          
+          {/* Mobile Language Selector */}
+          <div className="mt-4 sm:hidden">
+            <LanguageSelector />
           </div>
         </div>
 
@@ -392,13 +513,13 @@ export default function KidGamesPage() {
               <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Gamepad2 className="w-10 h-10 text-gray-500" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">No Games Available</h3>
-              <p className="text-gray-400 mb-6">Check back later for new games!</p>
+              <h3 className="text-xl font-bold text-white mb-2">{t('games.noGames')}</h3>
+              <p className="text-gray-400 mb-6">{t('games.noGamesDesc')}</p>
               <button
                 onClick={fetchAvailableGames}
                 className="bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white px-6 py-2.5 rounded-lg font-bold hover:opacity-90"
               >
-                Refresh Games
+                {t('games.refresh')}
               </button>
             </div>
           ) : (
@@ -423,12 +544,11 @@ export default function KidGamesPage() {
                       <span className="text-xs text-gray-400">{game.category}</span>
                       {game.skills_count > 0 && (
                         <span className="text-xs text-blue-400 ml-2">
-                          • {game.skills_count} skill{game.skills_count > 1 ? 's' : ''}
                         </span>
                       )}
                     </div>
                     <button className="px-3 py-1.5 bg-gradient-to-r from-[#FF5722] to-[#FF9800] text-white rounded-lg text-xs font-bold hover:opacity-90">
-                      Play
+                      {t('games.play')}
                     </button>
                   </div>
                 </div>

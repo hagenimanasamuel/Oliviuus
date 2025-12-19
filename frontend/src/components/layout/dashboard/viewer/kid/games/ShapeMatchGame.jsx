@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trophy, Heart, Zap, Clock, Users, Star, Target, Medal, Volume2, VolumeX, Crown, SkipForward, RotateCw, RefreshCw, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
+  const { t } = useTranslation(); // Initialize translation hook
+  
   const [gameMode, setGameMode] = useState('practice');
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
@@ -32,21 +35,31 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
   const gameContainerRef = useRef(null);
 
   const shapes = [
-    { id: 1, emoji: '🔺', name: 'Triangle', color: '#FF6B6B' },
-    { id: 2, emoji: '🔵', name: 'Circle', color: '#4ECDC4' },
-    { id: 3, emoji: '🟦', name: 'Square', color: '#45B7D1' },
-    { id: 4, emoji: '⭐', name: 'Star', color: '#FFD166' },
-    { id: 5, emoji: '❤️', name: 'Heart', color: '#FF6B9D' },
-    { id: 6, emoji: '🔶', name: 'Diamond', color: '#A13E97' },
-    { id: 7, emoji: '🌙', name: 'Moon', color: '#96CEB4' },
-    { id: 8, emoji: '⚡', name: 'Zap', color: '#FFE066' },
+    { id: 1, emoji: t('shapeMatchGame.shapes.triangle.emoji'), name: t('shapeMatchGame.shapes.triangle.name'), color: '#FF6B6B' },
+    { id: 2, emoji: t('shapeMatchGame.shapes.circle.emoji'), name: t('shapeMatchGame.shapes.circle.name'), color: '#4ECDC4' },
+    { id: 3, emoji: t('shapeMatchGame.shapes.square.emoji'), name: t('shapeMatchGame.shapes.square.name'), color: '#45B7D1' },
+    { id: 4, emoji: t('shapeMatchGame.shapes.star.emoji'), name: t('shapeMatchGame.shapes.star.name'), color: '#FFD166' },
+    { id: 5, emoji: t('shapeMatchGame.shapes.heart.emoji'), name: t('shapeMatchGame.shapes.heart.name'), color: '#FF6B9D' },
+    { id: 6, emoji: t('shapeMatchGame.shapes.diamond.emoji'), name: t('shapeMatchGame.shapes.diamond.name'), color: '#A13E97' },
+    { id: 7, emoji: t('shapeMatchGame.shapes.moon.emoji'), name: t('shapeMatchGame.shapes.moon.name'), color: '#96CEB4' },
+    { id: 8, emoji: t('shapeMatchGame.shapes.zap.emoji'), name: t('shapeMatchGame.shapes.zap.name'), color: '#FFE066' },
   ];
 
   const characters = [
-    { emoji: '🦊', name: 'Foxy' },
-    { emoji: '🐼', name: 'Panda' },
-    { emoji: '🦁', name: 'Leo' },
-    { emoji: '🐨', name: 'Koala' }
+    { emoji: t('shapeMatchGame.characters.foxy.emoji'), name: t('shapeMatchGame.characters.foxy.name') },
+    { emoji: t('shapeMatchGame.characters.panda.emoji'), name: t('shapeMatchGame.characters.panda.name') },
+    { emoji: t('shapeMatchGame.characters.leo.emoji'), name: t('shapeMatchGame.characters.leo.name') },
+    { emoji: t('shapeMatchGame.characters.koala.emoji'), name: t('shapeMatchGame.characters.koala.name') }
+  ];
+
+  // Translated funny messages
+  const funnyMessages = [
+    t('shapeMatchGame.feedback.correct.perfectMatch'),
+    t('shapeMatchGame.feedback.correct.shapeMaster'),
+    t('shapeMatchGame.feedback.correct.awesome'),
+    t('shapeMatchGame.feedback.correct.superFind'),
+    t('shapeMatchGame.feedback.correct.patternPro'),
+    t('shapeMatchGame.feedback.correct.bullseye')
   ];
 
   const generateBoard = (lvl) => {
@@ -197,15 +210,6 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
     
     setSelectedShapes([]);
     
-    const funnyMessages = [
-      "🎉 Perfect Match!",
-      "🌟 Shape Master!",
-      "✨ Awesome!",
-      "🎪 Super Find!",
-      "🧩 Pattern Pro!",
-      "🎯 Bullseye!"
-    ];
-    
     setFeedback(`${funnyMessages[Math.floor(Math.random() * funnyMessages.length)]} +${points}`);
     setIsCorrect(true);
     
@@ -215,7 +219,7 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
       if (streak + 1 >= 5) {
         const newLives = Math.min(lives + 1, 5);
         setLives(newLives);
-        setFeedback(prev => `${prev} 🏆 +1 Heart!`);
+        setFeedback(prev => `${prev} ${t('shapeMatchGame.feedback.bonusHeart')}`);
         onGameEvent?.({ type: 'heartsUpdate', payload: newLives });
       }
       
@@ -225,7 +229,7 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
       
       setTimeout(() => {
         setLevel(prev => prev + 1);
-        setFeedback("🚀 Level Up!");
+        setFeedback(t('shapeMatchGame.feedback.levelUp'));
       }, 1500);
     }
     
@@ -241,7 +245,7 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
     setLives(newLives);
     setStreak(0);
     
-    setFeedback("❌ Try again!");
+    setFeedback(t('shapeMatchGame.feedback.incorrect'));
     setIsCorrect(false);
     
     // Hide the selected shapes after delay
@@ -270,15 +274,15 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
       case 'reveal':
         setShowHint(true);
         setTimeout(() => setShowHint(false), 3000);
-        setFeedback("🔍 Hint activated!");
+        setFeedback(t('shapeMatchGame.powerUps.reveal.feedback'));
         break;
       case 'shuffle':
         generateBoard(level);
-        setFeedback("🌀 Board shuffled!");
+        setFeedback(t('shapeMatchGame.powerUps.shuffle.feedback'));
         break;
       case 'extraTime':
         setTimeLeft(prev => prev + 15);
-        setFeedback("⏰ +15 seconds!");
+        setFeedback(t('shapeMatchGame.powerUps.extraTime.feedback'));
         break;
     }
   };
@@ -320,21 +324,31 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
       <div className={`flex items-center justify-center ${isFullscreen ? 'h-full' : 'min-h-[400px]'} p-3 w-full`}>
         <div className="w-full bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-xl shadow-lg p-4 border border-[#4ECDC4]/30">
           <div className="text-4xl mb-3 text-center">🧩</div>
-          <h1 className="text-2xl font-bold text-white mb-2 text-center">Game Complete!</h1>
-          <p className="text-gray-300 mb-4 text-sm text-center">You matched {matches} shapes!</p>
+          <h1 className="text-2xl font-bold text-white mb-2 text-center">
+            {t('shapeMatchGame.gameOver.title')}
+          </h1>
+          <p className="text-gray-300 mb-4 text-sm text-center">
+            {t('shapeMatchGame.gameOver.subtitle', { count: matches })}
+          </p>
           
           <div className="grid grid-cols-3 gap-2 mb-4">
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{score}</div>
-              <div className="text-gray-400 text-xs text-center">Score</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('shapeMatchGame.gameOver.score')}
+              </div>
             </div>
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{level}</div>
-              <div className="text-gray-400 text-xs text-center">Level</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('shapeMatchGame.gameOver.level')}
+              </div>
             </div>
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{matches}</div>
-              <div className="text-gray-400 text-xs text-center">Matched</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('shapeMatchGame.gameOver.matched')}
+              </div>
             </div>
           </div>
           
@@ -342,7 +356,7 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
             onClick={resetGame}
             className="w-full py-2.5 rounded-lg bg-gradient-to-r from-[#4ECDC4] to-[#45B7D1] text-white font-bold hover:opacity-90 text-sm"
           >
-            🔄 Play Again
+            {t('shapeMatchGame.gameOver.playAgain')}
           </button>
         </div>
       </div>
@@ -381,13 +395,19 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
               <span className="text-lg">{selectedCharacter}</span>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-white">Shape Match</h1>
+              <h1 className="text-sm font-bold text-white">
+                {t('shapeMatchGame.gameHeader.title')}
+              </h1>
               <div className="flex items-center gap-1">
-                <span className="text-xs text-gray-400">Lvl {level}</span>
+                <span className="text-xs text-gray-400">
+                  {t('shapeMatchGame.gameHeader.level', { level })}
+                </span>
                 {streak > 0 && (
                   <>
                     <span className="text-gray-600">•</span>
-                    <span className="text-xs text-yellow-400">{streak}🔥</span>
+                    <span className="text-xs text-yellow-400">
+                      {t('shapeMatchGame.gameHeader.streak', { streak })}
+                    </span>
                   </>
                 )}
               </div>
@@ -404,6 +424,7 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="p-1.5 bg-[#1A1A2E] border border-[#4ECDC4]/20 rounded-lg hover:bg-[#4ECDC4]/10 transition-colors"
+              title={t('shapeMatchGame.buttons.toggleSound')}
             >
               {soundEnabled ? 
                 <Volume2 className="w-4 h-4 text-green-400" /> : 
@@ -419,20 +440,20 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => setGameMode('practice')}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold ${gameMode === 'practice' ? 'bg-gradient-to-r from-[#4ECDC4] to-[#45B7D1] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
           >
-            Practice
+            {t('shapeMatchGame.gameModes.practice')}
           </button>
           <button
             onClick={() => setGameMode('timed')}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold ${gameMode === 'timed' ? 'bg-gradient-to-r from-[#4ECDC4] to-[#45B7D1] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
           >
             <Clock className="inline w-3 h-3 mr-1" />
-            Timed
+            {t('shapeMatchGame.gameModes.timed')}
           </button>
           <button
             onClick={() => setGameMode('pattern')}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold ${gameMode === 'pattern' ? 'bg-gradient-to-r from-[#4ECDC4] to-[#45B7D1] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
           >
-            Pattern
+            {t('shapeMatchGame.gameModes.pattern')}
           </button>
         </div>
 
@@ -440,9 +461,11 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
         {gameMode === 'timed' && (
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-400">Time Left:</span>
+              <span className="text-xs text-gray-400">
+                {t('shapeMatchGame.timer.timeLeft')}
+              </span>
               <span className={`text-sm font-bold ${timeLeft <= 10 ? 'text-red-400' : 'text-green-400'}`}>
-                {timeLeft}s
+                {t('shapeMatchGame.timer.seconds', { time: timeLeft })}
               </span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-1.5">
@@ -457,12 +480,15 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
         {/* Pattern Target Display */}
         {gameMode === 'pattern' && targetPattern.length > 0 && (
           <div className="mb-3 bg-gradient-to-r from-[#4ECDC4]/10 to-[#45B7D1]/10 rounded-lg p-2 border border-[#4ECDC4]/20">
-            <div className="text-xs text-gray-400 mb-1">Match this pattern:</div>
+            <div className="text-xs text-gray-400 mb-1">
+              {t('shapeMatchGame.patternMode.matchPattern')}
+            </div>
             <div className="flex items-center justify-center gap-2">
               {targetPattern.map((shape, index) => (
                 <div 
                   key={index}
                   className={`p-1.5 rounded-lg ${index < matches ? 'bg-[#4ECDC4]/20' : 'bg-[#1A1A2E]'}`}
+                  aria-label={`${t('shapeMatchGame.patternMode.matchPattern')}: ${shape.name} ${index < matches ? t('shapeMatchGame.instructions.matched') : t('shapeMatchGame.instructions.selected')}`}
                 >
                   <span className="text-xl">{shape.emoji}</span>
                 </div>
@@ -478,17 +504,22 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
               <Heart
                 key={i}
                 className={`w-4 h-4 ${i < lives ? 'text-red-400 fill-red-400' : 'text-gray-600'}`}
+                aria-label={`${t('shapeMatchGame.stats.lives')}: ${i + 1} ${i < lives ? 'full' : 'empty'}`}
               />
             ))}
           </div>
           
           <div className="flex items-center gap-3 text-xs">
             <div className="flex items-center gap-1">
-              <span className="text-gray-400">Matches:</span>
+              <span className="text-gray-400">
+                {t('shapeMatchGame.stats.matches')}
+              </span>
               <span className="font-bold text-white">{matches}</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-gray-400">Moves:</span>
+              <span className="text-gray-400">
+                {t('shapeMatchGame.stats.moves')}
+              </span>
               <span className="font-bold text-white">{moves}</span>
             </div>
           </div>
@@ -500,7 +531,8 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
                style={{ 
                  gridTemplateColumns: `repeat(${board.length}, 1fr)`,
                  maxWidth: 'min(100%, 400px)'
-               }}>
+               }}
+               aria-label={t('shapeMatchGame.labels.shapeBoard')}>
             {board.flat().map((cell) => (
               <button
                 key={cell.uniqueId}
@@ -519,6 +551,7 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
                   minHeight: '55px',
                   minWidth: '55px'
                 }}
+                aria-label={`${cell.name} shape - ${cell.isMatched ? t('shapeMatchGame.instructions.matched') : cell.isRevealed || showHint ? t('shapeMatchGame.instructions.selected') : t('shapeMatchGame.instructions.hidden')}`}
               >
                 {cell.isMatched || cell.isRevealed || showHint ? cell.emoji : '?'}
               </button>
@@ -530,8 +563,8 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
         <div className="mb-3 text-center">
           <div className="text-xs text-gray-400">
             {gameMode === 'pattern' 
-              ? 'Click shapes in the target pattern order!' 
-              : 'Find matching shape pairs!'}
+              ? t('shapeMatchGame.patternMode.instructions')
+              : t('shapeMatchGame.instructions.practiceTimed')}
           </div>
         </div>
 
@@ -541,9 +574,11 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => usePowerUp('reveal')}
             disabled={powerUps.reveal <= 0}
             className={`flex-1 p-2 rounded-lg border text-xs ${powerUps.reveal <= 0 ? 'border-gray-600/30 text-gray-500' : 'border-[#FFD166]/30 text-white hover:bg-[#FFD166]/10 transition-colors'}`}
+            title={t('shapeMatchGame.powerUps.reveal.description')}
+            aria-label={t('shapeMatchGame.buttons.usePowerUp', { powerUp: t('shapeMatchGame.powerUps.reveal.name') })}
           >
             <div className="text-sm">🔍</div>
-            <div>Reveal</div>
+            <div>{t('shapeMatchGame.powerUps.reveal.name')}</div>
             <div className="text-xs text-gray-400">x{powerUps.reveal}</div>
           </button>
           
@@ -551,9 +586,11 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => usePowerUp('shuffle')}
             disabled={powerUps.shuffle <= 0}
             className={`flex-1 p-2 rounded-lg border text-xs ${powerUps.shuffle <= 0 ? 'border-gray-600/30 text-gray-500' : 'border-[#FF6B6B]/30 text-white hover:bg-[#FF6B6B]/10 transition-colors'}`}
+            title={t('shapeMatchGame.powerUps.shuffle.description')}
+            aria-label={t('shapeMatchGame.buttons.usePowerUp', { powerUp: t('shapeMatchGame.powerUps.shuffle.name') })}
           >
             <div className="text-sm">🌀</div>
-            <div>Shuffle</div>
+            <div>{t('shapeMatchGame.powerUps.shuffle.name')}</div>
             <div className="text-xs text-gray-400">x{powerUps.shuffle}</div>
           </button>
           
@@ -561,9 +598,11 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => usePowerUp('extraTime')}
             disabled={powerUps.extraTime <= 0 || gameMode !== 'timed'}
             className={`flex-1 p-2 rounded-lg border text-xs ${powerUps.extraTime <= 0 || gameMode !== 'timed' ? 'border-gray-600/30 text-gray-500' : 'border-[#A13E97]/30 text-white hover:bg-[#A13E97]/10 transition-colors'}`}
+            title={t('shapeMatchGame.powerUps.extraTime.description')}
+            aria-label={t('shapeMatchGame.buttons.usePowerUp', { powerUp: t('shapeMatchGame.powerUps.extraTime.name') })}
           >
             <div className="text-sm">⏰</div>
-            <div>+15s</div>
+            <div>{t('shapeMatchGame.powerUps.extraTime.name')}</div>
             <div className="text-xs text-gray-400">x{powerUps.extraTime}</div>
           </button>
         </div>
@@ -584,15 +623,15 @@ const ShapeMatchGame = ({ onGameEvent, isFullscreen }) => {
           <div className="grid grid-cols-3 gap-1 text-xs text-gray-500">
             <div className="flex items-center justify-center gap-1">
               <span>🔍</span>
-              <span>H = Hint</span>
+              <span>{t('shapeMatchGame.powerUps.reveal.key')}</span>
             </div>
             <div className="flex items-center justify-center gap-1">
               <span>🌀</span>
-              <span>R = Shuffle</span>
+              <span>{t('shapeMatchGame.powerUps.shuffle.key')}</span>
             </div>
             <div className="flex items-center justify-center gap-1">
               <span>🏆</span>
-              <span>3-streak</span>
+              <span>{t('shapeMatchGame.keyboard.streak')}</span>
             </div>
           </div>
         </div>

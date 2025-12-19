@@ -1765,6 +1765,7 @@
     }
   },
   "common": {
+    "years": "miaka",
     "yes": "Ndiyo",
     "no": "Hapana",
     "cancel": "Ghairi",
@@ -1802,7 +1803,8 @@
     },
     "tabs": {
       "pinManagement": "Usimamizi wa PIN",
-      "securityLogs": "Kumbukumbu za Usalama"
+      "securityLogs": "Kumbukumbu za Usalama",
+      "kidInsights": "Taarifa za Mtoto"
     },
     "pinSection": {
       "activeTitle": "PIN Kuu Inafanya Kazi",
@@ -1886,6 +1888,278 @@
       "success": "Mafanikio",
       "error": "Hitilafu",
       "warning": "Onyo"
+    }
+  },
+  "kidInsights": {
+    "title": "Uchambuzi wa Shughuli za Mtoto",
+    "subtitle": "Uchambuzi kamili na maarifa kuhusu shughuli za kidijitali za mtoto wako",
+    "export": "Hamisha PDF",
+    "refreshData": "Sasisha Data",
+    "loading": "Inapakia...",
+    "unknownKid": "Mtoto Asiyejulikana",
+    "years": "miaka",
+    "timeframes": {
+      "day": "Leo",
+      "week": "Wiki Hii",
+      "month": "Mwezi Huu",
+      "year": "Mwaka Huu"
+    },
+    "modes": {
+      "overview": "Muhtasari",
+      "gaming": "Michezo",
+      "content": "Maudhui",
+      "learning": "Kujifunza",
+      "screentime": "Muda wa Skrini",
+      "behavior": "Tabia",
+      "comparative": "Kulinganisha"
+    },
+    "stats": {
+      "totalPlaytime": "Muda Wa Michezo Jumla",
+      "totalEngagement": "Ushirikiano Jumla",
+      "learningProgress": "Maendeleo ya Kujifunza",
+      "contentWatched": "Maudhui Yaliyotazamwa",
+      "screenTimeHealth": "Afya ya Muda wa Skrini",
+      "sessions": "vipindi",
+      "skillsImproved": "ujuzi ulioboreshwa",
+      "watchTime": "muda wa kutazama",
+      "compliant": "inazingatiwa",
+      "totalGamingTime": "Muda Wa Michezo Jumla",
+      "gamesPlayed": "Michezo Iliyochezwa",
+      "plays": "michezo",
+      "averageScore": "Alama ya Wastani",
+      "highScores": "alama bora",
+      "engagementRate": "Kiwango cha Ushirikiano",
+      "productivity": "Uzalishaji",
+      "points": "pointi",
+      "favoriteGame": "Mchezo Unayopenda",
+      "noData": "Hakuna data bado",
+      "topSkill": "Ujuzi wa Juu",
+      "improvement": "uboreshaji",
+      "productivityScore": "Alama ya Uzalishaji",
+      "completionRate": "Kiwango cha Kukamilisha",
+      "averageCompletion": "Kukamilisha kwa wastani kwa maudhui",
+      "favoriteCategory": "Kategoria Inayopendwa",
+      "ofWatchTime": "ya muda wa kutazama",
+      "engagementScore": "Alama ya Ushirikiano",
+      "contentInteraction": "Ubora wa mwingiliano na maudhui",
+      "skillsImproved": "Ujuzi Ulioboreshwa",
+      "avgImprovement": "uboreshaji wa wastani",
+      "learningTime": "Muda wa Kujifunza",
+      "overTimeframe": "Zaidi ya",
+      "gamesCompleted": "Michezo Iliyokamilika",
+      "educationalGames": "michezo ya kielimu",
+      "learningScore": "Alama ya Kujifunza",
+      "overallProgress": "maendeleo jumla",
+      "totalScreenTime": "Muda wa Skrini Jumla",
+      "total": "jumla",
+      "dailyAverage": "Wastani wa Kila Siku",
+      "perDayAverage": "Wastani kwa siku",
+      "complianceRate": "Kiwango cha Kufuata",
+      "rulesFollowed": "Kanuni zilizofuatwa",
+      "peakUsage": "Matumizi ya Kilele",
+      "focusLevel": "Kiwango cha Kuzingatia",
+      "taskCompletion": "Uwezo wa kukamilisha kazi",
+      "persistence": "Uvumilivu",
+      "sessionIndicator": "Kiashiria cha muda wa kipindi",
+      "ruleCompliance": "Kufuata Kanuni",
+      "followingRestrictions": "Kufuata vikwazo",
+      "curiosity": "Udadisi",
+      "varietySeeking": "Kutafuta aina mbalimbali",
+      "averageSessionLength": "Urefu wa wastani wa kipindi",
+      "mostWatchedDay": "Siku iliyotazamwa zaidi",
+      "preferredContentType": "Aina ya maudhui inayopendwa",
+      "timeLimitCompliance": "Kufuata mipaka ya muda",
+      "ruleViolations": "Ukiukaji wa kanuni",
+      "times": "mara",
+      "currentLevel": "Kiwango cha Sasa"
+    },
+    "charts": {
+      "activityDistribution": "Usambazaji wa Shughuli",
+      "timeSpentDescription": "Jinsi muda ulivyotumiwa kwenye shughuli",
+      "skillDevelopment": "Ukuzaji wa Ujuzi",
+      "progressDescription": "Maendeleo katika kategoria tofauti za ujuzi",
+      "skillScore": "Alama ya Ujuzi",
+      "gamesDistribution": "Usambazaji wa Michezo",
+      "mostPlayedGames": "Michezo iliyochezwa zaidi kwa idadi ya vipindi",
+      "plays": "michezo",
+      "ofSessions": "ya vipindi",
+      "skillProgress": "Maendeleo ya Ujuzi",
+      "improvementOverTime": "Uboreshaji kwa muda uliochaguliwa",
+      "improvementPercentage": "Uboreshaji %",
+      "improvement": "Uboreshaji",
+      "skillBreakdown": "Mgawanyiko wa Ujuzi",
+      "games": "michezo",
+      "total": "Muda wa Skrini Jumla",
+      "gaming": "Muda wa Michezo",
+      "content": "Muda wa Maudhui",
+      "contentCategories": "Kategoria za Maudhui",
+      "watchDistribution": "Usambazaji wa maudhui yaliyotazamwa kwa kategoria",
+      "watchCount": "Idadi ya Kutazama",
+      "skillRadar": "Radar ya Ukuzaji wa Ujuzi",
+      "skillProgressAreas": "Maendeleo katika maeneo tofauti ya ujuzi",
+      "skillLevel": "Kiwango cha Ujuzi",
+      "screenTimeTrends": "Mienendo ya Muda wa Skrini",
+      "dailyScreenTime": "Muda wa skrini wa kila siku zaidi ya",
+      "activityBreakdown": "Mgawanyiko wa Shughuli",
+      "screenTimeDistribution": "Jinsi muda wa skrini unavyosambazwa",
+      "behaviorProfile": "Wasifu wa Tabia",
+      "behaviorTraits": "Tabia na mifumo ya tabia",
+      "behaviorScore": "Alama ya Tabia"
+    },
+    "categories": {
+      "gaming": "Michezo",
+      "content": "Maudhui",
+      "learning": "Kujifunza",
+      "other": "Nyingine"
+    },
+    "sections": {
+      "recentActivity": "Shughuli za Hivi Karibuni",
+      "recentGamingSessions": "Vipindi vya Michezo vya Hivi Karibuni",
+      "latestGameplay": "Shughuli za hivi punde za mchezo",
+      "recentAchievements": "Mafanikio ya Hivi Karibuni",
+      "milestonesReached": "Vipimo na mafanikio",
+      "recommendations": "Mapendekezo",
+      "personalizedSuggestions": "Mapendekezo ya kibinafsi kulingana na shughuli",
+      "suggestion": "Pendekezo",
+      "tryNewActivities": "Zingatia kujaribu shughuli mpya",
+      "importantAlerts": "Taarifa Muhimu",
+      "areasRequiringAttention": "Maeneo yanayohitaji tahadhari",
+      "checkSettings": "Angalia mipangilio kwa maelezo zaidi",
+      "watchTimePatterns": "Mifumo ya Muda wa Kutazama",
+      "dailyViewingHabits": "Tabia za kila siku za kutazama na mifumo",
+      "watchPatterns": "Mifumo ya Kutazama",
+      "strengths": "Nguvu",
+      "excelAreas": "Maeneo ambayo mtoto wako anafanya vizuri",
+      "skill": "Ujuzi",
+      "strongPerformance": "Utendaji mzuri katika eneo hili",
+      "areasImprovement": "Maeneo ya Kuboresha",
+      "needsPractice": "Ujuzi unaohitaji mazoezi zaidi",
+      "needsPracticeArea": "Inahitaji mazoezi zaidi katika eneo hili",
+      "timeRestrictions": "Vikwazo vya Muda",
+      "positivePatterns": "Mifumo Chanya",
+      "healthyBehavior": "Tabia nzuri iliyozingatiwa",
+      "areasMonitor": "Maeneo ya Kufuatilia",
+      "behaviorPatternsWatch": "Mifumo ya tabia ya kuangalia",
+      "compareBenchmarks": "Linganisha na watoto wengine na viwango",
+      "comparativeAnalysis": "Uchambuzi wa Kulinganisha Unakuja",
+      "comparativeDescription": "Huu kipengele kiko katika maendeleo. Hivi karibuni utaweza kulinganisha shughuli za mtoto wako na wastani wa kundi la umri na utendaji wa ndugu.",
+      "compareFeatures": "Unachoweza Kulinganisha"
+    },
+    "timeOfDay": {
+      "morning": "Asubuhi",
+      "afternoon": "Mchana",
+      "evening": "Jioni",
+      "night": "Usiku"
+    },
+    "levels": {
+      "high": "Ju",
+      "medium": "Wastani"
+    },
+    "behavior": {
+      "consistentSchedule": "Ratiba Thabiti",
+      "goodRoutine": "Mifumo ya shughuli thabiti inaonyesha tabia nzuri za kawaida",
+      "goodFocus": "Kuzingatia Vizuri",
+      "completesTasks": "Anakamilisha kazi bila usumbufu mwingi",
+      "variedInterests": "Maslahi Mbalimbali",
+      "exploresContent": "Anachunguza aina tofauti za maudhui na shughuli",
+      "lateSessions": "Vipindi vya Usiku",
+      "bedtimeActivity": "Baadhi ya shughuli hufanyika karibu na wakati wa kulala",
+      "restrictionAttempts": "Majaribio ya Vikwazo",
+      "accessRestricted": "Majaribio ya kupata maudhui yaliyozuiwa",
+      "extendedSessions": "Vipindi Vilivyopanuliwa",
+      "exceedsDuration": "Baadhi ya vipindi vya mchezo vinazidi muda ulipendekezwa"
+    },
+    "comparison": {
+      "vsAverage": "dhidi ya wastani",
+      "ageGroup": "Ulinganishaji wa kundi la umri",
+      "vsSiblings": "dhidi ya ndugu",
+      "familyComparison": "Ulinganishaji wa familia",
+      "progress": "Maendeleo",
+      "growthTime": "Ukuaji kwa muda",
+      "gamingPerformance": "Utendaji wa Michezo",
+      "gamingMetrics": "Alama, viwango vya kukamilisha, muda wa mchezo",
+      "learningProgress": "Maendeleo ya Kujifunza",
+      "skillComparison": "Ukuzaji wa ujuzi ulilinganishwa na wenzao",
+      "screenTimeHabits": "Tabia za Muda wa Skrini",
+      "usageComparison": "Matumizi ya kila siku yanayolinganishwa na mapendekezo"
+    },
+    "status": {
+      "comingSoon": "Inakuja Hivi Karibuni"
+    },
+    "achievements": {
+      "firstGame": "Mchezo wa Kwanza Umekamilika!",
+      "completedFirstGame": "Amekamilisha mchezo wake wa kwanza wa kielimu",
+      "streak": "Mfululizo wa Siku 3!",
+      "played3Days": "Amecheza michezo ya kielimu kwa siku 3 mfululizo",
+      "skillMaster": "Mtaalamu wa Ujuzi",
+      "improvedSkill": "Ameboresha ujuzi kwa 25% au zaidi"
+    },
+    "recommendations": {
+      "title": "Maarifa & Mapendekezo",
+      "basedOnActivity": "Kulingana na shughuli za hivi karibuni za mchezo na maendeleo",
+      "strengths": "Nguvu",
+      "highEngagement": "Kiwango cha juu cha ushirikiano - mtoto anajifunza kikamilifu",
+      "goodEngagement": "Ushirikiano mzuri - tabia thabiti za kujifunza",
+      "opportunities": "Fursa",
+      "moreVariety": "Jaribu kategoria tofauti za michezo kwa ukuzaji mpana wa ujuzi",
+      "continueVariety": "Aina nzuri - endelea kuchunguza michezo tofauti",
+      "suggestions": "Mapendekezo",
+      "tryNewSkills": "Jaribu michezo inayolenga ujuzi tofauti wa kielimu",
+      "continueTopSkill": "Endelea kukuza ujuzi wa juu na michezo inayohusiana"
+    },
+    "pdf": {
+      "title": "Oliviuus Maarifa ya Watoto",
+      "reportFor": "Ripoti kwa",
+      "timeframe": "Muda",
+      "generated": "Imetengenezwa",
+      "exportError": "Imeshindwa kuhamisha PDF. Tafadhali jaribu tena.",
+      "sections": {
+        "overview": "📊 Muhtasari",
+        "gaming": "🎮 Maarifa ya Michezo",
+        "content": "🎬 Maarifa ya Maudhui",
+        "learning": "🧠 Maarifa ya Kujifunza",
+        "screentime": "⏰ Maarifa ya Muda wa Skrini",
+        "recommendations": "💡 Mapendekezo",
+        "alerts": "🚨 Taarifa Muhimu",
+        "summary": "📝 Muhtasari"
+      },
+      "totalEngagement": "Ushirikiano Jumla",
+      "totalSessions": "Vipindi Vya Jumla",
+      "learningScore": "Alama ya Kujifunza",
+      "productivityScore": "Alama ya Uzalishaji",
+      "gamesPlayed": "Michezo Iliyochezwa",
+      "totalGamingTime": "Muda wa Michezo Jumla",
+      "averageSession": "Kipindi cha Wastani",
+      "minutes": "dakika",
+      "mostPlayedGames": "Michezo Iliyochezwa Zaidi",
+      "plays": "michezo",
+      "contentWatched": "Maudhui Yaliyotazamwa",
+      "totalWatchTime": "Muda wa Kutazama Jumla",
+      "completionRate": "Kiwango cha Kukamilisha",
+      "engagementScore": "Alama ya Ushirikiano",
+      "topCategories": "Kategoria Bora",
+      "items": "vitu",
+      "skillsImproved": "Ujuzi Ulioboreshwa",
+      "averageImprovement": "Uboreshaji wa Wastani",
+      "totalLearningTime": "Muda wa Kujifunza Jumla",
+      "gamesCompleted": "Michezo Iliyokamilika",
+      "strengths": "Nguvu",
+      "totalScreenTime": "Muda wa Skrini Jumla",
+      "dailyAverage": "Wastani wa Kila Siku",
+      "gaming": "Michezo",
+      "content": "Maudhui",
+      "other": "Nyingine",
+      "suggestion": "Pendekezo",
+      "reportGeneratedFor": "Ripoti imetengenezwa kwa",
+      "timePeriod": "Kipindi cha Muda",
+      "overallEngagement": "Ushirikiano wa jumla",
+      "learningProgress": "Maendeleo ya kujifunza",
+      "footer": {
+        "company": "Oliviuus - Ripoti ya Maarifa ya Shughuli za Watoto",
+        "page": "Ukurasa",
+        "of": "ya"
+      },
+      "years": "miaka"
     }
   },
   "familyProfiles": {
@@ -2288,7 +2562,29 @@
     },
     "pinModal": {
       "title": "Thibitisha PIN kuondoka kwenye Mode ya Watoto",
-      "description": "Ingiza PIN ya familia kuondoka kwenye mode ya watoto na kurudi kwenye dashibodi ya mzazi"
+      "description": "Ingiza PIN ya familia kuondoka kwenye mode ya watoto na kurudi kwenye dashibodi ya mzazi",
+      "incorrectPin": "PIN si sahihi. Tafadhali jaribu tena.",
+      "verificationFailed": "Uthibitishaji wa PIN umeshindwa. Tafadhali jaribu tena.",
+      "enterPin": "Weka PIN ya tarakimu 4",
+      "digits": "tarakimu",
+      "clear": "Futa",
+      "cancel": "Ghairi",
+      "verifying": "Inathibitishwa...",
+      "verify": "Thibitisha PIN",
+      "securityNote": "Kwa usalama, majaribio yote ya PIN yanarekodiwa",
+      "attempts": "Majaribio: {{count}}",
+      "lastAttempt": "Jaribio la mwisho",
+      "errors": {
+        "invalidLength": "PIN lazima iwe na tarakimu 4",
+        "incorrectPin": "PIN si sahihi",
+        "verificationFailed": "Uthibitishaji umeshindwa"
+      },
+      "securityWarning": {
+        "title": "Tahadhari ya Usalama",
+        "twoAttempts": "Majaribio mengi ya PIN yasiyo sahihi yamegunduliwa. Jaribio hili litarekodiwa.",
+        "threeAttempts": "Majaribio mengi yaliyoshindwa yamegunduliwa. Mzazi ataarifiwa.",
+        "multipleAttempts": "Majaribio {{count}} yaliyoshindwa yamegunduliwa. Tahadhari ya usalama imetumwa kwa mzazi."
+      }
     }
   },
   "pinModal": {
@@ -2514,28 +2810,1453 @@
     }
   },
   "games": {
+    "play": "Cheza",
+    "title": "Michezo ya Watoto",
+    "subtitle": "Michezo {{count}} ya kujifunza yenye furaha inapatikana",
+    "noGames": "Hakuna Michezo Inayopatikana",
+    "noGamesDesc": "Rudi tena baadaye kwa michezo mipya!",
+    "refresh": "Pakia Upya Michezo",
+    "playNow": "🎮 Cheza Sasa",
+    "back": "Rudi Nyuma",
+    "skill": "Ujuzi",
+    "type": "Aina",
+    "age": "Umri",
+    "skills": "Ujuzi",
+    "loading": "Inapakia Michezo...",
+    "loadingDesc": "Inatafuta michezo ya kujifunza yenye furaha",
+    "categories": {
+      "Math": "Hisabati",
+      "Puzzles": "Vitendawili",
+      "Colors": "Rangi",
+      "Memory": "Kumbukumbu",
+      "Science": "Sayansi",
+      "Language": "Lugha",
+      "Racing": "Mashindano",
+      "Logic": "Mantiki",
+      "Action": "Vitendo",
+      "Educational": "Elimu"
+    },
+    "gameDetails": {
+      "counting_adventure": "Safari ya Kuhesabu",
+      "counting_desc": "Jifunze kujumlisha kwa picha za kufurahisha",
+      "shape_match": "Linganisha Maumbo",
+      "shape_desc": "Linganisha maumbo na mifumo",
+      "color_quest": "Safari ya Rangi",
+      "color_desc": "Jifunze rangi kupitia michezo",
+      "memory_match": "Linganisha Kumbukumbu",
+      "memory_desc": "Boresha uwezo wa kumbukumbu",
+      "animal_safari": "Safari ya Wanyama",
+      "animal_desc": "Jifunze kuhusu wanyama",
+      "alphabet_race": "Mbio za Alfabeti",
+      "alphabet_desc": "Jifunze herufi ukiwa kwenye mbio",
+      "pro_racing": "Changamoto ya Mbio za Kitaalam",
+      "pro_racing_desc": "Kimbia barabarani na kusanya nguvu",
+      "water_sort": "Kitendawili cha Kuchambua Maji",
+      "water_sort_desc": "Panga maji ya rangi kwenye mirija"
+    }
+  },
+  "gamePlayer": {
+    "exit": "Toka",
+    "exitGame": "Toka Kwenye Mchezo",
+    "resume": "Endelea",
+    "pause": "Sitisha",
+    "fullscreen": "Skrini Kamili",
+    "exitFS": "Toka Skrini Kamili",
+    "controls": "Vidhibiti",
+    "volume": "Sauti",
+    "musicPlaying": "Muziki Unacheza",
+    "audioUnavailable": "Sauti Haipatikani",
+    "audioMuted": "Sauti Imezimwa",
+    "gotIt": "Nimeelewa!",
+    "score": "Alama",
+    "time": "Muda",
+    "hearts": "Maisha",
+    "shortcuts": {
+      "esc": "ESC",
+      "escape": "Toka Kwenye Mchezo",
+      "f": "F",
+      "fullscreenKey": "Skrini Kamili",
+      "m": "M",
+      "mute": "Zima Sauti",
+      "space": "Space",
+      "pausePlay": "Sitisha/Cheza",
+      "c": "C",
+      "toggleControls": "Onyesha/Ficha Vidhibiti",
+      "s": "S",
+      "saveProgress": "Hifadhi Maendeleo",
+      "zeroNine": "0-9",
+      "volumeLevels": "Viwango vya Sauti"
+    }
+  },
+  "proRacingChallenge": {
     "seo": {
-      "title": "Michezo ya Watoto - Inakuja Hivi Karibuni",
-      "description": "Michezo ya kufurahisha na ya kujifunza kwa watoto itapatikana hivi karibuni!"
+      "title": "Changamoto ya Mbio za Kitaalamu - Mchezo wa Kasi Kubwa",
+      "description": "Epuka magari barabarani, kusanya power-ups, na tumia shield katika mchezo huu mkali wa mbio!"
     },
-    "header": {
-      "title": "Eneo la Michezo",
-      "subtitle": "Michezo ya Kufurahisha Inakuja Hivi Karibuni! 🎮",
-      "description": "Tunafanya kazi kuwaletea michezo bora, salama, ya watoto, inayoburudisha na ya kielimu. Endelea kufuatilia kwa masasisho ya kusisimua!"
+    "game": {
+      "title": "MPANDA MBIO MTAALAMU",
+      "level": "L{{level}}",
+      "score": "{{score}}",
+      "startButton": "🚀 ANZA MBIO",
+      "restartButton": "🏎️ CHEZA TENA",
+      "gameOver": {
+        "title": "MBIO ZIMEKAMILIKA!",
+        "newHighScore": "🥇 REKODI MPYA!",
+        "highScore": "🥈 JUU: {{score}}"
+      },
+      "instructions": {
+        "tapLanes": "Gusa njia kubadilisha mstari",
+        "shieldButton": "Gusa kitufe cha SHIELD",
+        "touchHint": "Gusa L1/L2/L3 kubadilisha mstari • Gusa SHIELD kujilinda"
+      },
+      "controls": {
+        "lane": "L{{lane}}",
+        "up": "↑ JUU",
+        "down": "↓ CHINI",
+        "shield": "SHIELD ({{charges}})",
+        "shieldCooldown": "⏳",
+        "recharging": "Shield inachajiwa..."
+      },
+      "powerUps": {
+        "shieldCharge": "🛡️ +1 Shield!",
+        "autoShield": "🛡️ Shield ya Moja kwa Moja!",
+        "slowMotion": "🐌 Mwendo wa Polepole!",
+        "speedBoost": "⚡ Ongeza Kasi!",
+        "shieldActive": "🛡️ Shield Inafanya Kazi (7s)!",
+        "roadColor": "⭐ Rangi Mpya ya Barabara!",
+        "roadGlow": "🌟 Barabara Inang'aa!"
+      },
+      "collision": {
+        "crash": "Umegonga! Gusa kuanza tena"
+      }
     },
-    "features": {
-      "title": "Nini Kinakuja?",
-      "funEducational": "Michezo ya Kufurahisha na ya Kielimu",
-      "puzzles": "Vichangamoto vya Kufikirisha",
-      "skillBuilding": "Shughuli za Kukuza Ujuzi",
-      "safeContent": "Maudhui Salama na Yanaofaa Watoto"
+    "tutorial": {
+      "title": "MFUMO WA SHIELD",
+      "description": "Unaanza na charges 3",
+      "features": {
+        "shield": "• 🛡️ = Shield ya sekunde 7",
+        "collect": "• Kusanya kupata charges zaidi (kikomo 5)"
+      }
     },
-    "construction": {
-      "title": "Katikati ya Ujenzi",
-      "description": "Tunajenga mkusanyiko mzuri wa michezo ya watoto! Rudi hivi karibuni kuona michezo ya kufurahisha, ya kielimu, na ya kusisimua ambayo itafanya kujifunza kuwa raha! ✨"
+    "ui": {
+      "score": "ALAMA: {{score}}",
+      "level": "KIWANGO {{level}}",
+      "shieldCharges": "×{{charges}}",
+      "cooldown": "SHIELD CD",
+      "powerUpTimer": "{{icon}} {{time}}s"
+    },
+    "messages": {
+      "shieldReady": "Shield iko tayari (Q)",
+      "shieldActive": "Shield imewashwa!",
+      "shieldCooldown": "Shield inasubiri",
+      "collectible": "Kusanya {{item}}"
+    }
+  },
+  "countingGame": {
+    "seo": {
+      "title": "Mchezo wa Kuhesabu - Safari ya Hisabati kwa Watoto",
+      "description": "Mchezo wa kuhesabu unaofurahisha kwa watoto wenye hali nyingi, wahusika, na nguvu maalum za kujifunza hisabati kupitia kucheza!"
+    },
+    "gameOver": {
+      "title": "Mchezo Umeisha!",
+      "subtitle": "Umefanya vyema!",
+      "score": "Alama",
+      "level": "Kiwango",
+      "streak": "Mfululizo",
+      "reached": "Umefikia",
+      "playAgain": "🎮 Cheza Tena"
+    },
+    "characterSelection": {
+      "title": "Chagua Mhusika Wako!",
+      "letsPlay": "Tucheze!"
+    },
+    "gameModes": {
+      "practice": "Mazoezi",
+      "timed": "Kwa Muda",
+      "multiplayer": "Dhidi ya AI"
+    },
+    "gameHeader": {
+      "title": "Mchezo wa Kuhesabu",
+      "level": "Kiw {{level}}",
+      "streak": "{{streak}}🔥",
+      "vsAI": "vs"
+    },
+    "timer": {
+      "timeLeft": "Muda Uliobaki:",
+      "seconds": "{{time}}s"
+    },
+    "countingArea": {
+      "countItems": "Hesabu vitu!",
+      "groupA": "Kundi A",
+      "groupB": "Kundi B"
+    },
+    "inputModes": {
+      "numbers": "🔢 Nambari",
+      "emoji": "😀 Emoji",
+      "placeholderNumbers": "Andika jibu...",
+      "placeholderEmoji": "Chora emoji...",
+      "submit": "🚀 TUMA JIBU"
+    },
+    "numberPad": {
+      "clear": "Futa"
+    },
+    "powerUps": {
+      "extraTime": {
+        "label": "⏰",
+        "name": "+10s",
+        "count": "x{{count}}"
+      },
+      "skipQuestion": {
+        "label": "🚀",
+        "name": "Ruka",
+        "count": "x{{count}}"
+      },
+      "doublePoints": {
+        "label": "💰",
+        "name": "2x",
+        "count": "x{{count}}"
+      }
+    },
+    "feedback": {
+      "hint": "💡 Kidokezo: {{a}} + {{b}} = {{sum}}",
+      "correct": {
+        "awesome": "🎉 Nzuri sana!",
+        "greatJob": "🚀 Kazi nzuri!",
+        "perfect": "🌈 Kamili!",
+        "super": "🎪 Bora!",
+        "amazing": "🧙‍♂️ Ajabu!",
+        "excellent": "🦸‍♂️ Bora kabisa!"
+      },
+      "incorrect": "❌ Jaribu tena! Jibu: {{answer}}",
+      "bonusHeart": "🏆 +1 Maisha!",
+      "levelUp": "🚀 Kiwango Kipya!",
+      "extraTime": "⏰ +Sekunde 10!",
+      "skipped": "🚀 Umeruka!",
+      "doublePoints": "💰 +Alama 50!"
+    },
+    "instructions": {
+      "enterSubmit": "⏎ Bonyeza Enter kutuma",
+      "streakHeart": "🏆 Mfululizo wa 5 = maisha"
     },
     "buttons": {
-      "comingSoon": "Inakuja Hivi Karibuni!"
+      "toggleSound": "Washa/Zima sauti",
+      "playAgain": "Cheza Tena"
+    },
+    "errors": {
+      "emptyAnswer": "Tafadhali andika jibu!"
+    }
+  },
+  "waterSortGame": {
+    "seo": {
+      "title": "Kitendawili cha Kuchambua Maji - Mchezo wa Maji",
+      "description": "Changamoto akili yako kwa mchezo huu wa rangi wa kuchambua maji. Panga vimiminika kwenye mirija inayofanana!"
+    },
+    "loading": "Inapakia Mchezo wa Water Sort...",
+    "levelSelector": {
+      "open": "Ngazi",
+      "title": "Chagua Ngazi",
+      "subtitle": "Chagua ngazi ya kucheza",
+      "currentLevel": "Ngazi ya Sasa",
+      "highestReached": "Ngazi Kuu Iliyofikishwa",
+      "close": "Funga"
+    },
+    "tutorial": {
+      "title": "Jinsi ya Kucheza Mchezo wa Kuchambua Maji",
+      "subtitle": "Maliza mafunzo ili ujifunze mchezo!",
+      "skipTutorial": "Ruka Mafunzo",
+      "startRealGame": "Anza Mchezo Halisi",
+      "next": "Ifuatayo",
+      "previous": "Iliyopita",
+      "progress": "Maendeleo",
+      "steps": {
+        "step1": {
+          "title": "🎯 Hatua ya 1: Chagua Mrija",
+          "description": "Bofya mrija wa bluu (Mrija #1) ili kuuchagua.",
+          "hint": "Mirija iliyochaguliwa huangaza kwa njano.",
+          "clickHint": "👉 Bofya Mrija #1"
+        },
+        "step2": {
+          "title": "💧 Hatua ya 2: Mimina Kwenye Mrija Tupu",
+          "description": "Sasa bofya mrija tupu (Mrija #3 au #4) kumimina maji uliyochagua.",
+          "hint": "Mirija tupu imeangaziwa kwa kijani hapa chini.",
+          "selectedLabel": "Umechaguliwa",
+          "clickHint": "👉 Bofya Hapa"
+        },
+        "step3": {
+          "title": "✨ Kazi Nzuri!",
+          "description": "Umefanya hatua yako ya kwanza! Uko tayari kwa mchezo halisi?",
+          "hint": "Katika mchezo halisi, hutapata vidokezo—tumia akili yako!",
+          "noHints": "Hakuna kuangaziwa kwenye mchezo halisi. Tumia mantiki!"
+        }
+      }
+    },
+    "header": {
+      "title": "Kuchambua Maji",
+      "tutorialBadge": "Mafunzo",
+      "level": "Kiwango {{level}}",
+      "moves": "Hatua: {{moves}}",
+      "highestLevel": "Kuu Zaidi: {{highestLevel}}"
+    },
+    "controls": {
+      "undo": "Rudisha Nyuma",
+      "restartTutorial": "Anza Mafunzo Upya",
+      "restartLevel": "Anza Kiwango Upya",
+      "playAgain": "Cheza Tena",
+      "nextLevel": "Kiwango Kifuatacho →"
+    },
+    "instructions": {
+      "tutorial": {
+        "step0": "🎯 Bofya Mrija #1 (umeangaziwa kwa njano)",
+        "step1": "💧 Sasa bofya mrija tupu (umeangaziwa kwa kijani)",
+        "step2": "✨ Mafunzo yamekamilika! Uko tayari kwa changamoto halisi?",
+        "followHints": "Fuata mirija iliyoangaziwa",
+        "noHints": "Hakuna vidokezo kwenye mchezo halisi!"
+      },
+      "mainGame": {
+        "title": "💡 Panga rangi kwenye mirija inayofanana!",
+        "description": "Bofya mrija kuchagua, kisha bofya mwingine kumimina • Hakuna vidokezo kwenye mchezo halisi!"
+      }
+    },
+    "victory": {
+      "title": "Kiwango Kimekamilika!",
+      "completedIn": "Umekamilisha kwa hatua <1>{{moves}}</1>",
+      "playAgain": "Cheza Tena",
+      "nextLevel": "Kiwango Kifuatacho →"
+    },
+    "tube": {
+      "label": "Mrija #{{number}}",
+      "selected": "Umechaguliwa",
+      "completionCrown": "Taji la kukamilisha"
+    },
+    "animations": {
+      "float": "Uhuishaji wa kuelea",
+      "pour": "Uhuishaji wa kumimina",
+      "droplet": "Uhuishaji wa tone",
+      "ripple": "Athari ya mawimbi",
+      "sparkle": "Uhuishaji wa kung’aa",
+      "liquidShake": "Kutetemeka kwa maji",
+      "bubble": "Uhuishaji wa mapovu",
+      "shine": "Athari ya kung’aa",
+      "pulseGlow": "Uhuishaji wa mwanga unaodunda"
+    }
+  },
+  "colorQuestGame": {
+    "seo": {
+      "title": "Safari ya Rangi - Mchezo wa Kujifunza Rangi kwa Watoto",
+      "description": "Mchezo wa kufurahisha wa kutambua, kuchanganya, kupanga na kupaka rangi ili watoto wajifunze rangi kwa kucheza!"
+    },
+    "gameOver": {
+      "title": "Safari ya Rangi Imekamilika!",
+      "subtitle": "Wewe ni bingwa wa rangi!",
+      "score": "Alama",
+      "level": "Kiwango",
+      "streak": "Mfululizo",
+      "playAgain": "🎨 Cheza Tena"
+    },
+    "gameHeader": {
+      "title": "Safari ya Rangi",
+      "level": "Kiw {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "identify": "Tambua",
+      "mix": "Changanya",
+      "sort": "Panga",
+      "paint": "Paka Rangi"
+    },
+    "timer": {
+      "timeLeft": "Muda Uliobaki:",
+      "seconds": "{{time}}s"
+    },
+    "questions": {
+      "identify": {
+        "default": "Hii ni rangi gani?",
+        "colorSample": "Mfano wa Rangi"
+      },
+      "mix": {
+        "default": "{{color1}} na {{color2}} zinakuwa nini?",
+        "resultUnknown": "?"
+      },
+      "sort": {
+        "default": "Pata vitu vyote vya {{color}}!"
+      },
+      "paint": {
+        "default": "Paka kwa {{color}}!",
+        "paintBucket": "Ndoo ya Rangi",
+        "colorDrops": "Matone ya Rangi"
+      }
+    },
+    "feedback": {
+      "correct": {
+        "colorGenius": "🎨 Mtaalamu wa Rangi!",
+        "perfectMatch": "🌈 Mechi Kamili!",
+        "youreRainbow": "✨ Wewe ni upinde wa mvua!",
+        "masterPainter": "🖌️ Bingwa wa Kupaka!",
+        "colorWizard": "🌟 Mchawi wa Rangi!",
+        "bullseye": "🎯 Umefanya Vizuri!"
+      },
+      "incorrect": {
+        "tryAgain": "❌ Jaribu tena!",
+        "identifyHint": "Ni {{color}}!",
+        "mixHint": "Jaribu rangi nyingine!"
+      },
+      "bonusHeart": "💖 +1 Maisha!",
+      "levelUp": "🚀 Kiwango Kipya!"
+    },
+    "buttons": {
+      "toggleSound": "Washa/Zima sauti",
+      "newColor": "🔄 Rangi Mpya",
+      "easier": "⬇️ Rahisi Zaidi",
+      "harder": "⬆️ Ngumu Zaidi",
+      "playAgain": "Cheza Tena"
+    },
+    "labels": {
+      "colorSample": "Mfano wa Rangi",
+      "colorPalette": "Paleti ya Rangi:",
+      "lives": "Maisha",
+      "score": "Alama",
+      "time": "Muda",
+      "mixFormula": "{{color1}} + {{color2}} = {{result}}",
+      "result": "Matokeo"
+    },
+    "colors": {
+      "red": "Nyekundu",
+      "blue": "Bluu",
+      "yellow": "Njano",
+      "green": "Kijani",
+      "purple": "Zambarau",
+      "orange": "Machungwa",
+      "pink": "Waridi",
+      "brown": "Kahawia",
+      "lightBlue": "Bluu nyepesi"
+    },
+    "instructions": {
+      "identifyMode": "Bofya rangi inayolingana na mfano",
+      "mixMode": "Chagua rangi inayotokana na mchanganyiko",
+      "sortMode": "Gusa vitu vinavyolingana na rangi lengwa",
+      "paintMode": "Chagua tone la rangi linalolingana na ndoo"
+    },
+    "characters": {
+      "arty": {
+        "emoji": "🎨",
+        "name": "Arty"
+      },
+      "rainbow": {
+        "emoji": "🦄",
+        "name": "Rainbow"
+      },
+      "inky": {
+        "emoji": "🐙",
+        "name": "Inky"
+      },
+      "peacock": {
+        "emoji": "🦚",
+        "name": "Peacock"
+      }
+    }
+  },
+  "animalSafariGame": {
+    "seo": {
+      "title": "Safari ya Wanyama - Mchezo wa Kugundua Wanyama kwa Watoto",
+      "description": "Gundua makazi, tafuta wanyama, na jifunze mambo kuhusu wanyama katika mchezo huu wa safari ya watoto!"
+    },
+    "gameOver": {
+      "title": "Safari Imekamilika!",
+      "subtitle": "Umeugundua wanyama {{count}}!",
+      "score": "Alama",
+      "level": "Kiwango",
+      "photos": "Picha",
+      "animalsFound": "Wanyama Uliowagundua:",
+      "startNewSafari": "🦁 Anza safari mpya"
+    },
+    "gameHeader": {
+      "title": "Safari ya Wanyama",
+      "level": "Kiwango {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "explore": "Gundua",
+      "quiz": "Kozi",
+      "timed": "Muda"
+    },
+    "timer": {
+      "timeLeft": "Muda Uliobaki:",
+      "seconds": "{{time}}s"
+    },
+    "habitat": {
+      "currentHabitat": "Makazi ya Sasa:",
+      "animalsFound": "Wanyama Walioonekana:",
+      "savannah": {
+        "name": "Savana",
+        "description": "Nyanda za joto zenye miti michache"
+      },
+      "jungle": {
+        "name": "Msitu",
+        "description": "Msitu wa mvuna wenye miti mingi na mitambaa"
+      },
+      "ocean": {
+        "name": "Bahari",
+        "description": "Bahari ya bluu yenye miamba ya matumbawe"
+      },
+      "arctic": {
+        "name": "Arktiki",
+        "description": "Nchi ya baridi ya barafu na theluji"
+      }
+    },
+    "animalAnnouncement": {
+      "findThisAnimal": "Tafuta Mnyama Huyu:",
+      "repeatInstructions": "Rudia maelekezo",
+      "sayAnimalName": "Sema jina la mnyama",
+      "stopListening": "Acha kusikiliza",
+      "hint": "💡 Kidokezo: {{hint}}"
+    },
+    "questions": {
+      "sound": "Mnyama {{animal}} analiaje?",
+      "fact": "Ni ukweli gani kuhusu {{animal}}?",
+      "name": "Ni mnyama gani analia hivi: \"{{sound}}\"?",
+      "instructions": "Bonyeza au sema jibu"
+    },
+    "feedback": {
+      "correct": {
+        "greatSpot": "🎯 Utafutaji Mzuri! Umeugundua!",
+        "animalFound": "📸 Mnyama Ameonekana! Bora!",
+        "safariSuccess": "🦁 Safari Imefaulu! Ajabu!",
+        "wildDiscovery": "🌟 Ugunduzi wa Wanyama! Kamili!",
+        "natureExplorer": "🎪 Mgunduzi wa Asili! Mzuri!",
+        "wildlifePro": "🏆 Mtaalam wa Wanyama! Furaha!"
+      },
+      "incorrect": {
+        "wrongAnimal": "❐ Huyo ni {{animal}}. Tafuta {{targetAnimal}}!",
+        "tryAgainHint": "❐ Jaribu tena! Kidokezo: {{hint}}",
+        "itsAnimal": "❐ Ni {{animal}}! {{sound}}",
+        "answerIs": "❐ Jibu ni {{animal}}: {{answer}}"
+      },
+      "listening": "🎤 Nasikiliza... Sema jina la mnyama!",
+      "microphoneError": "❐ Mikrofoni haipatikani. Tafadhali bonyeza.",
+      "voiceNotHeard": "❐ Sikumsikia \"{{animal}}\". Jaribu tena!",
+      "bonusHeart": "💖 +1 Moyo!",
+      "levelUp": "🚀 Safari ya Safari Imekamilika! Makazi mengine...",
+      "welcomeHabitat": "Karibu kwenye {{habitat}}! Tafuta {{animal}}. {{hint}}. Tafuta {{emoji}}"
+    },
+    "powerUps": {
+      "binoculars": {
+        "name": "Darubini",
+        "description": "Onyesha wanyama kwa muda mfupi",
+        "feedback": "🔍 Darubini zinaonyesha wanyama waliotafichwa!"
+      },
+      "camera": {
+        "name": "Kamera",
+        "description": "Pata mnyama mmoja moja kwa moja",
+        "feedback": "📸 Kamera ilipiga! Mnyama ameonekana!"
+      },
+      "map": {
+        "name": "Ramani",
+        "description": "Gundua makazi mapya",
+        "feedback": "🗺️ Ramani imegundua makazi mapya!"
+      },
+      "hint": {
+        "name": "Kidokezo",
+        "description": "Pata kidokezo",
+        "feedback": "💡 Kidokezo: {{hint}}"
+      },
+      "voiceHelp": {
+        "name": "Msaada wa Sauti",
+        "description": "Msaada wa sauti",
+        "feedback": "🔊 Msaada wa sauti umeamilishwa!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Badilisha sauti",
+      "voiceOn": "Sauti Imewashwa",
+      "voiceOff": "Sauti Imezimwa",
+      "soundOn": "Sauti Imewashwa",
+      "soundOff": "Sauti Imezimwa",
+      "newSafari": "Anza safari mpya"
+    },
+    "labels": {
+      "findTheseAnimals": "Tafuta Wanyama Hawa:",
+      "recentPhotos": "Picha za Hivi Karibuni:",
+      "explorationComplete": "Gundua {{habitat}}! Tafuta wanyama {{count}}.",
+      "movementControls": "Vidhibiti vya Kusonga",
+      "habitatDecorations": "Mapambo ya Makazi"
+    },
+    "instructions": {
+      "sayAnimalNames": "🎤 Sema majina ya wanyama",
+      "findAnnouncedAnimal": "💡 Tafuta mnyama aliyetangazwa",
+      "turnOnVoice": "🔊 Washa sauti kwa msaada",
+      "findInOrder": "🏆 Tafuta wanyama kwa mpangilio"
+    },
+    "animals": {
+      "lion": {
+        "name": "Simba",
+        "sound": "Roar!",
+        "hint": "Mfalme wa msitu, ana nywele nyingi",
+        "voice": "Mimi ni simba! Nalia kwa nguvu!"
+      },
+      "elephant": {
+        "name": "Tembo",
+        "sound": "Trumpet!",
+        "hint": "Mnyama mkubwa wa kijivu mwenye mkonga mrefu",
+        "voice": "Mimi ni tembo! Nina mkonga mrefu!"
+      },
+      "giraffe": {
+        "name": "Twiga",
+        "sound": "Moo!",
+        "hint": "Mrefu sana mwenye shingo ndefu",
+        "voice": "Mimi ni twiga! Mimi ndiye mnyama mrefu zaidi!"
+      },
+      "zebra": {
+        "name": "Punda Milia",
+        "sound": "Bray!",
+        "hint": "Miraba nyeusi na nyeupe",
+        "voice": "Mimi ni punda milia! Nina miraba nyeusi na nyeupe!"
+      },
+      "hippo": {
+        "name": "Kiboko",
+        "sound": "Grunt!",
+        "hint": "Mkubwa na anaishi majini",
+        "voice": "Mimi ni kiboko! Napenda maji!"
+      },
+      "monkey": {
+        "name": "Kima",
+        "sound": "Chatter!",
+        "hint": "Hupanda miti na anapenda ndizi",
+        "voice": "Mimi ni kima! Napenda kupanda!"
+      },
+      "parrot": {
+        "name": "Kasuku",
+        "sound": "Squawk!",
+        "hint": "Ndege rangi anayeweza kuongea",
+        "voice": "Mimi ni kasuku! Ninaweza kuongea kama wewe!"
+      },
+      "tiger": {
+        "name": "Chui",
+        "sound": "Growl!",
+        "hint": "Paka mkubwa mwenye miraba ya machungwa na nyeusi",
+        "voice": "Mimi ni chui! Nina miraba nzuri!"
+      },
+      "snake": {
+        "name": "Nyoka",
+        "sound": "Hiss!",
+        "hint": "Mrefu na hutambaa chini",
+        "voice": "Mimi ni nyoka! Natambaa chini!"
+      },
+      "sloth": {
+        "name": "Mnyama polepole",
+        "sound": "...",
+        "hint": "Polepole sana na hutungika kwenye miti",
+        "voice": "Mimi ni mnyama polepole! Nasogea polepole sana!"
+      },
+      "whale": {
+        "name": "Nyangumi",
+        "sound": "Sing!",
+        "hint": "Mnyama mkubwa zaidi baharini",
+        "voice": "Mimi ni nyangumi! Mimi ni mkubwa sana!"
+      },
+      "dolphin": {
+        "name": "Pomboo",
+        "sound": "Click!",
+        "hint": "Mwerye akili na huruka kutoka majini",
+        "voice": "Mimi ni pomboo! Mimi ni mwerye akili sana!"
+      },
+      "shark": {
+        "name": "Papa",
+        "sound": "...",
+        "hint": "Ana meno makali na mapezi",
+        "voice": "Mimi ni papa! Nina meno makali!"
+      },
+      "turtle": {
+        "name": "Kobe",
+        "sound": "...",
+        "hint": "Ana ganda gumu mgongoni",
+        "voice": "Mimi ni kobe! Ninabeba nyumba yangu mgongoni!"
+      },
+      "squid": {
+        "name": "Ngisi",
+        "sound": "...",
+        "hint": "Ana mikonjo na wino",
+        "voice": "Mimi ni ngisi! Nina mikono minane!"
+      },
+      "penguin": {
+        "name": "Pengwini",
+        "sound": "Honk!",
+        "hint": "Ndege anayeogelea lakini hawezi kuruka",
+        "voice": "Mimi ni pengwini! Natembea kwa kutikisika!"
+      },
+      "polarBear": {
+        "name": "Dubaru wa Polar",
+        "sound": "Growl!",
+        "hint": "Dubaru mkubwa mweupe katika theluji",
+        "voice": "Mimi ni dubaru wa polar! Napenda baridi!"
+      },
+      "seal": {
+        "name": "Sili",
+        "sound": "Bark!",
+        "hint": "Huegelea na analia kama mbwa",
+        "voice": "Mimi ni sili! Ninaweza kushika pumzi yangu kwa muda mrefu!"
+      },
+      "arcticFox": {
+        "name": "Mbweha wa Arktiki",
+        "sound": "Yip!",
+        "hint": "Mbweha mdogo mwenye manyoya meupe",
+        "voice": "Mimi ni mbweha wa arktiki! Manyoya yangu huwa meupe wakati wa baridi!"
+      },
+      "wolf": {
+        "name": "Mbwa mwitu",
+        "sound": "Howl!",
+        "hint": "Anaonekana kama mbwa mkubwa, analia kwenye mwezi",
+        "voice": "Mimi ni mbwa mwitu! Nalia kwenye mwezi!"
+      }
+    },
+    "characters": {
+      "leo": {
+        "emoji": "🦁",
+        "name": "Leo",
+        "voice": "Mimi ni Leo Simba! Hebu tafute wanyama!"
+      },
+      "ellie": {
+        "emoji": "🐘",
+        "name": "Ellie",
+        "voice": "Mimi ni Ellie Tembo! Tayari kwa safari!"
+      },
+      "gigi": {
+        "emoji": "🦒",
+        "name": "Gigi",
+        "voice": "Mimi ni Gigi Twiga! Hebu tugundue!"
+      },
+      "momo": {
+        "emoji": "🐒",
+        "name": "Momo",
+        "voice": "Mimi ni Momo Kima! Wakati wa adventure!"
+      }
+    }
+  },
+  "shapeMatchGame": {
+    "seo": {
+      "title": "Shape Match - Mchezo wa Kutambua Maumbo",
+      "description": "Mchezo wa kufurahisha kwa watoto wa kulinganisha maumbo, kutambua patterns na kumbukumbu!"
+    },
+    "gameOver": {
+      "title": "Mchezo Umeisha!",
+      "subtitle": "Umefanikisha kulinganisha maumbo {{count}}!",
+      "score": "Alama",
+      "level": "Kiwango",
+      "matched": "Yalingana",
+      "playAgain": "🔄 Cheza Tena"
+    },
+    "gameHeader": {
+      "title": "Shape Match",
+      "level": "Ngazi {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "practice": "Mazoezi",
+      "timed": "Kwa Muda",
+      "pattern": "Mfumo",
+      "multiplayer": "Wachezaji Wengi"
+    },
+    "timer": {
+      "timeLeft": "Muda Uliobaki:",
+      "seconds": "{{time}}s"
+    },
+    "patternMode": {
+      "matchPattern": "Linganisha mfumo huu:",
+      "instructions": "Bonyeza maumbo kwa mpangilio wa mfumo!"
+    },
+    "stats": {
+      "matches": "Ulinganisho:",
+      "moves": "Hatua:",
+      "lives": "Maisha",
+      "streak": "Mfuatano"
+    },
+    "instructions": {
+      "practiceTimed": "Tafuta jozi zinazolingana!",
+      "pattern": "Bonyeza maumbo kwa mpangilio wa mfumo!",
+      "selected": "Umbo lililochaguliwa",
+      "matched": "Umbo lilingana",
+      "hidden": "Umbo lililofichwa"
+    },
+    "feedback": {
+      "correct": {
+        "perfectMatch": "🎉 Lilingana Kikamilifu!",
+        "shapeMaster": "🌟 Mwalimu wa Maumbo!",
+        "awesome": "✨ Safi Sana!",
+        "superFind": "🎪 Imeonekana Vizuri!",
+        "patternPro": "🧩 Mtaalamu wa Mfumo!",
+        "bullseye": "🎯 Kwenye Lengo!"
+      },
+      "incorrect": "❌ Jaribu Tena!",
+      "bonusHeart": "🏆 +1 Moyo!",
+      "levelUp": "🚀 Ngazi Mpya!"
+    }
+  },
+  "memoryMatchGame": {
+    "seo": {
+      "title": "Memory Match - Mchezo wa Kadi za Kumbukumbu kwa Watoto",
+      "description": "Boresha kumbukumbu yako kwa kucheza mchezo wa kadi zinazofanana zenye wanyama, matunda, magari, na maumbo. Mafunzo ya ubongo kwa furaha kwa watoto!"
+    },
+    "gameOver": {
+      "title": "Mchezo wa Kumbukumbu Umeisha!",
+      "subtitle": "Ulikuta jozi {{count}}!",
+      "score": "Alama",
+      "level": "Ngazi",
+      "moves": "Hatua",
+      "playAgain": "🧠 Cheza Tena"
+    },
+    "gameHeader": {
+      "title": "Memory Match",
+      "level": "Ngazi {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "practice": "Mazoezi",
+      "timed": "Ya Muda"
+    },
+    "themes": {
+      "animals": "Wanyama",
+      "fruits": "Matunda",
+      "vehicles": "Magari",
+      "shapes": "Maumbo"
+    },
+    "timer": {
+      "timeLeft": "Muda Uliobaki:",
+      "seconds": "{{time}}s"
+    },
+    "stats": {
+      "moves": "Hatua:",
+      "pairs": "Jozi:",
+      "lives": "Maisha",
+      "progress": "Maendeleo",
+      "gridSize": "Gridi ya {{size}}x{{size}}"
+    },
+    "gameBoard": {
+      "themeMemory": "Kumbukumbu ya {{theme}}",
+      "findMatchingPairs": "Tafuta jozi zinazofanana za {{theme}}!"
+    },
+    "feedback": {
+      "correct": {
+        "memoryMaster": "🧠 Mtaalamu wa Kumbukumbu!",
+        "superMatch": "🌟 Pairs Zilizofanana!",
+        "perfectRecall": "🎯 Kumbukumbu Kamili!",
+        "amazingMemory": "✨ Kumbukumbu Ya Ajabu!",
+        "brainPower": "🏆 Nguvu ya Ubongo!",
+        "matchFound": "🎉 Jozi Imetokea!"
+      },
+      "incorrect": {
+        "notMatch": "❌ Sio jozi! Jaribu tena!",
+        "rememberBetter": "❌ Jaribu kukumbuka vizuri zaidi! -1 Maisha"
+      },
+      "bonusHeart": "💖 +1 Maisha!",
+      "levelUp": "🚀 Ngazi Inayofuata!"
+    },
+    "buttons": {
+      "toggleSound": "Geuza Sauti",
+      "showAllCards": "Onyesha Kadi Zote",
+      "reset": "Anzisha Tena",
+      "playAgain": "Cheza Tena",
+      "startGame": "Anza Mchezo"
+    },
+    "controls": {
+      "showHint": "Onyesha kadi zote kwa muda mfupi",
+      "restartBoard": "Anzisha Bodi Hii Tena"
+    },
+    "cards": {
+      "hidden": "?",
+      "unknown": "Kadi Iliyofichwa"
+    },
+    "instructions": {
+      "rememberPositions": "🧠 Kumbuka nafasi za kadi",
+      "clickMatchingCards": "🎯 Bonyeza kadi mbili zinazofanana",
+      "fewerMovesMorePoints": "🚀 Hatua chache = alama nyingi",
+      "completePairsToLevelUp": "🏆 Kamilisha jozi zote ili kupanda ngazi"
+    },
+    "themesDetails": {
+      "animals": {
+        "cat": {
+          "emoji": "🐱",
+          "name": "Paka"
+        },
+        "dog": {
+          "emoji": "🐶",
+          "name": "Mbwa"
+        },
+        "lion": {
+          "emoji": "🦁",
+          "name": "Simba"
+        },
+        "tiger": {
+          "emoji": "🐯",
+          "name": "Chui"
+        },
+        "fox": {
+          "emoji": "🦊",
+          "name": "Mbweha"
+        },
+        "panda": {
+          "emoji": "🐼",
+          "name": "Panda"
+        },
+        "koala": {
+          "emoji": "🐨",
+          "name": "Koala"
+        },
+        "unicorn": {
+          "emoji": "🦄",
+          "name": "Pundamilia wa ajabu"
+        },
+        "frog": {
+          "emoji": "🐸",
+          "name": "Chura"
+        },
+        "octopus": {
+          "emoji": "🐙",
+          "name": "Pweza"
+        }
+      },
+      "fruits": {
+        "apple": {
+          "emoji": "🍎",
+          "name": "Tufaha"
+        },
+        "banana": {
+          "emoji": "🍌",
+          "name": "Ndizi"
+        },
+        "grapes": {
+          "emoji": "🍇",
+          "name": "Zabibu"
+        },
+        "strawberry": {
+          "emoji": "🍓",
+          "name": "Strawberry"
+        },
+        "orange": {
+          "emoji": "🍊",
+          "name": "Chungwa"
+        },
+        "pineapple": {
+          "emoji": "🍍",
+          "name": "Nanasi"
+        },
+        "mango": {
+          "emoji": "🥭",
+          "name": "Embe"
+        },
+        "watermelon": {
+          "emoji": "🍉",
+          "name": "Tikiti maji"
+        },
+        "cherry": {
+          "emoji": "🍒",
+          "name": "Cherry"
+        },
+        "kiwi": {
+          "emoji": "🥝",
+          "name": "Kiwi"
+        }
+      },
+      "vehicles": {
+        "car": {
+          "emoji": "🚗",
+          "name": "Gari"
+        },
+        "bus": {
+          "emoji": "🚌",
+          "name": "Basi"
+        },
+        "airplane": {
+          "emoji": "✈️",
+          "name": "Ndege"
+        },
+        "train": {
+          "emoji": "🚂",
+          "name": "Treni"
+        },
+        "helicopter": {
+          "emoji": "🚁",
+          "name": "Helikopta"
+        },
+        "ship": {
+          "emoji": "🚢",
+          "name": "Meli"
+        },
+        "rocket": {
+          "emoji": "🚀",
+          "name": "Roketi"
+        },
+        "ufo": {
+          "emoji": "🛸",
+          "name": "Ndege ya ajabu"
+        },
+        "tractor": {
+          "emoji": "🚜",
+          "name": "Trakta"
+        },
+        "raceCar": {
+          "emoji": "🏎️",
+          "name": "Gari la Mbio"
+        }
+      },
+      "shapes": {
+        "triangle": {
+          "emoji": "🔺",
+          "name": "Pembetatu"
+        },
+        "circle": {
+          "emoji": "🔵",
+          "name": "Mduara"
+        },
+        "square": {
+          "emoji": "🟦",
+          "name": "Mraba"
+        },
+        "star": {
+          "emoji": "⭐",
+          "name": "Nyota"
+        },
+        "heart": {
+          "emoji": "❤️",
+          "name": "Moyo"
+        },
+        "diamond": {
+          "emoji": "🔶",
+          "name": "Almasi"
+        },
+        "moon": {
+          "emoji": "🌙",
+          "name": "Mwezi"
+        },
+        "lightning": {
+          "emoji": "⚡",
+          "name": "Radi"
+        },
+        "snowflake": {
+          "emoji": "❄️",
+          "name": "Theluji"
+        },
+        "balloon": {
+          "emoji": "🎈",
+          "name": "Baluni"
+        }
+      }
+    },
+    "characters": {
+      "brainy": {
+        "emoji": "🧠",
+        "name": "Mwerevu"
+      },
+      "wiseOwl": {
+        "emoji": "🦉",
+        "name": "Bundi Mwerevu"
+      },
+      "elephant": {
+        "emoji": "🐘",
+        "name": "Tembo"
+      },
+      "butterfly": {
+        "emoji": "🦋",
+        "name": "Kipepeo"
+      }
+    }
+  },
+  "alphabetRaceGame": {
+    "seo": {
+      "title": "Mbio ya Alfabeti - Mchezo wa Kujifunza Herufi kwa Watoto",
+      "description": "Fanya mbio kupitia alfabeti, jifunze sauti za herufi, na fanya mazoezi ya kuandika maneno katika mchezo huu wa kuelimisha wa kusisimua kwa watoto!"
+    },
+    "gameOver": {
+      "opponentWon": "Mbio Imekwisha!",
+      "playerWon": "Safari ya Alfabeti Imekwisha!",
+      "raceLost": "Mpinzani alishinda mbio!",
+      "raceWon": "Umefanya mbio kupitia alfabeti!",
+      "greatLearning": "Kujifunza bora!",
+      "score": "Alama",
+      "level": "Kiwango",
+      "bestStreak": "Mfululizo Bora",
+      "lettersLearned": "Herufi Zilizojifunzwa:",
+      "playAgain": "🚀 Cheza Tena"
+    },
+    "gameHeader": {
+      "title": "Mbio ya Alfabeti",
+      "level": "Lvl {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "letters": "Herufi",
+      "race": "Mbio",
+      "spelling": "Kuandika",
+      "timed": "Muda"
+    },
+    "timer": {
+      "timeLeft": "Muda Ulioachwa:",
+      "seconds": "{{time}}s"
+    },
+    "voiceControls": {
+      "repeatInstructions": "Rudia maelekezo",
+      "startVoiceInput": "Anza usakinizi wa sauti",
+      "stopListening": "Acha kusikiliza",
+      "speak": "Ongea",
+      "listening": "Nasikiliza...",
+      "listeningPrompt": "🎤 Nasikiliza... Ongea sasa!",
+      "microphoneError": "❌ Mikrofoni haipatikani. Tafadhali chapa badala.",
+      "voiceNotHeard": "❌ Sikusikia \"{{letter}}\". Jaribu tena!"
+    },
+    "practiceLetters": {
+      "title": "Fanya Mazoezi na Herufi Hizi:"
+    },
+    "letterRecognition": {
+      "clickOrSay": "Bonyeza au sema herufi {{letter}}",
+      "firstMistake": "Hiyo ni {{letter}}. Jaribu tena! Kidokezo: {{hint}}",
+      "secondMistake": "Fonetiki: {{phonics}}",
+      "thirdMistake": "Ni {{letter}} kwa \"{{example}}\" {{penalty}}",
+      "correct": {
+        "excellent": "🎯 Bora sana! Mtaalamu wa herufi!",
+        "perfect": "🌟 Kamili! Mtaalamu wa alfabeti!",
+        "amazing": "✨ Ajabu! Umeipata!",
+        "fantastic": "🏆 Kuvutia! Mtaalamu wa fonetiki!",
+        "superb": "🚀 Bora! Roketi ya herufi!",
+        "greatJob": "🎉 Sahihi! Kazi nzuri!"
+      }
+    },
+    "raceMode": {
+      "typeOrSay": "Chapa au sema herufi inayofuata:",
+      "nextLetter": "Chapa herufi au tumia mikrofoni...",
+      "correct": "✅ {{letter}} sahihi! +{{points}}",
+      "firstMistake": "❌ Jaribu {{target}}. Ulibonyeza {{pressed}}",
+      "secondMistake": "❌ Ni {{target}}, sio {{pressed}} -1 Moyo",
+      "raceComplete": "Umeshinda mbio! Kazi nzuri!",
+      "nextLevel": "🚀 Umeshinda mbio! Kiwango kifuatacho..."
+    },
+    "spellingMode": {
+      "title": "Andika neno:",
+      "currentWord": "Umechapa:",
+      "startTyping": "Anza kuchapa...",
+      "clear": "Futa",
+      "checkSpelling": "Angalia Uandishi",
+      "instructions": "Chapa au sema neno: {{hint}}",
+      "firstMistake": "❌ Jaribu tena! Kidokezo: {{hint}}",
+      "secondMistake": "❌ Neno linaanza na {{firstLetter}} na lina herufi {{length}}",
+      "thirdMistake": "❌ Limeandikwa \"{{word}}\" {{emoji}} -1 Moyo",
+      "correct": "✅ Uandishi kamili! \"{{word}}\" {{emoji}} +{{points}}",
+      "bonusHeart": "💖 +1 Moyo!"
+    },
+    "powerUps": {
+      "hint": {
+        "name": "Kidokezo",
+        "description": "Pata kidokezo",
+        "feedback": "💡 Kidokezo: {{hint}}"
+      },
+      "voiceHelp": {
+        "name": "Msaada wa Sauti",
+        "description": "Msaada wa sauti",
+        "feedback": "🔊 Msaada wa sauti umewashwa!"
+      },
+      "boost": {
+        "name": "Kuongeza Kasi",
+        "description": "Kuongeza kasi katika hali ya mbio",
+        "feedback": "🚀 Kuongeza kasi! +2 Nafasi!"
+      },
+      "shield": {
+        "name": "Ngome",
+        "description": "Moyo wa ziada",
+        "feedback": "🛡️ Ngome imewashwa! +1 Moyo!"
+      },
+      "slowOpponent": {
+        "name": "Punguza Kasi",
+        "description": "Punguza kasi ya mpinzani katika hali ya mbio",
+        "feedback": "🐢 Mpinzani amepunguziwa kasi!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Badilisha sauti",
+      "soundOn": "Sauti Imewashwa",
+      "soundOff": "Sauti Imezimwa",
+      "voiceOn": "Sauti Imewashwa",
+      "voiceOff": "Sauti Imezimwa",
+      "repeat": "Rudia",
+      "playAgain": "Cheza Tena"
+    },
+    "instructions": {
+      "useVoice": "🎤 Tumia sauti kusema herufi",
+      "hintsAfterMistakes": "💡 Vidokezo baada ya makosa",
+      "turnOnVoice": "🔊 Washwa sauti kwa msaada",
+      "practiceLetters": "🏆 Fanya mazoezi na herufi maalum"
+    },
+    "letterSounds": {
+      "A": {
+        "sound": "Tufaha - /æ/",
+        "example": "A kwa Tufaha",
+        "phonics": "A mfupi kama katika \"paka\""
+      },
+      "B": {
+        "sound": "Mpira - /b/",
+        "example": "B kwa Mpira",
+        "phonics": "Sauti ya B"
+      },
+      "C": {
+        "sound": "Paka - /k/ au /s/",
+        "example": "C kwa Paka",
+        "phonics": "Inaweza kuwa C ngumu (paka) au C laini (senti)"
+      },
+      "D": {
+        "sound": "Mbwa - /d/",
+        "example": "D kwa Mbwa",
+        "phonics": "Sauti ya D"
+      },
+      "E": {
+        "sound": "Yai - /ɛ/",
+        "example": "E kwa Yai",
+        "phonics": "E mfupi kama katika \"kitanda\""
+      },
+      "F": {
+        "sound": "Samaki - /f/",
+        "example": "F kwa Samaki",
+        "phonics": "Sauti ya F"
+      },
+      "G": {
+        "sound": "Mbuzi - /g/",
+        "example": "G kwa Mbuzi",
+        "phonics": "Inaweza kuwa G ngumu (mbuzi) au G laini (twiga)"
+      },
+      "H": {
+        "sound": "Kofia - /h/",
+        "example": "H kwa Kofia",
+        "phonics": "Sauti ya H"
+      },
+      "I": {
+        "sound": "Nyumba ya barafu - /ɪ/",
+        "example": "I kwa Nyumba ya barafu",
+        "phonics": "I mfupi kama katika \"nguruwe\""
+      },
+      "J": {
+        "sound": "Ruka - /dʒ/",
+        "example": "J kwa Ruka",
+        "phonics": "Sauti ya J"
+      },
+      "K": {
+        "sound": "Kipepeo - /k/",
+        "example": "K kwa Kipepeo",
+        "phonics": "Sauti ya K"
+      },
+      "L": {
+        "sound": "Simba - /l/",
+        "example": "L kwa Simba",
+        "phonics": "Sauti ya L"
+      },
+      "M": {
+        "sound": "Nyani - /m/",
+        "example": "M kwa Nyani",
+        "phonics": "Sauti ya M"
+      },
+      "N": {
+        "sound": "Kiota - /n/",
+        "example": "N kwa Kiota",
+        "phonics": "Sauti ya N"
+      },
+      "O": {
+        "sound": "Pweza - /ɒ/",
+        "example": "O kwa Pweza",
+        "phonics": "O mfupi kama katika \"mbwa\""
+      },
+      "P": {
+        "sound": "Nguruwe - /p/",
+        "example": "P kwa Nguruwe",
+        "phonics": "Sauti ya P"
+      },
+      "Q": {
+        "sound": "Malkia - /kw/",
+        "example": "Q kwa Malkia",
+        "phonics": "Q daima hufuatwa na U"
+      },
+      "R": {
+        "sound": "Sungura - /r/",
+        "example": "R kwa Sungura",
+        "phonics": "Sauti ya R"
+      },
+      "S": {
+        "sound": "Nyoka - /s/",
+        "example": "S kwa Nyoka",
+        "phonics": "Sauti ya S"
+      },
+      "T": {
+        "sound": "Chui - /t/",
+        "example": "T kwa Chui",
+        "phonics": "Sauti ya T"
+      },
+      "U": {
+        "sound": "Mwavuli - /ʌ/",
+        "example": "U kwa Mwavuli",
+        "phonics": "U mfupi kama katika \"kikombe\""
+      },
+      "V": {
+        "sound": "Gari - /v/",
+        "example": "V kwa Gari",
+        "phonics": "Sauti ya V"
+      },
+      "W": {
+        "sound": "Maji - /w/",
+        "example": "W kwa Maji",
+        "phonics": "Sauti ya W"
+      },
+      "X": {
+        "sound": "Mbweha - /ks/",
+        "example": "X kwa Mbweha",
+        "phonics": "Sauti ya mwisho kama katika \"sanduku\""
+      },
+      "Y": {
+        "sound": "Manjano - /j/",
+        "example": "Y kwa Manjano",
+        "phonics": "Sauti ya Y"
+      },
+      "Z": {
+        "sound": "Punda milia - /z/",
+        "example": "Z kwa Punda milia",
+        "phonics": "Sauti ya Z kama nyuki"
+      }
+    },
+    "words": {
+      "CAT": {
+        "hint": "Mnyama mwenye manyoya anayesema meow",
+        "emoji": "🐱"
+      },
+      "DOG": {
+        "hint": "Mnyama mwenye manyoya anayebweka",
+        "emoji": "🐶"
+      },
+      "SUN": {
+        "hint": "Nyota angavu angani",
+        "emoji": "☀️"
+      },
+      "MOON": {
+        "hint": "Inang'aa usiku",
+        "emoji": "🌙"
+      },
+      "STAR": {
+        "hint": "Inametameta angani",
+        "emoji": "⭐"
+      },
+      "FISH": {
+        "hint": "Huogelea majini",
+        "emoji": "🐟"
+      },
+      "BIRD": {
+        "hint": "Huruka angani",
+        "emoji": "🐦"
+      },
+      "TREE": {
+        "hint": "Ina majani na matawi",
+        "emoji": "🌳"
+      },
+      "BOOK": {
+        "hint": "Unaisoma",
+        "emoji": "📚"
+      },
+      "BALL": {
+        "hint": "Unairuka",
+        "emoji": "⚽"
+      },
+      "CAKE": {
+        "hint": "Kitamu cha sherehe za kuzaliwa",
+        "emoji": "🎂"
+      },
+      "RAIN": {
+        "hint": "Huteremka kutoka mawinguni",
+        "emoji": "🌧️"
+      },
+      "SNOW": {
+        "hint": "Nyeupe na baridi",
+        "emoji": "❄️"
+      },
+      "FIRE": {
+        "hint": "Moto na rangi ya machungwa",
+        "emoji": "🔥"
+      },
+      "WATER": {
+        "hint": "Unakunywa",
+        "emoji": "💧"
+      },
+      "HOUSE": {
+        "hint": "Mahali unaokaa",
+        "emoji": "🏠"
+      },
+      "CAR": {
+        "hint": "Inaendeshwa barabarani",
+        "emoji": "🚗"
+      },
+      "BOAT": {
+        "hint": "Huelea majini",
+        "emoji": "🛶"
+      },
+      "PLANE": {
+        "hint": "Huruka angani",
+        "emoji": "✈️"
+      },
+      "TRAIN": {
+        "hint": "Choo choo!",
+        "emoji": "🚂"
+      },
+      "APPLE": {
+        "hint": "Tunda nyekundu",
+        "emoji": "🍎"
+      },
+      "BEAR": {
+        "hint": "Mnyama mkubwa mwenye manyoya",
+        "emoji": "🐻"
+      },
+      "DUCK": {
+        "hint": "Anasema quack",
+        "emoji": "🦆"
+      },
+      "EGG": {
+        "hint": "Hutoka kwenye kuku",
+        "emoji": "🥚"
+      },
+      "FROG": {
+        "hint": "Huruka na kusema ribbit",
+        "emoji": "🐸"
+      },
+      "GOAT": {
+        "hint": "Mnyama wa shamba mwenye pembe",
+        "emoji": "🐐"
+      },
+      "HAT": {
+        "hint": "Unaivaa kichwani",
+        "emoji": "🧢"
+      },
+      "ICE": {
+        "hint": "Maji yaliyoganda",
+        "emoji": "🧊"
+      },
+      "JUMP": {
+        "hint": "Unafanya hii juu na chini",
+        "emoji": "🦘"
+      },
+      "KITE": {
+        "hint": "Huruka kwenye upepo",
+        "emoji": "🪁"
+      }
+    },
+    "characters": {
+      "raceCar": {
+        "emoji": "🚗",
+        "name": "Gari la Mbio",
+        "voice": "vroom vroom!"
+      },
+      "train": {
+        "emoji": "🚂",
+        "name": "Gari Moshi",
+        "voice": "choo choo!"
+      },
+      "rocket": {
+        "emoji": "🚀",
+        "name": "Roketi",
+        "voice": "3, 2, 1, panda anga!"
+      },
+      "unicorn": {
+        "emoji": "🦄",
+        "name": "Farasi wa Ajabu",
+        "voice": "neigh! uchawi!"
+      }
     }
   },
   "kidLanding": {
@@ -4032,5 +5753,191 @@
       "phonePattern": "Muundo wa simu si sahihi",
       "nameInvalid": "Jina si halali"
     }
+  },
+  "securityLogs": {
+    "title": "Kumbukumbu za Usalama na Ufuatiliaji wa Shughuli",
+    "filters": "Vichujio",
+    "allKids": "Watoto Wote",
+    "refresh": "Sasisha",
+    "export": {
+      "format": "Umbizo:",
+      "export": "Hamisha",
+      "exporting": "Inahamisha...",
+      "pdfTooltip": "Ripoti ya Kitaalamu ya PDF",
+      "csvTooltip": "Faili ya Data ya CSV",
+      "jsonTooltip": "Faili ya Data ya JSON"
+    },
+    "exportSuccess": {
+      "pdf": "Ripoti ya PDF imetengenezwa kwa mafanikio!"
+    },
+    "exportError": "Imeshindwa kuhamisha kumbukumbu za shughuli. Tafadhali jaribu tena.",
+    "exportFormats": {
+      "pdf": {
+        "title": "Ripoti ya Kitaalamu ya PDF",
+        "description": "Ripoti ya kitaalamu yenye chapa ya Oliviuus, muhtasari, chati, na kumbukumbu za kina. Bora kwa mawasilisho na ripoti."
+      },
+      "csv": {
+        "title": "Faili ya Data ya CSV",
+        "description": "Umbizo la karatasi za kazi kwa uchambuzi wa data katika Excel, Google Sheets, au zana za usindikaji data."
+      },
+      "json": {
+        "title": "Faili ya Data ya JSON",
+        "description": "Umbizo la data lililopangwa kwa watengenezaji wa programu. Inajumuisha metadata na data iliyopangwa."
+      }
+    },
+    "timeRanges": {
+      "7days": "Siku 7 Zilizopita",
+      "30days": "Siku 30 Zilizopita",
+      "90days": "Siku 90 Zilizopita"
+    },
+    "filterLabels": {
+      "activityType": "Aina ya Shughuli",
+      "status": "Hali",
+      "deviceType": "Aina ya Kifaa"
+    },
+    "filterOptions": {
+      "allTypes": "Aina Zote",
+      "allStatus": "Hali Zote",
+      "allDevices": "Vifaa Vyote"
+    },
+    "activityTypes": {
+      "content_view": "Kutazama Maudhui",
+      "content_attempt": "Majaribio ya Maudhui",
+      "search": "Kutafuta",
+      "time_limit": "Kikomo cha Muda",
+      "pin_entry": "Kuingiza PIN",
+      "mode_switch": "Kubadili Hali"
+    },
+    "status": {
+      "allowed": "Imeruhusiwa",
+      "blocked": "Imezuiwa"
+    },
+    "deviceTypes": {
+      "web": "Wavuti",
+      "mobile": "Rununu",
+      "tablet": "Tabuleti",
+      "smarttv": "Televisheni ya Kisasa"
+    },
+    "stats": {
+      "totalKids": "Watoto Wote",
+      "todayActivities": "Shughuli za Leo",
+      "blocked": "zilizozuiwa",
+      "pendingAlerts": "Arifa Zinazosubiri",
+      "timeLimitWarnings": "Maonyo ya Kikomo cha Muda",
+      "blockRate": "Kiwango cha Kuzuia",
+      "mostActiveTime": "Mda Unaoshughulikia Zaidi",
+      "mostActiveKid": "Mtoto Anayeshughulikia Zaidi",
+      "outOf": "kati ya",
+      "activities": "shughuli",
+      "noData": "Hakuna data",
+      "peakActivityHour": "Saa ya kilele cha shughuli"
+    },
+    "sections": {
+      "activitySummary": "Muhtasari wa Shughuli",
+      "activityByType": "Shughuli kwa Aina",
+      "detailedLogs": "Kumbukumbu za Kinzo za Shughuli",
+      "logsDescription": "Shughuli zote kutoka kwa watoto wako"
+    },
+    "summary": {
+      "totalActivities": "Jumla ya Shughuli",
+      "allowedActivities": "Shughuli Zilizoruhusiwa",
+      "blockedActivities": "Shughuli Zilizozuiwa",
+      "allowed": "Zilizoruhusiwa",
+      "blocked": "Zilizozuiwa"
+    },
+    "tableHeaders": {
+      "kid": "Mtoto",
+      "activity": "Shughuli",
+      "status": "Hali",
+      "details": "Maelezo",
+      "time": "Muda"
+    },
+    "kidInitial": "M",
+    "unknownKid": "Mtoto Asiyejulikana",
+    "totalLogs": "Jumla",
+    "logs": "kumbukumbu",
+    "noLogs": {
+      "title": "Hakuna kumbukumbu za shughuli zilizopatikana",
+      "description": "Shughuli zitaonekana hapa watoto wako wanapotumia jukwaa"
+    },
+    "pdf": {
+      "title": "Ripoti ya Usalama ya Oliviuus",
+      "subtitle": "Uchambuzi wa Kitaalamu wa Shughuli na Usalama wa Watoto",
+      "reportGenerated": "Ripoti Imetengenezwa",
+      "reportFor": "Ripoti Kwa",
+      "timePeriod": "Kipindi cha Muda",
+      "sections": {
+        "executiveSummary": "📊 Muhtasari wa Utendaji",
+        "activitySummary": "📈 Muhtasari wa Shughuli",
+        "mostActiveKid": "👑 Mtoto Anayeshughulikia Zaidi",
+        "detailedLogs": "📋 Kumbukumbu za Kinzo za Shughuli",
+        "recommendations": "💡 Mapendekezo ya Usalama"
+      },
+      "totalKidsMonitored": "Jumla ya Watoto Wanaofuatiliwa",
+      "todaysActivities": "Shughuli za Leo",
+      "activitiesBlocked": "Shughuli Zilizozuiwa",
+      "pendingAlerts": "Arifa Zinazosubiri",
+      "timeLimitWarnings": "Maonyo ya Kikomo cha Muda",
+      "totalActivities": "Jumla ya Shughuli",
+      "allowedActivities": "Shughuli Zilizoruhusiwa",
+      "blockedActivities": "Shughuli Zilizozuiwa",
+      "blockRate": "Kiwango cha Kuzuia",
+      "peakActivityHour": "Saa ya Kilele cha Shughuli",
+      "kidName": "Jina la Mtoto",
+      "activityCount": "Idadi ya Shughuli",
+      "averageDaily": "Wastani wa Shughuli za Kila Siku",
+      "unknownKid": "Mtoto Asiyejulikana",
+      "allowed": "Zilizoruhusiwa",
+      "blocked": "Zilizozuiwa",
+      "tableHeaders": {
+        "kid": "Mtoto",
+        "activity": "Shughuli",
+        "status": "Hali",
+        "details": "Maelezo",
+        "date": "Tarehe"
+      },
+      "recommendations": {
+        "reviewLogs": "Kagua kumbukumbu za shughuli mara kwa mara kwa mwenendo usio wa kawaida",
+        "updateRestrictions": "Sasisha vizuizi vya maudhui kulingana na shughuli zilizozuiwa",
+        "monitorPeakHours": "Fuatilia masaa ya kilele cha shughuli kwa ajili ya usimamizi wa muda",
+        "educateKids": "Waelimishe watoto kuhusu usalama wa kidijitali kulingana na majaribio yaliyozuiwa",
+        "adjustSettings": "Rekebisha mipangilio ya udhibiti wa wazazi kulingana na mwenendo wa shughuli"
+      },
+      "footer": {
+        "confidential": "SIRI - Kwa matumizi ya kuidhinishwa tu",
+        "oliviuus": "Jukwaa la Usalama la Watoto la Oliviuus",
+        "page": "Ukurasa",
+        "of": "wa"
+      },
+      "noData": "Hakuna data"
+    }
+  },
+  "download": {
+    "title": "Pakua",
+    "subtitle": "Pakua maudhui unayoyapenda na uyaangalie nje ya mtandao, popote pale, wakati wowote",
+    "progress": "Maendeleo ya Ukuzaji",
+    "comingSoon": {
+      "title": "Pakua Inakuja Hivi Karibuni!",
+      "message": "Tunafurahi kutangaza kwamba kipengele cha kupakua kiko katika ukuzaji. Hivi karibuni utaweza kuhifadhi maudhui ili uyaangalie nje ya mtandao!",
+      "hd": "Pakua za HD & 4K",
+      "unlimited": "Pakua zisizo na kikomo",
+      "expire": "Hakuna tarehe ya mwisho",
+      "sync": "Sawazisha Kwenye Vifaa Vyote"
+    },
+    "features": {
+      "offline": "Angalia Nje ya Mtandao",
+      "offlineDesc": "Pakua vipindi na sinema unazovipenda ili uziangalie bila mtandao",
+      "mobile": "Inafaa kwa Simu",
+      "mobileDesc": "Pakua maudhui kwenye simu yako ili uyaangalie unaposafiri",
+      "tablet": "Inafaa kwa Kompyuta Kibao",
+      "tabletDesc": "Uzoefu bora wa kuangalia kwenye kompyuta kibao",
+      "computer": "Inafaa kwa Kompyuta",
+      "computerDesc": "Pakua kwenye kompyuta yako ili ufurahie kwenye skrini kubwa"
+    },
+    "buttons": {
+      "home": "Rudi Nyumbani",
+      "check": "Angalia Usasishaji"
+    },
+    "footer": "Kipengele cha kupakua kinatarajiwa kuzinduliwa katika robo karibuni. Subiri usasishaji!"
   }
 }

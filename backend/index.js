@@ -63,6 +63,9 @@ const trendingRoutes = require('./routes/trendingRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const securityRoutes = require('./routes/viewerSecurity');
 const gameRoutes = require('./routes/gameRoutes');
+const kidInsightsRoutes = require('./routes/kidInsightsRoutes');
+const { kidsActivityLogger } = require("./middlewares/kidsActivityLogger");
+const kidsSecurityRoutes = require("./routes/kidsSecurityRoutes");
 
 const cookieParser = require("cookie-parser");
 
@@ -81,6 +84,20 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE', 'PATCH'],
   credentials: true,
 }));
+
+app.use((req, res, next) => {
+  // Skip activity logging for security endpoints to avoid circular logging
+  if (req.path.startsWith('/api/kids/security-logs') || 
+      req.path.startsWith('/api/kids/activity-summary') ||
+      req.path.startsWith('/api/kids/dashboard-stats') ||
+      req.path.startsWith('/api/kids/export-logs')) {
+    return next();
+  }
+  next();
+});
+
+// kids activity logger middleware
+app.use(kidsActivityLogger);
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -118,6 +135,8 @@ app.use('/api/trending', trendingRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/security', securityRoutes);
 app.use('/api/games', gameRoutes);
+app.use('/api/parent/kid-insights', kidInsightsRoutes);
+app.use("/api/kids", kidsSecurityRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

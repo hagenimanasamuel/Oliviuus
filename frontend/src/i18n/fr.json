@@ -1766,6 +1766,7 @@
     }
   },
   "common": {
+    "years": "ans",
     "yes": "Oui",
     "no": "Non",
     "cancel": "Annuler",
@@ -1803,7 +1804,8 @@
     },
     "tabs": {
       "pinManagement": "Gestion du PIN",
-      "securityLogs": "Journaux de Sécurité"
+      "securityLogs": "Journaux de Sécurité",
+      "kidInsights": "Analyses enfant"
     },
     "pinSection": {
       "activeTitle": "PIN Maître Actif",
@@ -1887,6 +1889,278 @@
       "success": "Succès",
       "error": "Erreur",
       "warning": "Avertissement"
+    }
+  },
+"kidInsights": {
+    "title": "Analyses d'Activité Enfant",
+    "subtitle": "Analyses complètes et insights sur les activités numériques de votre enfant",
+    "export": "Exporter PDF",
+    "refreshData": "Actualiser les Données",
+    "loading": "Chargement...",
+    "unknownKid": "Enfant Inconnu",
+    "years": "ans",
+    "timeframes": {
+      "day": "Aujourd'hui",
+      "week": "Cette Semaine",
+      "month": "Ce Mois",
+      "year": "Cette Année"
+    },
+    "modes": {
+      "overview": "Aperçu",
+      "gaming": "Jeux",
+      "content": "Contenu",
+      "learning": "Apprentissage",
+      "screentime": "Temps d'Écran",
+      "behavior": "Comportement",
+      "comparative": "Comparatif"
+    },
+    "stats": {
+      "totalPlaytime": "Temps de Jeu Total",
+      "totalEngagement": "Engagement Total",
+      "learningProgress": "Progrès d'Apprentissage",
+      "contentWatched": "Contenu Visionné",
+      "screenTimeHealth": "Santé du Temps d'Écran",
+      "sessions": "sessions",
+      "skillsImproved": "compétences améliorées",
+      "watchTime": "temps de visionnage",
+      "compliant": "conforme",
+      "totalGamingTime": "Temps de Jeu Total",
+      "gamesPlayed": "Jeux Joués",
+      "plays": "parties",
+      "averageScore": "Score Moyen",
+      "highScores": "meilleurs scores",
+      "engagementRate": "Taux d'Engagement",
+      "productivity": "Productivité",
+      "points": "points",
+      "favoriteGame": "Jeu Préféré",
+      "noData": "Aucune donnée disponible",
+      "topSkill": "Meilleure Compétence",
+      "improvement": "amélioration",
+      "productivityScore": "Score de Productivité",
+      "completionRate": "Taux d'Achèvement",
+      "averageCompletion": "Achèvement moyen du contenu",
+      "favoriteCategory": "Catégorie Préférée",
+      "ofWatchTime": "du temps de visionnage",
+      "engagementScore": "Score d'Engagement",
+      "contentInteraction": "Qualité d'interaction avec le contenu",
+      "skillsImproved": "Compétences Améliorées",
+      "avgImprovement": "amélioration moyenne",
+      "learningTime": "Temps d'Apprentissage",
+      "overTimeframe": "Sur",
+      "gamesCompleted": "Jeux Terminés",
+      "educationalGames": "jeux éducatifs",
+      "learningScore": "Score d'Apprentissage",
+      "overallProgress": "progrès général",
+      "totalScreenTime": "Temps d'Écran Total",
+      "total": "total",
+      "dailyAverage": "Moyenne Quotidienne",
+      "perDayAverage": "Moyenne par jour",
+      "complianceRate": "Taux de Conformité",
+      "rulesFollowed": "Règles suivies",
+      "peakUsage": "Utilisation Maximale",
+      "focusLevel": "Niveau de Concentration",
+      "taskCompletion": "Capacité à terminer les tâches",
+      "persistence": "Persévérance",
+      "sessionIndicator": "Indicateur de durée de session",
+      "ruleCompliance": "Conformité aux Règles",
+      "followingRestrictions": "Respect des restrictions",
+      "curiosity": "Curiosité",
+      "varietySeeking": "Recherche de variété",
+      "averageSessionLength": "Durée moyenne de session",
+      "mostWatchedDay": "Jour le plus regardé",
+      "preferredContentType": "Type de contenu préféré",
+      "timeLimitCompliance": "Conformité aux limites de temps",
+      "ruleViolations": "Violations de règles",
+      "times": "fois",
+      "currentLevel": "Niveau Actuel"
+    },
+    "charts": {
+      "activityDistribution": "Répartition des Activités",
+      "timeSpentDescription": "Comment le temps est passé entre les activités",
+      "skillDevelopment": "Développement des Compétences",
+      "progressDescription": "Progrès dans différentes catégories de compétences",
+      "skillScore": "Score de Compétence",
+      "gamesDistribution": "Répartition des Jeux",
+      "mostPlayedGames": "Jeux les plus joués par nombre de sessions",
+      "plays": "parties",
+      "ofSessions": "des sessions",
+      "skillProgress": "Progrès des Compétences",
+      "improvementOverTime": "Amélioration sur la période sélectionnée",
+      "improvementPercentage": "Amélioration %",
+      "improvement": "Amélioration",
+      "skillBreakdown": "Répartition des Compétences",
+      "games": "jeux",
+      "total": "Temps d'Écran Total",
+      "gaming": "Temps de Jeu",
+      "content": "Temps de Contenu",
+      "contentCategories": "Catégories de Contenu",
+      "watchDistribution": "Répartition du contenu visionné par catégorie",
+      "watchCount": "Nombre de Visionnages",
+      "skillRadar": "Radar de Développement des Compétences",
+      "skillProgressAreas": "Progrès dans différents domaines de compétences",
+      "skillLevel": "Niveau de Compétence",
+      "screenTimeTrends": "Tendances du Temps d'Écran",
+      "dailyScreenTime": "Temps d'écran quotidien sur",
+      "activityBreakdown": "Répartition des Activités",
+      "screenTimeDistribution": "Comment le temps d'écran est distribué",
+      "behaviorProfile": "Profil Comportemental",
+      "behaviorTraits": "Traits et modèles comportementaux",
+      "behaviorScore": "Score Comportemental"
+    },
+    "categories": {
+      "gaming": "Jeux",
+      "content": "Contenu",
+      "learning": "Apprentissage",
+      "other": "Autre"
+    },
+    "sections": {
+      "recentActivity": "Activité Récente",
+      "recentGamingSessions": "Sessions de Jeu Récentes",
+      "latestGameplay": "Dernières activités de jeu",
+      "recentAchievements": "Réalisations Récentes",
+      "milestonesReached": "Jalons et accomplissements",
+      "recommendations": "Recommandations",
+      "personalizedSuggestions": "Suggestions personnalisées basées sur l'activité",
+      "suggestion": "Suggestion",
+      "tryNewActivities": "Envisagez d'essayer de nouvelles activités",
+      "importantAlerts": "Alertes Importantes",
+      "areasRequiringAttention": "Zones nécessitant une attention",
+      "checkSettings": "Vérifiez les paramètres pour plus de détails",
+      "watchTimePatterns": "Modèles de Visionnage",
+      "dailyViewingHabits": "Habitudes de visionnage quotidiennes et modèles",
+      "watchPatterns": "Modèles de Visionnage",
+      "strengths": "Points Forts",
+      "excelAreas": "Domaines où votre enfant excelle",
+      "skill": "Compétence",
+      "strongPerformance": "Bonne performance dans ce domaine",
+      "areasImprovement": "Domaines à Améliorer",
+      "needsPractice": "Compétences nécessitant plus de pratique",
+      "needsPracticeArea": "Nécessite plus de pratique dans ce domaine",
+      "timeRestrictions": "Restrictions de Temps",
+      "positivePatterns": "Modèles Positifs",
+      "healthyBehavior": "Comportement sain observé",
+      "areasMonitor": "Domaines à Surveiller",
+      "behaviorPatternsWatch": "Modèles comportementaux à observer",
+      "compareBenchmarks": "Comparer avec d'autres enfants et repères",
+      "comparativeAnalysis": "Analyse Comparative à Venir",
+      "comparativeDescription": "Cette fonctionnalité est actuellement en développement. Bientôt, vous pourrez comparer l'activité de votre enfant avec les moyennes du groupe d'âge et les performances des frères et sœurs.",
+      "compareFeatures": "Ce Que Vous Pourrez Comparer"
+    },
+    "timeOfDay": {
+      "morning": "Matin",
+      "afternoon": "Après-midi",
+      "evening": "Soir",
+      "night": "Nuit"
+    },
+    "levels": {
+      "high": "Élevé",
+      "medium": "Moyen"
+    },
+    "behavior": {
+      "consistentSchedule": "Planning Régulier",
+      "goodRoutine": "Modèles d'activité réguliers montrent de bonnes habitudes de routine",
+      "goodFocus": "Bonne Concentration",
+      "completesTasks": "Termine les tâches sans distraction excessive",
+      "variedInterests": "Intérêts Variés",
+      "exploresContent": "Explore différents types de contenu et d'activités",
+      "lateSessions": "Sessions Tardives",
+      "bedtimeActivity": "Certaines activités se produisent près de l'heure du coucher",
+      "restrictionAttempts": "Tentatives de Restriction",
+      "accessRestricted": "Tentatives occasionnelles d'accéder à du contenu restreint",
+      "extendedSessions": "Sessions Prolongées",
+      "exceedsDuration": "Certaines sessions de jeu dépassent la durée recommandée"
+    },
+    "comparison": {
+      "vsAverage": "vs Moyenne",
+      "ageGroup": "Comparaison par groupe d'âge",
+      "vsSiblings": "vs Frères et Sœurs",
+      "familyComparison": "Comparaison familiale",
+      "progress": "Progrès",
+      "growthTime": "Croissance dans le temps",
+      "gamingPerformance": "Performance de Jeu",
+      "gamingMetrics": "Scores, taux d'achèvement, temps de jeu",
+      "learningProgress": "Progrès d'Apprentissage",
+      "skillComparison": "Développement des compétences comparé aux pairs",
+      "screenTimeHabits": "Habitudes de Temps d'Écran",
+      "usageComparison": "Utilisation quotidienne comparée aux recommandations"
+    },
+    "status": {
+      "comingSoon": "Bientôt Disponible"
+    },
+    "achievements": {
+      "firstGame": "Premier Jeu Terminé !",
+      "completedFirstGame": "A terminé son premier jeu éducatif",
+      "streak": "Série de 3 Jours !",
+      "played3Days": "A joué à des jeux éducatifs pendant 3 jours consécutifs",
+      "skillMaster": "Maître des Compétences",
+      "improvedSkill": "A amélioré une compétence de 25% ou plus"
+    },
+    "recommendations": {
+      "title": "Insights & Recommandations",
+      "basedOnActivity": "Basé sur l'activité de jeu récente et les progrès",
+      "strengths": "Points Forts",
+      "highEngagement": "Taux d'engagement élevé - l'enfant apprend activement",
+      "goodEngagement": "Bon engagement - habitudes d'apprentissage constantes",
+      "opportunities": "Opportunités",
+      "moreVariety": "Essayez différentes catégories de jeux pour un développement de compétences plus large",
+      "continueVariety": "Bonne variété - continuez à explorer différents jeux",
+      "suggestions": "Suggestions",
+      "tryNewSkills": "Essayez des jeux axés sur différentes compétences éducatives",
+      "continueTopSkill": "Continuez à développer la compétence principale avec des jeux connexes"
+    },
+    "pdf": {
+      "title": "Oliviuus Insights Enfants",
+      "reportFor": "Rapport pour",
+      "timeframe": "Période",
+      "generated": "Généré",
+      "exportError": "Échec de l'exportation PDF. Veuillez réessayer.",
+      "sections": {
+        "overview": "📊 Aperçu",
+        "gaming": "🎮 Insights Jeux",
+        "content": "🎬 Insights Contenu",
+        "learning": "🧠 Insights Apprentissage",
+        "screentime": "⏰ Insights Temps d'Écran",
+        "recommendations": "💡 Recommandations",
+        "alerts": "🚨 Alertes Importantes",
+        "summary": "📝 Résumé"
+      },
+      "totalEngagement": "Engagement Total",
+      "totalSessions": "Sessions Totales",
+      "learningScore": "Score d'Apprentissage",
+      "productivityScore": "Score de Productivité",
+      "gamesPlayed": "Jeux Joués",
+      "totalGamingTime": "Temps de Jeu Total",
+      "averageSession": "Session Moyenne",
+      "minutes": "minutes",
+      "mostPlayedGames": "Jeux les Plus Joués",
+      "plays": "parties",
+      "contentWatched": "Contenu Visionné",
+      "totalWatchTime": "Temps de Visionnage Total",
+      "completionRate": "Taux d'Achèvement",
+      "engagementScore": "Score d'Engagement",
+      "topCategories": "Meilleures Catégories",
+      "items": "éléments",
+      "skillsImproved": "Compétences Améliorées",
+      "averageImprovement": "Amélioration Moyenne",
+      "totalLearningTime": "Temps d'Apprentissage Total",
+      "gamesCompleted": "Jeux Terminés",
+      "strengths": "Points Forts",
+      "totalScreenTime": "Temps d'Écran Total",
+      "dailyAverage": "Moyenne Quotidienne",
+      "gaming": "Jeux",
+      "content": "Contenu",
+      "other": "Autre",
+      "suggestion": "Suggestion",
+      "reportGeneratedFor": "Rapport généré pour",
+      "timePeriod": "Période",
+      "overallEngagement": "Engagement global",
+      "learningProgress": "Progrès d'apprentissage",
+      "footer": {
+        "company": "Oliviuus - Rapport d'Insights d'Activité Enfant",
+        "page": "Page",
+        "of": "sur"
+      },
+      "years": "ans"
     }
   },
   "familyProfiles": {
@@ -2289,7 +2563,29 @@
     },
     "pinModal": {
       "title": "Vérifiez le PIN pour quitter le mode enfant",
-      "description": "Entrez le PIN familial pour quitter le mode enfant et revenir au tableau de bord parent"
+      "description": "Entrez le PIN familial pour quitter le mode enfant et revenir au tableau de bord parent",
+      "incorrectPin": "PIN incorrect. Veuillez réessayer.",
+      "verificationFailed": "La vérification du PIN a échoué. Veuillez réessayer.",
+      "enterPin": "Entrez le PIN à 4 chiffres",
+      "digits": "chiffres",
+      "clear": "Effacer",
+      "cancel": "Annuler",
+      "verifying": "Vérification en cours...",
+      "verify": "Vérifier le PIN",
+      "securityNote": "Pour des raisons de sécurité, toutes les tentatives de PIN sont enregistrées",
+      "attempts": "Tentatives : {{count}}",
+      "lastAttempt": "Dernière tentative",
+      "errors": {
+        "invalidLength": "Le PIN doit comporter 4 chiffres",
+        "incorrectPin": "PIN incorrect",
+        "verificationFailed": "Échec de la vérification"
+      },
+      "securityWarning": {
+        "title": "Alerte de sécurité",
+        "twoAttempts": "Plusieurs tentatives de PIN incorrectes détectées. Cette tentative sera enregistrée.",
+        "threeAttempts": "Plusieurs échecs détectés. Le parent sera notifié.",
+        "multipleAttempts": "{{count}} tentatives échouées détectées. Une alerte de sécurité a été envoyée au parent."
+      }
     }
   },
   "pinModal": {
@@ -2515,28 +2811,1053 @@
     }
   },
   "games": {
+    "play": "Jouer",
+    "title": "Jeux pour Enfants",
+    "subtitle": "{{count}} jeux éducatifs amusants disponibles",
+    "noGames": "Aucun Jeu Disponible",
+    "noGamesDesc": "Revenez plus tard pour de nouveaux jeux !",
+    "refresh": "Actualiser les Jeux",
+    "playNow": "🎮 Jouer Maintenant",
+    "back": "Retour",
+    "skill": "Compétence",
+    "type": "Type",
+    "age": "Âge",
+    "skills": "Compétences",
+    "loading": "Chargement des Jeux...",
+    "loadingDesc": "Chargement de jeux éducatifs amusants",
+    "categories": {
+      "Math": "Mathématiques",
+      "Puzzles": "Puzzles",
+      "Colors": "Couleurs",
+      "Memory": "Mémoire",
+      "Science": "Science",
+      "Language": "Langue",
+      "Racing": "Course",
+      "Logic": "Logique",
+      "Action": "Action",
+      "Educational": "Éducatif"
+    },
+    "gameDetails": {
+      "counting_adventure": "Aventure du Comptage",
+      "counting_desc": "Apprenez l’addition avec des visuels amusants",
+      "shape_match": "Association de Formes",
+      "shape_desc": "Associez les formes et les motifs",
+      "color_quest": "Quête des Couleurs",
+      "color_desc": "Apprenez les couleurs en jouant",
+      "memory_match": "Mémoire Associative",
+      "memory_desc": "Améliorez vos capacités de mémoire",
+      "animal_safari": "Safari Animalier",
+      "animal_desc": "Découvrez les animaux",
+      "alphabet_race": "Course de l’Alphabet",
+      "alphabet_desc": "Apprenez les lettres en courant",
+      "pro_racing": "Défi de Course Pro",
+      "pro_racing_desc": "Courez dans le trafic et collectez des bonus",
+      "water_sort": "Puzzle de Tri d’Eau",
+      "water_sort_desc": "Triez de l’eau colorée dans des tubes"
+    }
+  },
+  "gamePlayer": {
+    "exit": "Quitter",
+    "exitGame": "Quitter le Jeu",
+    "resume": "Reprendre",
+    "pause": "Pause",
+    "fullscreen": "Plein Écran",
+    "exitFS": "Quitter le Plein Écran",
+    "controls": "Commandes",
+    "volume": "Volume",
+    "musicPlaying": "Musique en Cours",
+    "audioUnavailable": "Audio Indisponible",
+    "audioMuted": "Son Coupé",
+    "gotIt": "Compris !",
+    "score": "Score",
+    "time": "Temps",
+    "hearts": "Vies",
+    "shortcuts": {
+      "esc": "ESC",
+      "escape": "Quitter le Jeu",
+      "f": "F",
+      "fullscreenKey": "Plein Écran",
+      "m": "M",
+      "mute": "Couper le Son",
+      "space": "Espace",
+      "pausePlay": "Pause/Lecture",
+      "c": "C",
+      "toggleControls": "Afficher/Masquer les Commandes",
+      "s": "S",
+      "saveProgress": "Sauvegarder la Progression",
+      "zeroNine": "0-9",
+      "volumeLevels": "Niveaux de Volume"
+    }
+  },
+  "proRacingChallenge": {
     "seo": {
-      "title": "Jeux pour Enfants - Bientôt Disponible",
-      "description": "Des jeux amusants et éducatifs pour enfants seront bientôt disponibles !"
+      "title": "Défi de Course Pro - Jeu de Voiture à Grande Vitesse",
+      "description": "Évitez le trafic, collectez des bonus et utilisez des boucliers dans ce jeu intense de course professionnelle !"
     },
-    "header": {
-      "title": "Zone de Jeux",
-      "subtitle": "Des Jeux Amusants Arrivent Bientôt ! 🎮",
-      "description": "Nous travaillons à vous apporter des jeux incroyables, adaptés aux enfants, amusants et éducatifs. Restez à l’écoute pour des nouveautés passionnantes !"
+    "game": {
+      "title": "PRO RACER",
+      "level": "L{{level}}",
+      "score": "{{score}}",
+      "startButton": "🚀 DÉMARRER LA COURSE",
+      "restartButton": "🏎️ RECOURIR",
+      "gameOver": {
+        "title": "COURSE TERMINÉE !",
+        "newHighScore": "🥇 NOUVEAU RECORD !",
+        "highScore": "🥈 MEILLEUR : {{score}}"
+      },
+      "instructions": {
+        "tapLanes": "Touchez les voies pour bouger",
+        "shieldButton": "Touchez le bouton BOUCLIER",
+        "touchHint": "Touchez L1/L2/L3 pour changer de voie • Touchez BOUCLIER pour vous protéger"
+      },
+      "controls": {
+        "lane": "L{{lane}}",
+        "up": "↑ HAUT",
+        "down": "↓ BAS",
+        "shield": "BOUCLIER ({{charges}})",
+        "shieldCooldown": "⏳",
+        "recharging": "Recharge du bouclier..."
+      },
+      "powerUps": {
+        "shieldCharge": "🛡️ +1 Bouclier !",
+        "autoShield": "🛡️ Bouclier Auto !",
+        "slowMotion": "🐌 Ralenti !",
+        "speedBoost": "⚡ Accélération !",
+        "shieldActive": "🛡️ Bouclier Actif (7s) !",
+        "roadColor": "⭐ Nouvelle Couleur de Route !",
+        "roadGlow": "🌟 Route Lumineuse !"
+      },
+      "collision": {
+        "crash": "Collision ! Touchez pour recommencer"
+      }
     },
-    "features": {
-      "title": "Qu’est-ce qui Arrive ?",
-      "funEducational": "Jeux Amusants et Éducatifs",
-      "puzzles": "Casse-têtes pour Stimuler l’Esprit",
-      "skillBuilding": "Activités pour Développer les Compétences",
-      "safeContent": "Contenu Sécurisé et Adapté aux Enfants"
+    "tutorial": {
+      "title": "SYSTÈME DE BOUCLIER",
+      "description": "Commence avec 3 charges",
+      "features": {
+        "shield": "• 🛡️ = Bouclier de 7 secondes",
+        "collect": "• Collectez pour plus de charges (max 5)"
+      }
     },
-    "construction": {
-      "title": "En Construction",
-      "description": "Nous construisons une collection incroyable de jeux pour enfants ! Revenez bientôt pour découvrir des jeux amusants, éducatifs et passionnants qui rendront l’apprentissage agréable ! ✨"
+    "ui": {
+      "score": "SCORE : {{score}}",
+      "level": "NIV {{level}}",
+      "shieldCharges": "×{{charges}}",
+      "cooldown": "CD BOUCLIER",
+      "powerUpTimer": "{{icon}} {{time}}s"
+    },
+    "messages": {
+      "shieldReady": "Bouclier prêt (touche Q)",
+      "shieldActive": "Bouclier activé !",
+      "shieldCooldown": "Bouclier en recharge",
+      "collectible": "Collectez {{item}}"
+    }
+  },
+  "countingGame": {
+    "seo": {
+      "title": "Jeu de Comptage - Aventure Mathématique pour Enfants",
+      "description": "Jeu de comptage amusant pour enfants avec plusieurs modes, personnages et bonus pour apprendre les maths en jouant !"
+    },
+    "gameOver": {
+      "title": "Partie Terminée !",
+      "subtitle": "Très bon travail !",
+      "score": "Score",
+      "level": "Niveau",
+      "streak": "Série",
+      "reached": "Atteint",
+      "playAgain": "🎮 Rejouer"
+    },
+    "characterSelection": {
+      "title": "Choisis ton Personnage !",
+      "letsPlay": "Jouons !"
+    },
+    "gameModes": {
+      "practice": "Entraînement",
+      "timed": "Chronométré",
+      "multiplayer": "Contre l’IA"
+    },
+    "gameHeader": {
+      "title": "Jeu de Comptage",
+      "level": "Niv {{level}}",
+      "streak": "{{streak}}🔥",
+      "vsAI": "vs"
+    },
+    "timer": {
+      "timeLeft": "Temps restant :",
+      "seconds": "{{time}}s"
+    },
+    "countingArea": {
+      "countItems": "Compte les objets !",
+      "groupA": "Groupe A",
+      "groupB": "Groupe B"
+    },
+    "inputModes": {
+      "numbers": "🔢 Nombres",
+      "emoji": "😀 Emojis",
+      "placeholderNumbers": "Entre la réponse...",
+      "placeholderEmoji": "Dessine des emojis...",
+      "submit": "🚀 ENVOYER LA RÉPONSE"
+    },
+    "numberPad": {
+      "clear": "Effacer"
+    },
+    "powerUps": {
+      "extraTime": {
+        "label": "⏰",
+        "name": "+10s",
+        "count": "x{{count}}"
+      },
+      "skipQuestion": {
+        "label": "🚀",
+        "name": "Passer",
+        "count": "x{{count}}"
+      },
+      "doublePoints": {
+        "label": "💰",
+        "name": "2x",
+        "count": "x{{count}}"
+      }
+    },
+    "feedback": {
+      "hint": "💡 Indice : {{a}} + {{b}} = {{sum}}",
+      "correct": {
+        "awesome": "🎉 Génial !",
+        "greatJob": "🚀 Très bon travail !",
+        "perfect": "🌈 Parfait !",
+        "super": "🎪 Super !",
+        "amazing": "🧙‍♂️ Incroyable !",
+        "excellent": "🦸‍♂️ Excellent !"
+      },
+      "incorrect": "❌ Essaie encore ! Réponse : {{answer}}",
+      "bonusHeart": "🏆 +1 Vie !",
+      "levelUp": "🚀 Niveau Supérieur !",
+      "extraTime": "⏰ +10 secondes !",
+      "skipped": "🚀 Question passée !",
+      "doublePoints": "💰 +50 points !"
+    },
+    "instructions": {
+      "enterSubmit": "⏎ Entrée pour valider",
+      "streakHeart": "🏆 Série de 5 = vie"
     },
     "buttons": {
-      "comingSoon": "Bientôt Disponible !"
+      "toggleSound": "Activer/Désactiver le son",
+      "playAgain": "Rejouer"
+    },
+    "errors": {
+      "emptyAnswer": "Veuillez entrer une réponse !"
+    }
+  },
+  "waterSortGame": {
+    "seo": {
+      "title": "Puzzle de Tri d’Eau - Jeu de Liquides",
+      "description": "Mettez votre cerveau au défi avec ce puzzle coloré de tri d’eau. Triez les liquides dans les tubes correspondants !"
+    },
+    "loading": "Chargement du jeu Water Sort...",
+    "levelSelector": {
+      "open": "Niveaux",
+      "title": "Sélectionnez un niveau",
+      "subtitle": "Choisissez un niveau à jouer",
+      "currentLevel": "Niveau actuel",
+      "highestReached": "Plus haut atteint",
+      "close": "Fermer"
+    },
+    "tutorial": {
+      "title": "Comment Jouer au Puzzle de Tri d’Eau",
+      "subtitle": "Terminez le tutoriel pour apprendre le jeu !",
+      "skipTutorial": "Passer le Tutoriel",
+      "startRealGame": "Commencer le Vrai Jeu",
+      "next": "Suivant",
+      "previous": "Précédent",
+      "progress": "Progression",
+      "steps": {
+        "step1": {
+          "title": "🎯 Étape 1 : Sélectionner un Tube",
+          "description": "Cliquez sur le tube bleu (Tube n°1) pour le sélectionner.",
+          "hint": "Les tubes sélectionnés brillent en jaune.",
+          "clickHint": "👉 Cliquez sur le Tube n°1"
+        },
+        "step2": {
+          "title": "💧 Étape 2 : Verser dans un Tube Vide",
+          "description": "Cliquez maintenant sur un tube vide (Tube n°3 ou n°4) pour verser le liquide sélectionné.",
+          "hint": "Les tubes vides sont surlignés en vert ci-dessous.",
+          "selectedLabel": "Sélectionné",
+          "clickHint": "👉 Cliquez Ici"
+        },
+        "step3": {
+          "title": "✨ Excellent Travail !",
+          "description": "Vous avez fait votre premier mouvement ! Prêt pour le vrai jeu ?",
+          "hint": "Dans le vrai jeu, il n’y aura pas d’indices — à vous de réfléchir !",
+          "noHints": "Plus de surbrillance dans le vrai jeu. Utilisez votre logique !"
+        }
+      }
+    },
+    "header": {
+      "title": "Puzzle de Tri d’Eau",
+      "tutorialBadge": "Tutoriel",
+      "level": "Niveau {{level}}",
+      "moves": "Coups : {{moves}}",
+      "highestLevel": "Plus haut : {{highestLevel}}"
+    },
+    "controls": {
+      "undo": "Annuler",
+      "restartTutorial": "Redémarrer le Tutoriel",
+      "restartLevel": "Redémarrer le Niveau",
+      "playAgain": "Rejouer",
+      "nextLevel": "Niveau Suivant →"
+    },
+    "instructions": {
+      "tutorial": {
+        "step0": "🎯 Cliquez sur le Tube n°1 (surligné en jaune)",
+        "step1": "💧 Cliquez maintenant sur un tube vide (surligné en vert)",
+        "step2": "✨ Tutoriel terminé ! Prêt pour le vrai défi ?",
+        "followHints": "Suivez les tubes surlignés",
+        "noHints": "Aucun indice dans le vrai jeu !"
+      },
+      "mainGame": {
+        "title": "💡 Triez les couleurs dans les bons tubes !",
+        "description": "Cliquez sur un tube pour le sélectionner, puis sur un autre pour verser • Aucun indice dans le vrai jeu !"
+      }
+    },
+    "victory": {
+      "title": "Niveau Terminé !",
+      "completedIn": "Terminé en <1>{{moves}}</1> coups",
+      "playAgain": "Rejouer",
+      "nextLevel": "Niveau Suivant →"
+    },
+    "tube": {
+      "label": "Tube n°{{number}}",
+      "selected": "Sélectionné",
+      "completionCrown": "Couronne de réussite"
+    },
+    "animations": {
+      "float": "Animation flottante",
+      "pour": "Animation de versement",
+      "droplet": "Animation de goutte",
+      "ripple": "Effet d’ondulation",
+      "sparkle": "Animation scintillante",
+      "liquidShake": "Secousse du liquide",
+      "bubble": "Animation de bulles",
+      "shine": "Effet de brillance",
+      "pulseGlow": "Animation de lueur pulsée"
+    }
+  },
+  "colorQuestGame": {
+    "seo": {
+      "title": "Color Quest - Jeu d’Apprentissage des Couleurs pour Enfants",
+      "description": "Jeu amusant d’identification, de mélange, de tri et de peinture pour aider les enfants à apprendre les couleurs en jouant !"
+    },
+    "gameOver": {
+      "title": "Color Quest Terminé !",
+      "subtitle": "Tu es un maître des couleurs !",
+      "score": "Score",
+      "level": "Niveau",
+      "streak": "Série",
+      "playAgain": "🎨 Rejouer"
+    },
+    "gameHeader": {
+      "title": "Color Quest",
+      "level": "Niv {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "identify": "Identifier",
+      "mix": "Mélanger",
+      "sort": "Trier",
+      "paint": "Peindre"
+    },
+    "timer": {
+      "timeLeft": "Temps restant :",
+      "seconds": "{{time}}s"
+    },
+    "questions": {
+      "identify": {
+        "default": "Quelle est cette couleur ?",
+        "colorSample": "Échantillon de Couleur"
+      },
+      "mix": {
+        "default": "Que donnent {{color1}} et {{color2}} ?",
+        "resultUnknown": "?"
+      },
+      "sort": {
+        "default": "Trouve tous les objets {{color}} !"
+      },
+      "paint": {
+        "default": "Peins avec {{color}} !",
+        "paintBucket": "Pot de Peinture",
+        "colorDrops": "Gouttes de Couleur"
+      }
+    },
+    "feedback": {
+      "correct": {
+        "colorGenius": "🎨 Génie des couleurs !",
+        "perfectMatch": "🌈 Correspondance parfaite !",
+        "youreRainbow": "✨ Tu es un arc-en-ciel !",
+        "masterPainter": "🖌️ Maître peintre !",
+        "colorWizard": "🌟 Magicien des couleurs !",
+        "bullseye": "🎯 En plein dans le mille !"
+      },
+      "incorrect": {
+        "tryAgain": "❌ Essaie encore !",
+        "identifyHint": "C’est {{color}} !",
+        "mixHint": "Essaie une autre couleur !"
+      },
+      "bonusHeart": "💖 +1 Vie !",
+      "levelUp": "🚀 Niveau Supérieur !"
+    },
+    "buttons": {
+      "toggleSound": "Activer/Désactiver le son",
+      "newColor": "🔄 Nouvelle Couleur",
+      "easier": "⬇️ Plus facile",
+      "harder": "⬆️ Plus difficile",
+      "playAgain": "Rejouer"
+    },
+    "labels": {
+      "colorSample": "Échantillon de Couleur",
+      "colorPalette": "Palette de Couleurs :",
+      "lives": "Vies",
+      "score": "Score",
+      "time": "Temps",
+      "mixFormula": "{{color1}} + {{color2}} = {{result}}",
+      "result": "Résultat"
+    },
+    "colors": {
+      "red": "Rouge",
+      "blue": "Bleu",
+      "yellow": "Jaune",
+      "green": "Vert",
+      "purple": "Violet",
+      "orange": "Orange",
+      "pink": "Rose",
+      "brown": "Marron",
+      "lightBlue": "Bleu clair"
+    },
+    "instructions": {
+      "identifyMode": "Clique sur la couleur qui correspond à l’échantillon",
+      "mixMode": "Sélectionne la couleur obtenue après le mélange",
+      "sortMode": "Tape sur les objets de la couleur cible",
+      "paintMode": "Choisis la goutte de couleur qui correspond au pot"
+    },
+    "characters": {
+      "arty": {
+        "emoji": "🎨",
+        "name": "Arty"
+      },
+      "rainbow": {
+        "emoji": "🦄",
+        "name": "Rainbow"
+      },
+      "inky": {
+        "emoji": "🐙",
+        "name": "Inky"
+      },
+      "peacock": {
+        "emoji": "🦚",
+        "name": "Peacock"
+      }
+    }
+  },
+  "animalSafariGame": {
+    "seo": {
+      "title": "Safari Animal - Jeu d'exploration de la faune pour enfants",
+      "description": "Explorez les habitats, trouvez les animaux et apprenez des faits sur la faune dans ce jeu de safari interactif pour enfants!"
+    },
+    "gameOver": {
+      "title": "Safari Terminé!",
+      "subtitle": "Vous avez trouvé {{count}} animaux!",
+      "score": "Score",
+      "level": "Niveau",
+      "photos": "Photos",
+      "animalsFound": "Animaux que vous avez trouvés:",
+      "startNewSafari": "🦁 Commencer un nouveau safari"
+    },
+    "gameHeader": {
+      "title": "Safari Animal",
+      "level": "Niv {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "explore": "Explorer",
+      "quiz": "Quiz",
+      "timed": "Contre la montre"
+    },
+    "timer": {
+      "timeLeft": "Temps restant:",
+      "seconds": "{{time}}s"
+    },
+    "habitat": {
+      "currentHabitat": "Habitat actuel:",
+      "animalsFound": "Animaux trouvés:",
+      "savannah": {
+        "name": "Savane",
+        "description": "Prairie chaude avec peu d'arbres"
+      },
+      "jungle": {
+        "name": "Jungle",
+        "description": "Forêt tropicale avec de nombreux arbres et lianes"
+      },
+      "ocean": {
+        "name": "Océan",
+        "description": "Mer bleue profonde avec récifs coralliens"
+      },
+      "arctic": {
+        "name": "Arctique",
+        "description": "Terre froide de glace et de neige"
+      }
+    },
+    "animalAnnouncement": {
+      "findThisAnimal": "Trouvez cet animal:",
+      "repeatInstructions": "Répéter les instructions",
+      "sayAnimalName": "Dire le nom de l'animal",
+      "stopListening": "Arrêter d'écouter",
+      "hint": "💡 Indice: {{hint}}"
+    },
+    "questions": {
+      "sound": "Quel bruit fait le {{animal}}?",
+      "fact": "Quel fait est vrai sur les {{animal}}s?",
+      "name": "Quel animal fait ce bruit: \"{{sound}}\"?",
+      "instructions": "Cliquez ou dites la réponse"
+    },
+    "feedback": {
+      "correct": {
+        "greatSpot": "🎯 Bon œil! Vous l'avez trouvé!",
+        "animalFound": "📸 Animal trouvé! Excellent!",
+        "safariSuccess": "🦁 Succès du safari! Incroyable!",
+        "wildDiscovery": "🌟 Découverte sauvage! Parfait!",
+        "natureExplorer": "🎪 Explorateur de nature! Merveilleux!",
+        "wildlifePro": "🏆 Pro de la faune! Fantastique!"
+      },
+      "incorrect": {
+        "wrongAnimal": "❌ C'est un {{animal}}. Cherchez le {{targetAnimal}}!",
+        "tryAgainHint": "❌ Essayez encore! Indice: {{hint}}",
+        "itsAnimal": "❌ C'est le {{animal}}! {{sound}}",
+        "answerIs": "❌ La réponse est {{animal}}: {{answer}}"
+      },
+      "listening": "🎤 Écoute... Dites le nom de l'animal!",
+      "microphoneError": "❌ Microphone non disponible. Veuillez cliquer.",
+      "voiceNotHeard": "❌ Je n'ai pas entendu \"{{animal}}\". Essayez encore!",
+      "bonusHeart": "💖 +1 Cœur!",
+      "levelUp": "🚀 Aventure de safari terminée! Prochain habitat...",
+      "welcomeHabitat": "Bienvenue dans la {{habitat}}! Trouvez le {{animal}}. {{hint}}. Cherchez {{emoji}}"
+    },
+    "powerUps": {
+      "binoculars": {
+        "name": "Jumelles",
+        "description": "Révèle les animaux brièvement",
+        "feedback": "🔍 Les jumelles révèlent les animaux cachés!"
+      },
+      "camera": {
+        "name": "Appareil photo",
+        "description": "Trouve automatiquement un animal",
+        "feedback": "📸 Photo prise! Animal trouvé!"
+      },
+      "map": {
+        "name": "Carte",
+        "description": "Découvre un nouvel habitat",
+        "feedback": "🗺️ Carte a découvert un nouvel habitat!"
+      },
+      "hint": {
+        "name": "Indice",
+        "description": "Obtenir un indice",
+        "feedback": "💡 Indice: {{hint}}"
+      },
+      "voiceHelp": {
+        "name": "Aide vocale",
+        "description": "Assistance vocale",
+        "feedback": "🔊 Aide vocale activée!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Basculer le son",
+      "voiceOn": "Voix Activée",
+      "voiceOff": "Voix Désactivée",
+      "soundOn": "Son Activé",
+      "soundOff": "Son Désactivé",
+      "newSafari": "Commencer un nouveau safari"
+    },
+    "labels": {
+      "findTheseAnimals": "Trouvez ces animaux:",
+      "recentPhotos": "Photos récentes:",
+      "explorationComplete": "Explorez la {{habitat}}! Trouvez {{count}} animaux.",
+      "movementControls": "Contrôles de mouvement",
+      "habitatDecorations": "Décorations d'habitat"
+    },
+    "instructions": {
+      "sayAnimalNames": "🎤 Dites les noms d'animaux",
+      "findAnnouncedAnimal": "💡 Trouvez l'animal annoncé",
+      "turnOnVoice": "🔊 Activez la voix pour l'aide",
+      "findInOrder": "🏆 Trouvez les animaux dans l'ordre"
+    },
+    "animals": {
+      "lion": {
+        "name": "Lion",
+        "sound": "Rugir!",
+        "hint": "Roi de la jungle, a une grosse crinière",
+        "voice": "Je suis un lion! Je rugis fort!"
+      },
+      "elephant": {
+        "name": "Éléphant",
+        "sound": "Barrir!",
+        "hint": "Grand animal gris avec une longue trompe",
+        "voice": "Je suis un éléphant! J'ai une longue trompe!"
+      },
+      "giraffe": {
+        "name": "Girafe",
+        "sound": "Meugler!",
+        "hint": "Très grand avec un long cou",
+        "voice": "Je suis une girafe! Je suis le plus grand animal!"
+      },
+      "zebra": {
+        "name": "Zèbre",
+        "sound": "Hennir!",
+        "hint": "Rayures noires et blanches",
+        "voice": "Je suis un zèbre! J'ai des rayures noires et blanches!"
+      },
+      "hippo": {
+        "name": "Hippopotame",
+        "sound": "Grognement!",
+        "hint": "Grand et vit dans l'eau",
+        "voice": "Je suis un hippopotame! J'aime l'eau!"
+      },
+      "monkey": {
+        "name": "Singe",
+        "sound": "Jaser!",
+        "hint": "Grimpe aux arbres et aime les bananes",
+        "voice": "Je suis un singe! J'aime grimper!"
+      },
+      "parrot": {
+        "name": "Perroquet",
+        "sound": "Piailler!",
+        "hint": "Oiseau coloré qui peut parler",
+        "voice": "Je suis un perroquet! Je peux parler comme toi!"
+      },
+      "tiger": {
+        "name": "Tigre",
+        "sound": "Rugir!",
+        "hint": "Grand chat avec des rayures orange et noires",
+        "voice": "Je suis un tigre! J'ai de belles rayures!"
+      },
+      "snake": {
+        "name": "Serpent",
+        "sound": "Siffler!",
+        "hint": "Long et se faufile sur le sol",
+        "voice": "Je suis un serpent! Je me faufile sur le sol!"
+      },
+      "sloth": {
+        "name": "Paresseux",
+        "sound": "...",
+        "hint": "Très lent et se suspend aux arbres",
+        "voice": "Je suis un paresseux! Je bouge très lentement!"
+      },
+      "whale": {
+        "name": "Baleine",
+        "sound": "Chanter!",
+        "hint": "Plus grand animal dans l'océan",
+        "voice": "Je suis une baleine! Je suis très grande!"
+      },
+      "dolphin": {
+        "name": "Dauphin",
+        "sound": "Cliquer!",
+        "hint": "Intelligent et saute hors de l'eau",
+        "voice": "Je suis un dauphin! Je suis très intelligent!"
+      },
+      "shark": {
+        "name": "Requin",
+        "sound": "...",
+        "hint": "A des dents pointues et des nageoires",
+        "voice": "Je suis un requin! J'ai des dents pointues!"
+      },
+      "turtle": {
+        "name": "Tortue",
+        "sound": "...",
+        "hint": "A une coquille dure sur son dos",
+        "voice": "Je suis une tortue! Je porte ma maison sur mon dos!"
+      },
+      "squid": {
+        "name": "Calmar",
+        "sound": "...",
+        "hint": "A des tentacules et de l'encre",
+        "voice": "Je suis un calmar! J'ai huit bras!"
+      },
+      "penguin": {
+        "name": "Manchot",
+        "sound": "Klaxonner!",
+        "hint": "Oiseau qui nage mais ne peut pas voler",
+        "voice": "Je suis un manchot! Je marche en dandinant!"
+      },
+      "polarBear": {
+        "name": "Ours polaire",
+        "sound": "Rugir!",
+        "hint": "Grand ours blanc dans la neige",
+        "voice": "Je suis un ours polaire! J'aime le froid!"
+      },
+      "seal": {
+        "name": "Phoque",
+        "sound": "Aboyer!",
+        "hint": "Nage et aboie comme un chien",
+        "voice": "Je suis un phoque! Je peux retenir ma respiration longtemps!"
+      },
+      "arcticFox": {
+        "name": "Renard arctique",
+        "sound": "Japper!",
+        "hint": "Petit renard avec une fourrure blanche",
+        "voice": "Je suis un renard arctique! Ma fourrure devient blanche en hiver!"
+      },
+      "wolf": {
+        "name": "Loup",
+        "sound": "Hurler!",
+        "hint": "Ressemble à un grand chien, hurle à la lune",
+        "voice": "Je suis un loup! Je hurle à la lune!"
+      }
+    },
+    "characters": {
+      "leo": {
+        "emoji": "🦁",
+        "name": "Léo",
+        "voice": "Je suis Léo le Lion! Cherchons des animaux!"
+      },
+      "ellie": {
+        "emoji": "🐘",
+        "name": "Élie",
+        "voice": "Je suis Élie l'Éléphant! Prêt pour le safari!"
+      },
+      "gigi": {
+        "emoji": "🦒",
+        "name": "Gigi",
+        "voice": "Je suis Gigi la Girafe! Explorons!"
+      },
+      "momo": {
+        "emoji": "🐒",
+        "name": "Momo",
+        "voice": "Je suis Momo le Singe! Temps d'aventure!"
+      }
+    }
+  },
+  "shapeMatchGame": {
+    "seo": {
+      "title": "Shape Match - Jeu de Reconnaissance des Formes",
+      "description": "Jeu amusant pour enfants de correspondance de formes, reconnaissance de motifs et mémoire !"
+    },
+    "gameOver": {
+      "title": "Jeu Terminé !",
+      "subtitle": "Vous avez apparié {{count}} formes !",
+      "score": "Score",
+      "level": "Niveau",
+      "matched": "Apparié",
+      "playAgain": "🔄 Rejouer"
+    },
+    "gameHeader": {
+      "title": "Shape Match",
+      "level": "Niv {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "practice": "Pratique",
+      "timed": "Chronométré",
+      "pattern": "Motif",
+      "multiplayer": "Multijoueur"
+    },
+    "timer": {
+      "timeLeft": "Temps restant :",
+      "seconds": "{{time}}s"
+    },
+    "patternMode": {
+      "matchPattern": "Apparie ce motif :",
+      "instructions": "Cliquez sur les formes dans l’ordre du motif !"
+    },
+    "stats": {
+      "matches": "Correspondances :",
+      "moves": "Mouvements :",
+      "lives": "Vies",
+      "streak": "Série"
+    },
+    "instructions": {
+      "practiceTimed": "Trouvez les paires de formes !",
+      "pattern": "Cliquez sur les formes dans l’ordre du motif !",
+      "selected": "Forme sélectionnée",
+      "matched": "Forme appariée",
+      "hidden": "Forme cachée"
+    },
+    "feedback": {
+      "correct": {
+        "perfectMatch": "🎉 Parfait !",
+        "shapeMaster": "🌟 Maître des Formes !",
+        "awesome": "✨ Super !",
+        "superFind": "🎪 Super Trouvé !",
+        "patternPro": "🧩 Pro des Motifs !",
+        "bullseye": "🎯 Dans le mille !"
+      },
+      "incorrect": "❌ Réessayez !",
+      "bonusHeart": "🏆 +1 Cœur !",
+      "levelUp": "🚀 Niveau Suivant !"
+    }
+  },
+  "memoryMatchGame": {
+    "seo": {
+      "title": "Memory Match - Jeu de cartes mémoire pour enfants",
+      "description": "Améliorez la mémoire avec un jeu de cartes assorties incluant animaux, fruits, véhicules et formes. Entraînement cérébral amusant pour les enfants !"
+    },
+    "gameOver": {
+      "title": "Jeu de mémoire terminé !",
+      "subtitle": "Vous avez trouvé {{count}} paires !",
+      "score": "Score",
+      "level": "Niveau",
+      "moves": "Coups",
+      "playAgain": "🧠 Rejouer"
+    },
+    "gameHeader": {
+      "title": "Memory Match",
+      "level": "Niveau {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "practice": "Pratique",
+      "timed": "Chronométré"
+    },
+    "themes": {
+      "animals": "Animaux",
+      "fruits": "Fruits",
+      "vehicles": "Véhicules",
+      "shapes": "Formes"
+    },
+    "timer": {
+      "timeLeft": "Temps restant :",
+      "seconds": "{{time}}s"
+    },
+    "stats": {
+      "moves": "Coups :",
+      "pairs": "Paires :",
+      "lives": "Vies",
+      "progress": "Progression",
+      "gridSize": "Grille {{size}}x{{size}}"
+    },
+    "gameBoard": {
+      "themeMemory": "Mémoire {{theme}}",
+      "findMatchingPairs": "Trouvez les paires correspondantes de {{theme}} !"
+    },
+    "feedback": {
+      "correct": {
+        "memoryMaster": "🧠 Maître de la mémoire !",
+        "superMatch": "🌟 Super correspondance !",
+        "perfectRecall": "🎯 Rappel parfait !",
+        "amazingMemory": "✨ Mémoire incroyable !",
+        "brainPower": "🏆 Puissance cérébrale !",
+        "matchFound": "🎉 Paire trouvée !"
+      },
+      "incorrect": {
+        "notMatch": "❌ Pas une correspondance ! Essayez encore !",
+        "rememberBetter": "❌ Essayez de mieux vous souvenir ! -1 vie"
+      },
+      "bonusHeart": "💖 +1 Vie !",
+      "levelUp": "🚀 Niveau supérieur !"
+    },
+    "buttons": {
+      "toggleSound": "Basculer le son",
+      "showAllCards": "Montrer toutes les cartes",
+      "reset": "Réinitialiser",
+      "playAgain": "Rejouer",
+      "startGame": "Démarrer le jeu"
+    },
+    "controls": {
+      "showHint": "Afficher toutes les cartes brièvement",
+      "restartBoard": "Recommencer le plateau actuel"
+    },
+    "cards": {
+      "hidden": "?",
+      "unknown": "Carte cachée"
+    },
+    "instructions": {
+      "rememberPositions": "🧠 Souvenez-vous des positions des cartes",
+      "clickMatchingCards": "🎯 Cliquez sur deux cartes correspondantes",
+      "fewerMovesMorePoints": "🚀 Moins de coups = plus de points",
+      "completePairsToLevelUp": "🏆 Complétez toutes les paires pour passer au niveau suivant"
+    },
+    "themesDetails": {
+      "animals": {
+        "cat": {
+          "emoji": "🐱",
+          "name": "Chat"
+        },
+        "dog": {
+          "emoji": "🐶",
+          "name": "Chien"
+        },
+        "lion": {
+          "emoji": "🦁",
+          "name": "Lion"
+        },
+        "tiger": {
+          "emoji": "🐯",
+          "name": "Tigre"
+        },
+        "fox": {
+          "emoji": "🦊",
+          "name": "Renard"
+        },
+        "panda": {
+          "emoji": "🐼",
+          "name": "Panda"
+        },
+        "koala": {
+          "emoji": "🐨",
+          "name": "Koala"
+        },
+        "unicorn": {
+          "emoji": "🦄",
+          "name": "Licorne"
+        },
+        "frog": {
+          "emoji": "🐸",
+          "name": "Grenouille"
+        },
+        "octopus": {
+          "emoji": "🐙",
+          "name": "Poulpe"
+        }
+      },
+      "fruits": {
+        "apple": {
+          "emoji": "🍎",
+          "name": "Pomme"
+        },
+        "banana": {
+          "emoji": "🍌",
+          "name": "Banane"
+        },
+        "grapes": {
+          "emoji": "🍇",
+          "name": "Raisin"
+        },
+        "strawberry": {
+          "emoji": "🍓",
+          "name": "Fraise"
+        },
+        "orange": {
+          "emoji": "🍊",
+          "name": "Orange"
+        },
+        "pineapple": {
+          "emoji": "🍍",
+          "name": "Ananas"
+        },
+        "mango": {
+          "emoji": "🥭",
+          "name": "Mangue"
+        },
+        "watermelon": {
+          "emoji": "🍉",
+          "name": "Pastèque"
+        },
+        "cherry": {
+          "emoji": "🍒",
+          "name": "Cerise"
+        },
+        "kiwi": {
+          "emoji": "🥝",
+          "name": "Kiwi"
+        }
+      },
+      "vehicles": {
+        "car": {
+          "emoji": "🚗",
+          "name": "Voiture"
+        },
+        "bus": {
+          "emoji": "🚌",
+          "name": "Bus"
+        },
+        "airplane": {
+          "emoji": "✈️",
+          "name": "Avion"
+        },
+        "train": {
+          "emoji": "🚂",
+          "name": "Train"
+        },
+        "helicopter": {
+          "emoji": "🚁",
+          "name": "Hélicoptère"
+        },
+        "ship": {
+          "emoji": "🚢",
+          "name": "Bateau"
+        },
+        "rocket": {
+          "emoji": "🚀",
+          "name": "Fusée"
+        },
+        "ufo": {
+          "emoji": "🛸",
+          "name": "OVNI"
+        },
+        "tractor": {
+          "emoji": "🚜",
+          "name": "Tracteur"
+        },
+        "raceCar": {
+          "emoji": "🏎️",
+          "name": "Voiture de course"
+        }
+      },
+      "shapes": {
+        "triangle": {
+          "emoji": "🔺",
+          "name": "Triangle"
+        },
+        "circle": {
+          "emoji": "🔵",
+          "name": "Cercle"
+        },
+        "square": {
+          "emoji": "🟦",
+          "name": "Carré"
+        },
+        "star": {
+          "emoji": "⭐",
+          "name": "Étoile"
+        },
+        "heart": {
+          "emoji": "❤️",
+          "name": "Cœur"
+        },
+        "diamond": {
+          "emoji": "🔶",
+          "name": "Diamant"
+        },
+        "moon": {
+          "emoji": "🌙",
+          "name": "Lune"
+        },
+        "lightning": {
+          "emoji": "⚡",
+          "name": "Éclair"
+        },
+        "snowflake": {
+          "emoji": "❄️",
+          "name": "Flocon"
+        },
+        "balloon": {
+          "emoji": "🎈",
+          "name": "Ballon"
+        }
+      }
+    },
+    "characters": {
+      "brainy": {
+        "emoji": "🧠",
+        "name": "Cérébral"
+      },
+      "wiseOwl": {
+        "emoji": "🦉",
+        "name": "Chouette Sage"
+      },
+      "elephant": {
+        "emoji": "🐘",
+        "name": "Éléphant"
+      },
+      "butterfly": {
+        "emoji": "🦋",
+        "name": "Papillon"
+      }
     }
   },
   "kidLanding": {
@@ -2607,6 +3928,406 @@
       "error": "Erreur",
       "noContent": "Aucun contenu disponible",
       "checkBackLater": "Revenez plus tard pour découvrir les nouveautés."
+    }
+  },
+  "alphabetRaceGame": {
+    "seo": {
+      "title": "Course d'Alphabet - Jeu d'Apprentissage des Lettres pour Enfants",
+      "description": "Coursez à travers l'alphabet, apprenez les sons des lettres et pratiquez l'orthographe dans ce jeu éducatif passionnant pour les enfants!"
+    },
+    "gameOver": {
+      "opponentWon": "Course Terminée!",
+      "playerWon": "Aventure d'Alphabet Terminée!",
+      "raceLost": "L'adversaire a gagné la course!",
+      "raceWon": "Vous avez couru à travers l'alphabet!",
+      "greatLearning": "Super apprentissage!",
+      "score": "Score",
+      "level": "Niveau",
+      "bestStreak": "Meilleure Série",
+      "lettersLearned": "Lettres Apprises:",
+      "playAgain": "🚀 Rejouer"
+    },
+    "gameHeader": {
+      "title": "Course d'Alphabet",
+      "level": "Niv {{level}}",
+      "streak": "{{streak}}🔥"
+    },
+    "gameModes": {
+      "letters": "Lettres",
+      "race": "Course",
+      "spelling": "Orthographe",
+      "timed": "Chrono"
+    },
+    "timer": {
+      "timeLeft": "Temps Restant:",
+      "seconds": "{{time}}s"
+    },
+    "voiceControls": {
+      "repeatInstructions": "Répéter les instructions",
+      "startVoiceInput": "Démarrer la saisie vocale",
+      "stopListening": "Arrêter d'écouter",
+      "speak": "Parler",
+      "listening": "Écoute...",
+      "listeningPrompt": "🎤 Écoute... Parlez maintenant!",
+      "microphoneError": "❌ Microphone non disponible. Veuillez taper.",
+      "voiceNotHeard": "❌ Je n'ai pas entendu \"{{letter}}\". Réessayez!"
+    },
+    "practiceLetters": {
+      "title": "Pratiquez ces Lettres:"
+    },
+    "letterRecognition": {
+      "clickOrSay": "Cliquez ou dites la lettre {{letter}}",
+      "firstMistake": "C'est {{letter}}. Réessayez! Indice: {{hint}}",
+      "secondMistake": "Phonétique: {{phonics}}",
+      "thirdMistake": "C'est {{letter}} pour \"{{example}}\" {{penalty}}",
+      "correct": {
+        "excellent": "🎯 Excellent! Expert en lettres!",
+        "perfect": "🌟 Parfait! As de l'alphabet!",
+        "amazing": "✨ Incroyable! Vous l'avez!",
+        "fantastic": "🏆 Fantastique! Pro de la phonétique!",
+        "superb": "🚀 Superbe! Fusée de lettres!",
+        "greatJob": "🎉 Correct! Bon travail!"
+      }
+    },
+    "raceMode": {
+      "typeOrSay": "Tapez ou dites la lettre suivante:",
+      "nextLetter": "Tapez une lettre ou utilisez le microphone...",
+      "correct": "✅ {{letter}} correct! +{{points}}",
+      "firstMistake": "❌ Essayez {{target}}. Vous avez appuyé sur {{pressed}}",
+      "secondMistake": "❌ C'est {{target}}, pas {{pressed}} -1 Cœur",
+      "raceComplete": "Vous avez gagné la course! Bon travail!",
+      "nextLevel": "🚀 Vous avez gagné la course! Niveau suivant..."
+    },
+    "spellingMode": {
+      "title": "Épelez le mot:",
+      "currentWord": "Vous avez tapé:",
+      "startTyping": "Commencez à taper...",
+      "clear": "Effacer",
+      "checkSpelling": "Vérifier l'Orthographe",
+      "instructions": "Tapez ou dites le mot: {{hint}}",
+      "firstMistake": "❌ Réessayez! Indice: {{hint}}",
+      "secondMistake": "❌ Le mot commence par {{firstLetter}} et a {{length}} lettres",
+      "thirdMistake": "❌ C'est épelé \"{{word}}\" {{emoji}} -1 Cœur",
+      "correct": "✅ Orthographe parfaite! \"{{word}}\" {{emoji}} +{{points}}",
+      "bonusHeart": "💖 +1 Cœur!"
+    },
+    "powerUps": {
+      "hint": {
+        "name": "Indice",
+        "description": "Obtenir un indice",
+        "feedback": "💡 Indice: {{hint}}"
+      },
+      "voiceHelp": {
+        "name": "Aide Vocale",
+        "description": "Assistance vocale",
+        "feedback": "🔊 Aide vocale activée!"
+      },
+      "boost": {
+        "name": "Boost",
+        "description": "Accélération en mode course",
+        "feedback": "🚀 Boost de vitesse! +2 positions!"
+      },
+      "shield": {
+        "name": "Bouclier",
+        "description": "Cœur supplémentaire",
+        "feedback": "🛡️ Bouclier activé! +1 Cœur!"
+      },
+      "slowOpponent": {
+        "name": "Ralentir",
+        "description": "Ralentir l'adversaire en mode course",
+        "feedback": "🐢 Adversaire ralenti!"
+      }
+    },
+    "buttons": {
+      "toggleSound": "Activer/désactiver le son",
+      "soundOn": "Son Activé",
+      "soundOff": "Son Désactivé",
+      "voiceOn": "Voix Activée",
+      "voiceOff": "Voix Désactivée",
+      "repeat": "Répéter",
+      "playAgain": "Rejouer"
+    },
+    "instructions": {
+      "useVoice": "🎤 Utilisez la voix pour dire les lettres",
+      "hintsAfterMistakes": "💡 Indices après les erreurs",
+      "turnOnVoice": "🔊 Activez la voix pour obtenir de l'aide",
+      "practiceLetters": "🏆 Pratiquez les lettres personnalisées"
+    },
+    "letterSounds": {
+      "A": {
+        "sound": "Pomme - /æ/",
+        "example": "A comme dans Apple",
+        "phonics": "A court comme dans \"cat\""
+      },
+      "B": {
+        "sound": "Ballon - /b/",
+        "example": "B comme dans Ball",
+        "phonics": "Son Buh"
+      },
+      "C": {
+        "sound": "Chat - /k/ ou /s/",
+        "example": "C comme dans Cat",
+        "phonics": "Peut être C dur (cat) ou C doux (cent)"
+      },
+      "D": {
+        "sound": "Chien - /d/",
+        "example": "D comme dans Dog",
+        "phonics": "Son Duh"
+      },
+      "E": {
+        "sound": "Œuf - /ɛ/",
+        "example": "E comme dans Egg",
+        "phonics": "E court comme dans \"bed\""
+      },
+      "F": {
+        "sound": "Poisson - /f/",
+        "example": "F comme dans Fish",
+        "phonics": "Son Fff"
+      },
+      "G": {
+        "sound": "Chèvre - /g/",
+        "example": "G comme dans Goat",
+        "phonics": "Peut être G dur (goat) ou G doux (giraffe)"
+      },
+      "H": {
+        "sound": "Chapeau - /h/",
+        "example": "H comme dans Hat",
+        "phonics": "Son Huh"
+      },
+      "I": {
+        "sound": "Igloo - /ɪ/",
+        "example": "I comme dans Igloo",
+        "phonics": "I court comme dans \"pig\""
+      },
+      "J": {
+        "sound": "Sauter - /dʒ/",
+        "example": "J comme dans Jump",
+        "phonics": "Son Juh"
+      },
+      "K": {
+        "sound": "Cerf-volant - /k/",
+        "example": "K comme dans Kite",
+        "phonics": "Son Kuh"
+      },
+      "L": {
+        "sound": "Lion - /l/",
+        "example": "L comme dans Lion",
+        "phonics": "Son Lll"
+      },
+      "M": {
+        "sound": "Singe - /m/",
+        "example": "M comme dans Monkey",
+        "phonics": "Son Mmm"
+      },
+      "N": {
+        "sound": "Nid - /n/",
+        "example": "N comme dans Nest",
+        "phonics": "Son Nnn"
+      },
+      "O": {
+        "sound": "Poulpe - /ɒ/",
+        "example": "O comme dans Octopus",
+        "phonics": "O court comme dans \"dog\""
+      },
+      "P": {
+        "sound": "Cochon - /p/",
+        "example": "P comme dans Pig",
+        "phonics": "Son Puh"
+      },
+      "Q": {
+        "sound": "Reine - /kw/",
+        "example": "Q comme dans Queen",
+        "phonics": "Q est toujours suivi de U"
+      },
+      "R": {
+        "sound": "Lapin - /r/",
+        "example": "R comme dans Rabbit",
+        "phonics": "Son Rrr"
+      },
+      "S": {
+        "sound": "Serpent - /s/",
+        "example": "S comme dans Snake",
+        "phonics": "Son Sss"
+      },
+      "T": {
+        "sound": "Tigre - /t/",
+        "example": "T comme dans Tiger",
+        "phonics": "Son Tuh"
+      },
+      "U": {
+        "sound": "Parapluie - /ʌ/",
+        "example": "U comme dans Umbrella",
+        "phonics": "U court comme dans \"cup\""
+      },
+      "V": {
+        "sound": "Camionnette - /v/",
+        "example": "V comme dans Van",
+        "phonics": "Son Vvv"
+      },
+      "W": {
+        "sound": "Eau - /w/",
+        "example": "W comme dans Water",
+        "phonics": "Son Wuh"
+      },
+      "X": {
+        "sound": "Renard - /ks/",
+        "example": "X comme dans Fox",
+        "phonics": "Son final comme dans \"box\""
+      },
+      "Y": {
+        "sound": "Jaune - /j/",
+        "example": "Y comme dans Yellow",
+        "phonics": "Son Yuh"
+      },
+      "Z": {
+        "sound": "Zèbre - /z/",
+        "example": "Z comme dans Zebra",
+        "phonics": "Son Zzz comme une abeille"
+      }
+    },
+    "words": {
+      "CAT": {
+        "hint": "Un animal poilu qui dit miaou",
+        "emoji": "🐱"
+      },
+      "DOG": {
+        "hint": "Un animal poilu qui aboie",
+        "emoji": "🐶"
+      },
+      "SUN": {
+        "hint": "Étoile brillante dans le ciel",
+        "emoji": "☀️"
+      },
+      "MOON": {
+        "hint": "Brille la nuit",
+        "emoji": "🌙"
+      },
+      "STAR": {
+        "hint": "Scintille dans le ciel",
+        "emoji": "⭐"
+      },
+      "FISH": {
+        "hint": "Nage dans l'eau",
+        "emoji": "🐟"
+      },
+      "BIRD": {
+        "hint": "Vole dans le ciel",
+        "emoji": "🐦"
+      },
+      "TREE": {
+        "hint": "A des feuilles et des branches",
+        "emoji": "🌳"
+      },
+      "BOOK": {
+        "hint": "Vous le lisez",
+        "emoji": "📚"
+      },
+      "BALL": {
+        "hint": "Vous la faites rebondir",
+        "emoji": "⚽"
+      },
+      "CAKE": {
+        "hint": "Dessert sucré pour les anniversaires",
+        "emoji": "🎂"
+      },
+      "RAIN": {
+        "hint": "Tombe des nuages",
+        "emoji": "🌧️"
+      },
+      "SNOW": {
+        "hint": "Blanc et froid",
+        "emoji": "❄️"
+      },
+      "FIRE": {
+        "hint": "Chaud et orange",
+        "emoji": "🔥"
+      },
+      "WATER": {
+        "hint": "Vous le buvez",
+        "emoji": "💧"
+      },
+      "HOUSE": {
+        "hint": "Où vous vivez",
+        "emoji": "🏠"
+      },
+      "CAR": {
+        "hint": "Roule sur les routes",
+        "emoji": "🚗"
+      },
+      "BOAT": {
+        "hint": "Flotte sur l'eau",
+        "emoji": "🛶"
+      },
+      "PLANE": {
+        "hint": "Vole dans le ciel",
+        "emoji": "✈️"
+      },
+      "TRAIN": {
+        "hint": "Tchou tchou!",
+        "emoji": "🚂"
+      },
+      "APPLE": {
+        "hint": "Fruit rouge",
+        "emoji": "🍎"
+      },
+      "BEAR": {
+        "hint": "Grand animal poilu",
+        "emoji": "🐻"
+      },
+      "DUCK": {
+        "hint": "Dit coin coin",
+        "emoji": "🦆"
+      },
+      "EGG": {
+        "hint": "Vient des poules",
+        "emoji": "🥚"
+      },
+      "FROG": {
+        "hint": "Saute et dit coâ coâ",
+        "emoji": "🐸"
+      },
+      "GOAT": {
+        "hint": "Animal de ferme avec des cornes",
+        "emoji": "🐐"
+      },
+      "HAT": {
+        "hint": "Vous le portez sur la tête",
+        "emoji": "🧢"
+      },
+      "ICE": {
+        "hint": "Eau gelée",
+        "emoji": "🧊"
+      },
+      "JUMP": {
+        "hint": "Vous faites ça de haut en bas",
+        "emoji": "🦘"
+      },
+      "KITE": {
+        "hint": "Vole dans le vent",
+        "emoji": "🪁"
+      }
+    },
+    "characters": {
+      "raceCar": {
+        "emoji": "🚗",
+        "name": "Voiture de Course",
+        "voice": "vroom vroom!"
+      },
+      "train": {
+        "emoji": "🚂",
+        "name": "Train",
+        "voice": "tchou tchou!"
+      },
+      "rocket": {
+        "emoji": "🚀",
+        "name": "Fusée",
+        "voice": "3, 2, 1, décollage!"
+      },
+      "unicorn": {
+        "emoji": "🦄",
+        "name": "Licorne",
+        "voice": "hihan! magie!"
+      }
     }
   },
   "termsOfService": {
@@ -4116,5 +5837,191 @@
       "title": "Support Paiement & Facturation",
       "subtitle": "Besoin d’aide concernant les paiements Mobile Money, la facturation ou la sécurité ? Notre équipe est là pour vous aider."
     }
+  },
+  "securityLogs": {
+    "title": "Journaux de Sécurité et Surveillance d'Activité",
+    "filters": "Filtres",
+    "allKids": "Tous les Enfants",
+    "refresh": "Actualiser",
+    "export": {
+      "format": "Format :",
+      "export": "Exporter",
+      "exporting": "Exportation...",
+      "pdfTooltip": "Rapport Professionnel PDF",
+      "csvTooltip": "Fichier de Données CSV",
+      "jsonTooltip": "Fichier de Données JSON"
+    },
+    "exportSuccess": {
+      "pdf": "Rapport PDF généré avec succès !"
+    },
+    "exportError": "Échec de l'exportation des journaux d'activité. Veuillez réessayer.",
+    "exportFormats": {
+      "pdf": {
+        "title": "Rapport Professionnel PDF",
+        "description": "Rapport professionnel avec branding Oliviuus, résumé, graphiques et journaux détaillés. Idéal pour les présentations et rapports."
+      },
+      "csv": {
+        "title": "Fichier de Données CSV",
+        "description": "Format tableur pour l'analyse de données dans Excel, Google Sheets ou outils de traitement de données."
+      },
+      "json": {
+        "title": "Fichier de Données JSON",
+        "description": "Format de données structuré pour développeurs et programmeurs. Inclut des métadonnées et données organisées."
+      }
+    },
+    "timeRanges": {
+      "7days": "7 derniers jours",
+      "30days": "30 derniers jours",
+      "90days": "90 derniers jours"
+    },
+    "filterLabels": {
+      "activityType": "Type d'Activité",
+      "status": "Statut",
+      "deviceType": "Type d'Appareil"
+    },
+    "filterOptions": {
+      "allTypes": "Tous les Types",
+      "allStatus": "Tous les Statuts",
+      "allDevices": "Tous les Appareils"
+    },
+    "activityTypes": {
+      "content_view": "Visualisation de Contenu",
+      "content_attempt": "Tentative de Contenu",
+      "search": "Recherche",
+      "time_limit": "Limite de Temps",
+      "pin_entry": "Entrée PIN",
+      "mode_switch": "Changement de Mode"
+    },
+    "status": {
+      "allowed": "Autorisé",
+      "blocked": "Bloqué"
+    },
+    "deviceTypes": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "tablet": "Tablette",
+      "smarttv": "Smart TV"
+    },
+    "stats": {
+      "totalKids": "Enfants Totaux",
+      "todayActivities": "Activités d'Aujourd'hui",
+      "blocked": "bloquées",
+      "pendingAlerts": "Alertes en Attente",
+      "timeLimitWarnings": "Avertissements Limite Temps",
+      "blockRate": "Taux de Blocage",
+      "mostActiveTime": "Heure la Plus Active",
+      "mostActiveKid": "Enfant le Plus Actif",
+      "outOf": "sur",
+      "activities": "activités",
+      "noData": "Aucune donnée",
+      "peakActivityHour": "Heure de pointe d'activité"
+    },
+    "sections": {
+      "activitySummary": "Résumé des Activités",
+      "activityByType": "Activités par Type",
+      "detailedLogs": "Journaux d'Activité Détaillés",
+      "logsDescription": "Toutes les activités de vos enfants"
+    },
+    "summary": {
+      "totalActivities": "Activités Totales",
+      "allowedActivities": "Activités Autorisées",
+      "blockedActivities": "Activités Bloquées",
+      "allowed": "Autorisé",
+      "blocked": "Bloqué"
+    },
+    "tableHeaders": {
+      "kid": "Enfant",
+      "activity": "Activité",
+      "status": "Statut",
+      "details": "Détails",
+      "time": "Heure"
+    },
+    "kidInitial": "E",
+    "unknownKid": "Enfant Inconnu",
+    "totalLogs": "Total",
+    "logs": "journaux",
+    "noLogs": {
+      "title": "Aucun journal d'activité trouvé",
+      "description": "Les activités apparaîtront ici lorsque vos enfants utiliseront la plateforme"
+    },
+    "pdf": {
+      "title": "Rapport de Sécurité Oliviuus",
+      "subtitle": "Analyse Professionnelle d'Activité et Sécurité Enfant",
+      "reportGenerated": "Rapport Généré",
+      "reportFor": "Rapport Pour",
+      "timePeriod": "Période",
+      "sections": {
+        "executiveSummary": "📊 Résumé Exécutif",
+        "activitySummary": "📈 Résumé des Activités",
+        "mostActiveKid": "👑 Enfant le Plus Actif",
+        "detailedLogs": "📋 Journaux d'Activité Détaillés",
+        "recommendations": "💡 Recommandations de Sécurité"
+      },
+      "totalKidsMonitored": "Enfants Surveillés Totaux",
+      "todaysActivities": "Activités d'Aujourd'hui",
+      "activitiesBlocked": "Activités Bloquées",
+      "pendingAlerts": "Alertes en Attente",
+      "timeLimitWarnings": "Avertissements Limite Temps",
+      "totalActivities": "Activités Totales",
+      "allowedActivities": "Activités Autorisées",
+      "blockedActivities": "Activités Bloquées",
+      "blockRate": "Taux de Blocage",
+      "peakActivityHour": "Heure de Pointe d'Activité",
+      "kidName": "Nom de l'Enfant",
+      "activityCount": "Nombre d'Activités",
+      "averageDaily": "Activités Quotidiennes Moyennes",
+      "unknownKid": "Enfant Inconnu",
+      "allowed": "Autorisé",
+      "blocked": "Bloqué",
+      "tableHeaders": {
+        "kid": "Enfant",
+        "activity": "Activité",
+        "status": "Statut",
+        "details": "Détails",
+        "date": "Date"
+      },
+      "recommendations": {
+        "reviewLogs": "Revoyez régulièrement les journaux d'activité pour détecter des modèles inhabituels",
+        "updateRestrictions": "Mettez à jour les restrictions de contenu basées sur les activités bloquées",
+        "monitorPeakHours": "Surveillez les heures de pointe d'activité pour la gestion du temps",
+        "educateKids": "Éduquez les enfants sur la sécurité numérique basée sur les tentatives bloquées",
+        "adjustSettings": "Ajustez les contrôles parentaux basés sur les modèles d'activité"
+      },
+      "footer": {
+        "confidential": "CONFIDENTIEL - Pour usage autorisé uniquement",
+        "oliviuus": "Plateforme de Sécurité Enfant Oliviuus",
+        "page": "Page",
+        "of": "sur"
+      },
+      "noData": "Aucune donnée"
+    }
+  },
+  "download": {
+    "title": "Téléchargements",
+    "subtitle": "Téléchargez vos contenus préférés et regardez hors ligne, n'importe où, n'importe quand",
+    "progress": "Progrès du développement",
+    "comingSoon": {
+      "title": "Téléchargements Arrivent Bientôt!",
+      "message": "Nous sommes ravis d'annoncer que la fonctionnalité de téléchargement est en cours de développement. Bientôt, vous pourrez enregistrer du contenu pour le regarder hors ligne!",
+      "hd": "Téléchargements HD & 4K",
+      "unlimited": "Téléchargements illimités",
+      "expire": "Pas de date d'expiration",
+      "sync": "Synchronisation multi-appareils"
+    },
+    "features": {
+      "offline": "Regarder hors ligne",
+      "offlineDesc": "Téléchargez vos émissions et films préférés pour les regarder sans internet",
+      "mobile": "Optimisé pour mobile",
+      "mobileDesc": "Téléchargez du contenu sur votre téléphone pour regarder en déplacement",
+      "tablet": "Optimisé pour tablette",
+      "tabletDesc": "Expérience de visionnage parfaite sur tablettes",
+      "computer": "Prêt pour ordinateur",
+      "computerDesc": "Téléchargez sur votre ordinateur pour profiter sur grand écran"
+    },
+    "buttons": {
+      "home": "Retour à l'Accueil",
+      "check": "Vérifier les Mises à Jour"
+    },
+    "footer": "La fonctionnalité de téléchargement devrait être lancée au premier bientôt. Restez à l'écoute pour les mises à jour!"
   }
 }

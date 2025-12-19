@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trophy, Heart, Clock, Volume2, VolumeX, Search, Map, Camera, Binoculars, Compass, Zap, Star, Home, Mic, MicOff, Speaker, Volume } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
+  const { t } = useTranslation(); // Initialize translation hook
+  
   const [gameMode, setGameMode] = useState('explore');
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
@@ -44,68 +47,78 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
 
   const habitats = {
     savannah: {
-      name: 'Savannah',
+      name: t('animalSafariGame.habitat.savannah.name'),
       color: 'from-[#F59E0B] to-[#D97706]',
       bgColor: '#FEF3C7',
-      description: 'Hot grassland with few trees',
+      description: t('animalSafariGame.habitat.savannah.description'),
       emoji: '🌾',
       animals: [
-        { id: 1, emoji: '🦁', name: 'Lion', sound: 'Roar!', fact: 'Lions are the only cats that live in groups called prides.', hint: 'King of the jungle, has a big mane', voice: 'I am a lion! I roar loudly!' },
-        { id: 2, emoji: '🐘', name: 'Elephant', sound: 'Trumpet!', fact: 'Elephants can recognize themselves in a mirror.', hint: 'Big gray animal with a long trunk', voice: 'I am an elephant! I have a long trunk!' },
-        { id: 3, emoji: '🦒', name: 'Giraffe', sound: 'Moo!', fact: 'Giraffes have the same number of neck bones as humans.', hint: 'Very tall with a long neck', voice: 'I am a giraffe! I am the tallest animal!' },
-        { id: 4, emoji: '🦓', name: 'Zebra', sound: 'Bray!', fact: 'Each zebra has a unique stripe pattern like fingerprints.', hint: 'Black and white stripes', voice: 'I am a zebra! I have black and white stripes!' },
-        { id: 5, emoji: '🦛', name: 'Hippo', sound: 'Grunt!', fact: 'Hippos can run faster than humans on land.', hint: 'Big and lives in water', voice: 'I am a hippo! I love water!' },
+        { id: 1, emoji: '🦁', name: t('animalSafariGame.animals.lion.name'), sound: t('animalSafariGame.animals.lion.sound'), hint: t('animalSafariGame.animals.lion.hint'), voice: t('animalSafariGame.animals.lion.voice') },
+        { id: 2, emoji: '🐘', name: t('animalSafariGame.animals.elephant.name'), sound: t('animalSafariGame.animals.elephant.sound'), hint: t('animalSafariGame.animals.elephant.hint'), voice: t('animalSafariGame.animals.elephant.voice') },
+        { id: 3, emoji: '🦒', name: t('animalSafariGame.animals.giraffe.name'), sound: t('animalSafariGame.animals.giraffe.sound'), hint: t('animalSafariGame.animals.giraffe.hint'), voice: t('animalSafariGame.animals.giraffe.voice') },
+        { id: 4, emoji: '🦓', name: t('animalSafariGame.animals.zebra.name'), sound: t('animalSafariGame.animals.zebra.sound'), hint: t('animalSafariGame.animals.zebra.hint'), voice: t('animalSafariGame.animals.zebra.voice') },
+        { id: 5, emoji: '🦛', name: t('animalSafariGame.animals.hippo.name'), sound: t('animalSafariGame.animals.hippo.sound'), hint: t('animalSafariGame.animals.hippo.hint'), voice: t('animalSafariGame.animals.hippo.voice') },
       ]
     },
     jungle: {
-      name: 'Jungle',
+      name: t('animalSafariGame.habitat.jungle.name'),
       color: 'from-[#10B981] to-[#059669]',
       bgColor: '#D1FAE5',
-      description: 'Rainforest with many trees and vines',
+      description: t('animalSafariGame.habitat.jungle.description'),
       emoji: '🌴',
       animals: [
-        { id: 6, emoji: '🐒', name: 'Monkey', sound: 'Chatter!', fact: 'Monkeys use different sounds to communicate with each other.', hint: 'Climbs trees and loves bananas', voice: 'I am a monkey! I love to climb!' },
-        { id: 7, emoji: '🦜', name: 'Parrot', sound: 'Squawk!', fact: 'Parrots can mimic human speech and other sounds.', hint: 'Colorful bird that can talk', voice: 'I am a parrot! I can talk like you!' },
-        { id: 8, emoji: '🐯', name: 'Tiger', sound: 'Growl!', fact: 'Tigers have striped skin, not just striped fur.', hint: 'Big cat with orange and black stripes', voice: 'I am a tiger! I have beautiful stripes!' },
-        { id: 9, emoji: '🐍', name: 'Snake', sound: 'Hiss!', fact: 'Snakes smell with their tongues and have no eyelids.', hint: 'Long and slithers on the ground', voice: 'I am a snake! I slither on the ground!' },
-        { id: 10, emoji: '🦥', name: 'Sloth', sound: '...', fact: 'Sloths sleep up to 20 hours a day and move very slowly.', hint: 'Very slow and hangs from trees', voice: 'I am a sloth! I move very slowly!' },
+        { id: 6, emoji: '🐒', name: t('animalSafariGame.animals.monkey.name'), sound: t('animalSafariGame.animals.monkey.sound'), hint: t('animalSafariGame.animals.monkey.hint'), voice: t('animalSafariGame.animals.monkey.voice') },
+        { id: 7, emoji: '🦜', name: t('animalSafariGame.animals.parrot.name'), sound: t('animalSafariGame.animals.parrot.sound'), hint: t('animalSafariGame.animals.parrot.hint'), voice: t('animalSafariGame.animals.parrot.voice') },
+        { id: 8, emoji: '🐯', name: t('animalSafariGame.animals.tiger.name'), sound: t('animalSafariGame.animals.tiger.sound'), hint: t('animalSafariGame.animals.tiger.hint'), voice: t('animalSafariGame.animals.tiger.voice') },
+        { id: 9, emoji: '🐍', name: t('animalSafariGame.animals.snake.name'), sound: t('animalSafariGame.animals.snake.sound'), hint: t('animalSafariGame.animals.snake.hint'), voice: t('animalSafariGame.animals.snake.voice') },
+        { id: 10, emoji: '🦥', name: t('animalSafariGame.animals.sloth.name'), sound: t('animalSafariGame.animals.sloth.sound'), hint: t('animalSafariGame.animals.sloth.hint'), voice: t('animalSafariGame.animals.sloth.voice') },
       ]
     },
     ocean: {
-      name: 'Ocean',
+      name: t('animalSafariGame.habitat.ocean.name'),
       color: 'from-[#0EA5E9] to-[#0284C7]',
       bgColor: '#E0F2FE',
-      description: 'Deep blue sea with coral reefs',
+      description: t('animalSafariGame.habitat.ocean.description'),
       emoji: '🌊',
       animals: [
-        { id: 11, emoji: '🐋', name: 'Whale', sound: 'Sing!', fact: 'Blue whales are the largest animals ever to live on Earth.', hint: 'Biggest animal in the ocean', voice: 'I am a whale! I am very big!' },
-        { id: 12, emoji: '🐬', name: 'Dolphin', sound: 'Click!', fact: 'Dolphins have names for each other and are very smart.', hint: 'Smart and jumps out of water', voice: 'I am a dolphin! I am very smart!' },
-        { id: 13, emoji: '🦈', name: 'Shark', sound: '...', fact: 'Sharks have been around for 400 million years.', hint: 'Has sharp teeth and fins', voice: 'I am a shark! I have sharp teeth!' },
-        { id: 14, emoji: '🐢', name: 'Turtle', sound: '...', fact: 'Some turtles can live over 100 years and return to where they were born.', hint: 'Has a hard shell on its back', voice: 'I am a turtle! I carry my house on my back!' },
-        { id: 15, emoji: '🦑', name: 'Squid', sound: '...', fact: 'Squids have three hearts and can change color.', hint: 'Has tentacles and ink', voice: 'I am a squid! I have eight arms!' },
+        { id: 11, emoji: '🐋', name: t('animalSafariGame.animals.whale.name'), sound: t('animalSafariGame.animals.whale.sound'), hint: t('animalSafariGame.animals.whale.hint'), voice: t('animalSafariGame.animals.whale.voice') },
+        { id: 12, emoji: '🐬', name: t('animalSafariGame.animals.dolphin.name'), sound: t('animalSafariGame.animals.dolphin.sound'), hint: t('animalSafariGame.animals.dolphin.hint'), voice: t('animalSafariGame.animals.dolphin.voice') },
+        { id: 13, emoji: '🦈', name: t('animalSafariGame.animals.shark.name'), sound: t('animalSafariGame.animals.shark.sound'), hint: t('animalSafariGame.animals.shark.hint'), voice: t('animalSafariGame.animals.shark.voice') },
+        { id: 14, emoji: '🐢', name: t('animalSafariGame.animals.turtle.name'), sound: t('animalSafariGame.animals.turtle.sound'), hint: t('animalSafariGame.animals.turtle.hint'), voice: t('animalSafariGame.animals.turtle.voice') },
+        { id: 15, emoji: '🦑', name: t('animalSafariGame.animals.squid.name'), sound: t('animalSafariGame.animals.squid.sound'), hint: t('animalSafariGame.animals.squid.hint'), voice: t('animalSafariGame.animals.squid.voice') },
       ]
     },
     arctic: {
-      name: 'Arctic',
+      name: t('animalSafariGame.habitat.arctic.name'),
       color: 'from-[#93C5FD] to-[#60A5FA]',
       bgColor: '#DBEAFE',
-      description: 'Cold ice and snow land',
+      description: t('animalSafariGame.habitat.arctic.description'),
       emoji: '❄️',
       animals: [
-        { id: 16, emoji: '🐧', name: 'Penguin', sound: 'Honk!', fact: 'Penguins propose to mates with pebbles.', hint: 'Bird that swims but cannot fly', voice: 'I am a penguin! I waddle when I walk!' },
-        { id: 17, emoji: '🐻‍❄️', name: 'Polar Bear', sound: 'Growl!', fact: 'Polar bears have black skin under white fur to absorb heat.', hint: 'Big white bear in the snow', voice: 'I am a polar bear! I love the cold!' },
-        { id: 18, emoji: '🦭', name: 'Seal', sound: 'Bark!', fact: 'Seals can hold their breath for 2 hours underwater.', hint: 'Swims and barks like a dog', voice: 'I am a seal! I can hold my breath a long time!' },
-        { id: 19, emoji: '🦊', name: 'Arctic Fox', sound: 'Yip!', fact: 'Arctic foxes change fur color with seasons for camouflage.', hint: 'Small fox with white fur', voice: 'I am an arctic fox! My fur turns white in winter!' },
-        { id: 20, emoji: '🐺', name: 'Wolf', sound: 'Howl!', fact: 'Wolves can run up to 38 miles per hour and live in packs.', hint: 'Looks like a big dog, howls at moon', voice: 'I am a wolf! I howl at the moon!' },
+        { id: 16, emoji: '🐧', name: t('animalSafariGame.animals.penguin.name'), sound: t('animalSafariGame.animals.penguin.sound'), hint: t('animalSafariGame.animals.penguin.hint'), voice: t('animalSafariGame.animals.penguin.voice') },
+        { id: 17, emoji: '🐻‍❄️', name: t('animalSafariGame.animals.polarBear.name'), sound: t('animalSafariGame.animals.polarBear.sound'), hint: t('animalSafariGame.animals.polarBear.hint'), voice: t('animalSafariGame.animals.polarBear.voice') },
+        { id: 18, emoji: '🦭', name: t('animalSafariGame.animals.seal.name'), sound: t('animalSafariGame.animals.seal.sound'), hint: t('animalSafariGame.animals.seal.hint'), voice: t('animalSafariGame.animals.seal.voice') },
+        { id: 19, emoji: '🦊', name: t('animalSafariGame.animals.arcticFox.name'), sound: t('animalSafariGame.animals.arcticFox.sound'), hint: t('animalSafariGame.animals.arcticFox.hint'), voice: t('animalSafariGame.animals.arcticFox.voice') },
+        { id: 20, emoji: '🐺', name: t('animalSafariGame.animals.wolf.name'), sound: t('animalSafariGame.animals.wolf.sound'), hint: t('animalSafariGame.animals.wolf.hint'), voice: t('animalSafariGame.animals.wolf.voice') },
       ]
     }
   };
 
   const characters = [
-    { emoji: '🦁', name: 'Leo', voice: 'I am Leo the Lion! Let\'s find animals!' },
-    { emoji: '🐘', name: 'Ellie', voice: 'I am Ellie the Elephant! Ready for safari!' },
-    { emoji: '🦒', name: 'Gigi', voice: 'I am Gigi the Giraffe! Let\'s explore!' },
-    { emoji: '🐒', name: 'Momo', voice: 'I am Momo the Monkey! Time for adventure!' }
+    { emoji: '🦁', name: t('animalSafariGame.characters.leo.name'), voice: t('animalSafariGame.characters.leo.voice') },
+    { emoji: '🐘', name: t('animalSafariGame.characters.ellie.name'), voice: t('animalSafariGame.characters.ellie.voice') },
+    { emoji: '🦒', name: t('animalSafariGame.characters.gigi.name'), voice: t('animalSafariGame.characters.gigi.voice') },
+    { emoji: '🐒', name: t('animalSafariGame.characters.momo.name'), voice: t('animalSafariGame.characters.momo.voice') }
+  ];
+
+  // Translated funny messages
+  const funnyMessages = [
+    t('animalSafariGame.feedback.correct.greatSpot'),
+    t('animalSafariGame.feedback.correct.animalFound'),
+    t('animalSafariGame.feedback.correct.safariSuccess'),
+    t('animalSafariGame.feedback.correct.wildDiscovery'),
+    t('animalSafariGame.feedback.correct.natureExplorer'),
+    t('animalSafariGame.feedback.correct.wildlifePro')
   ];
 
   // Initialize Web Speech API
@@ -174,10 +187,10 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
     try {
       recognitionRef.current.start();
       setIsListening(true);
-      setFeedback("🎤 Listening... Say the animal name!");
+      setFeedback(t('animalSafariGame.feedback.listening'));
     } catch (error) {
       console.error('Speech recognition start error:', error);
-      setFeedback("❌ Microphone not available. Please click instead.");
+      setFeedback(t('animalSafariGame.feedback.microphoneError'));
     }
   };
 
@@ -206,7 +219,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
           handleAnimalClick(targetAnimal);
         }
       } else {
-        setFeedback(`❌ I didn't hear "${animalToFind?.name}". Try again!`);
+        setFeedback(t('animalSafariGame.feedback.voiceNotHeard', { animal: animalToFind?.name }));
         if (voiceEnabled) {
           speakText(`Try saying ${animalToFind?.name}`);
         }
@@ -255,14 +268,27 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
     if (hiddenAnimals.length > 0) {
       const firstAnimal = hiddenAnimals[0];
       setAnimalToFind(firstAnimal);
-      setAnimalAnnouncement(`Find the ${firstAnimal.name}! ${firstAnimal.hint}`);
+      setAnimalAnnouncement(t('animalSafariGame.feedback.welcomeHabitat', {
+        habitat: habitats[randomHabitat].name,
+        animal: firstAnimal.name,
+        hint: firstAnimal.hint,
+        emoji: firstAnimal.emoji
+      }));
       
       if (voiceEnabled) {
-        speakText(`Welcome to the ${habitats[randomHabitat].name}! Find the ${firstAnimal.name}. ${firstAnimal.hint}. Look for ${firstAnimal.emoji}`);
+        speakText(t('animalSafariGame.feedback.welcomeHabitat', {
+          habitat: habitats[randomHabitat].name,
+          animal: firstAnimal.name,
+          hint: firstAnimal.hint,
+          emoji: firstAnimal.emoji
+        }));
       }
     }
     
-    setFeedback(`Explore the ${habitats[randomHabitat].name}! Find ${hiddenAnimals.length} animals.`);
+    setFeedback(t('animalSafariGame.labels.explorationComplete', {
+      habitat: habitats[randomHabitat].name,
+      count: hiddenAnimals.length
+    }));
     
     // Generate a question about animals
     if (gameMode === 'quiz') {
@@ -279,19 +305,19 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
     const questionTypes = [
       {
         type: 'sound',
-        question: `What sound does a ${randomAnimal.name} make?`,
+        question: t('animalSafariGame.questions.sound', { animal: randomAnimal.name }),
         answer: randomAnimal.sound.toLowerCase().replace('!', ''),
         options: generateSoundOptions(randomAnimal)
       },
       {
         type: 'fact',
-        question: `Which fact is true about ${randomAnimal.name}s?`,
-        answer: randomAnimal.fact.toLowerCase(),
+        question: t('animalSafariGame.questions.fact', { animal: randomAnimal.name }),
+        answer: randomAnimal.fact?.toLowerCase() || '',
         options: generateFactOptions(randomAnimal)
       },
       {
         type: 'name',
-        question: `What animal makes this sound: "${randomAnimal.sound}"?`,
+        question: t('animalSafariGame.questions.name', { sound: randomAnimal.sound }),
         answer: randomAnimal.name.toLowerCase(),
         options: generateNameOptions(randomAnimal)
       }
@@ -336,7 +362,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
       'they propose with pebbles.'
     ];
     
-    const options = [correctAnimal.fact.toLowerCase()];
+    const options = [correctAnimal.fact?.toLowerCase() || 'they are unique animals.'];
     
     while (options.length < 4) {
       const randomFact = allFacts[Math.floor(Math.random() * allFacts.length)];
@@ -393,12 +419,18 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
       setWrongAttempts(newWrongAttempts);
       
       if (newWrongAttempts === 1) {
-        setFeedback(`❌ That's a ${animal.name}. Find the ${animalToFind?.name}!`);
-        if (voiceEnabled) speakText(`That's a ${animal.name}. Look for ${animalToFind?.name}. ${animalToFind?.hint}`);
+        setFeedback(t('animalSafariGame.feedback.incorrect.wrongAnimal', {
+          animal: animal.name,
+          targetAnimal: animalToFind?.name
+        }));
+        if (voiceEnabled) speakText(t('animalSafariGame.feedback.incorrect.wrongAnimal', {
+          animal: animal.name,
+          targetAnimal: animalToFind?.name
+        }));
       } else {
-        setFeedback(`❌ Hint: ${animalToFind?.hint}`);
+        setFeedback(t('animalSafariGame.feedback.incorrect.tryAgainHint', { hint: animalToFind?.hint }));
         setShowAnimalHint(true);
-        if (voiceEnabled) speakText(`Hint: ${animalToFind?.hint}`);
+        if (voiceEnabled) speakText(t('animalSafariGame.feedback.incorrect.tryAgainHint', { hint: animalToFind?.hint }));
       }
       return;
     }
@@ -425,15 +457,6 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
       setTimeout(() => setShowConfetti(false), 1000);
     }
     
-    const funnyMessages = [
-      "🎯 Great Spot! You found it!",
-      "📸 Animal Found! Excellent!",
-      "🦁 Safari Success! Amazing!",
-      "🌟 Wild Discovery! Perfect!",
-      "🎪 Nature Explorer! Wonderful!",
-      "🏆 Wildlife Pro! Fantastic!"
-    ];
-    
     const message = `${funnyMessages[Math.floor(Math.random() * funnyMessages.length)]} Found ${animal.name} ${animal.emoji} +${points}`;
     setFeedback(message);
     
@@ -450,10 +473,20 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
     const nextAnimal = updatedAnimals.find(a => !a.found);
     if (nextAnimal) {
       setAnimalToFind(nextAnimal);
-      setAnimalAnnouncement(`Great! Now find the ${nextAnimal.name}! ${nextAnimal.hint}`);
+      setAnimalAnnouncement(t('animalSafariGame.feedback.welcomeHabitat', {
+        habitat: habitats[currentHabitat].name,
+        animal: nextAnimal.name,
+        hint: nextAnimal.hint,
+        emoji: nextAnimal.emoji
+      }));
       
       if (voiceEnabled) {
-        speakText(`Great job! You found ${animal.name}. Now find ${nextAnimal.name}. ${nextAnimal.hint}. Look for ${nextAnimal.emoji}`);
+        speakText(t('animalSafariGame.feedback.welcomeHabitat', {
+          habitat: habitats[currentHabitat].name,
+          animal: nextAnimal.name,
+          hint: nextAnimal.hint,
+          emoji: nextAnimal.emoji
+        }));
       }
     }
     
@@ -501,20 +534,32 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
       setStreak(0);
       
       if (newWrongAttempts === 1) {
-        setFeedback(`❌ Try again! Hint: ${currentQuestion.animal.hint}`);
-        if (voiceEnabled) speakText(`Try again. Hint: ${currentQuestion.animal.hint}`);
+        setFeedback(t('animalSafariGame.feedback.incorrect.tryAgainHint', { hint: currentQuestion.animal.hint }));
+        if (voiceEnabled) speakText(t('animalSafariGame.feedback.incorrect.tryAgainHint', { hint: currentQuestion.animal.hint }));
       } else if (newWrongAttempts === 2) {
-        setFeedback(`❌ It's the ${currentQuestion.animal.name}! ${currentQuestion.animal.sound}`);
-        if (voiceEnabled) speakText(`It's the ${currentQuestion.animal.name}! ${currentQuestion.animal.sound}`);
+        setFeedback(t('animalSafariGame.feedback.incorrect.itsAnimal', {
+          animal: currentQuestion.animal.name,
+          sound: currentQuestion.animal.sound
+        }));
+        if (voiceEnabled) speakText(t('animalSafariGame.feedback.incorrect.itsAnimal', {
+          animal: currentQuestion.animal.name,
+          sound: currentQuestion.animal.sound
+        }));
       } else {
         const newLives = lives - 1;
         setLives(newLives);
         setWrongAttempts(0);
         
-        setFeedback(`❌ The answer is ${currentQuestion.animal.name}: ${currentQuestion.answer}`);
+        setFeedback(t('animalSafariGame.feedback.incorrect.answerIs', {
+          animal: currentQuestion.animal.name,
+          answer: currentQuestion.answer
+        }));
         
         if (voiceEnabled) {
-          speakText(`The answer is ${currentQuestion.animal.name}. ${currentQuestion.animal.fact}`);
+          speakText(t('animalSafariGame.feedback.incorrect.answerIs', {
+            animal: currentQuestion.animal.name,
+            answer: currentQuestion.answer
+          }));
         }
         
         if (newLives <= 0) {
@@ -530,7 +575,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
     if (streak + 1 >= 5) {
       const newLives = Math.min(lives + 1, 5);
       setLives(newLives);
-      setFeedback(prev => `${prev} 💖 +1 Heart!`);
+      setFeedback(prev => `${prev} ${t('animalSafariGame.feedback.bonusHeart')}`);
       onGameEvent?.({ type: 'heartsUpdate', payload: newLives });
     }
     
@@ -540,7 +585,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
     
     setTimeout(() => {
       setLevel(prev => prev + 1);
-      setFeedback("🚀 Safari Adventure Complete! Next habitat...");
+      setFeedback(t('animalSafariGame.feedback.levelUp'));
       initializeGame();
     }, 2000);
   };
@@ -553,7 +598,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
     switch (type) {
       case 'binoculars':
         setHintUsed(true);
-        setFeedback("🔍 Binoculars reveal hidden animals!");
+        setFeedback(t('animalSafariGame.powerUps.binoculars.feedback'));
         if (voiceEnabled) speakText("Using binoculars! Animals are highlighted!");
         setTimeout(() => setHintUsed(false), 5000);
         break;
@@ -563,7 +608,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
         if (visibleAnimals.length > 0) {
           const randomAnimal = visibleAnimals[Math.floor(Math.random() * visibleAnimals.length)];
           handleAnimalClick(randomAnimal);
-          setFeedback("📸 Camera snap! Found an animal!");
+          setFeedback(t('animalSafariGame.powerUps.camera.feedback'));
           if (voiceEnabled) speakText(`Camera found ${randomAnimal.name}!`);
         }
         break;
@@ -573,21 +618,21 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
         const currentIndex = habitatKeys.indexOf(currentHabitat);
         const nextHabitat = habitatKeys[(currentIndex + 1) % habitatKeys.length];
         setCurrentHabitat(nextHabitat);
-        setFeedback("🗺️ Map discovered new habitat!");
-        if (voiceEnabled) speakText(`New habitat discovered: ${habitats[nextHabitat].name}`);
+        setFeedback(t('animalSafariGame.powerUps.map.feedback'));
+        if (voiceEnabled) speakText(t('animalSafariGame.powerUps.map.feedback'));
         initializeGame();
         break;
       case 'hint':
         if (animalToFind) {
           setShowAnimalHint(true);
-          setFeedback(`💡 Hint: ${animalToFind.hint}`);
-          if (voiceEnabled) speakText(`Hint: ${animalToFind.hint}`);
+          setFeedback(t('animalSafariGame.powerUps.hint.feedback', { hint: animalToFind.hint }));
+          if (voiceEnabled) speakText(t('animalSafariGame.powerUps.hint.feedback', { hint: animalToFind.hint }));
         }
         break;
       case 'voiceHelp':
         if (animalToFind) {
           speakText(`Find ${animalToFind.name}. ${animalToFind.hint}. Look for ${animalToFind.emoji}. ${animalToFind.voice}`);
-          setFeedback("🔊 Voice help activated!");
+          setFeedback(t('animalSafariGame.powerUps.voiceHelp.feedback'));
         }
         break;
     }
@@ -650,27 +695,39 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
       <div className={`flex items-center justify-center ${isFullscreen ? 'h-full' : 'min-h-[400px]'} p-3 w-full`}>
         <div className="w-full bg-gradient-to-br from-[#1A1A2E] to-[#16213E] rounded-xl shadow-lg p-4 border border-[#F59E0B]/30">
           <div className="text-4xl mb-3 text-center">🦁</div>
-          <h1 className="text-2xl font-bold text-white mb-2 text-center">Safari Complete!</h1>
-          <p className="text-gray-300 mb-4 text-sm text-center">You found {foundAnimals.length} animals!</p>
+          <h1 className="text-2xl font-bold text-white mb-2 text-center">
+            {t('animalSafariGame.gameOver.title')}
+          </h1>
+          <p className="text-gray-300 mb-4 text-sm text-center">
+            {t('animalSafariGame.gameOver.subtitle', { count: foundAnimals.length })}
+          </p>
           
           <div className="grid grid-cols-3 gap-2 mb-4">
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{score}</div>
-              <div className="text-gray-400 text-xs text-center">Score</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('animalSafariGame.gameOver.score')}
+              </div>
             </div>
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{level}</div>
-              <div className="text-gray-400 text-xs text-center">Level</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('animalSafariGame.gameOver.level')}
+              </div>
             </div>
             <div className="bg-[#1A1A2E]/50 rounded-lg p-3">
               <div className="text-lg font-bold text-white text-center">{cameraPhotos.length}</div>
-              <div className="text-gray-400 text-xs text-center">Photos</div>
+              <div className="text-gray-400 text-xs text-center">
+                {t('animalSafariGame.gameOver.photos')}
+              </div>
             </div>
           </div>
           
           {foundAnimals.length > 0 && (
             <div className="mb-4">
-              <div className="text-xs text-gray-400 mb-2 text-center">Animals You Found:</div>
+              <div className="text-xs text-gray-400 mb-2 text-center">
+                {t('animalSafariGame.gameOver.animalsFound')}
+              </div>
               <div className="flex flex-wrap gap-2 justify-center">
                 {foundAnimals.map(animal => (
                   <div key={animal.id} className="p-2 bg-[#1A1A2E]/50 rounded-lg border border-[#F59E0B]/20">
@@ -686,7 +743,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             onClick={resetGame}
             className="w-full py-2.5 rounded-lg bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white font-bold hover:opacity-90 text-sm"
           >
-            🦁 Start New Safari
+            {t('animalSafariGame.gameOver.startNewSafari')}
           </button>
         </div>
       </div>
@@ -725,13 +782,19 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
               <span className="text-lg">{selectedCharacter}</span>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-white">Animal Safari</h1>
+              <h1 className="text-sm font-bold text-white">
+                {t('animalSafariGame.gameHeader.title')}
+              </h1>
               <div className="flex items-center gap-1">
-                <span className="text-xs text-gray-400">Lvl {level}</span>
+                <span className="text-xs text-gray-400">
+                  {t('animalSafariGame.gameHeader.level', { level })}
+                </span>
                 {streak > 0 && (
                   <>
                     <span className="text-gray-600">•</span>
-                    <span className="text-xs text-yellow-400">{streak}🔥</span>
+                    <span className="text-xs text-yellow-400">
+                      {t('animalSafariGame.gameHeader.streak', { streak })}
+                    </span>
                   </>
                 )}
               </div>
@@ -748,7 +811,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="p-1.5 bg-[#1A1A2E] border border-[#F59E0B]/20 rounded-lg hover:bg-[#F59E0B]/10 transition-colors"
-              title={soundEnabled ? "Sound On" : "Sound Off"}
+              title={soundEnabled ? t('animalSafariGame.buttons.soundOn') : t('animalSafariGame.buttons.soundOff')}
             >
               {soundEnabled ? 
                 <Volume2 className="w-4 h-4 text-green-400" /> : 
@@ -763,7 +826,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
                 }
               }}
               className={`p-1.5 bg-[#1A1A2E] border ${voiceEnabled ? 'border-green-500/30 text-green-400' : 'border-[#F59E0B]/20 text-gray-400'} rounded-lg hover:bg-[#F59E0B]/10 transition-colors`}
-              title={voiceEnabled ? "Voice On" : "Voice Off"}
+              title={voiceEnabled ? t('animalSafariGame.buttons.voiceOn') : t('animalSafariGame.buttons.voiceOff')}
             >
               <Speaker className="w-4 h-4" />
             </button>
@@ -777,21 +840,21 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold ${gameMode === 'explore' ? 'bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
           >
             <Search className="inline w-3 h-3 mr-1" />
-            Explore
+            {t('animalSafariGame.gameModes.explore')}
           </button>
           <button
             onClick={() => { setGameMode('quiz'); initializeGame(); }}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold ${gameMode === 'quiz' ? 'bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
           >
             <Binoculars className="inline w-3 h-3 mr-1" />
-            Quiz
+            {t('animalSafariGame.gameModes.quiz')}
           </button>
           <button
             onClick={() => { setGameMode('timed'); setTimeLeft(60); initializeGame(); }}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold ${gameMode === 'timed' ? 'bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white' : 'bg-[#1A1A2E] text-gray-400 hover:text-white'}`}
           >
             <Clock className="inline w-3 h-3 mr-1" />
-            Timed
+            {t('animalSafariGame.gameModes.timed')}
           </button>
         </div>
 
@@ -799,9 +862,11 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
         {gameMode === 'timed' && (
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-400">Time Left:</span>
+              <span className="text-xs text-gray-400">
+                {t('animalSafariGame.timer.timeLeft')}
+              </span>
               <span className={`text-sm font-bold ${timeLeft <= 10 ? 'text-red-400' : 'text-green-400'}`}>
-                {timeLeft}s
+                {t('animalSafariGame.timer.seconds', { time: timeLeft })}
               </span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-1.5">
@@ -817,13 +882,17 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
         <div className={`mb-3 p-2 rounded-lg bg-gradient-to-r ${habitats[currentHabitat].color}/20 border ${habitats[currentHabitat].color.replace('from-', 'border-')}/30`}>
           <div className="flex items-center justify-between mb-1">
             <div>
-              <div className="text-xs text-gray-400">Current Habitat:</div>
+              <div className="text-xs text-gray-400">
+                {t('animalSafariGame.habitat.currentHabitat')}
+              </div>
               <div className="text-sm font-bold text-white flex items-center gap-1">
                 {habitats[currentHabitat].emoji} {habitats[currentHabitat].name}
               </div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-gray-400">Animals Found:</div>
+              <div className="text-xs text-gray-400">
+                {t('animalSafariGame.habitat.animalsFound')}
+              </div>
               <div className="text-sm font-bold text-white">{foundAnimals.length}/{animals.length}</div>
             </div>
           </div>
@@ -835,7 +904,9 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
           <div className="mb-3 p-2 rounded-lg bg-gradient-to-r from-[#10B981]/10 to-[#059669]/10 border border-[#10B981]/30">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs text-gray-400">Find This Animal:</div>
+                <div className="text-xs text-gray-400">
+                  {t('animalSafariGame.animalAnnouncement.findThisAnimal')}
+                </div>
                 <div className="text-sm font-bold text-white flex items-center gap-2">
                   <span className="text-xl">{animalToFind.emoji}</span>
                   {animalToFind.name}
@@ -846,7 +917,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
                   onClick={speakCurrentAnimal}
                   disabled={!voiceEnabled}
                   className={`p-1 rounded ${voiceEnabled ? 'bg-[#10B981] text-white' : 'bg-gray-700 text-gray-400'}`}
-                  title="Repeat instructions"
+                  title={t('animalSafariGame.animalAnnouncement.repeatInstructions')}
                 >
                   <Volume className="w-3 h-3" />
                 </button>
@@ -854,14 +925,16 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
                   onClick={isListening ? stopListening : startListening}
                   disabled={!voiceEnabled}
                   className={`p-1 rounded text-xs font-bold flex items-center gap-1 ${isListening ? 'bg-red-500 text-white animate-pulse' : voiceEnabled ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-400'}`}
-                  title={isListening ? "Stop listening" : "Say animal name"}
+                  title={isListening ? t('animalSafariGame.animalAnnouncement.stopListening') : t('animalSafariGame.animalAnnouncement.sayAnimalName')}
                 >
                   {isListening ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
                 </button>
               </div>
             </div>
             {showAnimalHint && (
-              <div className="mt-1 text-xs text-blue-300">💡 Hint: {animalToFind.hint}</div>
+              <div className="mt-1 text-xs text-blue-300">
+                {t('animalSafariGame.animalAnnouncement.hint', { hint: animalToFind.hint })}
+              </div>
             )}
           </div>
         )}
@@ -902,7 +975,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             </div>
             
             <div className="text-xs text-gray-500 text-center">
-              Click or say the answer
+              {t('animalSafariGame.questions.instructions')}
             </div>
           </div>
         ) : (
@@ -958,6 +1031,7 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
               <button
                 onClick={() => movePlayer('up')}
                 className="p-2 rounded-lg bg-[#1A1A2E] border border-[#F59E0B]/30 text-white hover:bg-[#F59E0B]/10"
+                aria-label={t('animalSafariGame.labels.movementControls') + " - Up"}
               >
                 ↑
               </button>
@@ -965,18 +1039,21 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
               <button
                 onClick={() => movePlayer('left')}
                 className="p-2 rounded-lg bg-[#1A1A2E] border border-[#F59E0B]/30 text-white hover:bg-[#F59E0B]/10"
+                aria-label={t('animalSafariGame.labels.movementControls') + " - Left"}
               >
                 ←
               </button>
               <button
                 onClick={() => movePlayer('down')}
                 className="p-2 rounded-lg bg-[#1A1A2E] border border-[#F59E0B]/30 text-white hover:bg-[#F59E0B]/10"
+                aria-label={t('animalSafariGame.labels.movementControls') + " - Down"}
               >
                 ↓
               </button>
               <button
                 onClick={() => movePlayer('right')}
                 className="p-2 rounded-lg bg-[#1A1A2E] border border-[#F59E0B]/30 text-white hover:bg-[#F59E0B]/10"
+                aria-label={t('animalSafariGame.labels.movementControls') + " - Right"}
               >
                 →
               </button>
@@ -984,7 +1061,9 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             
             {/* Animals to Find List */}
             <div className="mb-3">
-              <div className="text-xs text-gray-400 mb-1">Find These Animals:</div>
+              <div className="text-xs text-gray-400 mb-1">
+                {t('animalSafariGame.labels.findTheseAnimals')}
+              </div>
               <div className="flex flex-wrap gap-1">
                 {customAnimals.map(animal => (
                   <div
@@ -1007,10 +1086,10 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => usePowerUp('hint')}
             disabled={powerUps.hint <= 0}
             className={`flex-shrink-0 p-2 rounded-lg border text-xs ${powerUps.hint <= 0 ? 'border-gray-600/30 text-gray-500' : 'border-[#FF9800]/30 text-white hover:bg-[#FF9800]/10 transition-colors'}`}
-            title="Get a hint"
+            title={t('animalSafariGame.powerUps.hint.description')}
           >
             <div className="text-sm">💡</div>
-            <div>Hint</div>
+            <div>{t('animalSafariGame.powerUps.hint.name')}</div>
             <div className="text-xs text-gray-400">x{powerUps.hint}</div>
           </button>
           
@@ -1018,10 +1097,10 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => usePowerUp('voiceHelp')}
             disabled={powerUps.voiceHelp <= 0 || !voiceEnabled}
             className={`flex-shrink-0 p-2 rounded-lg border text-xs ${powerUps.voiceHelp <= 0 || !voiceEnabled ? 'border-gray-600/30 text-gray-500' : 'border-[#4CAF50]/30 text-white hover:bg-[#4CAF50]/10 transition-colors'}`}
-            title="Voice assistance"
+            title={t('animalSafariGame.powerUps.voiceHelp.description')}
           >
             <div className="text-sm">🔊</div>
-            <div>Voice Help</div>
+            <div>{t('animalSafariGame.powerUps.voiceHelp.name')}</div>
             <div className="text-xs text-gray-400">x{powerUps.voiceHelp}</div>
           </button>
           
@@ -1029,10 +1108,10 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => usePowerUp('binoculars')}
             disabled={powerUps.binoculars <= 0}
             className={`flex-shrink-0 p-2 rounded-lg border text-xs ${powerUps.binoculars <= 0 ? 'border-gray-600/30 text-gray-500' : 'border-[#0EA5E9]/30 text-white hover:bg-[#0EA5E9]/10 transition-colors'}`}
-            title="Reveal animals briefly"
+            title={t('animalSafariGame.powerUps.binoculars.description')}
           >
             <div className="text-sm">🔍</div>
-            <div>Binoculars</div>
+            <div>{t('animalSafariGame.powerUps.binoculars.name')}</div>
             <div className="text-xs text-gray-400">x{powerUps.binoculars}</div>
           </button>
           
@@ -1040,10 +1119,10 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => usePowerUp('camera')}
             disabled={powerUps.camera <= 0}
             className={`flex-shrink-0 p-2 rounded-lg border text-xs ${powerUps.camera <= 0 ? 'border-gray-600/30 text-gray-500' : 'border-[#10B981]/30 text-white hover:bg-[#10B981]/10 transition-colors'}`}
-            title="Auto-find one animal"
+            title={t('animalSafariGame.powerUps.camera.description')}
           >
             <div className="text-sm">📸</div>
-            <div>Camera</div>
+            <div>{t('animalSafariGame.powerUps.camera.name')}</div>
             <div className="text-xs text-gray-400">x{powerUps.camera}</div>
           </button>
           
@@ -1051,10 +1130,10 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
             onClick={() => usePowerUp('map')}
             disabled={powerUps.map <= 0}
             className={`flex-shrink-0 p-2 rounded-lg border text-xs ${powerUps.map <= 0 ? 'border-gray-600/30 text-gray-500' : 'border-[#F59E0B]/30 text-white hover:bg-[#F59E0B]/10 transition-colors'}`}
-            title="Discover new habitat"
+            title={t('animalSafariGame.powerUps.map.description')}
           >
             <div className="text-sm">🗺️</div>
-            <div>Map</div>
+            <div>{t('animalSafariGame.powerUps.map.name')}</div>
             <div className="text-xs text-gray-400">x{powerUps.map}</div>
           </button>
         </div>
@@ -1062,7 +1141,9 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
         {/* Camera Photos */}
         {cameraPhotos.length > 0 && (
           <div className="mb-3">
-            <div className="text-xs text-gray-400 mb-1">Recent Photos:</div>
+            <div className="text-xs text-gray-400 mb-1">
+              {t('animalSafariGame.labels.recentPhotos')}
+            </div>
             <div className="flex gap-1 overflow-x-auto pb-1">
               {cameraPhotos.map(photo => (
                 <div key={photo.id} className="flex-shrink-0 p-2 bg-[#1A1A2E]/50 rounded-lg border border-[#F59E0B]/20">
@@ -1095,19 +1176,19 @@ const AnimalSafariGame = ({ onGameEvent, isFullscreen }) => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-gray-500">
             <div className="flex items-center gap-1">
               <span className="text-lg">🎤</span>
-              <span>Say animal names</span>
+              <span>{t('animalSafariGame.instructions.sayAnimalNames')}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-lg">💡</span>
-              <span>Find the announced animal</span>
+              <span>{t('animalSafariGame.instructions.findAnnouncedAnimal')}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-lg">🔊</span>
-              <span>Turn on voice for help</span>
+              <span>{t('animalSafariGame.instructions.turnOnVoice')}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-lg">🏆</span>
-              <span>Find animals in order</span>
+              <span>{t('animalSafariGame.instructions.findInOrder')}</span>
             </div>
           </div>
         </div>

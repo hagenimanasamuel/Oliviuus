@@ -58,8 +58,6 @@ const upgradeController = {
       const userId = req.user.id;
       const { planId } = req.body;
 
-      console.log('🧮 Upgrade cost calculation request:', { userId, planId });
-
       if (!planId) {
         return res.status(400).json({
           success: false,
@@ -106,12 +104,6 @@ const upgradeController = {
         customerEmail,
         security_token
       } = req.body;
-
-      console.log('🚀 Upgrade initiation request:', {
-        userId,
-        plan_id,
-        phoneNumber: phoneNumber?.substring(0, 6) + '...' // Log partially for security
-      });
 
       // 🛡️ Basic validation
       if (!plan_id || !phoneNumber) {
@@ -180,8 +172,6 @@ const upgradeController = {
     try {
       const userId = req.user.id;
 
-      console.log('📋 Fetching available upgrades for user:', userId);
-
       const upgradeData = await upgradeService.getAvailableUpgrades(userId);
 
       res.json({
@@ -209,8 +199,6 @@ const upgradeController = {
     try {
       const { referenceId } = req.params;
       const userId = req.user.id;
-
-      console.log('🔍 Checking upgrade status:', referenceId);
 
       // Get upgrade payment record
       const payment = await upgradeService.getUpgradePaymentByReference(referenceId);
@@ -246,7 +234,6 @@ const upgradeController = {
       if (payment.status === 'pending') {
         try {
           const apiStatus = await upgradeService.paymentService.checkStatus(referenceId);
-          console.log('📊 Upgrade payment provider status:', apiStatus);
 
           if (apiStatus.status && apiStatus.status !== 'pending' && apiStatus.status !== 'processing') {
             await upgradeService.handleUpgradeCallback(referenceId, apiStatus.status);
@@ -293,8 +280,6 @@ const upgradeController = {
    */
   async handleUpgradeCallback(req, res) {
     try {
-      console.log('📨 Upgrade Callback Received:', req.body);
-
       const { reference_id, transaction_id, status } = req.body;
 
       if (!reference_id || !status) {
@@ -307,8 +292,6 @@ const upgradeController = {
 
       // Process upgrade callback
       const result = await upgradeService.handleUpgradeCallback(reference_id, status, transaction_id);
-
-      console.log(`✅ Upgrade callback processed: ${reference_id} -> ${result.status}`);
 
       // Redirect to frontend with status
       const frontendUrl = process.env.CLIENT_URL;

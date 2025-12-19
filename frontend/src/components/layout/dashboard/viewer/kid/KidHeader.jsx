@@ -1,4 +1,3 @@
-// src/components/layout/dashboard/kid/KidHeader.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../../../context/AuthContext";
@@ -9,7 +8,7 @@ import { useTranslation } from "react-i18next";
 
 export default function KidHeader({ kidProfile, onExit, isScrolled }) {
   const { user, familyMemberData, logoutUser } = useAuth();
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(false);
   const [showUpperSection, setShowUpperSection] = useState(true);
@@ -17,6 +16,11 @@ export default function KidHeader({ kidProfile, onExit, isScrolled }) {
   const [showPinModal, setShowPinModal] = useState(false);
   const [parentHasPin, setParentHasPin] = useState(true);
   const [checkingPin, setCheckingPin] = useState(false);
+
+  // Track PIN attempts for security logging
+  const [pinAttempts, setPinAttempts] = useState(0);
+  const [lastPinAttemptTime, setLastPinAttemptTime] = useState(null);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -65,6 +69,163 @@ export default function KidHeader({ kidProfile, onExit, isScrolled }) {
       checkPinStatus();
     }
   }, [shouldShowLogout]);
+
+  const logPinAttemptEvent = async (wasSuccessful, attemptNumber, errorMessage = null) => {
+    try {
+      // Get kid profile ID from context or props
+      const kidProfileId = kidProfile?.id || user?.kid_profile_id;
+
+      if (!kidProfileId) {
+        console.warn("Cannot log PIN attempt: No kid profile ID found");
+        return;
+      }
+
+      const activityData = {
+        kid_profile_id: kidProfileId,
+        activity_type: 'pin_entry',
+        activity_details: {
+          attempt_number: attemptNumber,
+          was_successful: wasSuccessful,
+          timestamp: new Date().toISOString(),
+          device_type: isMobile ? 'mobile' : 'web',
+          ip_address: 'unknown' // Can be obtained from backend if needed
+        },
+        search_query: null,
+        was_allowed: wasSuccessful,
+        restriction_reason: wasSuccessful ? null : (errorMessage || 'Incorrect PIN'),
+        device_type: isMobile ? 'mobile' : 'web',
+        ip_address: 'unknown'
+        // REMOVED: session_id: user?.session_id || 'unknown'
+      };
+
+      // Log the PIN attempt activity
+      await api.post("/kids/log-activity", activityData, {
+        withCredentials: true
+      });
+
+      console.log(`PIN attempt logged: ${wasSuccessful ? 'Success' : 'Failed'} (Attempt #${attemptNumber})`);
+
+      // If multiple failed attempts, create a security alert
+      if (!wasSuccessful && attemptNumber >= 2) {
+        await createPinSecurityAlert(kidProfileId, attemptNumber);
+      }
+
+    } catch (error) {
+      console.error("Error logging PIN attempt event:", error);
+    }
+  };
+
+  // Create security alert for multiple failed PIN attempts
+  const createPinSecurityAlert = async (kidProfileId, attemptNumber) => {
+    try {
+      const alertData = {
+        kid_profile_id: kidProfileId,
+        alert_type: 'multiple_pin_failures',
+        severity: attemptNumber >= 4 ? 'high' : 'medium',
+        description: `Multiple failed PIN attempts detected (${attemptNumber} attempts)`,
+        details: {
+          attempt_count: attemptNumber,
+          last_attempt_time: new Date().toISOString(),
+          is_mobile: isMobile,
+          action: 'exit_kid_mode'
+        }
+      };
+
+      await api.post("/kids/security-alert", alertData, {
+        withCredentials: true
+      });
+
+      console.log(`Security alert created for ${attemptNumber} failed PIN attempts`);
+
+    } catch (error) {
+      console.error("Error creating security alert:", error);
+    }
+  };
+
+  // Handle PIN verification with security logging
+  const handlePinVerification = async (pin) => {
+    try {
+      const response = await api.post("/family/pin/verify", {
+        pin: pin
+      }, {
+        withCredentials: true
+      });
+
+      const wasSuccessful = response.data.verified === true || response.data.success === true;
+
+      // Log the PIN attempt if logging is enabled
+      if (kidProfile?.id) {
+        try {
+          await api.post("/kids/log-activity", {
+            kid_profile_id: kidProfile.id,
+            activity_type: 'pin_entry',
+            activity_details: {
+              was_successful: wasSuccessful,
+              timestamp: new Date().toISOString(),
+              device_type: isMobile ? 'mobile' : 'web'
+            },
+            was_allowed: wasSuccessful,
+            restriction_reason: wasSuccessful ? null : 'Incorrect PIN',
+            device_type: isMobile ? 'mobile' : 'web',
+            ip_address: 'unknown'
+          }, {
+            withCredentials: true
+          });
+        } catch (logError) {
+          console.error("Error logging PIN attempt:", logError);
+          // Continue even if logging fails
+        }
+      }
+
+      if (wasSuccessful) {
+        return { success: true };
+      } else {
+        return {
+          success: false,
+          error: t('kidDashboard.pinModal.incorrectPin'),
+          shouldShowAlert: true // Show alert for failed attempts
+        };
+      }
+    } catch (error) {
+      console.error("PIN verification error:", error);
+
+      // Log the failed attempt
+      if (kidProfile?.id) {
+        try {
+          await api.post("/kids/log-activity", {
+            kid_profile_id: kidProfile.id,
+            activity_type: 'pin_entry',
+            activity_details: {
+              was_successful: false,
+              timestamp: new Date().toISOString(),
+              device_type: isMobile ? 'mobile' : 'web',
+              error: error.message
+            },
+            was_allowed: false,
+            restriction_reason: 'Verification failed',
+            device_type: isMobile ? 'mobile' : 'web',
+            ip_address: 'unknown'
+          }, {
+            withCredentials: true
+          });
+        } catch (logError) {
+          console.error("Error logging PIN attempt:", logError);
+        }
+      }
+
+      return {
+        success: false,
+        error: error.response?.data?.error || t('kidDashboard.pinModal.verificationFailed'),
+        shouldShowAlert: true
+      };
+    }
+  };
+
+  // Reset PIN attempts after successful exit or modal close
+  const resetPinAttempts = () => {
+    setPinAttempts(0);
+    setLastPinAttemptTime(null);
+  };
 
   // Check if mobile device
   useEffect(() => {
@@ -156,6 +317,7 @@ export default function KidHeader({ kidProfile, onExit, isScrolled }) {
       if (!parentHasPin) {
         console.log("No PIN set - exiting directly");
         onExit();
+        window.location.href = "/";
       } else {
         console.log("PIN exists - showing verification modal");
         setShowPinModal(true);
@@ -165,40 +327,48 @@ export default function KidHeader({ kidProfile, onExit, isScrolled }) {
 
   // Handle successful PIN verification for kid profile exit only
   const handlePinVerified = () => {
+    resetPinAttempts();
     onExit();
+    window.location.href = "/";
+  };
+
+  // Handle modal close
+  const handlePinModalClose = () => {
+    resetPinAttempts();
+    setShowPinModal(false);
   };
 
   // Navigation items with translations
   const navItems = [
-    { 
-      id: 'home', 
-      label: t('kidDashboard.navigation.home'), 
-      emoji: '🏠', 
-      path: '/' 
+    {
+      id: 'home',
+      label: t('kidDashboard.navigation.home'),
+      emoji: '🏠',
+      path: '/'
     },
-    { 
-      id: 'music', 
-      label: t('kidDashboard.navigation.music'), 
-      emoji: '🎧', 
-      path: '/music' 
+    {
+      id: 'music',
+      label: t('kidDashboard.navigation.music'),
+      emoji: '🎧',
+      path: '/music'
     },
-    { 
-      id: 'play', 
-      label: t('kidDashboard.navigation.play'), 
-      emoji: '🎮', 
-      path: '/play' 
+    {
+      id: 'play',
+      label: t('kidDashboard.navigation.play'),
+      emoji: '🎮',
+      path: '/play'
     },
-    { 
-      id: 'learn', 
-      label: t('kidDashboard.navigation.learn'), 
-      emoji: '📚', 
-      path: '/learn' 
+    {
+      id: 'learn',
+      label: t('kidDashboard.navigation.learn'),
+      emoji: '📚',
+      path: '/learn'
     },
-    { 
-      id: 'favorites', 
-      label: t('kidDashboard.navigation.favorites'), 
-      emoji: '⭐', 
-      path: '/favorites' 
+    {
+      id: 'favorites',
+      label: t('kidDashboard.navigation.favorites'),
+      emoji: '⭐',
+      path: '/favorites'
     },
   ];
 
@@ -246,15 +416,15 @@ export default function KidHeader({ kidProfile, onExit, isScrolled }) {
     if (isFamilyMemberWithKidDashboard) {
       return user?.email?.split('@')[0] || t('kidDashboard.defaultName');
     }
-    
+
     if (kidProfile && kidProfile.name) {
       return kidProfile.name;
     }
-    
+
     if (kidProfile && kidProfile.display_name) {
       return kidProfile.display_name;
     }
-    
+
     return user?.email?.split('@')[0] || t('kidDashboard.defaultName');
   };
 
@@ -322,8 +492,8 @@ export default function KidHeader({ kidProfile, onExit, isScrolled }) {
       return {
         emoji: parentHasPin ? '🔐' : '👨‍👩‍👧‍👦',
         label: t('kidDashboard.buttons.exit'),
-        title: parentHasPin 
-          ? t('kidDashboard.tooltips.exitWithPin') 
+        title: parentHasPin
+          ? t('kidDashboard.tooltips.exitWithPin')
           : t('kidDashboard.tooltips.exitNoPin')
       };
     }
@@ -439,8 +609,8 @@ export default function KidHeader({ kidProfile, onExit, isScrolled }) {
                       {t('kidDashboard.greeting', { name: getKidName() })} 👋
                     </h1>
                     <p className="text-white/80 text-xs sm:text-sm hidden sm:block animate-bounce">
-                      {isFamilyMemberWithKidDashboard 
-                        ? t('kidDashboard.status.familyFun') 
+                      {isFamilyMemberWithKidDashboard
+                        ? t('kidDashboard.status.familyFun')
                         : t('kidDashboard.status.letsPlay')}
                     </p>
                   </div>
@@ -461,8 +631,8 @@ export default function KidHeader({ kidProfile, onExit, isScrolled }) {
                   onClick={toggleFullscreen}
                   className="transition-all duration-300 transform hover:scale-110 flex items-center justify-center text-white min-h-[44px] min-w-[44px]"
                   style={getButtonStyle()}
-                  title={isFullscreen 
-                    ? t('kidDashboard.tooltips.exitFullscreen') 
+                  title={isFullscreen
+                    ? t('kidDashboard.tooltips.exitFullscreen')
                     : t('kidDashboard.tooltips.enterFullscreen')
                   }
                 >
@@ -589,6 +759,7 @@ export default function KidHeader({ kidProfile, onExit, isScrolled }) {
           isOpen={showPinModal}
           onClose={() => setShowPinModal(false)}
           onSuccess={handlePinVerified}
+          onPinVerify={handlePinVerification} // Add this line
           triggerButtonRef={exitButtonRef}
           title={t('kidDashboard.pinModal.title')}
           description={t('kidDashboard.pinModal.description')}
