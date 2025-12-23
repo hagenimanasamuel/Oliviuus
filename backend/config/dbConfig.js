@@ -150,7 +150,7 @@ const createSecurityLogsTable = async () => {
       id BIGINT AUTO_INCREMENT PRIMARY KEY,
       user_id INT DEFAULT NULL,
       action VARCHAR(100) NOT NULL,
-      ip_address VARCHAR(45) NOT NULL,
+      ip_address VARCHAR(255) NOT NULL,
       device_info JSON DEFAULT NULL,
       status ENUM('success', 'failed', 'blocked') NOT NULL,
       details JSON DEFAULT NULL,
