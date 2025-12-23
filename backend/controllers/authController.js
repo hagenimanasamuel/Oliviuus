@@ -131,8 +131,9 @@ const saveUserInfo = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // only over HTTPS in prod
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+      path: '/',
     });
 
     // 8. Record session in user_session table (same logic as login)
@@ -427,8 +428,9 @@ const loginUser = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
     });
 
     // 5️⃣ Record session in user_session table
@@ -536,8 +538,9 @@ const googleAuth = async (req, res) => {
     res.cookie("token", jwtToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
     });
     
     // Record session

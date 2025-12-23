@@ -79,11 +79,29 @@ app.use(express.json());
 app.use(cookieParser());
 
 // CORS
-const clientOrigin = process.env.CLIENT_ORIGIN;
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN,
+  process.env.CLIENT_URL,
+  'http://localhost:3000',
+  'http://localhost:5173'
+].filter(Boolean); // Remove any undefined values
+
 app.use(cors({
-  origin: clientOrigin,
-  methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE', 'PATCH'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.warn(`⚠️ Blocked by CORS: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Set-Cookie']
 }));
 
 app.use((req, res, next) => {
