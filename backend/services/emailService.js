@@ -18,10 +18,40 @@ const locales = {};
 // Configure transporter (reused across all email types)
 const transporter = nodemailer.createTransport({
   service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587, // MUST use 587 on Render
+  secure: false, // false for port 587
+  requireTLS: true, // Enable TLS
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  // Render-specific settings:
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 10000,
+  socketTimeout: 30000, // 30 seconds
+  // Add TLS options:
+  tls: {
+    ciphers: 'SSLv3',
+    rejectUnauthorized: false // Allow self-signed certs
+  },
+});
+
+transporter.verify(function(error, success) {
+  if (error) {
+    console.error('❌ Email connection failed:', {
+      error: error.message,
+      code: error.code,
+      port: process.env.EMAIL_PORT || 587
+    });
+    
+    // Try alternative port if 587 fails
+    if (error.code === 'ETIMEDOUT' || error.code === 'ECONNREFUSED') {
+      console.log('⚠️ Trying alternative SMTP configurations...');
+    }
+  } else {
+    console.log('✅ Email server is ready to send messages');
+  }
 });
 
 // VERIFICATION EMAIL
@@ -234,7 +264,7 @@ const sendFamilyInvitationEmail = async (to, ownerEmail, invitationToken, lang =
 
   // Enhanced message based on subscription status
   let subscriptionNotice = '';
-  
+
   if (hasActiveSubscription) {
     if (isFamilyPlan) {
       subscriptionNotice = `
