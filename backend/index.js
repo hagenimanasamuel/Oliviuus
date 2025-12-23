@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const { initializeDatabase } = require('./config/dbConfig');
 const {
   createUsersTable,
   createEmailVerificationsTable,
@@ -144,29 +145,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Create tables if not exist
-Promise.all([createUsersTable(),
-createEmailVerificationsTable(),
-createUserPreferencesTable(),
-createUserSessionTable(),
-createSubscriptionsTables(),
-createRolesTable(),
-createRoleFeaturesTable(),
-createPasswordResetsTable(),
-createContactsTable(),
-createContactResponsesTable(),
-createContactInfoTable(),
-createNotificationsTable(),
-createSecurityLogsTable(),
-createContentTables(),
-createPeopleTables(),
-createWatchTrackingTables(),
-createUserPreferencesTables(),
-createShareTables(),
-createKidsTables(),
-createFamilyMembersTable(),
-createFamilyPinSecurityTable(),
-createFeedbackTable(),
-createGameTables(),])
+initializeDatabase()
   .then(async () => {
     console.log("✅ Tables checked/created");
     await createAdminSeed();

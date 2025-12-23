@@ -6,12 +6,12 @@ const router = express.Router();
 
 /**
  * @route POST /api/security/validate-stream
- * @desc Main validation endpoint - STRICT subscription checking
+ * @desc Main security validation endpoint
  * @access Private
  */
 router.post("/validate-stream", authMiddleware, async (req, res) => {
   try {
-    const { contentId } = req.body;
+    const { contentId, deviceId, deviceType, hasDownloadManager } = req.body;
     const userId = req.user.id;
 
     if (!contentId) {
@@ -22,18 +22,13 @@ router.post("/validate-stream", authMiddleware, async (req, res) => {
       });
     }
 
-    console.log(`🔒 [API] STRICT validation for user ${userId}, content ${contentId}`);
+    console.log(`🔒 [SECURITY API] Validation for user ${userId}, content ${contentId}`);
 
-    // Simple device info
-    const deviceId = req.body.deviceId || `device_${Date.now()}`;
-    const deviceType = req.body.deviceType || 'web';
-
-    // Get STRICT validation result
     const validationResult = await SecurityValidator.validateContentStreamAccess(
       userId,
       contentId,
-      deviceId,
-      deviceType,
+      deviceId || `device_${Date.now()}`,
+      deviceType || 'web',
       req.ip
     );
 
@@ -46,12 +41,13 @@ router.post("/validate-stream", authMiddleware, async (req, res) => {
         contentId,
         valid: validationResult.valid,
         code: validationResult.code,
-        subscription_type: validationResult.details?.subscription?.plan_name
+        subscription_type: validationResult.details?.subscription?.plan_name,
+        device_type: deviceType
       }
     );
 
     if (!validationResult.valid) {
-      console.log(`❌ [API] Blocked user ${userId}: ${validationResult.code} - ${validationResult.message}`);
+      console.log(`❌ [SECURITY API] Blocked user ${userId}: ${validationResult.code} - ${validationResult.message}`);
       return res.status(403).json({
         success: false,
         ...validationResult,
@@ -59,9 +55,8 @@ router.post("/validate-stream", authMiddleware, async (req, res) => {
       });
     }
 
-    console.log(`✅ [API] Allowed user ${userId}: ${validationResult.details?.subscription?.plan_name}`);
+    console.log(`✅ [SECURITY API] Allowed user ${userId}: ${validationResult.details?.subscription?.plan_name}`);
     
-    // Success
     res.json({
       success: true,
       ...validationResult,
@@ -69,7 +64,7 @@ router.post("/validate-stream", authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error("❌ [API] Validation endpoint error:", error);
+    console.error("❌ [SECURITY API] Validation endpoint error:", error);
     
     res.status(500).json({
       success: false,
@@ -83,21 +78,22 @@ router.post("/validate-stream", authMiddleware, async (req, res) => {
 });
 
 /**
- * @route POST /api/security/debug-subscription
- * @desc Deep debug subscription status
+ * @route POST /api/security/debug
+ * @desc Debug security validation
  * @access Private
  */
-router.post("/debug-subscription", authMiddleware, async (req, res) => {
+router.post("/debug", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
+    const { contentId, deviceId, deviceType } = req.body;
 
-    console.log('🔍🔍🔍 [API DEEP DEBUG] Subscription debug for user:', userId);
+    console.log('🔍🔍🔍 [SECURITY API DEBUG] Debug for user:', userId);
     
     const debugResult = await SecurityValidator.debugValidationFlow(
       userId,
-      'test-content',
-      'debug-device',
-      'web',
+      contentId || 'test-content',
+      deviceId || 'debug-device',
+      deviceType || 'web',
       req.ip
     );
 
@@ -109,7 +105,7 @@ router.post("/debug-subscription", authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [API DEBUG] Error:', error);
+    console.error('❌ [SECURITY API DEBUG] Error:', error);
     res.status(500).json({
       success: false,
       error: error.message,
@@ -117,64 +113,5 @@ router.post("/debug-subscription", authMiddleware, async (req, res) => {
     });
   }
 });
-
-/**
- * @route GET /api/security/user-subscription-status
- * @desc Get user's subscription status
- * @access Private
- */
-router.get("/user-subscription-status", authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    // Get all subscription data
-    const [user, activeSubs, familyAccess] = await Promise.all([
-      query(`
-        SELECT id, email, subscription_plan, created_at
-        FROM users 
-        WHERE id = ?
-      `, [userId]),
-
-      query(`
-        SELECT us.*, s.name as plan_name, s.type as plan_type, s.is_family_plan
-        FROM user_subscriptions us
-        LEFT JOIN subscriptions s ON us.subscription_id = s.id
-        WHERE us.user_id = ? 
-          AND us.status = 'active'
-          AND (us.end_date IS NULL OR us.end_date > NOW())
-      `, [userId]),
-
-      query(`
-        SELECT fm.*, u.email as owner_email
-        FROM family_members fm
-        INNER JOIN users u ON fm.family_owner_id = u.id
-        WHERE fm.user_id = ?
-          AND fm.invitation_status = 'accepted'
-          AND fm.is_active = TRUE
-          AND fm.is_suspended = FALSE
-      `, [userId])
-    ]);
-
-    res.json({
-      success: true,
-      data: {
-        user: user[0] || null,
-        active_subscriptions: activeSubs,
-        family_access: familyAccess,
-        has_active_subscription: activeSubs.length > 0,
-        has_family_access: familyAccess.length > 0,
-        can_stream: activeSubs.length > 0 || familyAccess.length > 0,
-        timestamp: new Date().toISOString()
-      }
-    });
-
-  } catch (error) {
-    console.error('Subscription status error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get subscription status'
-    });
-  }
-}); 
 
 module.exports = router;

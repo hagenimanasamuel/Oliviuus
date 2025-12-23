@@ -23,6 +23,7 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-rate-limit": "^8.2.1",
+    "geoip-lite": "^1.4.10",
     "google-auth-library": "^10.5.0",
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
