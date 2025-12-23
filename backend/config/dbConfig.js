@@ -102,39 +102,38 @@ const createUserPreferencesTable = async () => {
 
 const createUserSessionTable = async () => {
   const sql = `
-  CREATE TABLE IF NOT EXISTS user_session (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    session_token VARCHAR(255) NOT NULL,
-    device_name VARCHAR(100),
-    device_type ENUM('mobile','desktop','tablet') DEFAULT 'desktop',
-    ip_address VARCHAR(45),
-    location VARCHAR(100),
-    login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT TRUE,
-    logout_time DATETIME DEFAULT NULL,
-    user_agent TEXT,
-    device_id VARCHAR(255),
-    token_expires DATETIME,
-    
-    session_mode ENUM('parent', 'kid') NULL,
-    active_kid_profile_id INT NULL,
-    
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    CONSTRAINT fk_user_session_user
-      FOREIGN KEY (user_id) REFERENCES users(id)
-      ON DELETE CASCADE,
-    
-    -- ADD THIS FOREIGN KEY:
-    CONSTRAINT fk_user_session_kid_profile
-      FOREIGN KEY (active_kid_profile_id) 
-      REFERENCES kids_profiles(id) 
-      ON DELETE SET NULL
-  );
-`;
+    CREATE TABLE IF NOT EXISTS user_session (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      session_token VARCHAR(255) NOT NULL,
+      device_name VARCHAR(100),
+      device_type ENUM('mobile','desktop','tablet', 'web', 'smarttv') DEFAULT 'desktop',
+      ip_address VARCHAR(45),
+      location VARCHAR(100),
+      login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+      last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
+      is_active BOOLEAN DEFAULT TRUE,
+      logout_time DATETIME DEFAULT NULL,
+      user_agent TEXT,
+      device_id VARCHAR(255),
+      token_expires DATETIME,
+      
+      session_mode ENUM('parent', 'kid') NULL,
+      active_kid_profile_id INT NULL,
+      
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      
+      CONSTRAINT fk_user_session_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE,
+      
+      CONSTRAINT fk_user_session_kid_profile
+        FOREIGN KEY (active_kid_profile_id) 
+        REFERENCES kids_profiles(id) 
+        ON DELETE SET NULL
+    );
+  `;
 
   try {
     // assuming you have a 'query' function for MySQL
