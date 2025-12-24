@@ -162,38 +162,63 @@ app.get('/api/health', (req, res) => {
 });
 
 // Create tables if not exist
-Promise.all([createUsersTable(),
-createEmailVerificationsTable(),
-createUserPreferencesTable(),
-createUserSessionTable(),
-createSubscriptionsTables(),
-createRolesTable(),
-createRoleFeaturesTable(),
-createPasswordResetsTable(),
-createContactsTable(),
-createContactResponsesTable(),
-createContactInfoTable(),
-createNotificationsTable(),
-createSecurityLogsTable(),
-createContentTables(),
-createPeopleTables(),
-createWatchTrackingTables(),
-createUserPreferencesTables(),
-createShareTables(),
-createKidsTables(),
-createFamilyMembersTable(),
-createFamilyPinSecurityTable(),
-createFeedbackTable(),
-createGameTables(),])
-  .then(async () => {
-    console.log("✅ Tables checked/created");
-    await createAdminSeed();
+// Create tables if not exist
+Promise.all([
+  // Layer 1: Foundation tables
+  createUsersTable(),
+  createEmailVerificationsTable(),
+  createRolesTable(),
+  createContactInfoTable(),
+  
+  // Layer 2: Direct user dependencies
+  createUserPreferencesTable(),
+  createPasswordResetsTable(),
+  createContactsTable(),
+  createRoleFeaturesTable(),
+  createNotificationsTable(),
+  createSecurityLogsTable(),
+  createFeedbackTable(), // Moved up - only depends on users
+  
+  // Layer 3: Contact responses
+  createContactResponsesTable(),
+  
+  // Layer 4: Subscriptions ecosystem
+  createSubscriptionsTables(), // This creates multiple tables internally
+  
+  // Layer 5: Content foundation
+  createContentTables(), // This creates genres, categories, contents, etc.
+  createPeopleTables(), // This creates people and related tables
+  
+  // Layer 6: Content relationships (run after contentTables)
+  // Note: contentTables already creates these internally, so no separate call needed
+  
+  // Layer 7: Kids foundation
+  createKidsTables(), // This creates kids_profiles and related tables
+  
+  // Layer 8: Games ecosystem
+  createGameTables(), // This creates games and related tables
+  
+  // Layer 9: Family ecosystem
+  createFamilyMembersTable(),
+  createFamilyPinSecurityTable(),
+  
+  // Layer 10: Watch tracking (must be after contentTables)
+  createWatchTrackingTables(),
+  createUserPreferencesTables(), // watchlist and likes
+  createShareTables(),
+  
+  // Layer 11: user_session (LAST because it references kids_profiles)
+  createUserSessionTable()
+])
+.then(async () => {
+  console.log("✅ All tables checked/created");
+  await createAdminSeed();
 
-    // 🚀 Initialize subscription monitor AFTER tables are ready
-    initializeSubscriptionMonitor();
-    console.log("✅ Subscription monitor started");
-  })
-  .catch(err => console.error("❌ Error creating tables:", err));
+  // 🚀 Initialize subscription monitor AFTER tables are ready
+  initializeSubscriptionMonitor();
+  console.log("✅ Subscription monitor started");
+})
+.catch(err => console.error("❌ Error creating tables:", err));
 
 // running url port
 const PORT = process.env.PORT || 3000;
