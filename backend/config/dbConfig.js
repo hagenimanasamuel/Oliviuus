@@ -178,7 +178,7 @@ const createSubscriptionsTables = async () => {
       devices_allowed JSON NOT NULL,
       max_sessions INT NOT NULL DEFAULT 1,
       max_devices_registered INT DEFAULT 10,
-      supported_platforms JSON DEFAULT '["web","mobile","tablet","smarttv"]',
+      supported_platforms JSON DEFAULT NULL,
       video_quality ENUM('SD','HD','FHD','UHD') DEFAULT 'SD',
       max_video_bitrate INT DEFAULT 2000,
       hdr_support BOOLEAN DEFAULT FALSE,
@@ -1455,7 +1455,7 @@ const createKidsTables = async () => {
         name VARCHAR(100) NOT NULL,
         avatar_url VARCHAR(500) DEFAULT NULL,
         birth_date DATE NOT NULL,
-        calculated_age INT GENERATED ALWAYS AS (TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) VIRTUAL,
+        calculated_age INT NULL,
         
         -- Custom age ratings (using actual ages like 11+, 13+, etc.)
         max_content_age_rating VARCHAR(10) DEFAULT '7+',
