@@ -130,10 +130,9 @@ const saveUserInfo = async (req, res) => {
     // 7. Set HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // only over HTTPS in prod
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production", // only over HTTPS in prod
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
-      path: '/',
     });
 
     // 8. Record session in user_session table (same logic as login)
@@ -345,13 +344,8 @@ const logout = async (req, res) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (jwtError) {
-      // If token is invalid, just clear the cookie with CORRECT settings
-      res.clearCookie("token", {
-        httpOnly: true,
-        secure: true,          // ← MUST match login cookie
-        sameSite: "none",       // ← MUST match login cookie
-        path: '/'
-      });
+      // If token is invalid, just clear the cookie
+      res.clearCookie("token");
       return res.json({ success: true, message: "Logged out successfully" });
     }
 
@@ -359,35 +353,25 @@ const logout = async (req, res) => {
 
     // Clear both adult and kid sessions
     await Promise.all([
+      // Clear adult session
       query(
         "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
         [userId]
       ),
+      // Clear kid sessions
       query(
         "UPDATE kids_sessions SET is_active = FALSE, logout_time = NOW() WHERE parent_user_id = ? AND is_active = TRUE",
         [userId]
       )
     ]);
 
-    // 🚨 CRITICAL FIX: Clear cookie with EXACT same settings
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,          // ← MUST be true
-      sameSite: "none",       // ← MUST be "none"
-      path: '/'
-    });
-    
+    res.clearCookie("token");
     res.json({ success: true, message: "Logged out successfully" });
 
   } catch (error) {
     console.error("Logout error:", error);
-    // Always clear cookie even on error with correct settings
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: '/'
-    });
+    // Always clear cookie even on error
+    res.clearCookie("token");
     res.json({ success: true, message: "Logged out successfully" });
   }
 };
@@ -442,10 +426,9 @@ const loginUser = async (req, res) => {
     // 4️⃣ Set HttpOnly cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/',
     });
 
     // 5️⃣ Record session in user_session table
@@ -552,10 +535,9 @@ const googleAuth = async (req, res) => {
     // Set HttpOnly cookie
     res.cookie("token", jwtToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
     });
     
     // Record session
