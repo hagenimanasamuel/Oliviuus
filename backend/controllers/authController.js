@@ -130,7 +130,7 @@ const saveUserInfo = async (req, res) => {
     // 7. Set HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // only over HTTPS in prod
+      secure: true, // only over HTTPS in prod
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
       path: '/',
@@ -348,7 +348,7 @@ const logout = async (req, res) => {
       // If token is invalid, just clear the cookie with CORRECT settings
       res.clearCookie("token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",          // ← MUST match login cookie
+        secure: true,          // ← MUST match login cookie
         sameSite: "none",       // ← MUST match login cookie
         path: '/'
       });
@@ -372,7 +372,7 @@ const logout = async (req, res) => {
     // 🚨 CRITICAL FIX: Clear cookie with EXACT same settings
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",          // ← MUST be true
+      secure: true,          // ← MUST be true
       sameSite: "none",       // ← MUST be "none"
       path: '/'
     });
@@ -442,7 +442,7 @@ const loginUser = async (req, res) => {
     // 4️⃣ Set HttpOnly cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: '/',
@@ -552,7 +552,7 @@ const googleAuth = async (req, res) => {
     // Set HttpOnly cookie
     res.cookie("token", jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
