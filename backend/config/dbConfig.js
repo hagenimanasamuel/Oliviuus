@@ -3,14 +3,9 @@ require('dotenv').config();
 
 const db = mysql.createPool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  ssl: {
-    minVersion: 'TLSv1.2',
-    rejectUnauthorized: true
-  },
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -25,15 +20,6 @@ const query = (sql, values) => {
     });
   });
 };
-
-db.getConnection((err, connection) => {
-  if (err) {
-    console.error('Database connection failed:', err.message);
-  } else {
-    console.log('Connected to database');
-    connection.release();
-  }
-});
 
 const createUsersTable = async () => {
   const sql = `
@@ -101,39 +87,40 @@ const createUserPreferencesTable = async () => {
 };
 
 const createUserSessionTable = async () => {
-  const sql = `
-    CREATE TABLE IF NOT EXISTS user_session (
-      id BIGINT AUTO_INCREMENT PRIMARY KEY,
-      user_id INT NOT NULL,
-      session_token VARCHAR(255) NOT NULL,
-      device_name VARCHAR(100),
-      device_type ENUM('mobile','desktop','tablet', 'web', 'smarttv') DEFAULT 'desktop',
-      ip_address VARCHAR(45),
-      location VARCHAR(100),
-      login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-      last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
-      is_active BOOLEAN DEFAULT TRUE,
-      logout_time DATETIME DEFAULT NULL,
-      user_agent TEXT,
-      device_id VARCHAR(255),
-      token_expires DATETIME,
-      
-      session_mode ENUM('parent', 'kid') NULL,
-      active_kid_profile_id INT NULL,
-      
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      
-      CONSTRAINT fk_user_session_user
-        FOREIGN KEY (user_id) REFERENCES users(id)
-        ON DELETE CASCADE,
-      
-      CONSTRAINT fk_user_session_kid_profile
-        FOREIGN KEY (active_kid_profile_id) 
-        REFERENCES kids_profiles(id) 
-        ON DELETE SET NULL
-    );
-  `;
+const sql = `
+  CREATE TABLE IF NOT EXISTS user_session (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    session_token VARCHAR(255) NOT NULL,
+    device_name VARCHAR(100),
+    device_type ENUM('mobile','desktop','tablet') DEFAULT 'desktop',
+    ip_address VARCHAR(45),
+    location VARCHAR(100),
+    login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    logout_time DATETIME DEFAULT NULL,
+    user_agent TEXT,
+    device_id VARCHAR(255),
+    token_expires DATETIME,
+    
+    session_mode ENUM('parent', 'kid') NULL,
+    active_kid_profile_id INT NULL,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_user_session_user
+      FOREIGN KEY (user_id) REFERENCES users(id)
+      ON DELETE CASCADE,
+    
+    -- ADD THIS FOREIGN KEY:
+    CONSTRAINT fk_user_session_kid_profile
+      FOREIGN KEY (active_kid_profile_id) 
+      REFERENCES kids_profiles(id) 
+      ON DELETE SET NULL
+  );
+`;
 
   try {
     // assuming you have a 'query' function for MySQL
@@ -150,7 +137,7 @@ const createSecurityLogsTable = async () => {
       id BIGINT AUTO_INCREMENT PRIMARY KEY,
       user_id INT DEFAULT NULL,
       action VARCHAR(100) NOT NULL,
-      ip_address VARCHAR(255) NOT NULL,
+      ip_address VARCHAR(45) NOT NULL,
       device_info JSON DEFAULT NULL,
       status ENUM('success', 'failed', 'blocked') NOT NULL,
       details JSON DEFAULT NULL,
@@ -176,52 +163,54 @@ const createSubscriptionsTables = async () => {
   try {
     // 1️⃣ Subscriptions table
   const sqlSubscriptions = `
-        CREATE TABLE IF NOT EXISTS subscriptions (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          name VARCHAR(50) NOT NULL UNIQUE,
-          name_translations JSON,
-          type ENUM('mobile','basic','standard','family','free','custom') NOT NULL DEFAULT 'free',
-          price INT NOT NULL DEFAULT 0,
-          original_price INT DEFAULT NULL,
-          description TEXT DEFAULT NULL,
-          description_translations JSON,
-          tagline VARCHAR(255) DEFAULT NULL,
-          tagline_translations JSON,
-          currency VARCHAR(3) DEFAULT 'RWF',
-          devices_allowed JSON NOT NULL,
-          max_sessions INT NOT NULL DEFAULT 1,
-          max_devices_registered INT DEFAULT 10,
-          supported_platforms JSON, -- REMOVED DEFAULT VALUE
-          video_quality ENUM('SD','HD','FHD','UHD') DEFAULT 'SD',
-          max_video_bitrate INT DEFAULT 2000,
-          hdr_support BOOLEAN DEFAULT FALSE,
-          offline_downloads BOOLEAN DEFAULT FALSE,
-          max_downloads INT DEFAULT 0,
-          download_quality ENUM('SD','HD','FHD','UHD') DEFAULT 'SD',
-          download_expiry_days INT DEFAULT 30,
-          simultaneous_downloads INT DEFAULT 1,
-          early_access BOOLEAN DEFAULT FALSE,
-          exclusive_content BOOLEAN DEFAULT FALSE,
-          content_restrictions JSON,
-          max_profiles INT DEFAULT 1,
-          is_family_plan BOOLEAN DEFAULT FALSE,
-          parental_controls BOOLEAN DEFAULT FALSE,
-          max_family_members INT DEFAULT 0,
-          display_order INT DEFAULT 0,
-          is_popular BOOLEAN DEFAULT FALSE,
-          is_featured BOOLEAN DEFAULT FALSE,
-          is_active BOOLEAN DEFAULT TRUE,
-          is_visible BOOLEAN DEFAULT TRUE,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          
-          INDEX idx_type_active (type, is_active),
-          INDEX idx_price_active (price, is_active),
-          INDEX idx_display_order (display_order),
-          INDEX idx_popular_active (is_popular, is_active),
-          INDEX idx_visible_active (is_visible, is_active)
-        );
-      `;
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(50) NOT NULL UNIQUE,
+      name_translations JSON DEFAULT NULL,
+      type ENUM('mobile','basic','standard','family','free','custom') NOT NULL DEFAULT 'free',
+      price INT NOT NULL DEFAULT 0,
+      original_price INT DEFAULT NULL,
+      description TEXT DEFAULT NULL,
+      description_translations JSON DEFAULT NULL,
+      tagline VARCHAR(255) DEFAULT NULL,
+      tagline_translations JSON DEFAULT NULL,
+      currency VARCHAR(3) DEFAULT 'RWF',
+      devices_allowed JSON NOT NULL,
+      max_sessions INT NOT NULL DEFAULT 1,
+      max_devices_registered INT DEFAULT 10,
+      supported_platforms JSON DEFAULT '["web","mobile","tablet","smarttv"]',
+      video_quality ENUM('SD','HD','FHD','UHD') DEFAULT 'SD',
+      max_video_bitrate INT DEFAULT 2000,
+      hdr_support BOOLEAN DEFAULT FALSE,
+      offline_downloads BOOLEAN DEFAULT FALSE,
+      max_downloads INT DEFAULT 0,
+      download_quality ENUM('SD','HD','FHD','UHD') DEFAULT 'SD',
+      download_expiry_days INT DEFAULT 30,
+      simultaneous_downloads INT DEFAULT 1,
+      early_access BOOLEAN DEFAULT FALSE,
+      exclusive_content BOOLEAN DEFAULT FALSE,
+      content_restrictions JSON DEFAULT NULL,
+      max_profiles INT DEFAULT 1,
+      is_family_plan BOOLEAN DEFAULT FALSE,
+      parental_controls BOOLEAN DEFAULT FALSE,
+      
+      -- Family Plan Column (NEW)
+      max_family_members INT DEFAULT 0,
+      
+      display_order INT DEFAULT 0,
+      is_popular BOOLEAN DEFAULT FALSE,
+      is_featured BOOLEAN DEFAULT FALSE,
+      is_active BOOLEAN DEFAULT TRUE,
+      is_visible BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_type_active (type, is_active),
+      INDEX idx_price_active (price, is_active),
+      INDEX idx_display_order (display_order),
+      INDEX idx_popular_active (is_popular, is_active),
+      INDEX idx_visible_active (is_visible, is_active)
+    );
+  `;
     await query(sqlSubscriptions);
 
     // 2️⃣ User subscriptions table
@@ -644,71 +633,95 @@ const createContentTables = async () => {
     await query(sqlCategories);
 
     // 3. Main contents table with SEO optimization
-  const sqlContents = `
-        CREATE TABLE IF NOT EXISTS contents (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          title VARCHAR(255) NOT NULL,
-          slug VARCHAR(255) UNIQUE NOT NULL,
-          description TEXT,
-          short_description TEXT,
-          content_type ENUM('movie', 'series', 'documentary', 'short_film', 'live_event') NOT NULL,
-          status ENUM('draft', 'published', 'archived', 'scheduled') DEFAULT 'draft',
-          visibility ENUM('public', 'private', 'unlisted') DEFAULT 'public',
-          production_company VARCHAR(255) DEFAULT NULL,
-          budget DECIMAL(15,2) DEFAULT NULL,
-          subject VARCHAR(255) DEFAULT NULL,
-          location VARCHAR(255) DEFAULT NULL,
-          festival VARCHAR(255) DEFAULT NULL,
-          age_rating VARCHAR(10) DEFAULT 'G',
-          primary_language VARCHAR(10) DEFAULT 'en',
-          duration_minutes INT,
-          release_date DATE,
-          director VARCHAR(255),
-          total_seasons INT DEFAULT NULL,
-          episodes_per_season INT DEFAULT NULL,
-          episode_duration_minutes INT DEFAULT NULL,
-          event_date DATETIME DEFAULT NULL,
-          event_location VARCHAR(255) DEFAULT NULL,
-          expected_audience INT DEFAULT NULL,
-          meta_title VARCHAR(255),
-          meta_description TEXT,
-          keywords TEXT,
-          canonical_url VARCHAR(500),
-          published_at DATETIME DEFAULT NULL,
-          scheduled_publish_at DATETIME DEFAULT NULL,
-          featured BOOLEAN DEFAULT FALSE,
-          trending BOOLEAN DEFAULT FALSE,
-          featured_order INT DEFAULT 0,
-          view_count BIGINT DEFAULT 0,
-          like_count INT DEFAULT 0,
-          share_count INT DEFAULT 0,
-          average_rating DECIMAL(3,2) DEFAULT 0.00,
-          rating_count INT DEFAULT 0,
-          content_quality ENUM('SD', 'HD', 'FHD', 'UHD') DEFAULT 'HD',
-          has_subtitles BOOLEAN DEFAULT FALSE,
-          has_dubbing BOOLEAN DEFAULT FALSE,
-          created_by INT NOT NULL,
-          updated_by INT NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          
-          FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
-          FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE CASCADE,
-          
-          INDEX idx_contents_slug (slug),
-          INDEX idx_contents_type_status (content_type, status),
-          INDEX idx_contents_status_visibility (status, visibility),
-          INDEX idx_contents_published (published_at),
-          INDEX idx_contents_featured (featured, featured_order),
-          INDEX idx_contents_trending (trending),
-          INDEX idx_contents_release_date (release_date),
-          INDEX idx_contents_view_count (view_count),
-          INDEX idx_contents_rating (average_rating),
-          INDEX idx_contents_created_at (created_at),
-          INDEX idx_contents_scheduled (scheduled_publish_at)
-          -- Removed FULLTEXT index for TiDB compatibility
-        );
-      `;
+    const sqlContents = `
+      CREATE TABLE IF NOT EXISTS contents (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        
+        -- Basic identification
+        title VARCHAR(255) NOT NULL,
+        slug VARCHAR(255) UNIQUE NOT NULL,
+        description TEXT,
+        short_description TEXT,
+        
+        -- Content classification
+        content_type ENUM('movie', 'series', 'documentary', 'short_film', 'live_event') NOT NULL,
+        status ENUM('draft', 'published', 'archived', 'scheduled') DEFAULT 'draft',
+        visibility ENUM('public', 'private', 'unlisted') DEFAULT 'public',
+
+        -- optional fields
+        production_company VARCHAR(255) DEFAULT NULL,
+        budget DECIMAL(15,2) DEFAULT NULL,
+        subject VARCHAR(255) DEFAULT NULL,
+        location VARCHAR(255) DEFAULT NULL,
+        festival VARCHAR(255) DEFAULT NULL,
+        
+        -- Core metadata
+        age_rating VARCHAR(10) DEFAULT 'G',
+        primary_language VARCHAR(10) DEFAULT 'en',
+        duration_minutes INT,
+        release_date DATE,
+        director VARCHAR(255),
+        
+        -- Series-specific fields
+        total_seasons INT DEFAULT NULL,
+        episodes_per_season INT DEFAULT NULL,
+        episode_duration_minutes INT DEFAULT NULL,
+        
+        -- Live event specific
+        event_date DATETIME DEFAULT NULL,
+        event_location VARCHAR(255) DEFAULT NULL,
+        expected_audience INT DEFAULT NULL,
+        
+        -- SEO optimization
+        meta_title VARCHAR(255),
+        meta_description TEXT,
+        keywords TEXT,
+        canonical_url VARCHAR(500),
+        
+        -- Publishing control
+        published_at DATETIME DEFAULT NULL,
+        scheduled_publish_at DATETIME DEFAULT NULL,
+        featured BOOLEAN DEFAULT FALSE,
+        trending BOOLEAN DEFAULT FALSE,
+        featured_order INT DEFAULT 0,
+        
+        -- Engagement metrics
+        view_count BIGINT DEFAULT 0,
+        like_count INT DEFAULT 0,
+        share_count INT DEFAULT 0,
+        average_rating DECIMAL(3,2) DEFAULT 0.00,
+        rating_count INT DEFAULT 0,
+        
+        -- Content quality
+        content_quality ENUM('SD', 'HD', 'FHD', 'UHD') DEFAULT 'HD',
+        has_subtitles BOOLEAN DEFAULT FALSE,
+        has_dubbing BOOLEAN DEFAULT FALSE,
+        
+        -- Ownership & timestamps
+        created_by INT NOT NULL,
+        updated_by INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        -- Foreign keys
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE CASCADE,
+        
+        -- SEO and performance indexes
+        INDEX idx_contents_slug (slug),
+        INDEX idx_contents_type_status (content_type, status),
+        INDEX idx_contents_status_visibility (status, visibility),
+        INDEX idx_contents_published (published_at),
+        INDEX idx_contents_featured (featured, featured_order),
+        INDEX idx_contents_trending (trending),
+        INDEX idx_contents_release_date (release_date),
+        INDEX idx_contents_view_count (view_count),
+        INDEX idx_contents_rating (average_rating),
+        INDEX idx_contents_created_at (created_at),
+        INDEX idx_contents_scheduled (scheduled_publish_at),
+        FULLTEXT KEY idx_contents_ft_search (title, description, keywords)
+      );
+    `;
     await query(sqlContents);
 
     // 4. Content warnings
@@ -972,33 +985,33 @@ const createContentTables = async () => {
     await query(sqlEpisodes);
 
     // 12. Content reviews and ratings
-  const sqlContentRatings = `
-    CREATE TABLE IF NOT EXISTS content_ratings (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      content_id INT NOT NULL,
-      user_id INT NOT NULL,
-      rating TINYINT NOT NULL CHECK (rating >= 1 AND rating <= 5),
-      review_title VARCHAR(255),
-      review_text TEXT,
-      is_verified BOOLEAN DEFAULT FALSE,
-      helpful_count INT DEFAULT 0,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      
-      FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE CASCADE,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-      UNIQUE KEY unique_content_user_rating (content_id, user_id),
-      INDEX idx_ratings_content (content_id),
-      INDEX idx_ratings_user (user_id),
-      INDEX idx_ratings_rating (rating),
-      INDEX idx_ratings_verified (is_verified)
-      -- REMOVED: FULLTEXT KEY idx_ratings_ft_search (review_title, review_text)
-    );
-  `;
+    const sqlContentRatings = `
+      CREATE TABLE IF NOT EXISTS content_ratings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        content_id INT NOT NULL,
+        user_id INT NOT NULL,
+        rating TINYINT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+        review_title VARCHAR(255),
+        review_text TEXT,
+        is_verified BOOLEAN DEFAULT FALSE,
+        helpful_count INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_content_user_rating (content_id, user_id),
+        INDEX idx_ratings_content (content_id),
+        INDEX idx_ratings_user (user_id),
+        INDEX idx_ratings_rating (rating),
+        INDEX idx_ratings_verified (is_verified),
+        FULLTEXT KEY idx_ratings_ft_search (review_title, review_text)
+      );
+    `;
     await query(sqlContentRatings);
 
     // 13. Content view history for recommendations
-    const sqlContentViewHistory = `
+  const sqlContentViewHistory = `
     CREATE TABLE IF NOT EXISTS content_view_history (
       id BIGINT AUTO_INCREMENT PRIMARY KEY,
       content_id INT NOT NULL,
@@ -1158,40 +1171,59 @@ const insertDefaultCategories = async () => {
 const createPeopleTables = async () => {
   try {
     // People table (actors, directors, crew members)
-  const sqlPeople = `
+    const sqlPeople = `
       CREATE TABLE IF NOT EXISTS people (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        
+        -- Basic information
         full_name VARCHAR(255) NOT NULL,
         display_name VARCHAR(255),
         bio TEXT,
+        
+        -- Personal details
         date_of_birth DATE,
         place_of_birth VARCHAR(255),
         nationality VARCHAR(100),
         gender ENUM('male', 'female', 'other') DEFAULT 'other',
+        
+        -- Professional details
         primary_role ENUM('actor', 'director', 'producer', 'writer', 'cinematographer', 'composer', 'editor', 'other') NOT NULL,
-        other_roles JSON,
+        other_roles JSON DEFAULT NULL,
+        
+        -- Contact and representation (optional)
         agent_name VARCHAR(255),
         agent_contact VARCHAR(255),
+        
+        -- Media and assets
         profile_image_url VARCHAR(500),
-        gallery_images JSON,
+        gallery_images JSON DEFAULT NULL,
+        
+        -- Social media and links
         website_url VARCHAR(500),
         imdb_url VARCHAR(500),
         wikipedia_url VARCHAR(500),
-        social_links JSON,
+        social_links JSON DEFAULT NULL,
+        
+        -- Status and metadata
         is_active BOOLEAN DEFAULT TRUE,
         is_verified BOOLEAN DEFAULT FALSE,
         popularity_score INT DEFAULT 0,
-        search_keywords JSON,
+        
+        -- SEO and discovery
+        search_keywords JSON DEFAULT NULL,
         slug VARCHAR(255) UNIQUE NOT NULL,
+        
+        -- Timestamps
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         
+        -- Indexes for performance
         INDEX idx_people_name (full_name),
         INDEX idx_people_role (primary_role),
         INDEX idx_people_active (is_active),
         INDEX idx_people_slug (slug),
-        INDEX idx_people_popularity (popularity_score)
-        -- Removed FULLTEXT index for TiDB compatibility
+        INDEX idx_people_popularity (popularity_score),
+        FULLTEXT KEY idx_people_search (full_name, display_name, bio)
       );
     `;
     await query(sqlPeople);
@@ -1416,36 +1448,48 @@ const createWatchTrackingTables = async () => {
 const createKidsTables = async () => {
   try {
     // 1. Main kids profiles table
-  const sqlKidsProfiles = `
-        CREATE TABLE IF NOT EXISTS kids_profiles (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          parent_user_id INT NOT NULL,
-          name VARCHAR(100) NOT NULL,
-          avatar_url VARCHAR(500) DEFAULT NULL,
-          birth_date DATE NOT NULL,
-          -- REMOVED: calculated_age INT AS (TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) VIRTUAL,
-          max_content_age_rating VARCHAR(10) DEFAULT '7+',
-          allowed_content_types JSON,
-          theme_color VARCHAR(50) DEFAULT 'blue',
-          interface_mode ENUM('simple', 'regular', 'detailed') DEFAULT 'simple',
-          is_active BOOLEAN DEFAULT TRUE,
-          require_pin_to_exit BOOLEAN DEFAULT TRUE,
-          daily_time_limit_minutes INT DEFAULT 120,
-          bedtime_start TIME DEFAULT '21:00:00',
-          bedtime_end TIME DEFAULT '07:00:00',
-          total_watch_time_minutes INT DEFAULT 0,
-          last_active_at TIMESTAMP NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          
-          FOREIGN KEY (parent_user_id) REFERENCES users(id) ON DELETE CASCADE,
-          UNIQUE KEY unique_parent_kid_name (parent_user_id, name),
-          INDEX idx_kids_parent (parent_user_id),
-          INDEX idx_kids_active (is_active),
-          INDEX idx_kids_age_rating (max_content_age_rating),
-          INDEX idx_kids_birth_date (birth_date)
-        );
-      `;
+    const sqlKidsProfiles = `
+      CREATE TABLE IF NOT EXISTS kids_profiles (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        parent_user_id INT NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        avatar_url VARCHAR(500) DEFAULT NULL,
+        birth_date DATE NOT NULL,
+        calculated_age INT GENERATED ALWAYS AS (TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) VIRTUAL,
+        
+        -- Custom age ratings (using actual ages like 11+, 13+, etc.)
+        max_content_age_rating VARCHAR(10) DEFAULT '7+',
+        allowed_content_types JSON DEFAULT '["cartoons", "educational", "family"]',
+        
+        -- Appearance & Experience
+        theme_color VARCHAR(50) DEFAULT 'blue',
+        interface_mode ENUM('simple', 'regular', 'detailed') DEFAULT 'simple',
+        
+        -- Parental Controls
+        is_active BOOLEAN DEFAULT TRUE,
+        require_pin_to_exit BOOLEAN DEFAULT TRUE,
+        
+        -- Time Restrictions
+        daily_time_limit_minutes INT DEFAULT 120,
+        bedtime_start TIME DEFAULT '21:00:00',
+        bedtime_end TIME DEFAULT '07:00:00',
+        
+        -- Tracking
+        total_watch_time_minutes INT DEFAULT 0,
+        last_active_at TIMESTAMP NULL,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        FOREIGN KEY (parent_user_id) REFERENCES users(id) ON DELETE CASCADE,
+        
+        UNIQUE KEY unique_parent_kid_name (parent_user_id, name),
+        INDEX idx_kids_parent (parent_user_id),
+        INDEX idx_kids_active (is_active),
+        INDEX idx_kids_age_rating (max_content_age_rating),
+        INDEX idx_kids_birth_date (birth_date)
+      );
+    `;
     await query(sqlKidsProfiles);
     console.log("✅ kids_profiles table created");
 
@@ -2051,7 +2095,7 @@ const createFeedbackTable = async () => {
         ON DELETE SET NULL
     );
   `;
-
+  
   try {
     await query(sql);
     console.log("✅ feedback table is ready");
@@ -2517,7 +2561,7 @@ const createGameTables = async () => {
     // Insert default games data
     await insertDefaultGames();
     await insertDefaultSkills();
-
+    
   } catch (error) {
     console.error("❌ Error creating game tables:", error);
     throw error;
@@ -2641,7 +2685,7 @@ const insertDefaultGames = async () => {
          age_minimum, age_maximum, game_component, metadata, sort_order) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          game.game_key, game.title, game.description, game.icon_emoji,
+          game.game_key, game.title, game.description, game.icon_emoji, 
           game.color_gradient, game.category, game.age_minimum, game.age_maximum,
           game.game_component, game.metadata, game.sort_order
         ]
@@ -2746,7 +2790,7 @@ const insertDefaultSkills = async () => {
          category, difficulty_level, icon_emoji) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          skill.skill_key, skill.name, skill.description,
+          skill.skill_key, skill.name, skill.description, 
           skill.age_range_min, skill.age_range_max, skill.category,
           skill.difficulty_level, skill.icon_emoji
         ]
@@ -2779,30 +2823,30 @@ const insertGameSkillMappings = async () => {
       // Counting Game
       { game_key: 'counting_game', skill_key: 'basic_addition', strength: 'primary' },
       { game_key: 'counting_game', skill_key: 'pattern_recognition', strength: 'secondary' },
-
+      
       // Shape Match Game
       { game_key: 'shape_match_game', skill_key: 'shape_recognition', strength: 'primary' },
       { game_key: 'shape_match_game', skill_key: 'memory_skills', strength: 'secondary' },
-
+      
       // Color Quest Game
       { game_key: 'color_quest_game', skill_key: 'color_recognition', strength: 'primary' },
       { game_key: 'color_quest_game', skill_key: 'memory_skills', strength: 'secondary' },
-
+      
       // Memory Match Game
       { game_key: 'memory_match_game', skill_key: 'memory_skills', strength: 'primary' },
       { game_key: 'memory_match_game', skill_key: 'pattern_recognition', strength: 'secondary' },
-
+      
       // Animal Safari Game
       { game_key: 'animal_safari_game', skill_key: 'memory_skills', strength: 'primary' },
-
+      
       // Alphabet Race Game
       { game_key: 'alphabet_race_game', skill_key: 'letter_recognition', strength: 'primary' },
       { game_key: 'alphabet_race_game', skill_key: 'hand_eye_coordination', strength: 'secondary' },
-
+      
       // Pro Racing Challenge
       { game_key: 'pro_racing_challenge', skill_key: 'hand_eye_coordination', strength: 'primary' },
       { game_key: 'pro_racing_challenge', skill_key: 'problem_solving', strength: 'secondary' },
-
+      
       // Water Sort Puzzle
       { game_key: 'water_sort_puzzle', skill_key: 'problem_solving', strength: 'primary' },
       { game_key: 'water_sort_puzzle', skill_key: 'pattern_recognition', strength: 'secondary' }
@@ -2811,7 +2855,7 @@ const insertGameSkillMappings = async () => {
     for (const mapping of mappings) {
       const gameId = gameMap[mapping.game_key];
       const skillId = skillMap[mapping.skill_key];
-
+      
       if (gameId && skillId) {
         await query(
           `INSERT IGNORE INTO game_skills_mapping (game_id, skill_id, strength_level) 
@@ -2827,64 +2871,6 @@ const insertGameSkillMappings = async () => {
 };
 
 
-const initializeDatabase = async () => {
-  try {
-    console.log("🔄 Initializing database tables...");
-    
-    // 1. Core tables
-    await createUsersTable();
-    await createRolesTable();
-    
-    // 2. Tables that depend only on users
-    await createEmailVerificationsTable();
-    await createUserPreferencesTable();
-    await createSecurityLogsTable();
-    await createPasswordResetsTable();
-    await createContactsTable();
-    await createContactInfoTable();
-    await createNotificationsTable();
-    await createRoleFeaturesTable();
-    
-    // 3. Subscriptions
-    await createSubscriptionsTables();
-    
-    // 4. Content tables
-    await createContentTables();
-    
-    // 5. People tables
-    await createPeopleTables();
-    
-    // 6. Kids tables
-    await createKidsTables();
-    
-    // 7. User session (depends on users AND kids_profiles)
-    await createUserSessionTable();
-    
-    // 8. Content-related tables
-    await createWatchTrackingTables();
-    await createUserPreferencesTables();
-    await createShareTables();
-    
-    // 9. Contact responses
-    await createContactResponsesTable();
-    
-    // 10. Family tables
-    await createFamilyMembersTable();
-    await createFamilyPinSecurityTable();
-    
-    // 11. Feedback
-    await createFeedbackTable();
-    
-    // 12. Games tables LAST
-    await createGameTables();
-    
-    console.log("✅ All tables initialized successfully!");
-    return true;
-  } catch (error) {
-    console.error("❌ Database initialization failed:", error.message);
-    throw error;
-  }
-};
 
 module.exports = {
   db,
@@ -2911,6 +2897,5 @@ module.exports = {
   createFamilyMembersTable,
   createFamilyPinSecurityTable,
   createFeedbackTable,
-  createGameTables,
-  initializeDatabase
+  createGameTables
 };

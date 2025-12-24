@@ -2,7 +2,6 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { initializeDatabase } = require('./config/dbConfig');
 const {
   createUsersTable,
   createEmailVerificationsTable,
@@ -90,7 +89,7 @@ app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, Postman)
     if (!origin) return callback(null, true);
-    
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -106,10 +105,10 @@ app.use(cors({
 
 app.use((req, res, next) => {
   // Skip activity logging for security endpoints to avoid circular logging
-  if (req.path.startsWith('/api/kids/security-logs') || 
-      req.path.startsWith('/api/kids/activity-summary') ||
-      req.path.startsWith('/api/kids/dashboard-stats') ||
-      req.path.startsWith('/api/kids/export-logs')) {
+  if (req.path.startsWith('/api/kids/security-logs') ||
+    req.path.startsWith('/api/kids/activity-summary') ||
+    req.path.startsWith('/api/kids/dashboard-stats') ||
+    req.path.startsWith('/api/kids/export-logs')) {
     return next();
   }
   next();
@@ -163,7 +162,29 @@ app.get('/api/health', (req, res) => {
 });
 
 // Create tables if not exist
-initializeDatabase()
+Promise.all([createUsersTable(),
+createEmailVerificationsTable(),
+createUserPreferencesTable(),
+createUserSessionTable(),
+createSubscriptionsTables(),
+createRolesTable(),
+createRoleFeaturesTable(),
+createPasswordResetsTable(),
+createContactsTable(),
+createContactResponsesTable(),
+createContactInfoTable(),
+createNotificationsTable(),
+createSecurityLogsTable(),
+createContentTables(),
+createPeopleTables(),
+createWatchTrackingTables(),
+createUserPreferencesTables(),
+createShareTables(),
+createKidsTables(),
+createFamilyMembersTable(),
+createFamilyPinSecurityTable(),
+createFeedbackTable(),
+createGameTables(),])
   .then(async () => {
     console.log("✅ Tables checked/created");
     await createAdminSeed();
