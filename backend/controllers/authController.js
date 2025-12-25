@@ -130,9 +130,11 @@ const saveUserInfo = async (req, res) => {
     // 7. Set HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // only over HTTPS in prod
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+      secure: process.env.NODE_ENV === "production", //true for HTTPS
+      sameSite: "none", // Changed to "none" for cross-domain
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: process.env.COOKIE_DOMAIN || ".oliviuus.com", 
+      path: "/"
     });
 
     // 8. Record session in user_session table (same logic as login)
@@ -334,44 +336,35 @@ const getMe = async (req, res) => {
 const logout = async (req, res) => {
   try {
     const token = req.cookies?.token;
-
-    if (!token) {
-      return res.status(200).json({ success: true, message: "Already logged out" });
-    }
-
-    // Verify token to get user info
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (jwtError) {
-      // If token is invalid, just clear the cookie
-      res.clearCookie("token");
-      return res.json({ success: true, message: "Logged out successfully" });
-    }
-
-    const userId = decoded.id;
-
-    // Clear both adult and kid sessions
-    await Promise.all([
-      // Clear adult session
-      query(
+    const userId = req.user?.id;
+    
+    // Clear cookie with same options as login
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      domain: process.env.COOKIE_DOMAIN || ".yourdomain.com",
+      path: "/"
+    });
+    
+    if (userId) {
+      await query(
         "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
         [userId]
-      ),
-      // Clear kid sessions
-      query(
-        "UPDATE kids_sessions SET is_active = FALSE, logout_time = NOW() WHERE parent_user_id = ? AND is_active = TRUE",
-        [userId]
-      )
-    ]);
-
-    res.clearCookie("token");
+      );
+    }
+    
     res.json({ success: true, message: "Logged out successfully" });
-
+    
   } catch (error) {
     console.error("Logout error:", error);
-    // Always clear cookie even on error
-    res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      domain: process.env.COOKIE_DOMAIN || ".yourdomain.com",
+      path: "/"
+    });
     res.json({ success: true, message: "Logged out successfully" });
   }
 };
@@ -426,9 +419,11 @@ const loginUser = async (req, res) => {
     // 4️⃣ Set HttpOnly cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: false, //true for HTTPS
+      sameSite: "none", // Changed to "none" for cross-domain
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: process.env.COOKIE_DOMAIN || ".oliviuus.com", 
+      path: "/"
     });
 
     // 5️⃣ Record session in user_session table
@@ -464,7 +459,7 @@ const loginUser = async (req, res) => {
 // Google Sign-In authentication
 const googleAuth = async (req, res) => {
   const { token } = req.body;
-  
+
   if (!token) {
     return res.status(400).json({ error: "Google token is required" });
   }
@@ -472,38 +467,38 @@ const googleAuth = async (req, res) => {
   try {
     const { OAuth2Client } = require('google-auth-library');
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-    
+
     // Verify Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-    
+
     const payload = ticket.getPayload();
     const { sub: googleId, email, name, picture, email_verified } = payload;
-    
+
     // Check if user exists in your database
     const existingUser = await query("SELECT id, role, is_active, profile_avatar_url FROM users WHERE email = ?", [email]);
-    
+
     let userId;
     let userRole = "viewer";
     let isNewUser = false;
-    
+
     if (existingUser.length > 0) {
       // Existing user
       userId = existingUser[0].id;
       userRole = existingUser[0].role;
-      
+
       if (!existingUser[0].is_active) {
         return res.status(403).json({ error: "Account is disabled" });
       }
     } else {
       // New user - create account
       isNewUser = true;
-      
+
       // Generate avatar URL using DiceBear (based on googleId)
       const avatarUrl = picture || `https://api.dicebear.com/7.x/shapes/svg?seed=${googleId}`;
-      
+
       // Insert new user
       const result = await query(
         `INSERT INTO users 
@@ -511,39 +506,41 @@ const googleAuth = async (req, res) => {
         VALUES (?, ?, ?, true, 'viewer', 'none', ?)`,
         [email, 'google_oauth', email_verified || false, avatarUrl]
       );
-      
+
       userId = result.insertId;
-      
+
       // Set default language
       const language = req.headers['accept-language']?.split(',')[0]?.split('-')[0] || 'rw';
       await query(
         `INSERT INTO user_preferences (user_id, language) VALUES (?, ?)`,
         [userId, language]
       );
-      
+
       // Send welcome notifications
       await sendWelcomeNotifications(userId, language);
     }
-    
+
     // Generate JWT token
     const jwtToken = jwt.sign(
       { id: userId, role: userRole },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-    
+
     // Set HttpOnly cookie
     res.cookie("token", jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production", //true for HTTPS
+      sameSite: "none", // Changed to "none" for cross-domain
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: process.env.COOKIE_DOMAIN || ".oliviuus.com", 
+      path: "/"
     });
-    
+
     // Record session
     const ip_address = req.headers["x-forwarded-for"] || req.connection.remoteAddress || "Unknown";
     const user_agent = req.headers["user-agent"] || "Unknown";
-    
+
     await query(
       `INSERT INTO user_session 
       (user_id, session_token, device_name, device_type, ip_address, 
@@ -558,10 +555,10 @@ const googleAuth = async (req, res) => {
         user_agent,
       ]
     );
-    
+
     // Send login notification
     await handleSuccessfulLogin(userId, email, ip_address, "Google Sign-In", "web", user_agent);
-    
+
     return res.status(200).json({
       success: true,
       message: isNewUser ? "Account created and logged in successfully" : "Login successful",
@@ -573,15 +570,15 @@ const googleAuth = async (req, res) => {
         is_new_user: isNewUser
       }
     });
-    
+
   } catch (error) {
     console.error("❌ Google auth error:", error);
-    
+
     if (error.message.includes('Token used too late')) {
       return res.status(401).json({ error: "Google token has expired" });
     }
-    
-    res.status(401).json({ 
+
+    res.status(401).json({
       success: false,
       error: "Google authentication failed"
     });

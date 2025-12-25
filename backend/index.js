@@ -78,11 +78,29 @@ app.use(express.json());
 app.use(cookieParser());
 
 // CORS
-const clientOrigin = process.env.CLIENT_ORIGIN;
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN,
+  process.env.CLIENT_URL,
+  'https://oliviuus.com',
+  'https://www.oliviuus.com',
+  "http://localhost:5173/"
+];
+
 app.use(cors({
-  origin: clientOrigin,
-  methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE', 'PATCH'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Set-Cookie', 'Date', 'ETag']
 }));
 
 app.use((req, res, next) => {
