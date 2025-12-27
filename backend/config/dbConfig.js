@@ -1460,7 +1460,7 @@ const createKidsTables = async () => {
         
         -- Custom age ratings (using actual ages like 11+, 13+, etc.)
         max_content_age_rating VARCHAR(10) DEFAULT '7+',
-        allowed_content_types JSON DEFAULT '["cartoons", "educational", "family"]',
+        allowed_content_types JSON DEFAULT NULL,
         
         -- Appearance & Experience
         theme_color VARCHAR(50) DEFAULT 'blue',
