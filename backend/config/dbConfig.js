@@ -1621,12 +1621,12 @@ const createKidsTables = async () => {
         -- Daily limits
         daily_time_limit_minutes INT DEFAULT 120,
         current_daily_usage INT DEFAULT 0,
-        last_reset_date DATE DEFAULT CURDATE(),
+        last_reset_date DATE DEFAULT NULL,
         
         -- Weekly limits
         weekly_time_limit_minutes INT DEFAULT 600,
         current_weekly_usage INT DEFAULT 0,
-        last_weekly_reset DATE DEFAULT CURDATE(),
+        last_weekly_reset DATE DEFAULT NULL,
         
         -- Time window restrictions
         allowed_start_time TIME DEFAULT '07:00:00',
