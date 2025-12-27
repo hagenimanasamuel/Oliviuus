@@ -35,6 +35,17 @@ const {
   markNotificationAsRead,
   archiveNotification,
   bulkUserOperations,
+  getAvailableGenres,
+  completeOnboarding,
+  getOnboardingStatus,
+    getKidProfiles,
+  getKidViewingHistory,
+  getKidProfileDetails,
+  deleteKidProfile,
+  getFamilyMembers,
+  inviteFamilyMember,
+  updateFamilyMember,
+  removeFamilyMember
 } = require("../controllers/userController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require('../middlewares/adminMiddleware');
@@ -140,5 +151,24 @@ router.put('/:userId/notifications/:notificationId/archive', archiveNotification
 
 // ✅ Bulk user operations
 router.post('/bulk-operations', bulkUserOperations);
+
+router.get("/genres/list", authMiddleware, getAvailableGenres);
+
+// ✅ ONBOARDING ENDPOINTS
+router.get("/onboarding/status", authMiddleware, getOnboardingStatus);
+router.post("/complete-onboarding", authMiddleware, completeOnboarding);
+router.put("/update-preferences", authMiddleware, updateUserPreferences);
+
+// ✅ KID PROFILES ROUTES (Specials tab)
+router.get("/kids/profiles", authMiddleware, adminMiddleware, getKidProfiles);
+router.get("/kids/:kidId/viewing-history", authMiddleware, adminMiddleware, getKidViewingHistory);
+router.get("/kids/:kidId/details", authMiddleware, adminMiddleware, getKidProfileDetails);
+router.delete("/kids/:kidId", authMiddleware, adminMiddleware, deleteKidProfile);
+
+// ✅ FAMILY MEMBERS ROUTES (FamilyPlan tab)
+router.get("/family/members", authMiddleware, adminMiddleware, getFamilyMembers);
+router.post("/family/members/invite", authMiddleware, adminMiddleware, inviteFamilyMember);
+router.put("/family/members/:memberId", authMiddleware, adminMiddleware, updateFamilyMember);
+router.delete("/family/members/:memberId", authMiddleware, adminMiddleware, removeFamilyMember);
 
 module.exports = router;

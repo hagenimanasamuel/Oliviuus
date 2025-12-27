@@ -130,11 +130,10 @@ const saveUserInfo = async (req, res) => {
     // 7. Set HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", //true for HTTPS
-      sameSite: "none", // Changed to "none" for cross-domain
+      secure: true, // MUST be true for sameSite: "none"
+      sameSite: "none", // Allow cross-domain
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: process.env.COOKIE_DOMAIN || ".oliviuus.com", 
-      path: "/"
+      domain: ".oliviuus.com",
     });
 
     // 8. Record session in user_session table (same logic as login)
@@ -336,35 +335,44 @@ const getMe = async (req, res) => {
 const logout = async (req, res) => {
   try {
     const token = req.cookies?.token;
-    const userId = req.user?.id;
-    
-    // Clear cookie with same options as login
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      domain: process.env.COOKIE_DOMAIN || ".yourdomain.com",
-      path: "/"
-    });
-    
-    if (userId) {
-      await query(
+
+    if (!token) {
+      return res.status(200).json({ success: true, message: "Already logged out" });
+    }
+
+    // Verify token to get user info
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (jwtError) {
+      // If token is invalid, just clear the cookie
+      res.clearCookie("token");
+      return res.json({ success: true, message: "Logged out successfully" });
+    }
+
+    const userId = decoded.id;
+
+    // Clear both adult and kid sessions
+    await Promise.all([
+      // Clear adult session
+      query(
         "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
         [userId]
-      );
-    }
-    
+      ),
+      // Clear kid sessions
+      query(
+        "UPDATE kids_sessions SET is_active = FALSE, logout_time = NOW() WHERE parent_user_id = ? AND is_active = TRUE",
+        [userId]
+      )
+    ]);
+
+    res.clearCookie("token");
     res.json({ success: true, message: "Logged out successfully" });
-    
+
   } catch (error) {
     console.error("Logout error:", error);
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      domain: process.env.COOKIE_DOMAIN || ".yourdomain.com",
-      path: "/"
-    });
+    // Always clear cookie even on error
+    res.clearCookie("token");
     res.json({ success: true, message: "Logged out successfully" });
   }
 };
@@ -419,11 +427,10 @@ const loginUser = async (req, res) => {
     // 4️⃣ Set HttpOnly cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, //true for HTTPS
-      sameSite: "none", // Changed to "none" for cross-domain
+      secure: true, // MUST be true for sameSite: "none"
+      sameSite: "none", // Allow cross-domain
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: process.env.COOKIE_DOMAIN || ".oliviuus.com", 
-      path: "/"
+      domain: ".oliviuus.com",
     });
 
     // 5️⃣ Record session in user_session table
@@ -530,11 +537,10 @@ const googleAuth = async (req, res) => {
     // Set HttpOnly cookie
     res.cookie("token", jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", //true for HTTPS
-      sameSite: "none", // Changed to "none" for cross-domain
+      secure: true, // MUST be true for sameSite: "none"
+      sameSite: "none", // Allow cross-domain
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: process.env.COOKIE_DOMAIN || ".oliviuus.com", 
-      path: "/"
+      domain: ".oliviuus.com",
     });
 
     // Record session

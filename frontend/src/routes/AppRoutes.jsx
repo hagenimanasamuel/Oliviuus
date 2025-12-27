@@ -19,7 +19,7 @@ import Users from "../pages/Dashboards/Admins/users/Users";
 import Library from "../pages/Dashboards/Admins/library/Library";
 import Subscriptions from "../pages/Dashboards/Admins/subscriptions/Subscriptions";
 import Analytics from "../pages/Dashboards/Admins/analytics/Analytics";
-import GlobalManagement from "../pages/Dashboards/Admins/GlobalManagement/GlobalManagement";
+import Games from "../pages/Dashboards/Admins/games/Games";
 import Support from "../pages/Dashboards/Admins/support/Support";
 
 // Viewer Dashboard modules
@@ -56,6 +56,7 @@ import FeedbackPage from "../pages/landing/Legal&Help/FeedbackPage.jsx";
 import About from "../pages/landing/Legal&Help/About.jsx";
 import CountingGame from "../pages/subscription/SimpleGame.jsx";
 import EndlessRacer from "../pages/subscription/SimpleGame2.jsx";
+import Onboarding from "../pages/onBoarding/onBoarding.jsx";
 
 // ==================== PRO SKELETON LOADERS ====================
 const DashboardSkeleton = () => (
@@ -512,7 +513,7 @@ export default function AppRoutes() {
       <Route path="/admin/library" element={<AdminRoute element={<Library />} />} />
       <Route path="/admin/subscriptions" element={<AdminRoute element={<Subscriptions />} />} />
       <Route path="/admin/analytics" element={<AdminRoute element={<Analytics />} />} />
-      <Route path="/admin/global-management" element={<AdminRoute element={<GlobalManagement />} />} />
+      <Route path="/admin/games" element={<AdminRoute element={<Games />} />} />
       <Route path="/admin/support" element={<AdminRoute element={<Support />} />} />
 
       {/* Viewer routes - Each component handles its own subscription logic */}
@@ -526,6 +527,7 @@ export default function AppRoutes() {
       <Route path="/browse" element={<ViewerRoute element={<BrowsePage />} />} />
       <Route path="/profile" element={<ViewerRoute element={<ProfilePage />} />} />
       <Route path="/search" element={<ViewerRoute element={<SearchModal isPage={true} />} />} />
+      <Route path="/onboarding" element={<Onboarding />} />
 
       {/* Kid routes */}
       <Route path="/learn" element={<KidRoute element={<KidLearningPage />} />} />

@@ -1,4 +1,5 @@
-import React from "react";
+// src/pages/dashboard/Dashboard.jsx
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useSubscription } from "../../context/SubscriptionContext";
@@ -7,6 +8,7 @@ import ViewerDashboard from "./ViewerDashboard.jsx";
 import KidDashboard from "./viewer/kid/KidDashboard.jsx";
 import Overview from "./Admins/overview/Overview";
 import ViewerLandingPage from "../../components/layout/dashboard/viewer/ViewerLandingPage";
+import api from "../../api/axios";
 
 const Dashboard = () => {
   const { user, kidProfile, isKidMode, familyMemberData } = useAuth();
@@ -19,8 +21,10 @@ const Dashboard = () => {
   } = useSubscription();
 
   // State to track if we've loaded subscription data
-  const [dataLoaded, setDataLoaded] = React.useState(false);
-  const [loadAttempted, setLoadAttempted] = React.useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [loadAttempted, setLoadAttempted] = useState(false);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(null);
+  // Remove: const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
   // Check if user is family member with kid dashboard
   const isFamilyMemberKidDashboard = familyMemberData && familyMemberData.dashboard_type === 'kid';
@@ -28,8 +32,34 @@ const Dashboard = () => {
   // Combined kid mode check - includes family members with kid dashboard
   const shouldShowKidDashboard = isKidMode || isFamilyMemberKidDashboard;
 
+  // Check onboarding status when user logs in - IN BACKGROUND
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (user && user.id) {
+        try {
+          const response = await api.get('/user/onboarding/status', {
+            withCredentials: true
+          });
+          
+          if (response.data.success) {
+            setOnboardingCompleted(response.data.onboarding_completed);
+          } else {
+            // If API fails, assume onboarding not completed to be safe
+            setOnboardingCompleted(false);
+          }
+        } catch (error) {
+          console.error("Error checking onboarding status:", error);
+          setOnboardingCompleted(false);
+        }
+        // Remove: setCheckingOnboarding(false);
+      }
+    };
+
+    checkOnboardingStatus();
+  }, [user]);
+
   // Effect to load subscription data when user is a viewer - RUNS ONLY ONCE
-  React.useEffect(() => {
+  useEffect(() => {
     // Skip subscription checks for family members with plan access or kid mode
     if (user && (isFamilyPlanAccess || shouldShowKidDashboard)) {
       setDataLoaded(true);
@@ -49,6 +79,15 @@ const Dashboard = () => {
       setLoadAttempted(true);
     }
   }, [user, loadAttempted, refreshSubscription, shouldShowKidDashboard, isFamilyPlanAccess]);
+
+  // REMOVE COMPLETELY: The checkingOnboarding loading spinner
+  // No more: if (checkingOnboarding) { return spinner }
+
+  // 🎯 REDIRECT TO ONBOARDING if not completed
+  // Check only when we have the data
+  if (user && onboardingCompleted === false && user.role === "viewer" && !shouldShowKidDashboard) {
+    return <Navigate to="/onboarding" replace />;
+  }
 
   // Show generic loading during initial data fetch
   if (user && !dataLoaded && loadAttempted) {

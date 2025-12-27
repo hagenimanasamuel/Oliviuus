@@ -14,7 +14,7 @@ const getSystemOverview = async (req, res) => {
       FROM users
     `);
 
-    // 2. Subscription & Revenue Statistics
+    // 2. Subscription & Revenue Statistics - FIXED: Use actual subscription price from user_subscriptions
     const subscriptionStats = await query(`
       SELECT 
         COUNT(*) as total_subscriptions,
@@ -26,7 +26,7 @@ const getSystemOverview = async (req, res) => {
       FROM user_subscriptions
     `);
 
-    // 3. Payment Statistics
+    // 3. Payment Statistics - FIXED: Use payment_transactions table with correct WHERE clause
     const paymentStats = await query(`
       SELECT 
         COUNT(*) as total_transactions,
@@ -36,7 +36,7 @@ const getSystemOverview = async (req, res) => {
         SUM(CASE WHEN status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN amount ELSE 0 END) as revenue_30d,
         COUNT(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) as transactions_30d
       FROM payment_transactions
-      WHERE transaction_type = 'subscription'
+      WHERE status = 'completed'
     `);
 
     // 4. Support Statistics
@@ -121,7 +121,7 @@ const getSystemOverview = async (req, res) => {
       LIMIT 15
     `);
 
-    // 8. System Health Metrics
+    // 8. System Health Metrics - FIXED: Use correct table names
     const systemHealth = await query(`
       SELECT 
         (SELECT COUNT(*) FROM users) as total_users,
@@ -157,7 +157,7 @@ const getSystemOverview = async (req, res) => {
 
 const getDashboardMetrics = async (req, res) => {
   try {
-    // Quick metrics for dashboard cards
+    // Quick metrics for dashboard cards - FIXED: Use payment_transactions for revenue
     const metrics = await query(`
       SELECT 
         (SELECT COUNT(*) FROM users) as total_users,

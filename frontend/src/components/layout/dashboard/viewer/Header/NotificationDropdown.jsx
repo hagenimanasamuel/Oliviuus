@@ -21,6 +21,7 @@ const NotificationDropdown = ({
   const notificationsRef = useRef(null);
   const dropdownRef = useRef(null);
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
+  const [hasAutoMarkedAsRead, setHasAutoMarkedAsRead] = useState(false);
 
   const sortedNotifications = [...notifications].sort((a, b) => {
     if (a.status === 'unread' && b.status !== 'unread') return -1;
@@ -28,49 +29,48 @@ const NotificationDropdown = ({
     return new Date(b.created_at) - new Date(a.created_at);
   });
 
-  // Enhanced handleBellClick with auto-mark-as-read
+  // INSTANTLY mark as read when component loads/unread notifications change
+  useEffect(() => {
+    // Only mark as read if there are unread notifications and we haven't already done it
+    const hasUnread = notifications.some(notif => notif.status === 'unread');
+    
+    if (hasUnread && !hasAutoMarkedAsRead && !loading) {
+      instantMarkAllAsRead();
+    }
+  }, [notifications, loading]);
+
+  // Function to INSTANTLY mark all as read
+  const instantMarkAllAsRead = async () => {
+    if (isMarkingAsRead) return;
+    
+    setIsMarkingAsRead(true);
+    try {
+      // Make API call immediately
+      await api.put('/notifications/read-all');
+      
+      // Update local state to prevent repeated calls
+      setHasAutoMarkedAsRead(true);
+      
+      // Trigger refresh to update UI
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error('Error instantly marking all as read:', error);
+    } finally {
+      setIsMarkingAsRead(false);
+    }
+  };
+
+  // Enhanced handleBellClick
   const handleBellClick = async () => {
     const wasOpen = notificationsOpen;
     setNotificationsOpen(!wasOpen);
 
     if (!wasOpen) {
       // Fetch new notifications
-      onRefresh();
-      
-      // Mark all as read after a short delay when opening
-      setTimeout(() => {
-        markAllAsReadOnOpen();
-      }, 100);
-    }
-  };
-
-  // Function to mark all notifications as read when dropdown opens
-  const markAllAsReadOnOpen = async () => {
-    // Only mark as read if there are unread notifications
-    const hasUnread = notifications.some(notif => notif.status === 'unread');
-    
-    if (hasUnread && !isMarkingAsRead) {
-      setIsMarkingAsRead(true);
-      try {
-        const response = await api.put('/notifications/read-all');
-        if (response.data.success) {
-          // Trigger refresh to update the UI with read status
-          onRefresh();
-          
-          // Add visual feedback
-          const bellBtn = notificationsRef.current?.querySelector('button');
-          if (bellBtn) {
-            bellBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-              bellBtn.style.transform = 'scale(1)';
-            }, 150);
-          }
-        }
-      } catch (error) {
-        console.error('Error marking all as read:', error);
-        // Don't show error to user for this auto-action
-      } finally {
-        setIsMarkingAsRead(false);
+      if (onRefresh) {
+        onRefresh();
       }
     }
   };
@@ -80,42 +80,41 @@ const NotificationDropdown = ({
     // Mark as read immediately if unread
     if (notification.status === 'unread') {
       try {
-        const response = await api.put(`/notifications/${notification.id}/read`);
-        if (response.data.success) {
-          // Trigger refresh to update the UI
+        await api.put(`/notifications/${notification.id}/read`);
+        if (onRefresh) {
           onRefresh();
+        }
+        
+        // Add ripple effect similar to NotificationModal
+        const notificationElement = dropdownRef.current?.querySelector(`[data-notification-id="${notification.id}"]`);
+        if (notificationElement) {
+          const ripple = document.createElement('span');
+          const rect = notificationElement.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = rect.width / 2;
+          const y = rect.height / 2;
           
-          // Add ripple effect similar to NotificationModal
-          const notificationElement = dropdownRef.current?.querySelector(`[data-notification-id="${notification.id}"]`);
-          if (notificationElement) {
-            const ripple = document.createElement('span');
-            const rect = notificationElement.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = rect.width / 2;
-            const y = rect.height / 2;
-            
-            ripple.style.cssText = `
-              position: absolute;
-              border-radius: 50%;
-              background: rgba(188, 139, 188, 0.3);
-              transform: scale(0);
-              animation: ripple-animation-dropdown 400ms linear;
-              width: ${size}px;
-              height: ${size}px;
-              left: ${x - size/2}px;
-              top: ${y - size/2}px;
-              pointer-events: none;
-              z-index: 1;
-            `;
-            
-            notificationElement.style.position = 'relative';
-            notificationElement.style.overflow = 'hidden';
-            notificationElement.appendChild(ripple);
-            
-            setTimeout(() => {
-              ripple.remove();
-            }, 400);
-          }
+          ripple.style.cssText = `
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(188, 139, 188, 0.3);
+            transform: scale(0);
+            animation: ripple-animation-dropdown 400ms linear;
+            width: ${size}px;
+            height: ${size}px;
+            left: ${x - size/2}px;
+            top: ${y - size/2}px;
+            pointer-events: none;
+            z-index: 1;
+          `;
+          
+          notificationElement.style.position = 'relative';
+          notificationElement.style.overflow = 'hidden';
+          notificationElement.appendChild(ripple);
+          
+          setTimeout(() => {
+            ripple.remove();
+          }, 400);
         }
       } catch (error) {
         console.error('Error marking notification as read:', error);
@@ -177,7 +176,10 @@ const NotificationDropdown = ({
   };
 
   const renderNotificationBadge = () => {
-    if (unreadCount === 0 || apiError) return null;
+    // Don't show badge if we've already marked as read or are in the process
+    if (hasAutoMarkedAsRead || isMarkingAsRead || apiError) return null;
+    
+    if (unreadCount === 0) return null;
     const displayCount = unreadCount > 9 ? '9+' : unreadCount;
 
     return (
@@ -188,7 +190,7 @@ const NotificationDropdown = ({
   };
 
   const getNotificationBackground = (notification) => {
-    if (notification.status === 'unread') {
+    if (notification.status === 'unread' && !hasAutoMarkedAsRead && !isMarkingAsRead) {
       return 'bg-gradient-to-r from-[#BC8BBC]/10 via-[#BC8BBC]/5 to-transparent border-l-4 border-[#BC8BBC]';
     }
     return 'bg-gradient-to-r from-[#BC8BBC]/5 to-transparent';
@@ -284,7 +286,7 @@ const NotificationDropdown = ({
         disabled={loading || isMarkingAsRead}
         className="p-2 text-gray-300 hover:text-white transition-colors duration-200 hover:bg-gray-800/50 rounded-lg relative group flex-shrink-0"
       >
-        <Bell size={20} className={`group-hover:text-[#BC8BBC] transition-colors ${loading ? "animate-pulse" : ""}`} />
+        <Bell size={20} className={`group-hover:text-[#BC8BBC] transition-colors ${loading || isMarkingAsRead ? "animate-pulse" : ""}`} />
         {renderNotificationBadge()}
         {apiError && (
           <span className="absolute -top-0.5 -right-0.5 bg-yellow-500 rounded-full w-1.5 h-1.5 animate-ping"></span>
@@ -311,7 +313,7 @@ const NotificationDropdown = ({
                 <div className="min-w-0 flex-1">
                   <h3 className="font-bold text-white text-lg truncate">{t('notification.dropdown.title')}</h3>
                   <p className="text-gray-400 text-sm truncate">
-                    {unreadCount > 0 
+                    {unreadCount > 0 && !hasAutoMarkedAsRead && !isMarkingAsRead
                       ? t('notification.dropdown.unreadCount', { count: unreadCount })
                       : t('notification.dropdown.allCaughtUp')
                     }
@@ -385,7 +387,9 @@ const NotificationDropdown = ({
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <p className={`text-sm font-semibold truncate ${
-                                notification.status === 'unread' ? 'text-white' : 'text-gray-300'
+                                (notification.status === 'unread' && !hasAutoMarkedAsRead && !isMarkingAsRead) 
+                                  ? 'text-white' 
+                                  : 'text-gray-300'
                               }`}>
                                 {notification.title}
                               </p>
@@ -404,11 +408,11 @@ const NotificationDropdown = ({
                                 {formatTime(notification.created_at)}
                               </span>
                               <span className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${
-                                notification.status === 'unread' 
+                                (notification.status === 'unread' && !hasAutoMarkedAsRead && !isMarkingAsRead) 
                                   ? 'text-[#BC8BBC] bg-[#BC8BBC]/10 animate-pulse' 
                                   : 'text-green-400 bg-green-400/10'
                               }`}>
-                                {notification.status === 'read' 
+                                {notification.status === 'read' || hasAutoMarkedAsRead || isMarkingAsRead
                                   ? t('notification.status.read') 
                                   : t('notification.status.new')
                                 }

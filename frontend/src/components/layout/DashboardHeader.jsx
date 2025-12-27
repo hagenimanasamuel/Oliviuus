@@ -16,18 +16,92 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
   const [apiError, setApiError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
+  const [hasAutoMarkedAsRead, setHasAutoMarkedAsRead] = useState(false);
+  const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
 
   const [avatarUrl, setAvatarUrl] = useState(user?.profile_avatar_url || "");
   const [tempAvatar, setTempAvatar] = useState(user?.profile_avatar_url || "");
 
   const profileRef = useRef(null);
   const notifRef = useRef(null);
+  const dropdownRef = useRef(null);
   const soundRef = useRef(null);
   const lastPlayedRef = useRef(0);
   const previousUnreadCountRef = useRef(0);
 
+  // Get responsive dropdown position
+  const getDropdownPosition = () => {
+    if (windowWidth < 768) {
+      return "left-1/2 transform -translate-x-1/2 mx-auto";
+    } else {
+      return "right-0";
+    }
+  };
+
+  // Get responsive dropdown width
+  const getDropdownWidth = () => {
+    if (windowWidth < 640) {
+      return "w-[calc(100vw-2rem)] max-w-sm";
+    } else if (windowWidth < 768) {
+      return "w-[calc(100vw-3rem)] max-w-md";
+    } else if (windowWidth < 1024) {
+      return "w-80 min-w-80";
+    } else {
+      return "w-96 min-w-96";
+    }
+  };
+
   // Brand color
   const brandColor = '#BC8BBC';
+
+  // Sort notifications: unread first, then by creation date (newest first)
+  const sortedNotifications = [...notifications].sort((a, b) => {
+    // First sort by status (unread first)
+    if (a.status === 'unread' && b.status !== 'unread') return -1;
+    if (a.status !== 'unread' && b.status === 'unread') return 1;
+    
+    // Then sort by creation date (newest first)
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
+  // INSTANTLY mark as read when notifications load
+  useEffect(() => {
+    if (notifications.length > 0 && !loading && !hasAutoMarkedAsRead) {
+      instantMarkAllAsRead();
+    }
+  }, [notifications, loading]);
+
+  // Function to INSTANTLY mark all as read
+  const instantMarkAllAsRead = async () => {
+    const hasUnread = notifications.some(notif => notif.status === 'unread');
+    
+    if (hasUnread && !isMarkingAsRead) {
+      setIsMarkingAsRead(true);
+      try {
+        // Make API call immediately
+        await api.put('/notifications/read-all');
+        
+        // Update local state to prevent repeated calls
+        setHasAutoMarkedAsRead(true);
+        
+        // Update UI immediately
+        setNotifications(prev => 
+          prev.map(notif => ({ 
+            ...notif, 
+            status: 'read', 
+            read_at: new Date().toISOString() 
+          }))
+        );
+        setUnreadCount(0);
+        previousUnreadCountRef.current = 0;
+      } catch (error) {
+        console.error('Error instantly marking all as read:', error);
+        // Don't show error to user for auto-action
+      } finally {
+        setIsMarkingAsRead(false);
+      }
+    }
+  };
 
   // Initialize sound only when needed - prevent preloading that triggers download managers
   const initializeSound = useCallback(() => {
@@ -50,16 +124,6 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
       console.error('Failed to initialize notification sound:', error);
     }
   }, []);
-
-  // Sort notifications: unread first, then by creation date (newest first)
-  const sortedNotifications = [...notifications].sort((a, b) => {
-    // First sort by status (unread first)
-    if (a.status === 'unread' && b.status !== 'unread') return -1;
-    if (a.status !== 'unread' && b.status === 'unread') return 1;
-    
-    // Then sort by creation date (newest first)
-    return new Date(b.created_at) - new Date(a.created_at);
-  });
 
   // Smart sound notification player
   const playNotificationSound = useCallback(() => {
@@ -143,9 +207,17 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
       });
       
       if (response.data.success) {
-        setNotifications(response.data.data || []);
+        const fetchedNotifications = response.data.data || [];
+        setNotifications(fetchedNotifications);
         setApiError(false);
         setLastUpdate(Date.now());
+        
+        // Reset auto mark flag when fetching new notifications
+        setHasAutoMarkedAsRead(false);
+        
+        // Update unread count based on fetched data
+        const newUnreadCount = fetchedNotifications.filter(n => n.status === 'unread').length;
+        setUnreadCount(newUnreadCount);
       } else {
         throw new Error(response.data.message || 'Failed to fetch notifications');
       }
@@ -212,26 +284,7 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
     return false;
   };
 
-  // Auto-mark all visible notifications as read when dropdown opens
-  const markVisibleAsRead = async () => {
-    const unreadNotifications = notifications.filter(notif => notif.status === 'unread');
-    if (unreadNotifications.length === 0) return;
-
-    try {
-      const response = await api.put('/notifications/read-all');
-      if (response.data.success) {
-        setNotifications(prev => 
-          prev.map(notif => ({ ...notif, status: 'read', read_at: new Date().toISOString() }))
-        );
-        setUnreadCount(0);
-        previousUnreadCountRef.current = 0;
-      }
-    } catch (error) {
-      console.error('Error marking visible as read:', error);
-    }
-  };
-
-  // Mark all as read using API instance
+  // Manual mark all as read using API instance
   const markAllAsRead = async () => {
     try {
       const response = await api.put('/notifications/read-all');
@@ -242,6 +295,7 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
         );
         setUnreadCount(0);
         previousUnreadCountRef.current = 0;
+        setHasAutoMarkedAsRead(true);
       }
     } catch (error) {
       console.error('Error marking all as read:', error);
@@ -251,7 +305,7 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
   // Auto-mark notification as read when opened/clicked and handle navigation
   const handleNotificationClick = async (notification) => {
     // Mark as read immediately if unread
-    if (notification.status === 'unread') {
+    if (notification.status === 'unread' && !hasAutoMarkedAsRead) {
       await markAsRead(notification.id);
     }
 
@@ -279,10 +333,8 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
     setNotifOpen(!wasOpen);
     
     if (!wasOpen) {
-      // First time opening - fetch notifications and auto-mark as read
+      // First time opening - fetch notifications
       await fetchNotifications();
-      // Auto-mark all visible as read when dropdown opens
-      await markVisibleAsRead();
     }
   };
 
@@ -295,6 +347,19 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Close and reopen dropdown on resize for responsive positioning
+  useEffect(() => {
+    const handleResize = () => {
+      if (notifOpen) {
+        setNotifOpen(false);
+        setTimeout(() => setNotifOpen(true), 10);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [notifOpen]);
 
   // Initialize and set up real-time checks
   useEffect(() => {
@@ -391,6 +456,9 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
   };
 
   const getReadStatusIcon = (status) => {
+    if (hasAutoMarkedAsRead || isMarkingAsRead) {
+      return <CheckCircle size={14} className="text-green-400 flex-shrink-0" />;
+    }
     return status === 'read' ? (
       <CheckCircle size={14} className="text-green-400 flex-shrink-0" />
     ) : (
@@ -400,7 +468,7 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
 
   // Professional notification badge display
   const renderNotificationBadge = () => {
-    if (unreadCount === 0 || apiError) return null;
+    if (unreadCount === 0 || apiError || hasAutoMarkedAsRead || isMarkingAsRead) return null;
 
     // Show number up to 9, then 9+
     const displayCount = unreadCount > 9 ? '9+' : unreadCount;
@@ -410,6 +478,13 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
         {displayCount}
       </span>
     );
+  };
+
+  const getNotificationBackground = (notification) => {
+    if (notification.status === 'unread' && !hasAutoMarkedAsRead && !isMarkingAsRead) {
+      return 'bg-gradient-to-r from-[#BC8BBC]/5 to-transparent border-l-2 border-[#BC8BBC]';
+    }
+    return 'bg-transparent';
   };
 
   return (
@@ -444,9 +519,9 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
             <button
               className="relative cursor-pointer transition-colors hover:text-[#BC8BBC] disabled:opacity-50 group"
               onClick={handleBellClick}
-              disabled={loading}
+              disabled={loading || isMarkingAsRead}
             >
-              <Bell size={22} className={`group-hover:text-[#BC8BBC] transition-colors ${loading ? "animate-pulse" : ""}`} />
+              <Bell size={22} className={`group-hover:text-[#BC8BBC] transition-colors ${loading || isMarkingAsRead ? "animate-pulse" : ""}`} />
               {renderNotificationBadge()}
               {apiError && (
                 <span className="absolute -top-0.5 -right-0.5 bg-yellow-500 rounded-full w-1.5 h-1.5"></span>
@@ -454,28 +529,39 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
             </button>
 
             {notifOpen && (
-              <div className="absolute right-0 mt-2 w-96 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-50 backdrop-blur-sm">
-                <div className="px-4 py-3 border-b border-gray-700 bg-gray-900/95">
+              <div 
+                ref={dropdownRef}
+                className={`fixed sm:absolute ${getDropdownPosition()} top-16 sm:top-12 ${getDropdownWidth()} bg-gray-800/95 backdrop-blur-xl border border-gray-600/50 rounded-2xl shadow-2xl overflow-hidden z-50`}
+                style={{
+                  maxWidth: 'calc(100vw - 2rem)'
+                }}
+              >
+                <div className="px-4 py-3 border-b border-gray-600/50 bg-gradient-to-r from-gray-800 to-gray-900">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-white">Notifications</span>
                       <span className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded-full">
                         Updated {formatTime(new Date(lastUpdate))}
                       </span>
+                      {isMarkingAsRead && (
+                        <span className="text-xs text-[#BC8BBC] animate-pulse bg-[#BC8BBC]/10 px-2 py-1 rounded-full">
+                          Marking as read...
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={refreshNotifications}
-                        disabled={loading}
+                        disabled={loading || isMarkingAsRead}
                         className="text-xs text-gray-400 hover:text-[#BC8BBC] transition-colors disabled:opacity-50 p-1 rounded-lg hover:bg-gray-700"
                         title="Refresh"
                       >
                         ↻
                       </button>
-                      {unreadCount > 0 && !apiError && (
+                      {unreadCount > 0 && !apiError && !hasAutoMarkedAsRead && !isMarkingAsRead && (
                         <button 
                           onClick={markAllAsRead}
-                          disabled={loading}
+                          disabled={loading || isMarkingAsRead}
                           className="text-xs text-[#BC8BBC] hover:text-[#9b69b2] transition-colors disabled:opacity-50 px-2 py-1 rounded-lg border border-[#BC8BBC] hover:border-[#9b69b2] font-medium"
                         >
                           Mark all read
@@ -514,9 +600,7 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
                           <li 
                             key={notification.id}
                             className={`group transition-all duration-200 ${
-                              notification.status === 'unread' 
-                                ? 'bg-gradient-to-r from-[#BC8BBC]/5 to-transparent border-l-2 border-[#BC8BBC]' 
-                                : 'bg-transparent'
+                              getNotificationBackground(notification)
                             } ${
                               notification.action_url 
                                 ? 'cursor-pointer hover:bg-gray-700/50' 
@@ -535,7 +619,9 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-start justify-between gap-2 mb-1">
                                     <p className={`text-sm font-semibold truncate ${
-                                      notification.status === 'unread' ? 'text-white font-bold' : 'text-gray-300'
+                                      (notification.status === 'unread' && !hasAutoMarkedAsRead && !isMarkingAsRead) 
+                                        ? 'text-white font-bold' 
+                                        : 'text-gray-300'
                                     }`}>
                                       {notification.title}
                                     </p>
@@ -551,9 +637,14 @@ export default function DashboardHeader({ user, onLogout, onMenuToggle }) {
                                       {formatTime(notification.created_at)}
                                     </span>
                                     <span className={`text-xs font-medium ${
-                                      notification.status === 'unread' ? 'text-[#BC8BBC]' : 'text-green-400'
+                                      (notification.status === 'unread' && !hasAutoMarkedAsRead && !isMarkingAsRead) 
+                                        ? 'text-[#BC8BBC]' 
+                                        : 'text-green-400'
                                     }`}>
-                                      {notification.status === 'read' ? 'Read' : 'New'}
+                                      {notification.status === 'read' || hasAutoMarkedAsRead || isMarkingAsRead 
+                                        ? 'Read' 
+                                        : 'New'
+                                      }
                                     </span>
                                   </div>
                                 </div>

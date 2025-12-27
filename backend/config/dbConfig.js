@@ -32,6 +32,7 @@ const createUsersTable = async () => {
       subscription_plan ENUM('none', 'free_trial', 'basic', 'standard', 'premium', 'custom') DEFAULT 'none',
       role ENUM('viewer', 'admin') DEFAULT 'viewer',
       profile_avatar_url VARCHAR(255) DEFAULT NULL,
+      onboarding_completed BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
@@ -2871,6 +2872,130 @@ const insertGameSkillMappings = async () => {
 };
 
 
+const initializeDatabase = async () => {
+  try {
+    console.log("🚀 Starting database initialization...");
+    
+    // ====================
+    // PHASE 1: ABSOLUTE CORE TABLES (no foreign keys or self-contained)
+    // ====================
+    console.log("📦 Phase 1: Creating core tables...");
+    await createUsersTable(); // Must be FIRST - everything references this
+    await createEmailVerificationsTable();
+    await createRolesTable();
+    await createContactInfoTable(); // No foreign keys
+    
+    // ====================
+    // PHASE 2: SIMPLE USER DEPENDENCIES
+    // ====================
+    console.log("👤 Phase 2: Creating user-dependent tables...");
+    await createUserPreferencesTable(); // References users
+    await createPasswordResetsTable(); // References users
+    await createSecurityLogsTable(); // References users
+    await createFeedbackTable(); // References users
+    
+    // ====================
+    // PHASE 3: CONTENT FOUNDATION
+    // ====================
+    console.log("🎬 Phase 3: Creating content foundation...");
+    await createContentTables(); // This creates contents, genres, categories, media_assets
+    await createPeopleTables(); // Creates people table
+    
+    // ====================
+    // PHASE 4: TABLES THAT REFERENCE CONTENT
+    // ====================
+    console.log("📊 Phase 4: Creating content-dependent tables...");
+    // These need contents table to exist first
+    await createUserPreferencesTables(); // user_watchlist, user_likes
+    await createWatchTrackingTables(); // content_watch_sessions, etc
+    await createShareTables(); // content_shares
+    // Note: createPeopleTables already called in Phase 3, remove duplicate if needed
+    
+    // ====================
+    // PHASE 5: CONTACT TABLES (depend on users and contacts)
+    // ====================
+    console.log("📞 Phase 5: Creating contact tables...");
+    await createContactsTable(); // References users
+    await createContactResponsesTable(); // References contacts and users
+    
+    // ====================
+    // PHASE 6: SUBSCRIPTIONS
+    // ====================
+    console.log("💳 Phase 6: Creating subscription tables...");
+    await createSubscriptionsTables();
+    
+    // ====================
+    // PHASE 7: KIDS PROFILES
+    // ====================
+    console.log("👶 Phase 7: Creating kids tables...");
+    await createKidsTables(); // References users
+    
+    // ====================
+    // PHASE 8: FAMILY
+    // ====================
+    console.log("👨‍👩‍👧‍👦 Phase 8: Creating family tables...");
+    await createFamilyMembersTable(); // References users
+    await createFamilyPinSecurityTable(); // References family_members
+    
+    // ====================
+    // PHASE 9: GAMES
+    // ====================
+    console.log("🎮 Phase 9: Creating game tables...");
+    await createGameTables(); // References users and kids_profiles
+    
+    // ====================
+    // PHASE 10: ROLE FEATURES
+    // ====================
+    console.log("🔐 Phase 10: Creating role features...");
+    await createRoleFeaturesTable(); // References roles
+    
+    // ====================
+    // PHASE 11: NOTIFICATIONS
+    // ====================
+    console.log("🔔 Phase 11: Creating notifications...");
+    await createNotificationsTable(); // References users
+    
+    // ====================
+    // PHASE 12: USER SESSION (LAST - references everything)
+    // ====================
+    console.log("💻 Phase 12: Creating user session...");
+    await createUserSessionTable(); // References users and kids_profiles
+    
+    console.log("✅ All tables created successfully!");
+    
+    // ====================
+    // INSERT DEFAULT DATA
+    // ====================
+    console.log("📥 Inserting default data...");
+    // First, check if we need to insert default genres/categories
+    const checkGenres = await query("SELECT COUNT(*) as count FROM genres");
+    if (checkGenres[0].count === 0) {
+      await insertDefaultGenres();
+    }
+    
+    const checkCategories = await query("SELECT COUNT(*) as count FROM categories");
+    if (checkCategories[0].count === 0) {
+      await insertDefaultCategories();
+    }
+    
+    console.log("✅ Database initialization complete!");
+    return true;
+    
+  } catch (err) {
+    console.error("❌ Error initializing database:", err);
+    // Log more details about the error
+    if (err.code === 'ER_CANT_CREATE_TABLE') {
+      console.error("Foreign key constraint error details:", {
+        message: err.sqlMessage,
+        sql: err.sql ? err.sql.substring(0, 500) + "..." : 'No SQL available',
+        code: err.code
+      });
+    }
+    return false;
+  }
+};
+
+
 
 module.exports = {
   db,
@@ -2897,5 +3022,6 @@ module.exports = {
   createFamilyMembersTable,
   createFamilyPinSecurityTable,
   createFeedbackTable,
-  createGameTables
+  createGameTables,
+  initializeDatabase
 };

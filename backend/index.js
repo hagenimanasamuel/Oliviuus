@@ -26,6 +26,8 @@ const {
   createFamilyPinSecurityTable,
   createFeedbackTable,
   createGameTables,
+  initializeDatabase, 
+  query
 } = require('./config/dbConfig');
 const { initializeSubscriptionMonitor } = require('./controllers/subscriptionMonitorController');
 const createAdminSeed = require('./seeds/seedAdmin');
@@ -77,13 +79,10 @@ app.use(express.json());
 // use cookie parser 
 app.use(cookieParser());
 
-// CORS
+// Enhanced CORS headers configuration
 const allowedOrigins = [
   process.env.CLIENT_ORIGIN,
-  process.env.CLIENT_URL,
-  'https://oliviuus.com',
-  'https://www.oliviuus.com',
-  "http://localhost:5173/"
+  "http://localhost:5173"
 ];
 
 app.use(cors({
@@ -99,8 +98,100 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Set-Cookie', 'Date', 'ETag']
+  
+  // Enhanced allowedHeaders for production use
+  allowedHeaders: [
+    // Essential headers
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    
+    // Cache control (you already had these)
+    'Cache-Control',
+    'Pragma',
+    
+    // Additional standard headers for better compatibility
+    'Accept',
+    'Accept-Language',
+    'Accept-Encoding',
+    
+    // Security headers
+    'X-CSRF-Token',
+    'X-XSRF-Token',
+    
+    // Custom application headers
+    'X-Client-Version',
+    'X-API-Key',
+    'X-Request-ID',
+    
+    // File upload headers
+    'Content-Disposition',
+    'Content-Length',
+    
+    // Real-time/WebSocket headers
+    'Upgrade',
+    'Connection',
+    'Sec-WebSocket-Key',
+    'Sec-WebSocket-Version',
+    
+    // Conditional requests
+    'If-Modified-Since',
+    'If-None-Match',
+    'If-Match',
+    'If-Unmodified-Since',
+    
+    // Range requests
+    'Range',
+    
+    // CORS headers themselves
+    'Origin',
+    
+    // Analytics/telemetry
+    'User-Agent',
+    'Referer',
+    'DNT', // Do Not Track
+  ],
+  
+  // Enhanced exposedHeaders for production use
+  exposedHeaders: [
+    // You already had these
+    'Set-Cookie',
+    'Date',
+    'ETag',
+    
+    // Additional headers clients should be able to access
+    'Content-Length',
+    'Content-Type',
+    'Content-Disposition',
+    
+    // Cache information
+    'Last-Modified',
+    'Cache-Control',
+    'Expires',
+    
+    // Rate limiting information
+    'X-RateLimit-Limit',
+    'X-RateLimit-Remaining',
+    'X-RateLimit-Reset',
+    
+    // Application-specific headers
+    'X-Request-ID',
+    'X-Response-Time',
+    'X-Powered-By',
+    
+    // Pagination headers
+    'Link',
+    'X-Total-Count',
+    'X-Total-Pages',
+    'X-Current-Page',
+    'X-Per-Page',
+    
+    // Security headers
+    'Strict-Transport-Security',
+    'X-Content-Type-Options',
+    'X-Frame-Options',
+    'X-XSS-Protection',
+  ]
 }));
 
 app.use((req, res, next) => {
@@ -161,65 +252,46 @@ app.get('/api/health', (req, res) => {
   res.json({ status: "ok", message: "API is running" });
 });
 
-// Create tables if not exist
-// Create tables if not exist
-Promise.all([
-  // Layer 1: Foundation tables
-  createUsersTable(),
-  createEmailVerificationsTable(),
-  createRolesTable(),
-  createContactInfoTable(),
-  
-  // Layer 2: Direct user dependencies
-  createUserPreferencesTable(),
-  createPasswordResetsTable(),
-  createContactsTable(),
-  createRoleFeaturesTable(),
-  createNotificationsTable(),
-  createSecurityLogsTable(),
-  createFeedbackTable(), // Moved up - only depends on users
-  
-  // Layer 3: Contact responses
-  createContactResponsesTable(),
-  
-  // Layer 4: Subscriptions ecosystem
-  createSubscriptionsTables(), // This creates multiple tables internally
-  
-  // Layer 5: Content foundation
-  createContentTables(), // This creates genres, categories, contents, etc.
-  createPeopleTables(), // This creates people and related tables
-  
-  // Layer 6: Content relationships (run after contentTables)
-  // Note: contentTables already creates these internally, so no separate call needed
-  
-  // Layer 7: Kids foundation
-  createKidsTables(), // This creates kids_profiles and related tables
-  
-  // Layer 8: Games ecosystem
-  createGameTables(), // This creates games and related tables
-  
-  // Layer 9: Family ecosystem
-  createFamilyMembersTable(),
-  createFamilyPinSecurityTable(),
-  
-  // Layer 10: Watch tracking (must be after contentTables)
-  createWatchTrackingTables(),
-  createUserPreferencesTables(), // watchlist and likes
-  createShareTables(),
-  
-  // Layer 11: user_session (LAST because it references kids_profiles)
-  createUserSessionTable()
-])
-.then(async () => {
-  console.log("✅ All tables checked/created");
-  await createAdminSeed();
+// Initialize database and start server
+const startServer = async () => {
+  try {
+    console.log("🔧 Initializing database...");
+    
+    // Step 1: Initialize database tables
+    const dbInitialized = await initializeDatabase();
+    
+    if (!dbInitialized) {
+      console.error("❌ Failed to initialize database. Server cannot start.");
+      process.exit(1);
+    }
+    
+    // Step 2: Create admin seed (AFTER tables are created)
+    console.log("👑 Creating admin user...");
+    try {
+      await createAdminSeed();
+      console.log("✅ Admin user created/verified");
+    } catch (seedError) {
+      console.error("⚠️ Warning: Could not create admin seed:", seedError.message);
+      // Don't fail the server if admin seed fails - it might already exist
+    }
+    
+    // Step 3: Start subscription monitor
+    console.log("🚀 Starting subscription monitor...");
+    initializeSubscriptionMonitor();
+    
+    // Step 4: Start the server
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log("✅ Database initialized successfully!");
+      console.log("✅ Subscription monitor started");
+    });
+    
+  } catch (error) {
+    console.error("❌ Failed to start server:", error);
+    process.exit(1);
+  }
+};
 
-  // 🚀 Initialize subscription monitor AFTER tables are ready
-  initializeSubscriptionMonitor();
-  console.log("✅ Subscription monitor started");
-})
-.catch(err => console.error("❌ Error creating tables:", err));
-
-// Running url port
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// Start the server
+startServer();

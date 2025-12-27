@@ -27,7 +27,7 @@ const FORBIDDEN_KID_ROUTES = [
   '/admin/library',
   '/admin/subscriptions',
   '/admin/analytics',
-  '/admin/global-management',
+  '/admin/games',
   '/admin/support',
   '/subscription',
   '/payment',

@@ -2465,6 +2465,526 @@ const handleBulkDelete = async (userIds, results) => {
   }
 };
 
+// ✅ Get available genres from database
+const getAvailableGenres = async (req, res) => {
+  try {
+    const genres = await query(`
+      SELECT 
+        id,
+        name,
+        slug,
+        description,
+        sort_order
+      FROM genres 
+      WHERE is_active = TRUE
+      ORDER BY sort_order ASC, name ASC
+    `);
+
+    // Also get categories if you want to include them
+    const categories = await query(`
+      SELECT 
+        id,
+        name,
+        slug,
+        description,
+        sort_order
+      FROM categories 
+      WHERE is_active = TRUE
+      ORDER BY sort_order ASC, name ASC
+    `);
+
+    res.status(200).json({
+      genres: genres,
+      categories: categories,
+      total: genres.length
+    });
+  } catch (err) {
+    console.error("Error fetching genres:", err);
+    res.status(500).json({ message: "Failed to fetch available genres" });
+  }
+};
+
+// ✅ Get user onboarding status
+const getOnboardingStatus = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const result = await query(
+      "SELECT onboarding_completed FROM users WHERE id = ?",
+      [userId]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      onboarding_completed: result[0].onboarding_completed || false
+    });
+  } catch (err) {
+    console.error("Error getting onboarding status:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get onboarding status"
+    });
+  }
+};
+
+// ✅ Complete user onboarding
+const completeOnboarding = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    // Mark onboarding as completed
+    await query(
+      "UPDATE users SET onboarding_completed = TRUE, updated_at = NOW() WHERE id = ?",
+      [userId]
+    );
+
+    // Log the onboarding completion
+    await query(
+      `INSERT INTO security_logs (user_id, action, ip_address, status, details) 
+       VALUES (?, 'onboarding_completed', ?, 'success', ?)`,
+      [
+        userId,
+        req.ip || 'unknown',
+        JSON.stringify({
+          completed_at: new Date().toISOString()
+        })
+      ]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Onboarding completed successfully",
+      onboarding_completed: true
+    });
+  } catch (err) {
+    console.error("Error completing onboarding:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to complete onboarding"
+    });
+  }
+};
+
+// ✅ Get all kid profiles (for Specials tab)
+const getKidProfiles = async (req, res) => {
+  try {
+    const kidProfiles = await query(`
+      SELECT 
+        kp.*,
+        u.email as parent_email,
+        u.id as parent_id,
+        CONCAT(u.first_name, ' ', u.last_name) as parent_name,
+        (
+          SELECT COUNT(*) 
+          FROM kids_viewing_history 
+          WHERE kid_profile_id = kp.id
+        ) as total_viewing_sessions,
+        (
+          SELECT COUNT(*) 
+          FROM kids_watchlist 
+          WHERE kid_profile_id = kp.id
+        ) as watchlist_items,
+        (
+          SELECT COUNT(*) 
+          FROM parent_notifications 
+          WHERE kid_profile_id = kp.id 
+          AND status = 'pending'
+        ) as pending_notifications,
+        (
+          SELECT SUM(watch_duration_seconds) 
+          FROM kids_viewing_history 
+          WHERE kid_profile_id = kp.id
+        ) as total_watch_seconds
+      FROM kids_profiles kp
+      LEFT JOIN users u ON kp.parent_user_id = u.id
+      ORDER BY kp.created_at DESC
+    `);
+
+    // Convert watch seconds to minutes for display
+    const formattedProfiles = kidProfiles.map(profile => ({
+      ...profile,
+      total_watch_time_minutes: Math.round((profile.total_watch_seconds || 0) / 60),
+      calculated_age: calculateAgeFromDB(profile.birth_date)
+    }));
+
+    res.status(200).json({
+      profiles: formattedProfiles,
+      total: formattedProfiles.length
+    });
+  } catch (err) {
+    console.error("Error fetching kid profiles:", err);
+    res.status(500).json({ message: "Failed to fetch kid profiles." });
+  }
+};
+
+// Helper function to calculate age from birth date
+const calculateAgeFromDB = (birthDate) => {
+  if (!birthDate) return 0;
+  const birth = new Date(birthDate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+};
+
+// ✅ Get kid viewing history
+const getKidViewingHistory = async (req, res) => {
+  try {
+    const { kidId } = req.params;
+    
+    const history = await query(`
+      SELECT 
+        kvh.*,
+        c.title as content_title,
+        c.content_type,
+        ma.file_name as media_file,
+        ma.asset_type
+      FROM kids_viewing_history kvh
+      LEFT JOIN contents c ON kvh.content_id = c.id
+      LEFT JOIN media_assets ma ON kvh.media_asset_id = ma.id
+      WHERE kvh.kid_profile_id = ?
+      ORDER BY kvh.started_at DESC
+      LIMIT 50
+    `, [kidId]);
+
+    const formattedHistory = history.map(item => ({
+      ...item,
+      watch_duration_minutes: Math.round(item.watch_duration_seconds / 60)
+    }));
+
+    res.status(200).json({
+      history: formattedHistory,
+      total: formattedHistory.length
+    });
+  } catch (err) {
+    console.error("Error fetching viewing history:", err);
+    res.status(500).json({ message: "Failed to fetch viewing history." });
+  }
+};
+
+// ✅ Get all family members (for FamilyPlan tab)
+const getFamilyMembers = async (req, res) => {
+  try {
+    const familyMembers = await query(`
+      SELECT 
+        fm.*,
+        u.email as user_email,
+        CONCAT(u.first_name, ' ', u.last_name) as user_name,
+        ou.email as owner_email,
+        CONCAT(ou.first_name, ' ', ou.last_name) as owner_name,
+        fm.created_at as invited_at,
+        fm.joined_at,
+        (
+          SELECT COUNT(*) 
+          FROM user_session 
+          WHERE user_id = fm.user_id 
+          AND is_active = TRUE
+        ) as active_sessions,
+        (
+          SELECT MAX(login_time)
+          FROM user_session 
+          WHERE user_id = fm.user_id
+        ) as last_login
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      LEFT JOIN users ou ON fm.family_owner_id = ou.id
+      ORDER BY fm.created_at DESC
+    `);
+
+    res.status(200).json({
+      members: familyMembers,
+      total: familyMembers.length
+    });
+  } catch (err) {
+    console.error("Error fetching family members:", err);
+    res.status(500).json({ message: "Failed to fetch family members." });
+  }
+};
+
+// ✅ Invite new family member
+const inviteFamilyMember = async (req, res) => {
+  try {
+    const { email, role, relationship, dashboardType } = req.body;
+    const ownerId = req.user.id;
+
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ message: "Valid email is required." });
+    }
+
+    // Check if user exists
+    const user = await query("SELECT id, email, first_name, last_name FROM users WHERE email = ?", [email]);
+    
+    if (user.length === 0) {
+      return res.status(404).json({ message: "User not found with this email." });
+    }
+
+    const userId = user[0].id;
+
+    // Check if already a family member
+    const existingMember = await query(
+      "SELECT id FROM family_members WHERE user_id = ? AND family_owner_id = ?",
+      [userId, ownerId]
+    );
+
+    if (existingMember.length > 0) {
+      return res.status(400).json({ message: "User is already a family member." });
+    }
+
+    // Create invitation
+    const invitationToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+
+    await query(`
+      INSERT INTO family_members (
+        user_id, family_owner_id, member_role, relationship, 
+        dashboard_type, invitation_status, invitation_token,
+        invitation_expires_at, invited_by, created_at
+      ) VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?, NOW())
+    `, [userId, ownerId, role, relationship, dashboardType, invitationToken, expiresAt, ownerId]);
+
+    // Get owner info for email
+    const ownerInfo = await query(
+      "SELECT email, first_name, last_name FROM users WHERE id = ?",
+      [ownerId]
+    );
+
+    // Send invitation email (you would implement this)
+    /*
+    await sendInvitationEmail({
+      to: email,
+      ownerName: ownerInfo[0]?.first_name || 'Family Owner',
+      invitationToken,
+      expiresAt
+    });
+    */
+
+    res.status(200).json({
+      message: "Invitation sent successfully.",
+      invitation_sent: true,
+      email: email,
+      expires_at: expiresAt,
+      user_details: {
+        id: userId,
+        name: `${user[0].first_name} ${user[0].last_name}`,
+        email: user[0].email
+      }
+    });
+  } catch (err) {
+    console.error("Error inviting family member:", err);
+    res.status(500).json({ message: "Failed to send invitation." });
+  }
+};
+
+// ✅ Update family member status/restrictions
+const updateFamilyMember = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const updates = req.body;
+
+    // Check if member exists and belongs to current user
+    const memberCheck = await query(`
+      SELECT fm.*, u.email as user_email 
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      WHERE fm.id = ? AND fm.family_owner_id = ?
+    `, [memberId, req.user.id]);
+
+    if (memberCheck.length === 0) {
+      return res.status(404).json({ message: "Family member not found or you don't have permission." });
+    }
+
+    // Build update query dynamically
+    const updateFields = [];
+    const updateValues = [];
+
+    Object.keys(updates).forEach(key => {
+      if (key !== 'id' && key !== 'user_id' && key !== 'family_owner_id') {
+        updateFields.push(`${key} = ?`);
+        updateValues.push(updates[key]);
+      }
+    });
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ message: "No updates provided." });
+    }
+
+    // Add updated_at timestamp
+    updateFields.push("updated_at = NOW()");
+    
+    updateValues.push(memberId);
+
+    const result = await query(
+      `UPDATE family_members SET ${updateFields.join(', ')} WHERE id = ?`,
+      updateValues
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Member not found." });
+    }
+
+    // If suspending a member, also log them out
+    if (updates.is_suspended === true) {
+      await query(
+        "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
+        [memberCheck[0].user_id]
+      );
+    }
+
+    res.status(200).json({ 
+      message: "Member updated successfully.",
+      updated: true,
+      member_id: memberId
+    });
+  } catch (err) {
+    console.error("Error updating family member:", err);
+    res.status(500).json({ message: "Failed to update member." });
+  }
+};
+
+// ✅ Get detailed kid profile info
+const getKidProfileDetails = async (req, res) => {
+  try {
+    const { kidId } = req.params;
+
+    const kidProfile = await query(`
+      SELECT 
+        kp.*,
+        u.email as parent_email,
+        CONCAT(u.first_name, ' ', u.last_name) as parent_name,
+        kcr.max_age_rating,
+        kcr.allow_movies,
+        kcr.allow_series,
+        kcr.blocked_genres,
+        kcr.allowed_genres,
+        vtl.daily_time_limit_minutes,
+        vtl.current_daily_usage,
+        vtl.weekly_time_limit_minutes,
+        vtl.current_weekly_usage,
+        vtl.allowed_start_time,
+        vtl.allowed_end_time,
+        COUNT(DISTINCT kvh.id) as total_viewing_sessions,
+        COUNT(DISTINCT kw.id) as watchlist_items,
+        COUNT(DISTINCT pn.id) as total_notifications
+      FROM kids_profiles kp
+      LEFT JOIN users u ON kp.parent_user_id = u.id
+      LEFT JOIN kids_content_restrictions kcr ON kp.id = kcr.kid_profile_id
+      LEFT JOIN viewing_time_limits vtl ON kp.id = vtl.kid_profile_id
+      LEFT JOIN kids_viewing_history kvh ON kp.id = kvh.kid_profile_id
+      LEFT JOIN kids_watchlist kw ON kp.id = kw.kid_profile_id
+      LEFT JOIN parent_notifications pn ON kp.id = pn.kid_profile_id
+      WHERE kp.id = ?
+      GROUP BY kp.id, u.id, kcr.id, vtl.id
+    `, [kidId]);
+
+    if (kidProfile.length === 0) {
+      return res.status(404).json({ message: "Kid profile not found." });
+    }
+
+    res.status(200).json({
+      profile: kidProfile[0]
+    });
+  } catch (err) {
+    console.error("Error fetching kid profile details:", err);
+    res.status(500).json({ message: "Failed to fetch kid profile details." });
+  }
+};
+
+// ✅ Delete kid profile
+const deleteKidProfile = async (req, res) => {
+  try {
+    const { kidId } = req.params;
+    const adminId = req.user.id;
+
+    // Verify admin has permission (either admin or parent of the kid)
+    const kidProfile = await query(
+      "SELECT parent_user_id FROM kids_profiles WHERE id = ?",
+      [kidId]
+    );
+
+    if (kidProfile.length === 0) {
+      return res.status(404).json({ message: "Kid profile not found." });
+    }
+
+    // Check if admin is either the parent or a system admin
+    const adminUser = await query(
+      "SELECT role FROM users WHERE id = ?",
+      [adminId]
+    );
+
+    const isAdmin = adminUser[0]?.role === 'admin';
+    const isParent = kidProfile[0].parent_user_id === adminId;
+
+    if (!isAdmin && !isParent) {
+      return res.status(403).json({ message: "You don't have permission to delete this profile." });
+    }
+
+    // Delete the kid profile (cascade will handle related records)
+    await query("DELETE FROM kids_profiles WHERE id = ?", [kidId]);
+
+    res.status(200).json({
+      message: "Kid profile deleted successfully.",
+      deleted: true,
+      kid_id: kidId
+    });
+  } catch (err) {
+    console.error("Error deleting kid profile:", err);
+    res.status(500).json({ message: "Failed to delete kid profile." });
+  }
+};
+
+// ✅ Remove family member
+const removeFamilyMember = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const adminId = req.user.id;
+
+    // Check if member exists and admin has permission
+    const member = await query(
+      "SELECT id, family_owner_id FROM family_members WHERE id = ?",
+      [memberId]
+    );
+
+    if (member.length === 0) {
+      return res.status(404).json({ message: "Family member not found." });
+    }
+
+    // Check if admin is either the owner or a system admin
+    const adminUser = await query(
+      "SELECT role FROM users WHERE id = ?",
+      [adminId]
+    );
+
+    const isAdmin = adminUser[0]?.role === 'admin';
+    const isOwner = member[0].family_owner_id === adminId;
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: "You don't have permission to remove this member." });
+    }
+
+    // Remove the family member
+    await query("DELETE FROM family_members WHERE id = ?", [memberId]);
+
+    res.status(200).json({
+      message: "Family member removed successfully.",
+      removed: true,
+      member_id: memberId
+    });
+  } catch (err) {
+    console.error("Error removing family member:", err);
+    res.status(500).json({ message: "Failed to remove family member." });
+  }
+};
+
 
 module.exports = {
   deactivateAccount,
@@ -2501,4 +3021,15 @@ module.exports = {
   markNotificationAsRead,
   archiveNotification,
   bulkUserOperations,
+  getAvailableGenres,
+  completeOnboarding,
+  getOnboardingStatus,
+    getKidProfiles,
+  getKidViewingHistory,
+  getKidProfileDetails,
+  deleteKidProfile,
+  getFamilyMembers,
+  inviteFamilyMember,
+  updateFamilyMember,
+  removeFamilyMember
 };

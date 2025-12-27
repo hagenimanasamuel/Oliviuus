@@ -95,7 +95,35 @@
     "save": "Save Preferences",
     "saving": "Saving...",
     "update_success": "Preferences updated successfully!",
-    "update_error": "Failed to update preferences."
+    "update_error": "Failed to update preferences.",
+    "language_description": "This will change the interface language across the platform",
+    "notifications_label": "Notifications",
+    "notifications_description": "Receive email notifications about new content and updates",
+    "subtitles_label": "Auto Subtitles",
+    "subtitles_description": "Automatically show subtitles when available",
+    "genres_title": "Preferred Genres",
+    "genres_selected": "selected",
+    "genres_description": "Select your favorite genres for personalized recommendations",
+    "show_less": "Show Less",
+    "show_all": "Show All",
+    "clear_all": "Clear All",
+    "select_all_visible": "Select All Visible",
+    "search_placeholder": "Search genres by name...",
+    "filter_by_category": "Filter by Category:",
+    "all_categories": "All Categories",
+    "selected_genres": "Selected Genres",
+    "loading_genres": "Loading genres...",
+    "no_genres_found": "No genres found",
+    "clear_filters": "Clear Filters",
+    "showing_genres": "Showing {{count}} of {{total}} genres",
+    "load_all_genres": "Load All Genres",
+    "save_preferences_title": "Save Preferences",
+    "unsaved_changes": "You have unsaved changes in your preferences",
+    "all_up_to_date": "All your preferences are up to date",
+    "reset": "Reset",
+    "save_changes": "Save Changes",
+    "all_changes_saved": "All Changes Saved ✓",
+    "save_failed": "Save Failed"
   },
   "genres": {
     "comedy": "Comedy",
@@ -168,7 +196,7 @@
     "library": "Library",
     "subscriptions": "Subscriptions",
     "analytics": "Analytics",
-    "globalManagement": "Global Management",
+    "games": "Games",
     "support": "Support"
   },
   "usersHeader": {
@@ -2818,6 +2846,8 @@
     }
   },
   "games": {
+      "pageTitle": "Game Management",
+    "pageDescription": "Manage educational games, categories, and skills",
     "play": "Play",
     "title": "Kids Games",
     "subtitle": "{{count}} fun learning games available",
@@ -6173,5 +6203,278 @@
       "check": "Check for Updates"
     },
     "footer": "Download feature expected to launch Soon. Stay tuned for updates!"
+  },
+  "onboarding": {
+    "welcome_to": "Welcome to",
+    "welcome_subtitle": "Let's personalize your streaming experience in just a few simple steps.",
+    "continue_to_start": "Click continue below to get started",
+    "step1_title": "What do you love to watch?",
+    "step1_subtitle": "Select your favorite genres for personalized recommendations",
+    "selected_genres": "Selected {{count}} genres",
+    "step2_title": "Customize your experience",
+    "step2_subtitle": "Make Oliviuus work the way you want",
+    "language": "Language",
+    "language_subtitle": "Choose your interface language",
+    "notifications": "Notifications",
+    "notifications_subtitle": "Get updates about new content",
+    "auto_play": "Auto-play",
+    "auto_play_subtitle": "Play next episode automatically",
+    "dark_mode": "Dark Mode",
+    "dark_mode_subtitle": "Immersive dark experience",
+    "on": "ON",
+    "step3_title": "You're all set! 🎉",
+    "step3_subtitle": "Your personalized Oliviuus experience is ready. Get ready for amazing entertainment!",
+    "your_preferences": "Your Preferences",
+    "selected_genres_label": "Selected Genres",
+    "language_label": "Language",
+    "notifications_label": "Notifications",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "previous": "Previous",
+    "skip": "Skip",
+    "skipping": "Skipping...",
+    "continue": "Continue",
+    "start_streaming": "Start Streaming",
+    "saving": "Saving...",
+    "error": "Error",
+    "skip_error": "Failed to skip onboarding. Please try again.",
+    "complete_error": "Failed to save your preferences. Please try again."
+  },
+  "gamesTabs": {
+    "allGames": "All Games",
+    "gameAnalytics": "Game Analytics",
+    "categories": "Categories",
+    "skillsManagement": "Skills Management",
+    "bulkOperations": "Bulk Operations",
+    "more": "More"
+  },
+  "gamesHeader": {
+    "allGames": "All Games",
+    "filtered": "filtered",
+    "searchPlaceholder": "Search games by title, description...",
+    "refresh": "Refresh",
+    "bulkActions": "Bulk Actions ({{count}})",
+    "activateSelected": "Activate Selected",
+    "deactivateSelected": "Deactivate Selected",
+    "featureSelected": "Feature Selected",
+    "deleteSelected": "Delete Selected",
+    "export": "Export",
+    "addGame": "Add Game",
+    "filters": "Filters",
+    "allCategories": "All Categories",
+    "allStatus": "All Status",
+    "allAges": "All Ages",
+    "advanced": "Advanced",
+    "clearAll": "Clear All",
+    "sortBy": "Sort by",
+    "createdDate": "Created Date",
+    "minPlayers": "Minimum Players",
+    "clearAdvanced": "Clear Advanced",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "draft": "Draft",
+      "maintenance": "Maintenance"
+    },
+    "sort": {
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "titleAsc": "Title A-Z",
+      "titleDesc": "Title Z-A",
+      "popular": "Most Popular",
+      "rating": "Highest Rated",
+      "ageAsc": "Age: Low to High",
+      "ageDesc": "Age: High to Low"
+    }
+  },
+  "gamesList": {
+    "noGames": "No games found",
+    "noGamesDescription": "Try adjusting your filters or add a new game",
+    "players": "Players",
+    "avgScore": "Avg Score",
+    "sessions": "Sessions",
+    "seeMore": "See More",
+    "seeLess": "See Less",
+    "gameDetails": "Game Details",
+    "ageRange": "Age Range",
+    "skills": "Skills",
+    "skillsDeveloped": "Skills Developed",
+    "lastUpdated": "Last Updated",
+    "loading": "Loading...",
+    "loadMore": "Load More Games",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "draft": "Draft",
+      "maintenance": "Under Maintenance"
+    },
+    "actions": {
+      "view": "View Details",
+      "edit": "Edit Game",
+      "delete": "Delete Game"
+    }
+  },
+  "gameForm": {
+    "editGame": "Edit Game",
+    "createGame": "Create New Game",
+    "editGameDescription": "Update game information and settings",
+    "createGameDescription": "Add a new educational game to the platform",
+    "gameKey": "Game Key",
+    "gameKeyDescription": "Unique identifier for the game (no spaces, lowercase)",
+    "title": "Game Title",
+    "description": "Description",
+    "category": "Category",
+    "minAge": "Minimum Age",
+    "maxAge": "Maximum Age",
+    "iconEmoji": "Icon Emoji",
+    "colorGradient": "Color Gradient",
+    "gameImage": "Game Image",
+    "uploadImage": "Upload Image",
+    "imageDescription": "Recommended: 512x512 PNG or JPG",
+    "skills": "Educational Skills",
+    "searchSkills": "Search skills...",
+    "gameComponent": "Game Component",
+    "componentDescription": "React component name for this game",
+    "metadata": "Game Metadata",
+    "hidePreview": "Hide Preview",
+    "showPreview": "Show Preview",
+    "active": "Active",
+    "featured": "Featured",
+    "sortOrder": "Sort Order",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "updateGame": "Update Game"
+  },
+  
+  "gameAnalytics": {
+    "title": "Game Analytics",
+    "description": "Track performance and engagement metrics",
+    "timeframes": {
+      "day": "Last 24 Hours",
+      "week": "Last 7 Days",
+      "month": "Last 30 Days",
+      "quarter": "Last Quarter",
+      "year": "Last Year"
+    },
+    "export": "Export Data",
+    "totalGames": "Total Games",
+    "totalPlayers": "Total Players",
+    "totalSessions": "Total Sessions",
+    "avgPlaytime": "Avg. Playtime",
+    "topGames": "Top Performing Games",
+    "sessions": "Sessions",
+    "categories": "Categories Distribution",
+    "engagementMetrics": "Engagement Metrics",
+    "playerRetention": "Player Retention Rate",
+    "avgSessionDuration": "Avg. Session Duration",
+    "activeGames": "Active Games"
+  },
+  
+  "gameCategories": {
+    "title": "Game Categories",
+    "description": "Organize games into categories",
+    "searchPlaceholder": "Search categories...",
+    "addCategory": "Add Category",
+    "editCategory": "Edit Category",
+    "noCategories": "No categories found",
+    "noCategoriesDescription": "Create your first category to get started",
+    "active": "Active",
+    "inactive": "Inactive",
+    "noDescription": "No description provided",
+    "confirmDelete": "Are you sure you want to delete this category?",
+    "form": {
+      "name": "Category Name",
+      "description": "Description",
+      "iconEmoji": "Icon Emoji",
+      "color": "Color",
+      "sortOrder": "Sort Order",
+      "active": "Active",
+      "cancel": "Cancel",
+      "update": "Update Category",
+      "create": "Create Category"
+    }
+  },
+  
+  "skillsManagement": {
+    "title": "Skills Management",
+    "description": "Manage educational skills and learning objectives",
+    "searchPlaceholder": "Search skills by name or description...",
+    "allCategories": "All Categories",
+    "addSkill": "Add Skill",
+    "editSkill": "Edit Skill",
+    "noSkills": "No skills found",
+    "noSkillsDescription": "Create your first skill to get started",
+    "noDescription": "No description provided",
+    "active": "Active",
+    "inactive": "Inactive",
+    "confirmDelete": "Are you sure you want to delete this skill?",
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    },
+    "form": {
+      "name": "Skill Name",
+      "skillKey": "Skill Key",
+      "description": "Description",
+      "category": "Category",
+      "selectCategory": "Select Category",
+      "difficulty": "Difficulty Level",
+      "iconEmoji": "Icon Emoji",
+      "active": "Active",
+      "cancel": "Cancel",
+      "update": "Update Skill",
+      "create": "Create Skill"
+    }
+  },
+  
+  "bulkOperations": {
+    "title": "Bulk Operations",
+    "description": "Perform actions on multiple games at once",
+    "activate": {
+      "title": "Activate Games",
+      "description": "Activate selected games"
+    },
+    "deactivate": {
+      "title": "Deactivate Games",
+      "description": "Deactivate selected games"
+    },
+    "feature": {
+      "title": "Feature Games",
+      "description": "Mark games as featured"
+    },
+    "delete": {
+      "title": "Delete Games",
+      "description": "Permanently remove games"
+    },
+    "import": {
+      "title": "Bulk Import",
+      "description": "Import multiple games from CSV",
+      "downloadTemplate": "Download Template",
+      "dropText": "Drag & drop your CSV file here, or click to browse",
+      "chooseFile": "Choose CSV File",
+      "fileTypes": "CSV files only (.csv)",
+      "processing": "Processing file...",
+      "results": "Import Results",
+      "total": "Total Records",
+      "successful": "Successful",
+      "failed": "Failed",
+      "errors": "Import Errors"
+    },
+    "manual": {
+      "title": "Manual Bulk Action",
+      "description": "Select games and apply actions manually",
+      "selectGames": "Select Games",
+      "selectGamesPlaceholder": "Choose game selection method",
+      "action": "Action",
+      "execute": "Execute Bulk Action"
+    },
+    "errors": {
+      "selectOperation": "Please select an operation first",
+      "invalidFileType": "Please upload a CSV file"
+    },
+    "confirmAction": "Are you sure you want to perform this action?",
+    "actionSuccess": "Bulk action completed successfully"
   }
 }

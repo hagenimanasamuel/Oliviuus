@@ -6,7 +6,7 @@ import {
   Film,
   DollarSign,
   BarChart,
-  Globe,
+  Gamepad2,
   Headphones,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
@@ -18,9 +18,9 @@ export const navItems = [
   { labelKey: "sidebar.users", icon: Users, path: "/admin/users" },
   { labelKey: "sidebar.library", icon: Film, path: "/admin/library" },
   { labelKey: "sidebar.subscriptions", icon: DollarSign, path: "/admin/subscriptions" },
-  { labelKey: "sidebar.analytics", icon: BarChart, path: "/admin/analytics" },
-  { labelKey: "sidebar.globalManagement", icon: Globe, path: "/admin/global-management" },
+  { labelKey: "sidebar.games", icon: Gamepad2, path: "/admin/games" },
   { labelKey: "sidebar.support", icon: Headphones, path: "/admin/support" },
+  { labelKey: "sidebar.analytics", icon: BarChart, path: "/admin/analytics" },
 ];
 
 export default function NavItems({ isCollapsed }) {

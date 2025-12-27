@@ -1,3 +1,4 @@
+// controllers/gamesController.js
 const { query } = require("../config/dbConfig");
 const crypto = require('crypto');
 
@@ -11,22 +12,12 @@ const resolveKidIdentity = (req) => {
   try {
     const { kid_profile, user } = req;
 
-    if (!kid_profile) {
-      // Check if it's a family member kid
-      if (req.user && req.user.id) {
-        return {
-          user_id: req.user.id,
-          kid_profile_id: null,
-          family_member_id: null,
-          identity_type: 'user'
-        };
-      }
-
+    if (!kid_profile && !user) {
       throw new Error('No kid profile or user found in request');
     }
 
     // Family member kid with own account
-    if (kid_profile.is_family_member) {
+    if (kid_profile && kid_profile.is_family_member) {
       return {
         user_id: kid_profile.user_id || null,
         kid_profile_id: null,
@@ -36,12 +27,26 @@ const resolveKidIdentity = (req) => {
     }
 
     // Regular kid profile (under parent account)
-    return {
-      user_id: null,
-      kid_profile_id: kid_profile.id,
-      family_member_id: null,
-      identity_type: 'kid_profile'
-    };
+    if (kid_profile) {
+      return {
+        user_id: null,
+        kid_profile_id: kid_profile.id,
+        family_member_id: null,
+        identity_type: 'kid_profile'
+      };
+    }
+
+    // Regular user account
+    if (user) {
+      return {
+        user_id: user.id,
+        kid_profile_id: null,
+        family_member_id: null,
+        identity_type: 'user'
+      };
+    }
+
+    throw new Error('Unable to resolve identity');
   } catch (error) {
     console.error('Error resolving kid identity:', error);
     return {
@@ -54,7 +59,7 @@ const resolveKidIdentity = (req) => {
 };
 
 // ============================
-// GAME MANAGEMENT (Admin/Global)
+// GAME MANAGEMENT (Admin)
 // ============================
 
 // Get all games (admin/global view)
@@ -91,25 +96,40 @@ const getAllGames = async (req, res) => {
       params.push(searchTerm, searchTerm);
     }
 
+    // Get games with count
     const games = await query(
       `SELECT g.*, 
-              COUNT(DISTINCT gs.skill_id) as skills_count,
-              GROUP_CONCAT(DISTINCT es.name) as skill_names
+              COUNT(DISTINCT gp.id) as total_players,
+              AVG(gs.score_value) as average_score,
+              MAX(gs.score_value) as high_score
        FROM games g
-       LEFT JOIN game_skills_mapping gs ON g.id = gs.game_id
-       LEFT JOIN educational_skills es ON gs.skill_id = es.id
+       LEFT JOIN game_progress gp ON g.id = gp.game_id
+       LEFT JOIN game_scores gs ON g.id = gs.game_id
        ${whereClause}
        GROUP BY g.id
        ORDER BY g.sort_order, g.title`,
       params
     );
 
+    // Get skills for each game
+    for (const game of games) {
+      const skills = await query(
+        `SELECT es.*, gsm.strength_level
+         FROM game_skills_mapping gsm
+         JOIN educational_skills es ON gsm.skill_id = es.id
+         WHERE gsm.game_id = ?`,
+        [game.id]
+      );
+      game.skills = skills;
+      game.skills_count = skills.length;
+    }
+
     // Parse JSON fields
     const formattedGames = games.map(game => ({
       ...game,
       metadata: game.metadata ? JSON.parse(game.metadata) : {},
       skills_count: game.skills_count || 0,
-      skill_names: game.skill_names ? game.skill_names.split(',') : []
+      skill_names: game.skills ? game.skills.map(s => s.name) : []
     }));
 
     res.json({
@@ -135,11 +155,11 @@ const getGameById = async (req, res) => {
     const games = await query(
       `SELECT g.*, 
               COUNT(DISTINCT gp.id) as total_players,
-              AVG(gsc.score_value) as average_score,
-              MAX(gsc.score_value) as high_score
+              AVG(gs.score_value) as average_score,
+              MAX(gs.score_value) as high_score
        FROM games g
        LEFT JOIN game_progress gp ON g.id = gp.game_id
-       LEFT JOIN game_scores gsc ON g.id = gsc.game_id
+       LEFT JOIN game_scores gs ON g.id = gs.game_id
        WHERE g.id = ?
        GROUP BY g.id`,
       [gameId]
@@ -211,7 +231,8 @@ const createGame = async (req, res) => {
       game_component,
       metadata,
       skills, // Array of skill IDs
-      sort_order
+      sort_order,
+      is_active = true
     } = req.body;
 
     // Validation
@@ -242,8 +263,8 @@ const createGame = async (req, res) => {
     const gameResult = await query(
       `INSERT INTO games (
         game_key, title, description, icon_emoji, color_gradient,
-        category, age_minimum, age_maximum, game_component, metadata, sort_order
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        category, age_minimum, age_maximum, game_component, metadata, sort_order, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         game_key,
         title,
@@ -255,7 +276,8 @@ const createGame = async (req, res) => {
         parseInt(age_maximum) || 8,
         game_component,
         metadata ? JSON.stringify(metadata) : null,
-        sort_order || 0
+        sort_order || 0,
+        is_active
       ]
     );
 
@@ -263,22 +285,11 @@ const createGame = async (req, res) => {
 
     // Link skills if provided
     if (skills && Array.isArray(skills) && skills.length > 0) {
-      // Validate skills exist
-      const placeholders = skills.map(() => '?').join(',');
-      const validSkills = await query(
-        `SELECT id FROM educational_skills WHERE id IN (${placeholders})`,
-        skills
+      const skillValues = skills.map(skill_id => [gameId, skill_id]);
+      await query(
+        'INSERT INTO game_skills_mapping (game_id, skill_id) VALUES ?',
+        [skillValues]
       );
-
-      const validSkillIds = validSkills.map(s => s.id);
-
-      if (validSkillIds.length > 0) {
-        const skillValues = validSkillIds.map(skill_id => [gameId, skill_id]);
-        await query(
-          'INSERT INTO game_skills_mapping (game_id, skill_id) VALUES ?',
-          [skillValues]
-        );
-      }
     }
 
     // Commit transaction
@@ -355,14 +366,13 @@ const updateGame = async (req, res) => {
     }
 
     // Add updated_at
-    setClauses.push('updated_at = NOW()');
     values.push(gameId);
 
     // Start transaction
     await query('START TRANSACTION');
 
     // Update game
-    const updateQuery = `UPDATE games SET ${setClauses.join(', ')} WHERE id = ?`;
+    const updateQuery = `UPDATE games SET ${setClauses.join(', ')}, updated_at = NOW() WHERE id = ?`;
     await query(updateQuery, values);
 
     // Handle skills update if provided
@@ -372,18 +382,11 @@ const updateGame = async (req, res) => {
 
       // Insert new mappings if skills array is provided
       if (Array.isArray(updateData.skills) && updateData.skills.length > 0) {
-        const validSkills = await query(
-          `SELECT id FROM educational_skills WHERE id IN (${updateData.skills.map(() => '?').join(',')})`,
-          updateData.skills
+        const skillValues = updateData.skills.map(skill_id => [gameId, skill_id]);
+        await query(
+          'INSERT INTO game_skills_mapping (game_id, skill_id) VALUES ?',
+          [skillValues]
         );
-
-        if (validSkills.length > 0) {
-          const skillValues = validSkills.map(s => [gameId, s.id]);
-          await query(
-            'INSERT INTO game_skills_mapping (game_id, skill_id) VALUES ?',
-            [skillValues]
-          );
-        }
       }
     }
 
@@ -435,6 +438,704 @@ const deleteGame = async (req, res) => {
 };
 
 // ============================
+// ADMIN GAME ANALYTICS
+// ============================
+
+// Get game analytics (admin)
+const getGameAnalytics = async (req, res) => {
+  try {
+    const { timeframe = 'week' } = req.query;
+
+    // Calculate date range
+    let dateRange;
+    const now = new Date();
+
+    switch (timeframe) {
+      case 'day':
+        dateRange = new Date(now.setDate(now.getDate() - 1));
+        break;
+      case 'week':
+        dateRange = new Date(now.setDate(now.getDate() - 7));
+        break;
+      case 'month':
+        dateRange = new Date(now.setMonth(now.getMonth() - 1));
+        break;
+      case 'quarter':
+        dateRange = new Date(now.setMonth(now.getMonth() - 3));
+        break;
+      case 'year':
+        dateRange = new Date(now.setFullYear(now.getFullYear() - 1));
+        break;
+      default:
+        dateRange = new Date(now.setDate(now.getDate() - 7));
+    }
+
+    // Get overview statistics
+    const overview = await query(`
+      SELECT 
+        COUNT(DISTINCT id) as totalGames,
+        SUM(CASE WHEN is_active = TRUE THEN 1 ELSE 0 END) as activeGames
+      FROM games
+    `);
+
+    // Get total sessions
+    const sessions = await query(`
+      SELECT 
+        COUNT(*) as totalSessions,
+        AVG(duration_seconds) as avgSessionDuration
+      FROM game_sessions
+      WHERE start_time >= ?
+    `, [dateRange]);
+
+    // Get total players
+    const players = await query(`
+      SELECT COUNT(DISTINCT 
+        CASE 
+          WHEN user_id IS NOT NULL THEN CONCAT('user_', user_id)
+          WHEN kid_profile_id IS NOT NULL THEN CONCAT('kid_', kid_profile_id)
+          WHEN family_member_id IS NOT NULL THEN CONCAT('family_', family_member_id)
+        END
+      ) as totalPlayers
+      FROM game_sessions
+      WHERE start_time >= ?
+    `, [dateRange]);
+
+    // Get top games by sessions
+    const topGames = await query(`
+      SELECT 
+        g.id,
+        g.title,
+        g.icon_emoji,
+        g.category,
+        COUNT(gs.id) as sessions,
+        AVG(gs.duration_seconds) as avg_duration
+      FROM games g
+      LEFT JOIN game_sessions gs ON g.id = gs.game_id
+      WHERE gs.start_time >= ?
+      GROUP BY g.id, g.title, g.icon_emoji, g.category
+      ORDER BY sessions DESC
+      LIMIT 10
+    `, [dateRange]);
+
+    // Get categories distribution
+    const categories = await query(`
+      SELECT 
+        category,
+        COUNT(*) as count,
+        ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM games)), 1) as percentage
+      FROM games
+      WHERE is_active = TRUE
+      GROUP BY category
+      ORDER BY count DESC
+    `);
+
+    // Get engagement metrics
+    const engagement = await query(`
+      SELECT 
+        COUNT(DISTINCT 
+          CASE 
+            WHEN user_id IS NOT NULL THEN CONCAT('user_', user_id)
+            WHEN kid_profile_id IS NOT NULL THEN CONCAT('kid_', kid_profile_id)
+            WHEN family_member_id IS NOT NULL THEN CONCAT('family_', family_member_id)
+          END
+        ) as unique_players,
+        AVG(duration_seconds) as avg_session_duration,
+        MAX(duration_seconds) as max_session_duration
+      FROM game_sessions
+      WHERE start_time >= ?
+    `, [dateRange]);
+
+    res.json({
+      success: true,
+      analytics: {
+        timeframe,
+        overview: {
+          totalGames: overview[0]?.totalGames || 0,
+          activeGames: overview[0]?.activeGames || 0,
+          totalSessions: sessions[0]?.totalSessions || 0,
+          totalPlayers: players[0]?.totalPlayers || 0,
+          avgPlaytime: sessions[0]?.avgSessionDuration ? Math.round(sessions[0].avgSessionDuration / 60) : 0
+        },
+        topGames,
+        categories,
+        engagement: {
+          playerRetention: Math.round((engagement[0]?.unique_players || 0) / (players[0]?.totalPlayers || 1) * 100),
+          avgSessionDuration: Math.round(engagement[0]?.avg_session_duration / 60) || 0,
+          maxSessionDuration: Math.round(engagement[0]?.max_session_duration / 60) || 0
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error getting game analytics:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get game analytics'
+    });
+  }
+};
+
+// Export game analytics
+const exportGameAnalytics = async (req, res) => {
+  try {
+    const { timeframe = 'week' } = req.query;
+
+    // Calculate date range
+    let dateRange;
+    const now = new Date();
+    switch (timeframe) {
+      case 'day': dateRange = new Date(now.setDate(now.getDate() - 1)); break;
+      case 'week': dateRange = new Date(now.setDate(now.getDate() - 7)); break;
+      case 'month': dateRange = new Date(now.setMonth(now.getMonth() - 1)); break;
+      default: dateRange = new Date(now.setDate(now.getDate() - 7));
+    }
+
+    // Get game sessions data
+    const sessions = await query(`
+      SELECT 
+        g.title as game_title,
+        g.category,
+        DATE(gs.start_time) as date,
+        COUNT(gs.id) as sessions_count,
+        AVG(gs.duration_seconds) as avg_duration_seconds,
+        COUNT(DISTINCT 
+          CASE 
+            WHEN gs.user_id IS NOT NULL THEN CONCAT('user_', gs.user_id)
+            WHEN gs.kid_profile_id IS NOT NULL THEN CONCAT('kid_', gs.kid_profile_id)
+            WHEN gs.family_member_id IS NOT NULL THEN CONCAT('family_', gs.family_member_id)
+          END
+        ) as unique_players
+      FROM game_sessions gs
+      JOIN games g ON gs.game_id = g.id
+      WHERE gs.start_time >= ?
+      GROUP BY g.title, g.category, DATE(gs.start_time)
+      ORDER BY date DESC, sessions_count DESC
+    `, [dateRange]);
+
+    // Convert to CSV
+    const csvHeader = 'Game Title,Category,Date,Sessions Count,Average Duration (seconds),Unique Players\n';
+    const csvRows = sessions.map(row => 
+      `"${row.game_title}","${row.category}","${row.date}",${row.sessions_count},${row.avg_duration_seconds || 0},${row.unique_players}`
+    ).join('\n');
+    
+    const csvContent = csvHeader + csvRows;
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=game_analytics_${Date.now()}.csv`);
+    res.send(csvContent);
+
+  } catch (error) {
+    console.error('Error exporting game analytics:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to export analytics'
+    });
+  }
+};
+
+// ============================
+// GAME CATEGORIES MANAGEMENT
+// ============================
+
+// Get all game categories
+const getGameCategories = async (req, res) => {
+  try {
+    const categories = await query(`
+      SELECT 
+        DISTINCT category as name,
+        COUNT(*) as game_count
+      FROM games
+      WHERE is_active = TRUE
+      GROUP BY category
+      ORDER BY name
+    `);
+
+    res.json({
+      success: true,
+      categories
+    });
+
+  } catch (error) {
+    console.error('Error getting game categories:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get categories'
+    });
+  }
+};
+
+// Create game category
+const createGameCategory = async (req, res) => {
+  try {
+    const { name, description, icon_emoji, color, sort_order, is_active } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        error: 'Category name is required'
+      });
+    }
+
+    // Categories are stored as enum values in games table
+    // For management, we'll store them in a separate table if needed
+    // For now, we'll just validate the category
+    const validCategories = [
+      'Math', 'Puzzles', 'Colors', 'Memory', 'Science', 
+      'Language', 'Racing', 'Logic', 'Action'
+    ];
+
+    if (!validCategories.includes(name)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid category name'
+      });
+    }
+
+    // For now, just return success since categories are predefined
+    res.json({
+      success: true,
+      message: 'Category is valid',
+      category: {
+        name,
+        description,
+        icon_emoji: icon_emoji || '📁',
+        color: color || '#BC8BBC',
+        sort_order: sort_order || 0,
+        is_active: is_active !== false
+      }
+    });
+
+  } catch (error) {
+    console.error('Error creating game category:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create category'
+    });
+  }
+};
+
+// Update game category
+const updateGameCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const { name, description, icon_emoji, color, sort_order, is_active } = req.body;
+
+    // Since categories are predefined, we can't update them
+    // This endpoint is for future expansion
+    res.json({
+      success: true,
+      message: 'Category updated successfully',
+      category: {
+        id: categoryId,
+        name: name || 'Category',
+        description,
+        icon_emoji,
+        color,
+        sort_order,
+        is_active
+      }
+    });
+
+  } catch (error) {
+    console.error('Error updating game category:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update category'
+    });
+  }
+};
+
+// Delete game category
+const deleteGameCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    // Since categories are predefined, we can't delete them
+    // This endpoint is for future expansion
+    res.json({
+      success: true,
+      message: 'Category cannot be deleted as it is predefined'
+    });
+
+  } catch (error) {
+    console.error('Error deleting game category:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete category'
+    });
+  }
+};
+
+// ============================
+// EDUCATIONAL SKILLS MANAGEMENT
+// ============================
+
+// Get all educational skills
+const getAllEducationalSkills = async (req, res) => {
+  try {
+    const { category, difficulty, search } = req.query;
+
+    let whereClause = 'WHERE 1=1';
+    const params = [];
+
+    if (category) {
+      whereClause += ' AND category = ?';
+      params.push(category);
+    }
+
+    if (difficulty) {
+      whereClause += ' AND difficulty_level = ?';
+      params.push(difficulty);
+    }
+
+    if (search) {
+      whereClause += ' AND (name LIKE ? OR description LIKE ?)';
+      const searchTerm = `%${search}%`;
+      params.push(searchTerm, searchTerm);
+    }
+
+    const skills = await query(
+      `SELECT es.*, 
+              COUNT(DISTINCT gsm.game_id) as game_count
+       FROM educational_skills es
+       LEFT JOIN game_skills_mapping gsm ON es.id = gsm.skill_id
+       ${whereClause}
+       GROUP BY es.id
+       ORDER BY es.name`,
+      params
+    );
+
+    res.json({
+      success: true,
+      skills
+    });
+
+  } catch (error) {
+    console.error('Error getting educational skills:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch skills'
+    });
+  }
+};
+
+// Create educational skill
+const createEducationalSkill = async (req, res) => {
+  try {
+    const {
+      skill_key,
+      name,
+      description,
+      age_range_min,
+      age_range_max,
+      category,
+      difficulty_level,
+      icon_emoji,
+      is_active = true
+    } = req.body;
+
+    if (!skill_key || !name || !category) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: skill_key, name, category'
+      });
+    }
+
+    // Check if skill_key already exists
+    const existing = await query(
+      'SELECT id FROM educational_skills WHERE skill_key = ?',
+      [skill_key]
+    );
+
+    if (existing.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Skill key already exists'
+      });
+    }
+
+    const result = await query(
+      `INSERT INTO educational_skills (
+        skill_key, name, description, age_range_min, age_range_max,
+        category, difficulty_level, icon_emoji, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        skill_key,
+        name,
+        description || '',
+        parseInt(age_range_min) || 3,
+        parseInt(age_range_max) || 8,
+        category,
+        difficulty_level || 'beginner',
+        icon_emoji || '🎯',
+        is_active
+      ]
+    );
+
+    const skillId = result.insertId;
+    const skill = await query('SELECT * FROM educational_skills WHERE id = ?', [skillId]);
+
+    res.status(201).json({
+      success: true,
+      message: 'Skill created successfully',
+      skill: skill[0]
+    });
+
+  } catch (error) {
+    console.error('Error creating educational skill:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create skill'
+    });
+  }
+};
+
+// Update educational skill
+const updateEducationalSkill = async (req, res) => {
+  try {
+    const { skillId } = req.params;
+    const updateData = req.body;
+
+    // Check if skill exists
+    const existingSkill = await query(
+      'SELECT id FROM educational_skills WHERE id = ?',
+      [skillId]
+    );
+
+    if (existingSkill.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Skill not found'
+      });
+    }
+
+    // Build dynamic update query
+    const allowedFields = [
+      'name', 'description', 'age_range_min', 'age_range_max',
+      'category', 'difficulty_level', 'icon_emoji', 'is_active'
+    ];
+
+    const setClauses = [];
+    const values = [];
+
+    Object.keys(updateData).forEach(field => {
+      if (allowedFields.includes(field) && updateData[field] !== undefined) {
+        setClauses.push(`${field} = ?`);
+        if (['age_range_min', 'age_range_max'].includes(field)) {
+          values.push(parseInt(updateData[field]));
+        } else {
+          values.push(updateData[field]);
+        }
+      }
+    });
+
+    if (setClauses.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No valid fields to update'
+      });
+    }
+
+    values.push(skillId);
+    const updateQuery = `UPDATE educational_skills SET ${setClauses.join(', ')}, updated_at = NOW() WHERE id = ?`;
+    await query(updateQuery, values);
+
+    const skill = await query('SELECT * FROM educational_skills WHERE id = ?', [skillId]);
+
+    res.json({
+      success: true,
+      message: 'Skill updated successfully',
+      skill: skill[0]
+    });
+
+  } catch (error) {
+    console.error('Error updating educational skill:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update skill'
+    });
+  }
+};
+
+// Delete educational skill
+const deleteEducationalSkill = async (req, res) => {
+  try {
+    const { skillId } = req.params;
+
+    // Check if skill is used in any games
+    const gamesUsingSkill = await query(
+      'SELECT COUNT(*) as count FROM game_skills_mapping WHERE skill_id = ?',
+      [skillId]
+    );
+
+    if (gamesUsingSkill[0].count > 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Cannot delete skill that is being used in games'
+      });
+    }
+
+    await query('DELETE FROM educational_skills WHERE id = ?', [skillId]);
+
+    res.json({
+      success: true,
+      message: 'Skill deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Error deleting educational skill:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete skill'
+    });
+  }
+};
+
+// ============================
+// BULK GAME OPERATIONS
+// ============================
+
+// Bulk update games
+const bulkUpdateGames = async (req, res) => {
+  try {
+    const { gameIds, action, data } = req.body;
+
+    if (!gameIds || !Array.isArray(gameIds) || gameIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No games selected'
+      });
+    }
+
+    if (!action) {
+      return res.status(400).json({
+        success: false,
+        error: 'No action specified'
+      });
+    }
+
+    const placeholders = gameIds.map(() => '?').join(',');
+    let updateQuery = '';
+    let updateValues = [];
+
+    switch (action) {
+      case 'activate':
+        updateQuery = `UPDATE games SET is_active = TRUE, updated_at = NOW() WHERE id IN (${placeholders})`;
+        updateValues = gameIds;
+        break;
+
+      case 'deactivate':
+        updateQuery = `UPDATE games SET is_active = FALSE, updated_at = NOW() WHERE id IN (${placeholders})`;
+        updateValues = gameIds;
+        break;
+
+      case 'update_category':
+        if (!data?.category) {
+          return res.status(400).json({
+            success: false,
+            error: 'Category is required for update_category action'
+          });
+        }
+        updateQuery = `UPDATE games SET category = ?, updated_at = NOW() WHERE id IN (${placeholders})`;
+        updateValues = [data.category, ...gameIds];
+        break;
+
+      default:
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid action'
+        });
+    }
+
+    const result = await query(updateQuery, updateValues);
+
+    res.json({
+      success: true,
+      message: `Successfully ${action}d ${result.affectedRows} games`,
+      affectedRows: result.affectedRows
+    });
+
+  } catch (error) {
+    console.error('Error performing bulk update:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to perform bulk operation'
+    });
+  }
+};
+
+// Export games data
+const exportGamesData = async (req, res) => {
+  try {
+    const { search, category, is_active } = req.query;
+
+    let whereClause = 'WHERE 1=1';
+    const params = [];
+
+    if (search) {
+      whereClause += ' AND (title LIKE ? OR description LIKE ?)';
+      const searchTerm = `%${search}%`;
+      params.push(searchTerm, searchTerm);
+    }
+
+    if (category) {
+      whereClause += ' AND category = ?';
+      params.push(category);
+    }
+
+    if (is_active !== undefined) {
+      whereClause += ' AND is_active = ?';
+      params.push(is_active === 'true');
+    }
+
+    const games = await query(
+      `SELECT 
+        g.game_key,
+        g.title,
+        g.description,
+        g.category,
+        g.age_minimum,
+        g.age_maximum,
+        g.is_active,
+        g.sort_order,
+        g.created_at,
+        g.updated_at,
+        COUNT(DISTINCT gp.id) as total_players,
+        COUNT(DISTINCT gs.id) as total_sessions,
+        GROUP_CONCAT(DISTINCT es.name) as skills
+      FROM games g
+      LEFT JOIN game_progress gp ON g.id = gp.game_id
+      LEFT JOIN game_sessions gs ON g.id = gs.game_id
+      LEFT JOIN game_skills_mapping gsm ON g.id = gsm.game_id
+      LEFT JOIN educational_skills es ON gsm.skill_id = es.id
+      ${whereClause}
+      GROUP BY g.id
+      ORDER BY g.sort_order, g.title`,
+      params
+    );
+
+    // Convert to CSV
+    const csvHeader = 'Game Key,Title,Description,Category,Min Age,Max Age,Active,Sort Order,Total Players,Total Sessions,Skills,Created At,Updated At\n';
+    const csvRows = games.map(game => 
+      `"${game.game_key}","${game.title}","${game.description}","${game.category}",${game.age_minimum},${game.age_maximum},${game.is_active},${game.sort_order},${game.total_players},${game.total_sessions},"${game.skills || ''}","${game.created_at}","${game.updated_at}"`
+    ).join('\n');
+    
+    const csvContent = csvHeader + csvRows;
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=games_export_${Date.now()}.csv`);
+    res.send(csvContent);
+
+  } catch (error) {
+    console.error('Error exporting games data:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to export games data'
+    });
+  }
+};
+
+// ============================
 // KID GAME PLAY (For both kid types)
 // ============================
 
@@ -462,7 +1163,7 @@ const startGameSession = async (req, res) => {
     // Start transaction
     await query('START TRANSACTION');
 
-    // Create game session - using ACTUAL columns from your schema
+    // Create game session
     const sessionResult = await query(
       `INSERT INTO game_sessions (
         user_id, kid_profile_id, family_member_id,
@@ -481,7 +1182,7 @@ const startGameSession = async (req, res) => {
       ]
     );
 
-    const sessionId = sessionResult.insertId;
+    const sessionDbId = sessionResult.insertId;
 
     // Check if game progress exists, if not, create it
     let progressQuery;
@@ -546,7 +1247,7 @@ const startGameSession = async (req, res) => {
       success: true,
       message: 'Game session started',
       session: {
-        session_id: sessionId,
+        session_id: sessionDbId,
         session_token: session_id,
         game_id: gameId,
         game_title: game[0].title
@@ -646,17 +1347,17 @@ const submitGameScore = async (req, res) => {
         parseInt(time_taken) || 0,
         parseFloat(accuracy) || 0,
         metrics ? JSON.stringify(metrics) : null,
-        score > currentHighScore // Set is_high_score based on comparison
+        parseInt(score) > currentHighScore
       ]
     );
 
     // Update game progress
     if (progressId) {
       // Update if this is a high score
-      if (score > currentHighScore) {
+      if (parseInt(score) > currentHighScore) {
         await query(
           'UPDATE game_progress SET highest_score = ?, last_played = NOW() WHERE id = ?',
-          [score, progressId]
+          [parseInt(score), progressId]
         );
       }
 
@@ -696,7 +1397,7 @@ const submitGameScore = async (req, res) => {
         insertProgressValues = [
           identity.user_id,
           gameId,
-          score,
+          parseInt(score),
           time_taken || 0,
           level || 1,
           level || 1
@@ -711,7 +1412,7 @@ const submitGameScore = async (req, res) => {
         insertProgressValues = [
           identity.kid_profile_id,
           gameId,
-          score,
+          parseInt(score),
           time_taken || 0,
           level || 1,
           level || 1
@@ -726,7 +1427,7 @@ const submitGameScore = async (req, res) => {
         insertProgressValues = [
           identity.family_member_id,
           gameId,
-          score,
+          parseInt(score),
           time_taken || 0,
           level || 1,
           level || 1
@@ -753,10 +1454,10 @@ const submitGameScore = async (req, res) => {
     }
 
     // Check for achievements
-    await checkAchievements(identity, gameId, score, level);
+    await checkAchievements(identity, gameId, parseInt(score), level);
 
     // Update skill progress
-    await updateSkillProgress(identity, gameId, score, metrics);
+    await updateSkillProgress(identity, gameId, parseInt(score), metrics);
 
     // Commit transaction
     await query('COMMIT');
@@ -765,8 +1466,8 @@ const submitGameScore = async (req, res) => {
       success: true,
       message: 'Score submitted successfully',
       score_id: scoreResult.insertId,
-      is_high_score: score > currentHighScore,
-      current_score: score,
+      is_high_score: parseInt(score) > currentHighScore,
+      current_score: parseInt(score),
       previous_high_score: currentHighScore
     });
 
@@ -866,12 +1567,11 @@ const saveGameProgress = async (req, res) => {
   }
 };
 
-// Update session activity (can be called periodically)
+// Update session activity
 const updateSessionActivity = async (req, res) => {
   try {
     const { sessionId } = req.params;
     
-    // Just update the updated_at timestamp
     await query(
       'UPDATE game_sessions SET updated_at = NOW() WHERE session_id = ?',
       [sessionId]
@@ -923,7 +1623,7 @@ const loadGameProgress = async (req, res) => {
 
     const progressData = progress[0];
 
-    // Parse JSON fields (if they exist)
+    // Parse JSON fields
     const result = {
       ...progressData,
       save_state: progressData.save_state ? JSON.parse(progressData.save_state) : null,
@@ -1046,12 +1746,17 @@ const getAvailableGames = async (req, res) => {
 
     // Get kid's age from profile
     let kidAge = 5; // Default age
-    if (req.kid_profile.max_age_rating) {
+    if (req.kid_profile && req.kid_profile.max_content_age_rating) {
       // Parse age from rating like "7+" => 7
-      const ageMatch = req.kid_profile.max_age_rating.match(/(\d+)/);
+      const ageMatch = req.kid_profile.max_content_age_rating.match(/(\d+)/);
       if (ageMatch) {
         kidAge = parseInt(ageMatch[1]);
       }
+    } else if (req.user && req.user.birth_date) {
+      // Calculate age from birth date
+      const birthDate = new Date(req.user.birth_date);
+      const today = new Date();
+      kidAge = today.getFullYear() - birthDate.getFullYear();
     }
 
     let whereClause = 'WHERE g.is_active = TRUE';
@@ -1076,8 +1781,7 @@ const getAvailableGames = async (req, res) => {
     }
 
     const games = await query(
-      `SELECT DISTINCT g.*, 
-              (SELECT COUNT(*) FROM game_skills_mapping WHERE game_id = g.id) as skills_count
+      `SELECT DISTINCT g.*
        FROM games g
        ${joinClause}
        ${whereClause}
@@ -1316,11 +2020,9 @@ const getGameByIdHelper = async (gameId) => {
 
 // Check achievements
 const checkAchievements = async (identity, gameId, score, level) => {
-  // Achievement logic based on score, level, etc.
-  // This is a simplified version - expand as needed
   const achievements = [];
 
-  // Example: Score-based achievement
+  // Score-based achievement
   if (score >= 1000) {
     achievements.push({
       achievement_key: 'score_master_1000',
@@ -1354,12 +2056,14 @@ const checkAchievements = async (identity, gameId, score, level) => {
         `SELECT id FROM game_achievements 
          WHERE game_id = ? AND achievement_key = ? 
          AND (
-           (user_id = ?) OR 
-           (kid_profile_id = ?) OR 
-           (family_member_id = ?)
+           (user_id = ? AND ? IS NOT NULL) OR 
+           (kid_profile_id = ? AND ? IS NOT NULL) OR 
+           (family_member_id = ? AND ? IS NOT NULL)
          )`,
         [gameId, achievement.achievement_key,
-          identity.user_id, identity.kid_profile_id, identity.family_member_id]
+          identity.user_id, identity.user_id,
+          identity.kid_profile_id, identity.kid_profile_id,
+          identity.family_member_id, identity.family_member_id]
       );
 
       if (existing.length === 0) {
@@ -1401,20 +2105,20 @@ const updateSkillProgress = async (identity, gameId, score, metrics) => {
   );
 
   for (const skill of skills) {
-    // Calculate improvement (simplified - adjust based on your logic)
+    // Calculate improvement (simplified)
     const improvement = Math.min(10, Math.floor(score / 100));
 
     let progressQuery;
     let progressParams;
 
-    if (identity.user_id) {
-      progressQuery = 'SELECT * FROM kids_skill_progress WHERE user_id = ? AND skill_id = ?';
-      progressParams = [identity.user_id, skill.skill_id];
-    } else if (identity.kid_profile_id) {
+    if (identity.kid_profile_id) {
       progressQuery = 'SELECT * FROM kids_skill_progress WHERE kid_profile_id = ? AND skill_id = ?';
       progressParams = [identity.kid_profile_id, skill.skill_id];
+    } else if (identity.user_id) {
+      progressQuery = 'SELECT * FROM kids_skill_progress WHERE user_id = ? AND skill_id = ?';
+      progressParams = [identity.user_id, skill.skill_id];
     } else {
-      continue; // Family member kids might not have skill progress
+      continue; // No valid identity
     }
 
     const existingProgress = await query(progressQuery, progressParams);
@@ -1436,21 +2140,44 @@ const updateSkillProgress = async (identity, gameId, score, metrics) => {
       );
     } else {
       // Create new progress record
-      await query(
-        `INSERT INTO kids_skill_progress (
-          kid_profile_id, user_id, skill_id,
-          baseline_score, current_score, improvement_percentage,
-          games_played_count, last_assessed_date
-        ) VALUES (?, ?, ?, ?, ?, ?, 1, CURDATE())`,
-        [
+      let insertQuery;
+      let insertValues;
+
+      if (identity.kid_profile_id) {
+        insertQuery = `
+          INSERT INTO kids_skill_progress (
+            kid_profile_id, skill_id,
+            baseline_score, current_score, improvement_percentage,
+            games_played_count, last_assessed_date
+          ) VALUES (?, ?, ?, ?, ?, 1, CURDATE())
+        `;
+        insertValues = [
           identity.kid_profile_id,
+          skill.skill_id,
+          0,
+          improvement,
+          0
+        ];
+      } else if (identity.user_id) {
+        insertQuery = `
+          INSERT INTO kids_skill_progress (
+            user_id, skill_id,
+            baseline_score, current_score, improvement_percentage,
+            games_played_count, last_assessed_date
+          ) VALUES (?, ?, ?, ?, ?, 1, CURDATE())
+        `;
+        insertValues = [
           identity.user_id,
           skill.skill_id,
           0,
           improvement,
           0
-        ]
-      );
+        ];
+      }
+
+      if (insertQuery) {
+        await query(insertQuery, insertValues);
+      }
     }
   }
 };
@@ -1462,7 +2189,27 @@ module.exports = {
   createGame,
   updateGame,
   deleteGame,
-
+  
+  // Game Analytics (Admin)
+  getGameAnalytics,
+  exportGameAnalytics,
+  
+  // Categories Management
+  getGameCategories,
+  createGameCategory,
+  updateGameCategory,
+  deleteGameCategory,
+  
+  // Educational Skills Management
+  getAllEducationalSkills,
+  createEducationalSkill,
+  updateEducationalSkill,
+  deleteEducationalSkill,
+  
+  // Bulk Operations
+  bulkUpdateGames,
+  exportGamesData,
+  
   // Kid Game Play
   startGameSession,
   submitGameScore,
@@ -1471,7 +2218,7 @@ module.exports = {
   getKidGameHistory,
   getAvailableGames,
   updateSessionActivity,
-
+  
   // Parent Analytics
   getKidGameAnalytics,
 
