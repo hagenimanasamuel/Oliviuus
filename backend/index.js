@@ -82,6 +82,7 @@ app.use(cookieParser());
 // Enhanced CORS headers configuration
 const allowedOrigins = [
   process.env.CLIENT_ORIGIN,
+  "https://oliviuus.com",
   "http://localhost:5173"
 ];
 
