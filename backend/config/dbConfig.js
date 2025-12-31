@@ -2532,7 +2532,7 @@ const createGameTables = async () => {
         -- Daily limits
         daily_game_time_minutes INT DEFAULT 60,
         current_daily_game_usage INT DEFAULT 0,
-        last_reset_date DATE DEFAULT CURDATE(),
+        last_reset_date DATE DEFAULT NULL,
         
         -- Per-game specific limits
         per_game_limits JSON,
