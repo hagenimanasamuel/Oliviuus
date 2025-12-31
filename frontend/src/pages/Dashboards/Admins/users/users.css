@@ -1,0 +1,75 @@
+/* Add to your global CSS file */
+/* Responsive tables */
+@media (max-width: 768px) {
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .table-responsive table {
+    min-width: 768px;
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 640px) {
+  .grid-cols-1 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .grid-cols-4 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 768px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Card responsiveness */
+.card {
+  transition: transform 0.2s ease-in-out;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Better mobile spacing */
+@media (max-width: 640px) {
+  .p-6 {
+    padding: 1rem !important;
+  }
+  
+  .gap-6 {
+    gap: 1rem !important;
+  }
+  
+  .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+}

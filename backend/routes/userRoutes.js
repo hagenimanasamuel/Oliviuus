@@ -38,14 +38,25 @@ const {
   getAvailableGenres,
   completeOnboarding,
   getOnboardingStatus,
-    getKidProfiles,
+   getKidProfiles,
   getKidViewingHistory,
   getKidProfileDetails,
   deleteKidProfile,
+  getKidProfileById,
   getFamilyMembers,
-  inviteFamilyMember,
+  addFamilyMember,
   updateFamilyMember,
-  removeFamilyMember
+  removeFamilyMember,
+  getFamilyPinSecurity,
+  resetFamilyPin,
+  getFamilyPlanInfo,
+  getFamilyUsageAnalytics,
+  bulkFamilyOperations,
+  getFamilyMemberSessions,
+  terminateFamilyMemberSessions,
+  getTopUsers,
+  getUserEngagementAnalytics,
+  getTopUsersSummary
 } = require("../controllers/userController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require('../middlewares/adminMiddleware');
@@ -69,6 +80,11 @@ router.get("/total", getTotalUsers);
 
 // export users to CSV
 router.get("/export", authMiddleware, adminMiddleware, exportUsers);
+
+// ✅ TOP USERS ANALYTICS ROUTES
+router.get("/top-users", authMiddleware, adminMiddleware, getTopUsers);
+router.get("/user-engagement", authMiddleware, adminMiddleware, getUserEngagementAnalytics);
+router.get("/top-users-summary", authMiddleware, adminMiddleware, getTopUsersSummary);
 
 
 // ✅ Update user status (activate/deactivate)
@@ -161,14 +177,32 @@ router.put("/update-preferences", authMiddleware, updateUserPreferences);
 
 // ✅ KID PROFILES ROUTES (Specials tab)
 router.get("/kids/profiles", authMiddleware, adminMiddleware, getKidProfiles);
+router.get("/kids/profiles/:kidId", authMiddleware, adminMiddleware, getKidProfileById);
 router.get("/kids/:kidId/viewing-history", authMiddleware, adminMiddleware, getKidViewingHistory);
 router.get("/kids/:kidId/details", authMiddleware, adminMiddleware, getKidProfileDetails);
 router.delete("/kids/:kidId", authMiddleware, adminMiddleware, deleteKidProfile);
 
-// ✅ FAMILY MEMBERS ROUTES (FamilyPlan tab)
+// ✅ FAMILY MANAGEMENT ROUTES (FamilyPlan tab)
 router.get("/family/members", authMiddleware, adminMiddleware, getFamilyMembers);
-router.post("/family/members/invite", authMiddleware, adminMiddleware, inviteFamilyMember);
-router.put("/family/members/:memberId", authMiddleware, adminMiddleware, updateFamilyMember);
+router.post("/family/members/add", authMiddleware, adminMiddleware, addFamilyMember);
+router.put("/family/members/:memberId/settings", authMiddleware, adminMiddleware, updateFamilyMember);
 router.delete("/family/members/:memberId", authMiddleware, adminMiddleware, removeFamilyMember);
+
+// ✅ FAMILY PIN SECURITY ROUTES
+router.get("/family/members/:memberId/pin-security", authMiddleware, adminMiddleware, getFamilyPinSecurity);
+router.post("/family/members/:memberId/reset-pin", authMiddleware, adminMiddleware, resetFamilyPin);
+
+// ✅ FAMILY PLAN INFO ROUTES
+router.get("/family/plan-info", authMiddleware, adminMiddleware, getFamilyPlanInfo);
+router.get("/family/analytics", authMiddleware, adminMiddleware, getFamilyUsageAnalytics);
+
+// ✅ FAMILY BULK OPERATIONS
+router.post("/family/bulk-operations", authMiddleware, adminMiddleware, bulkFamilyOperations);
+
+// ✅ FAMILY SESSIONS MANAGEMENT
+router.get("/family/members/:memberId/sessions", authMiddleware, adminMiddleware, getFamilyMemberSessions);
+router.post("/family/members/:memberId/terminate-sessions", authMiddleware, adminMiddleware, terminateFamilyMemberSessions);
+
+
 
 module.exports = router;

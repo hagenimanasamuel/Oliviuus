@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback, useMemo } from "react";
-import { MessageSquare, Filter, BarChart3, MoreHorizontal, Settings } from "lucide-react";
+import { MessageSquare, Filter, BarChart3, MoreHorizontal, Settings, Star } from "lucide-react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 
@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 const AllContacts = React.lazy(() => import("../../../../../pages/Dashboards/Admins/support/AllContacts"));
 const ContactStats = React.lazy(() => import("../../../../../pages/Dashboards/Admins/support/ContactStats"));
 const ContactSettings = React.lazy(() => import("../../../../../pages/Dashboards/Admins/support/ContactSettings"));
+const FeedbackManager = React.lazy(() => import("../../../../../pages/Dashboards/Admins/support/FeedbackManager"));
 
 export default function SupportNavTabs() {
   const { t } = useTranslation();
@@ -24,6 +25,12 @@ export default function SupportNavTabs() {
         label: t("contactAdmin.tabs.allContacts", "All Contacts"), 
         icon: MessageSquare, 
         component: <AllContacts /> 
+      },
+            { 
+        id: "feedback", 
+        label: "Feedback", 
+        icon: Star, 
+        component: <FeedbackManager /> 
       },
       { 
         id: "stats", 

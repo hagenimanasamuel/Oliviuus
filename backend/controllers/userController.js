@@ -2580,7 +2580,7 @@ const getKidProfiles = async (req, res) => {
         kp.*,
         u.email as parent_email,
         u.id as parent_id,
-        CONCAT(u.first_name, ' ', u.last_name) as parent_name,
+        u.email as parent_name,
         (
           SELECT COUNT(*) 
           FROM kids_viewing_history 
@@ -2601,40 +2601,73 @@ const getKidProfiles = async (req, res) => {
           SELECT SUM(watch_duration_seconds) 
           FROM kids_viewing_history 
           WHERE kid_profile_id = kp.id
-        ) as total_watch_seconds
+        ) as total_watch_seconds,
+        DATE(kp.last_active_at) as last_active_date,
+        kcr.max_age_rating as max_content_age_rating,
+        vtl.daily_time_limit_minutes as daily_time_limit_minutes
       FROM kids_profiles kp
       LEFT JOIN users u ON kp.parent_user_id = u.id
+      LEFT JOIN kids_content_restrictions kcr ON kp.id = kcr.kid_profile_id
+      LEFT JOIN viewing_time_limits vtl ON kp.id = vtl.kid_profile_id
       ORDER BY kp.created_at DESC
     `);
 
-    // Convert watch seconds to minutes for display
+    // Calculate ages and format data for frontend
+    const calculateAge = (birthDate) => {
+      if (!birthDate) return 0;
+      try {
+        const birth = new Date(birthDate);
+        const today = new Date();
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+          age--;
+        }
+        return age;
+      } catch (e) {
+        return 0;
+      }
+    };
+
     const formattedProfiles = kidProfiles.map(profile => ({
-      ...profile,
-      total_watch_time_minutes: Math.round((profile.total_watch_seconds || 0) / 60),
-      calculated_age: calculateAgeFromDB(profile.birth_date)
+      id: profile.id,
+      name: profile.name || 'Unnamed',
+      birth_date: profile.birth_date,
+      calculated_age: calculateAge(profile.birth_date),
+      parent_id: profile.parent_id,
+      parent_name: profile.parent_name,
+      parent_email: profile.parent_email,
+      profile_avatar_url: profile.profile_avatar_url,
+      theme_color: profile.theme_color,
+      max_content_age_rating: profile.max_content_age_rating || 'N/A',
+      daily_time_limit_minutes: profile.daily_time_limit_minutes || 0,
+      bedtime_start: profile.bedtime_start,
+      bedtime_end: profile.bedtime_end,
+      require_pin_to_exit: Boolean(profile.require_pin_to_exit),
+      is_active: Boolean(profile.is_active),
+      last_active_at: profile.last_active_at,
+      last_active_date: profile.last_active_date,
+      created_at: profile.created_at,
+      updated_at: profile.updated_at,
+      total_viewing_sessions: profile.total_viewing_sessions || 0,
+      watchlist_items: profile.watchlist_items || 0,
+      pending_notifications: profile.pending_notifications || 0,
+      total_watch_seconds: profile.total_watch_seconds || 0,
+      total_watch_time_minutes: Math.round((profile.total_watch_seconds || 0) / 60)
     }));
 
     res.status(200).json({
+      success: true,
       profiles: formattedProfiles,
       total: formattedProfiles.length
     });
   } catch (err) {
     console.error("Error fetching kid profiles:", err);
-    res.status(500).json({ message: "Failed to fetch kid profiles." });
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch kid profiles." 
+    });
   }
-};
-
-// Helper function to calculate age from birth date
-const calculateAgeFromDB = (birthDate) => {
-  if (!birthDate) return 0;
-  const birth = new Date(birthDate);
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
 };
 
 // ✅ Get kid viewing history
@@ -2642,6 +2675,27 @@ const getKidViewingHistory = async (req, res) => {
   try {
     const { kidId } = req.params;
     
+    // Validate kidId
+    if (!kidId || kidId === 'undefined') {
+      return res.status(400).json({ 
+        success: false,
+        message: "Kid ID is required" 
+      });
+    }
+
+    // Check if kid exists
+    const kidExists = await query(
+      "SELECT id FROM kids_profiles WHERE id = ?",
+      [kidId]
+    );
+
+    if (kidExists.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Kid profile not found" 
+      });
+    }
+
     const history = await query(`
       SELECT 
         kvh.*,
@@ -2658,130 +2712,269 @@ const getKidViewingHistory = async (req, res) => {
     `, [kidId]);
 
     const formattedHistory = history.map(item => ({
-      ...item,
-      watch_duration_minutes: Math.round(item.watch_duration_seconds / 60)
+      id: item.id,
+      kid_profile_id: item.kid_profile_id,
+      content_id: item.content_id,
+      media_asset_id: item.media_asset_id,
+      device_type: item.device_type || 'Unknown',
+      content_title: item.content_title || 'Unknown Content',
+      content_type: item.content_type || 'N/A',
+      media_file: item.media_file,
+      asset_type: item.asset_type,
+      started_at: item.started_at,
+      ended_at: item.ended_at,
+      watch_duration_seconds: item.watch_duration_seconds || 0,
+      watch_duration_minutes: Math.round((item.watch_duration_seconds || 0) / 60),
+      percentage_watched: item.percentage_watched || 0,
+      is_completed: Boolean(item.is_completed),
+      created_at: item.created_at
     }));
 
     res.status(200).json({
+      success: true,
       history: formattedHistory,
       total: formattedHistory.length
     });
   } catch (err) {
     console.error("Error fetching viewing history:", err);
-    res.status(500).json({ message: "Failed to fetch viewing history." });
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch viewing history." 
+    });
   }
 };
+
 
 // ✅ Get all family members (for FamilyPlan tab)
 const getFamilyMembers = async (req, res) => {
   try {
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ 
+        success: false,
+        message: "User not authenticated" 
+      });
+    }
+
+    const adminId = req.user.id;
+
     const familyMembers = await query(`
       SELECT 
         fm.*,
         u.email as user_email,
-        CONCAT(u.first_name, ' ', u.last_name) as user_name,
-        ou.email as owner_email,
-        CONCAT(ou.first_name, ' ', ou.last_name) as owner_name,
-        fm.created_at as invited_at,
-        fm.joined_at,
-        (
-          SELECT COUNT(*) 
-          FROM user_session 
-          WHERE user_id = fm.user_id 
-          AND is_active = TRUE
-        ) as active_sessions,
-        (
-          SELECT MAX(login_time)
-          FROM user_session 
-          WHERE user_id = fm.user_id
-        ) as last_login
+        ou.email as owner_email
       FROM family_members fm
       LEFT JOIN users u ON fm.user_id = u.id
       LEFT JOIN users ou ON fm.family_owner_id = ou.id
+      WHERE fm.family_owner_id = ? AND fm.is_active = TRUE
       ORDER BY fm.created_at DESC
-    `);
+    `, [adminId]);
+
+    // Format the response
+    const formattedMembers = familyMembers.map(member => ({
+      id: member.id,
+      user_id: member.user_id,
+      family_owner_id: member.family_owner_id,
+      user_email: member.user_email,
+      owner_email: member.owner_email,
+      member_role: member.member_role || 'child',
+      relationship: member.relationship || 'Family Member',
+      dashboard_type: member.dashboard_type || 'normal',
+      invitation_status: member.invitation_status || 'accepted',
+      invited_at: member.created_at,
+      joined_at: member.joined_at,
+      is_suspended: Boolean(member.is_suspended),
+      suspended_until: member.suspended_until,
+      is_active: Boolean(member.is_active),
+      sleep_time_start: member.sleep_time_start,
+      sleep_time_end: member.sleep_time_end,
+      allowed_access_start: member.allowed_access_start,
+      allowed_access_end: member.allowed_access_end,
+      monthly_spending_limit: member.monthly_spending_limit || 0,
+      enforce_sleep_time: Boolean(member.enforce_sleep_time),
+      enforce_access_window: Boolean(member.enforce_access_window),
+      created_at: member.created_at,
+      updated_at: member.updated_at
+    }));
+
+    // Get family stats
+    const totalMembers = await query(`
+      SELECT COUNT(*) as total FROM family_members 
+      WHERE family_owner_id = ? AND is_active = TRUE
+    `, [adminId]);
+    
+    const activeMembers = await query(`
+      SELECT COUNT(*) as active FROM family_members 
+      WHERE family_owner_id = ? AND is_active = TRUE AND is_suspended = FALSE
+    `, [adminId]);
+    
+    const suspendedMembers = await query(`
+      SELECT COUNT(*) as suspended FROM family_members 
+      WHERE family_owner_id = ? AND is_active = TRUE AND is_suspended = TRUE
+    `, [adminId]);
 
     res.status(200).json({
-      members: familyMembers,
-      total: familyMembers.length
+      success: true,
+      members: formattedMembers,
+      stats: {
+        total: totalMembers[0]?.total || 0,
+        active: activeMembers[0]?.active || 0,
+        pending: 0, // Since we're auto-accepting members
+        suspended: suspendedMembers[0]?.suspended || 0
+      },
+      total: formattedMembers.length
     });
   } catch (err) {
     console.error("Error fetching family members:", err);
-    res.status(500).json({ message: "Failed to fetch family members." });
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch family members." 
+    });
   }
 };
 
 // ✅ Invite new family member
-const inviteFamilyMember = async (req, res) => {
+const addFamilyMember = async (req, res) => {
   try {
-    const { email, role, relationship, dashboardType } = req.body;
-    const ownerId = req.user.id;
+    const { email, role = 'child', relationship = '', dashboardType = 'normal' } = req.body;
+    const adminId = req.user.id;
 
     if (!email || !email.includes('@')) {
-      return res.status(400).json({ message: "Valid email is required." });
+      return res.status(400).json({ 
+        success: false,
+        message: "Valid email is required." 
+      });
     }
 
     // Check if user exists
-    const user = await query("SELECT id, email, first_name, last_name FROM users WHERE email = ?", [email]);
+    const user = await query(
+      "SELECT id, email FROM users WHERE email = ?", 
+      [email]
+    );
     
     if (user.length === 0) {
-      return res.status(404).json({ message: "User not found with this email." });
+      return res.status(404).json({ 
+        success: false,
+        message: "User not found with this email." 
+      });
     }
 
     const userId = user[0].id;
 
-    // Check if already a family member
-    const existingMember = await query(
-      "SELECT id FROM family_members WHERE user_id = ? AND family_owner_id = ?",
-      [userId, ownerId]
-    );
+    // Check if user is already in a family (as owner or member)
+    const existingFamily = await query(`
+      SELECT id FROM family_members 
+      WHERE user_id = ? AND is_active = TRUE
+    `, [userId]);
 
-    if (existingMember.length > 0) {
-      return res.status(400).json({ message: "User is already a family member." });
+    if (existingFamily.length > 0) {
+      return res.status(400).json({ 
+        success: false,
+        message: "User is already part of a family plan." 
+      });
     }
 
-    // Create invitation
-    const invitationToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+    // Check if admin is trying to add themselves
+    if (userId === adminId) {
+      return res.status(400).json({ 
+        success: false,
+        message: "You cannot add yourself to your own family plan." 
+      });
+    }
 
-    await query(`
+    // Get admin's subscription to check if they have family plan
+    const adminSubscription = await query(`
+      SELECT us.*, s.max_family_members, s.is_family_plan
+      FROM user_subscriptions us
+      LEFT JOIN subscriptions s ON us.subscription_id = s.id
+      WHERE us.user_id = ? 
+      AND us.status = 'active'
+      AND (us.end_date IS NULL OR us.end_date > NOW())
+      ORDER BY us.start_date DESC
+      LIMIT 1
+    `, [adminId]);
+
+    if (adminSubscription.length === 0 || !adminSubscription[0].is_family_plan) {
+      return res.status(400).json({ 
+        success: false,
+        message: "You need an active family plan subscription to add family members." 
+      });
+    }
+
+    // Check current family members count
+    const currentMembers = await query(`
+      SELECT COUNT(*) as count FROM family_members 
+      WHERE family_owner_id = ? AND is_active = TRUE
+    `, [adminId]);
+
+    const maxMembers = adminSubscription[0].max_family_members || 6;
+    if (currentMembers[0].count >= maxMembers) {
+      return res.status(400).json({ 
+        success: false,
+        message: `Family plan limit reached. Maximum ${maxMembers} members allowed.` 
+      });
+    }
+
+    // Add user to family (auto-accepted since admin is adding)
+    const result = await query(`
       INSERT INTO family_members (
         user_id, family_owner_id, member_role, relationship, 
-        dashboard_type, invitation_status, invitation_token,
-        invitation_expires_at, invited_by, created_at
-      ) VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?, NOW())
-    `, [userId, ownerId, role, relationship, dashboardType, invitationToken, expiresAt, ownerId]);
+        dashboard_type, invitation_status, is_suspended,
+        is_active, invited_by, joined_at
+      ) VALUES (?, ?, ?, ?, ?, 'accepted', FALSE, TRUE, ?, NOW())
+    `, [userId, adminId, role, relationship, dashboardType, adminId]);
 
-    // Get owner info for email
-    const ownerInfo = await query(
-      "SELECT email, first_name, last_name FROM users WHERE id = ?",
-      [ownerId]
+    // Update user's subscription plan to indicate they're part of family
+    await query(
+      "UPDATE users SET subscription_plan = 'custom', updated_at = NOW() WHERE id = ?",
+      [userId]
     );
 
-    // Send invitation email (you would implement this)
-    /*
-    await sendInvitationEmail({
-      to: email,
-      ownerName: ownerInfo[0]?.first_name || 'Family Owner',
-      invitationToken,
-      expiresAt
-    });
-    */
+    // Create family PIN security record
+    await query(`
+      INSERT INTO family_pin_security (
+        family_member_id,
+        max_pin_attempts,
+        pin_lock_duration_minutes
+      ) VALUES (?, 5, 30)
+    `, [result.insertId]);
+
+    // Log the action
+    await query(`
+      INSERT INTO security_logs (
+        user_id, action, ip_address, status, details
+      ) VALUES (?, 'family_member_added', ?, 'success', ?)
+    `, [
+      adminId,
+      req.ip || 'unknown',
+      JSON.stringify({
+        target_user_id: userId,
+        target_email: email,
+        role: role,
+        relationship: relationship,
+        added_at: new Date().toISOString()
+      })
+    ]);
 
     res.status(200).json({
-      message: "Invitation sent successfully.",
-      invitation_sent: true,
-      email: email,
-      expires_at: expiresAt,
-      user_details: {
-        id: userId,
-        name: `${user[0].first_name} ${user[0].last_name}`,
-        email: user[0].email
+      success: true,
+      message: "User added to family plan successfully.",
+      member: {
+        id: result.insertId,
+        user_id: userId,
+        email: email,
+        role: role,
+        relationship: relationship,
+        dashboard_type: dashboardType,
+        joined_at: new Date().toISOString()
       }
     });
   } catch (err) {
-    console.error("Error inviting family member:", err);
-    res.status(500).json({ message: "Failed to send invitation." });
+    console.error("Error adding family member:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to add user to family plan." 
+    });
   }
 };
 
@@ -2790,37 +2983,59 @@ const updateFamilyMember = async (req, res) => {
   try {
     const { memberId } = req.params;
     const updates = req.body;
+    const adminId = req.user.id;
 
-    // Check if member exists and belongs to current user
+    // Check if member exists and admin has permission
     const memberCheck = await query(`
-      SELECT fm.*, u.email as user_email 
+      SELECT fm.*, u.email 
       FROM family_members fm
       LEFT JOIN users u ON fm.user_id = u.id
       WHERE fm.id = ? AND fm.family_owner_id = ?
-    `, [memberId, req.user.id]);
+    `, [memberId, adminId]);
 
     if (memberCheck.length === 0) {
-      return res.status(404).json({ message: "Family member not found or you don't have permission." });
+      return res.status(404).json({ 
+        success: false,
+        message: "Family member not found or you don't have permission." 
+      });
     }
 
-    // Build update query dynamically
+    // Build update query dynamically with validation
     const updateFields = [];
     const updateValues = [];
 
+    // Allowed update fields
+    const allowedFields = [
+      'member_role', 'relationship', 'dashboard_type', 'is_suspended',
+      'suspended_until', 'sleep_time_start', 'sleep_time_end',
+      'allowed_access_start', 'allowed_access_end', 'monthly_spending_limit',
+      'enforce_sleep_time', 'enforce_access_window', 'content_restrictions',
+      'max_daily_watch_time', 'allowed_content_types', 'blocked_categories',
+      'custom_permissions'
+    ];
+
     Object.keys(updates).forEach(key => {
-      if (key !== 'id' && key !== 'user_id' && key !== 'family_owner_id') {
-        updateFields.push(`${key} = ?`);
-        updateValues.push(updates[key]);
+      if (allowedFields.includes(key)) {
+        // Handle JSON fields
+        if (['content_restrictions', 'allowed_content_types', 'blocked_categories', 'custom_permissions'].includes(key)) {
+          updateFields.push(`${key} = ?`);
+          updateValues.push(JSON.stringify(updates[key]));
+        } else {
+          updateFields.push(`${key} = ?`);
+          updateValues.push(updates[key]);
+        }
       }
     });
 
     if (updateFields.length === 0) {
-      return res.status(400).json({ message: "No updates provided." });
+      return res.status(400).json({ 
+        success: false,
+        message: "No valid updates provided." 
+      });
     }
 
     // Add updated_at timestamp
     updateFields.push("updated_at = NOW()");
-    
     updateValues.push(memberId);
 
     const result = await query(
@@ -2829,27 +3044,66 @@ const updateFamilyMember = async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Member not found." });
+      return res.status(404).json({ 
+        success: false,
+        message: "Member not found." 
+      });
     }
 
     // If suspending a member, also log them out
-    if (updates.is_suspended === true) {
+    if (updates.is_suspended === true || updates.is_suspended === 'true') {
       await query(
         "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
         [memberCheck[0].user_id]
       );
+      
+      // Set suspension until date if provided
+      if (updates.suspended_until) {
+        await query(
+          "UPDATE family_members SET suspended_until = ?, updated_at = NOW() WHERE id = ?",
+          [updates.suspended_until, memberId]
+        );
+      }
     }
 
+    // If unsuspending, clear suspension date
+    if (updates.is_suspended === false || updates.is_suspended === 'false') {
+      await query(
+        "UPDATE family_members SET suspended_until = NULL, updated_at = NOW() WHERE id = ?",
+        [memberId]
+      );
+    }
+
+    // Log the update
+    await query(`
+      INSERT INTO security_logs (
+        user_id, action, ip_address, status, details
+      ) VALUES (?, 'family_member_updated', ?, 'success', ?)
+    `, [
+      adminId,
+      req.ip || 'unknown',
+      JSON.stringify({
+        member_id: memberId,
+        updates: updates,
+        updated_at: new Date().toISOString()
+      })
+    ]);
+
     res.status(200).json({ 
-      message: "Member updated successfully.",
+      success: true,
+      message: "Member settings updated successfully.",
       updated: true,
       member_id: memberId
     });
   } catch (err) {
     console.error("Error updating family member:", err);
-    res.status(500).json({ message: "Failed to update member." });
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to update member settings." 
+    });
   }
 };
+
 
 // ✅ Get detailed kid profile info
 const getKidProfileDetails = async (req, res) => {
@@ -2860,7 +3114,7 @@ const getKidProfileDetails = async (req, res) => {
       SELECT 
         kp.*,
         u.email as parent_email,
-        CONCAT(u.first_name, ' ', u.last_name) as parent_name,
+        u.email as parent_name,
         kcr.max_age_rating,
         kcr.allow_movies,
         kcr.allow_series,
@@ -2887,15 +3141,22 @@ const getKidProfileDetails = async (req, res) => {
     `, [kidId]);
 
     if (kidProfile.length === 0) {
-      return res.status(404).json({ message: "Kid profile not found." });
+      return res.status(404).json({ 
+        success: false,
+        message: "Kid profile not found." 
+      });
     }
 
     res.status(200).json({
+      success: true,
       profile: kidProfile[0]
     });
   } catch (err) {
     console.error("Error fetching kid profile details:", err);
-    res.status(500).json({ message: "Failed to fetch kid profile details." });
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch kid profile details." 
+    });
   }
 };
 
@@ -2905,14 +3166,17 @@ const deleteKidProfile = async (req, res) => {
     const { kidId } = req.params;
     const adminId = req.user.id;
 
-    // Verify admin has permission (either admin or parent of the kid)
+    // Verify kid profile exists
     const kidProfile = await query(
       "SELECT parent_user_id FROM kids_profiles WHERE id = ?",
       [kidId]
     );
 
     if (kidProfile.length === 0) {
-      return res.status(404).json({ message: "Kid profile not found." });
+      return res.status(404).json({ 
+        success: false,
+        message: "Kid profile not found." 
+      });
     }
 
     // Check if admin is either the parent or a system admin
@@ -2925,20 +3189,27 @@ const deleteKidProfile = async (req, res) => {
     const isParent = kidProfile[0].parent_user_id === adminId;
 
     if (!isAdmin && !isParent) {
-      return res.status(403).json({ message: "You don't have permission to delete this profile." });
+      return res.status(403).json({ 
+        success: false,
+        message: "You don't have permission to delete this profile." 
+      });
     }
 
     // Delete the kid profile (cascade will handle related records)
     await query("DELETE FROM kids_profiles WHERE id = ?", [kidId]);
 
     res.status(200).json({
+      success: true,
       message: "Kid profile deleted successfully.",
       deleted: true,
       kid_id: kidId
     });
   } catch (err) {
     console.error("Error deleting kid profile:", err);
-    res.status(500).json({ message: "Failed to delete kid profile." });
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to delete kid profile." 
+    });
   }
 };
 
@@ -2949,41 +3220,1443 @@ const removeFamilyMember = async (req, res) => {
     const adminId = req.user.id;
 
     // Check if member exists and admin has permission
-    const member = await query(
-      "SELECT id, family_owner_id FROM family_members WHERE id = ?",
+    const member = await query(`
+      SELECT fm.*, u.email 
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      WHERE fm.id = ? AND fm.family_owner_id = ?
+    `, [memberId, adminId]);
+
+    if (member.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Family member not found or you don't have permission." 
+      });
+    }
+
+    const familyMember = member[0];
+
+    // Mark member as inactive (soft delete)
+    await query(
+      "UPDATE family_members SET is_active = FALSE, updated_at = NOW() WHERE id = ?",
       [memberId]
     );
 
-    if (member.length === 0) {
-      return res.status(404).json({ message: "Family member not found." });
-    }
-
-    // Check if admin is either the owner or a system admin
-    const adminUser = await query(
-      "SELECT role FROM users WHERE id = ?",
-      [adminId]
+    // Terminate all active sessions
+    await query(
+      "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
+      [familyMember.user_id]
     );
 
-    const isAdmin = adminUser[0]?.role === 'admin';
-    const isOwner = member[0].family_owner_id === adminId;
+    // Remove family PIN security record
+    await query(
+      "DELETE FROM family_pin_security WHERE family_member_id = ?",
+      [memberId]
+    );
 
-    if (!isAdmin && !isOwner) {
-      return res.status(403).json({ message: "You don't have permission to remove this member." });
-    }
+    // Reset user's subscription plan
+    await query(
+      "UPDATE users SET subscription_plan = 'none', updated_at = NOW() WHERE id = ?",
+      [familyMember.user_id]
+    );
 
-    // Remove the family member
-    await query("DELETE FROM family_members WHERE id = ?", [memberId]);
+    // Log the action
+    await query(`
+      INSERT INTO security_logs (
+        user_id, action, ip_address, status, details
+      ) VALUES (?, 'family_member_removed', ?, 'success', ?)
+    `, [
+      adminId,
+      req.ip || 'unknown',
+      JSON.stringify({
+        removed_user_id: familyMember.user_id,
+        removed_email: familyMember.email,
+        removed_at: new Date().toISOString()
+      })
+    ]);
 
     res.status(200).json({
+      success: true,
       message: "Family member removed successfully.",
       removed: true,
-      member_id: memberId
+      member_id: memberId,
+      user_email: familyMember.email
     });
   } catch (err) {
     console.error("Error removing family member:", err);
-    res.status(500).json({ message: "Failed to remove family member." });
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to remove family member." 
+    });
   }
 };
+
+// ✅ New endpoint: Get kid profile by ID
+const getKidProfileById = async (req, res) => {
+  try {
+    const { kidId } = req.params;
+
+    const kidProfile = await query(`
+      SELECT * FROM kids_profiles WHERE id = ?
+    `, [kidId]);
+
+    if (kidProfile.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Kid profile not found." 
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      profile: kidProfile[0]
+    });
+  } catch (err) {
+    console.error("Error fetching kid profile:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch kid profile." 
+    });
+  }
+};
+
+// ✅ Get family PIN security info
+const getFamilyPinSecurity = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const adminId = req.user.id;
+
+    // Check if member exists and admin has permission
+    const memberCheck = await query(`
+      SELECT fm.*, u.email 
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      WHERE fm.id = ? AND fm.family_owner_id = ?
+    `, [memberId, adminId]);
+
+    if (memberCheck.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Family member not found or you don't have permission." 
+      });
+    }
+
+    // Get PIN security info
+    const pinSecurity = await query(`
+      SELECT * FROM family_pin_security 
+      WHERE family_member_id = ?
+    `, [memberId]);
+
+    res.status(200).json({
+      success: true,
+      pin_security: pinSecurity[0] || null,
+      member: {
+        id: memberCheck[0].id,
+        user_id: memberCheck[0].user_id,
+        email: memberCheck[0].email,
+        member_role: memberCheck[0].member_role,
+        dashboard_type: memberCheck[0].dashboard_type
+      }
+    });
+  } catch (err) {
+    console.error("Error fetching family PIN security:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch PIN security information." 
+    });
+  }
+};
+
+// ✅ Reset family member PIN (Admin action)
+const resetFamilyPin = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const adminId = req.user.id;
+
+    // Check if member exists and admin has permission
+    const memberCheck = await query(`
+      SELECT fm.*, u.email 
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      WHERE fm.id = ? AND fm.family_owner_id = ?
+    `, [memberId, adminId]);
+
+    if (memberCheck.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Family member not found or you don't have permission." 
+      });
+    }
+
+    const member = memberCheck[0];
+
+    // Reset PIN security
+    await query(`
+      UPDATE family_pin_security 
+      SET 
+        pin_attempts = 0,
+        last_pin_attempt = NULL,
+        is_pin_locked = FALSE,
+        pin_locked_until = NULL,
+        updated_at = NOW()
+      WHERE family_member_id = ?
+    `, [memberId]);
+
+    // Log the action
+    await query(`
+      INSERT INTO security_logs (
+        user_id, action, ip_address, status, details
+      ) VALUES (?, 'family_pin_reset', ?, 'success', ?)
+    `, [
+      adminId,
+      req.ip || 'unknown',
+      JSON.stringify({
+        member_id: memberId,
+        user_email: member.email,
+        reset_at: new Date().toISOString()
+      })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: "PIN security reset successfully.",
+      reset: true,
+      member_id: memberId,
+      user_email: member.email
+    });
+  } catch (err) {
+    console.error("Error resetting family PIN:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to reset PIN security." 
+    });
+  }
+};
+
+// ✅ Get family plan subscription info
+const getFamilyPlanInfo = async (req, res) => {
+  try {
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ 
+        success: false,
+        message: "User not authenticated" 
+      });
+    }
+
+    const adminId = req.user.id;
+
+    // Get admin's subscription
+    const subscription = await query(`
+      SELECT 
+        us.*,
+        s.name,
+        s.type,
+        s.max_family_members,
+        s.is_family_plan,
+        s.price,
+        s.currency,
+        s.description
+      FROM user_subscriptions us
+      LEFT JOIN subscriptions s ON us.subscription_id = s.id
+      WHERE us.user_id = ? 
+      AND us.status = 'active'
+      AND (us.end_date IS NULL OR us.end_date > NOW())
+      ORDER BY us.start_date DESC
+      LIMIT 1
+    `, [adminId]);
+
+    if (subscription.length === 0) {
+      // Return basic info even if no subscription
+      const currentMembers = await query(`
+        SELECT COUNT(*) as count FROM family_members 
+        WHERE family_owner_id = ? AND is_active = TRUE
+      `, [adminId]);
+
+      return res.status(200).json({
+        success: true,
+        subscription: {
+          name: "No Active Subscription",
+          type: "none",
+          is_family_plan: false,
+          max_family_members: 0,
+          current_members: currentMembers[0]?.count || 0,
+          price: 0,
+          currency: 'RWF',
+          description: "No active family plan subscription",
+          status: "none"
+        },
+        family_members: [],
+        total_members: currentMembers[0]?.count || 0,
+        available_slots: 0
+      });
+    }
+
+    // Get current family members count
+    const currentMembers = await query(`
+      SELECT COUNT(*) as count FROM family_members 
+      WHERE family_owner_id = ? AND is_active = TRUE
+    `, [adminId]);
+
+    // Get detailed family members
+    const familyMembers = await query(`
+      SELECT 
+        fm.*,
+        u.email,
+        (
+          SELECT COUNT(*) 
+          FROM user_session 
+          WHERE user_id = fm.user_id 
+          AND is_active = TRUE
+        ) as active_sessions
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      WHERE fm.family_owner_id = ? AND fm.is_active = TRUE
+      ORDER BY fm.created_at DESC
+    `, [adminId]);
+
+    const formattedSubscription = {
+      name: subscription[0].name,
+      type: subscription[0].type,
+      is_family_plan: Boolean(subscription[0].is_family_plan),
+      max_family_members: subscription[0].max_family_members || 6,
+      current_members: currentMembers[0]?.count || 0,
+      price: subscription[0].price,
+      currency: subscription[0].currency || 'RWF',
+      description: subscription[0].description,
+      start_date: subscription[0].start_date,
+      end_date: subscription[0].end_date,
+      status: subscription[0].status
+    };
+
+    res.status(200).json({
+      success: true,
+      subscription: formattedSubscription,
+      family_members: familyMembers,
+      total_members: currentMembers[0]?.count || 0,
+      available_slots: Math.max(0, (subscription[0].max_family_members || 6) - (currentMembers[0]?.count || 0))
+    });
+  } catch (err) {
+    console.error("Error fetching family plan info:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch family plan information." 
+    });
+  }
+};
+
+// ✅ Get family plan usage analytics
+const getFamilyUsageAnalytics = async (req, res) => {
+  try {
+    const adminId = req.user.id;
+    const { period = 'month' } = req.query;
+
+    let dateFilter = '';
+    switch (period) {
+      case 'day':
+        dateFilter = "DATE(us.last_activity) = CURDATE()";
+        break;
+      case 'week':
+        dateFilter = "us.last_activity >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+        break;
+      case 'month':
+        dateFilter = "us.last_activity >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+        break;
+      case 'year':
+        dateFilter = "us.last_activity >= DATE_SUB(NOW(), INTERVAL 365 DAY)";
+        break;
+      default:
+        dateFilter = "us.last_activity >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+    }
+
+    // Get family members' session activity
+    const usageAnalytics = await query(`
+      SELECT 
+        fm.id as member_id,
+        u.email,
+        fm.member_role,
+        fm.dashboard_type,
+        COUNT(DISTINCT us.id) as total_sessions,
+        SUM(CASE WHEN us.is_active = TRUE THEN 1 ELSE 0 END) as active_sessions,
+        MAX(us.login_time) as last_login,
+        MIN(us.login_time) as first_login_this_period
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      LEFT JOIN user_session us ON fm.user_id = us.user_id AND ${dateFilter}
+      WHERE fm.family_owner_id = ? AND fm.is_active = TRUE
+      GROUP BY fm.id, u.email, fm.member_role, fm.dashboard_type
+      ORDER BY fm.member_role, u.email
+    `, [adminId]);
+
+    // Get total watch time for family members
+    const watchTimeAnalytics = await query(`
+      SELECT 
+        fm.id as member_id,
+        COALESCE(SUM(
+          CASE 
+            WHEN cs.total_watch_time IS NOT NULL THEN cs.total_watch_time
+            WHEN cws.total_watch_time IS NOT NULL THEN cws.total_watch_time
+            ELSE 0 
+          END
+        ), 0) as total_watch_minutes
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      LEFT JOIN (
+        SELECT user_id, SUM(total_watch_time) as total_watch_time
+        FROM content_watch_sessions
+        WHERE ${dateFilter.replace('us.last_activity', 'last_activity_at')}
+        GROUP BY user_id
+      ) cs ON fm.user_id = cs.user_id
+      LEFT JOIN (
+        SELECT user_id, SUM(total_watch_time) as total_watch_time
+        FROM kids_viewing_history
+        WHERE ${dateFilter.replace('us.last_activity', 'started_at')}
+        GROUP BY user_id
+      ) cws ON fm.user_id = cws.user_id
+      WHERE fm.family_owner_id = ? AND fm.is_active = TRUE
+      GROUP BY fm.id
+    `, [adminId]);
+
+    // Format analytics data
+    const analytics = usageAnalytics.map(usage => {
+      const watchTime = watchTimeAnalytics.find(wt => wt.member_id === usage.member_id);
+      return {
+        ...usage,
+        total_watch_minutes: watchTime?.total_watch_minutes || 0,
+        last_login: usage.last_login ? new Date(usage.last_login).toISOString() : null,
+        first_login_this_period: usage.first_login_this_period ? new Date(usage.first_login_this_period).toISOString() : null
+      };
+    });
+
+    // Calculate totals
+    const totals = {
+      total_members: analytics.length,
+      total_sessions: analytics.reduce((sum, a) => sum + (a.total_sessions || 0), 0),
+      active_sessions: analytics.reduce((sum, a) => sum + (a.active_sessions || 0), 0),
+      total_watch_minutes: analytics.reduce((sum, a) => sum + (a.total_watch_minutes || 0), 0),
+      period: period
+    };
+
+    res.status(200).json({
+      success: true,
+      analytics: analytics,
+      totals: totals,
+      period: period
+    });
+  } catch (err) {
+    console.error("Error fetching family usage analytics:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch family usage analytics." 
+    });
+  }
+};
+
+// ✅ Bulk family member operations
+const bulkFamilyOperations = async (req, res) => {
+  try {
+    const { memberIds, operation, settings } = req.body;
+    const adminId = req.user.id;
+
+    if (!memberIds || !Array.isArray(memberIds) || memberIds.length === 0) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Member IDs are required." 
+      });
+    }
+
+    if (!operation || !['suspend', 'unsuspend', 'update_settings', 'remove'].includes(operation)) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Valid operation is required." 
+      });
+    }
+
+    // Check if admin has permission for all members
+    const placeholders = memberIds.map(() => '?').join(',');
+    const members = await query(`
+      SELECT fm.id, fm.user_id, u.email 
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      WHERE fm.id IN (${placeholders}) AND fm.family_owner_id = ? AND fm.is_active = TRUE
+    `, [...memberIds, adminId]);
+
+    if (members.length === 0) {
+      return res.status(403).json({ 
+        success: false,
+        message: "No valid members found or you don't have permission." 
+      });
+    }
+
+    const results = {
+      processed: members.length,
+      successful: 0,
+      failed: 0,
+      errors: []
+    };
+
+    // Perform bulk operation
+    for (const member of members) {
+      try {
+        switch (operation) {
+          case 'suspend':
+            await query(
+              "UPDATE family_members SET is_suspended = TRUE, suspended_until = ?, updated_at = NOW() WHERE id = ?",
+              [settings?.suspended_until || null, member.id]
+            );
+            // Logout all sessions
+            await query(
+              "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
+              [member.user_id]
+            );
+            break;
+
+          case 'unsuspend':
+            await query(
+              "UPDATE family_members SET is_suspended = FALSE, suspended_until = NULL, updated_at = NOW() WHERE id = ?",
+              [member.id]
+            );
+            break;
+
+          case 'update_settings':
+            if (settings) {
+              const updateFields = [];
+              const updateValues = [];
+              
+              Object.keys(settings).forEach(key => {
+                if (['dashboard_type', 'member_role', 'relationship'].includes(key)) {
+                  updateFields.push(`${key} = ?`);
+                  updateValues.push(settings[key]);
+                }
+              });
+              
+              if (updateFields.length > 0) {
+                updateValues.push(member.id);
+                await query(
+                  `UPDATE family_members SET ${updateFields.join(', ')}, updated_at = NOW() WHERE id = ?`,
+                  updateValues
+                );
+              }
+            }
+            break;
+
+          case 'remove':
+            // Soft delete
+            await query(
+              "UPDATE family_members SET is_active = FALSE, updated_at = NOW() WHERE id = ?",
+              [member.id]
+            );
+            // Logout all sessions
+            await query(
+              "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
+              [member.user_id]
+            );
+            // Remove PIN security
+            await query(
+              "DELETE FROM family_pin_security WHERE family_member_id = ?",
+              [member.id]
+            );
+            // Reset user subscription
+            await query(
+              "UPDATE users SET subscription_plan = 'none', updated_at = NOW() WHERE id = ?",
+              [member.user_id]
+            );
+            break;
+        }
+
+        results.successful++;
+      } catch (err) {
+        results.failed++;
+        results.errors.push(`Member ${member.id} (${member.email}): ${err.message}`);
+      }
+    }
+
+    // Log bulk operation
+    await query(`
+      INSERT INTO security_logs (
+        user_id, action, ip_address, status, details
+      ) VALUES (?, ?, ?, ?, ?)
+    `, [
+      adminId,
+      `bulk_family_${operation}`,
+      req.ip || 'unknown',
+      results.failed === 0 ? 'success' : 'partial',
+      JSON.stringify({
+        operation: operation,
+        member_count: results.processed,
+        successful: results.successful,
+        failed: results.failed,
+        member_ids: memberIds,
+        settings: settings
+      })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: `Bulk ${operation} operation completed.`,
+      results: results
+    });
+  } catch (err) {
+    console.error("Error in bulk family operations:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to perform bulk operation." 
+    });
+  }
+};
+
+// ✅ Get family member device sessions
+const getFamilyMemberSessions = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const adminId = req.user.id;
+    const { limit = 20, offset = 0 } = req.query;
+
+    // Check if member exists and admin has permission
+    const memberCheck = await query(`
+      SELECT fm.*, u.email 
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      WHERE fm.id = ? AND fm.family_owner_id = ?
+    `, [memberId, adminId]);
+
+    if (memberCheck.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Family member not found or you don't have permission." 
+      });
+    }
+
+    const member = memberCheck[0];
+
+    // Get user sessions
+    const sessions = await query(`
+      SELECT 
+        us.*,
+        kp.name as active_kid_name
+      FROM user_session us
+      LEFT JOIN kids_profiles kp ON us.active_kid_profile_id = kp.id
+      WHERE us.user_id = ?
+      ORDER BY us.login_time DESC
+      LIMIT ? OFFSET ?
+    `, [member.user_id, parseInt(limit), parseInt(offset)]);
+
+    // Get total count
+    const totalResult = await query(
+      "SELECT COUNT(*) as total FROM user_session WHERE user_id = ?",
+      [member.user_id]
+    );
+
+    // Get session stats
+    const statsResult = await query(`
+      SELECT 
+        COUNT(*) as total_sessions,
+        COUNT(CASE WHEN is_active = TRUE THEN 1 END) as active_sessions,
+        MAX(login_time) as last_login,
+        MIN(login_time) as first_login
+      FROM user_session 
+      WHERE user_id = ?
+    `, [member.user_id]);
+
+    const formattedSessions = sessions.map(session => ({
+      id: session.id,
+      device_name: session.device_name || 'Unknown Device',
+      device_type: session.device_type || 'desktop',
+      ip_address: session.ip_address || 'Unknown',
+      location: session.location || 'Unknown',
+      login_time: session.login_time,
+      logout_time: session.logout_time,
+      last_activity: session.last_activity,
+      is_active: Boolean(session.is_active),
+      user_agent: session.user_agent,
+      device_id: session.device_id,
+      session_mode: session.session_mode,
+      active_kid_name: session.active_kid_name,
+      created_at: session.created_at
+    }));
+
+    res.status(200).json({
+      success: true,
+      sessions: formattedSessions,
+      total: totalResult[0]?.total || 0,
+      stats: statsResult[0] || {
+        total_sessions: 0,
+        active_sessions: 0,
+        last_login: null,
+        first_login: null
+      },
+      member: {
+        id: member.id,
+        user_id: member.user_id,
+        email: member.email,
+        member_role: member.member_role
+      }
+    });
+  } catch (err) {
+    console.error("Error fetching family member sessions:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch family member sessions." 
+    });
+  }
+};
+
+// ✅ Terminate family member sessions
+const terminateFamilyMemberSessions = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const { sessionId } = req.query;
+    const adminId = req.user.id;
+
+    // Check if member exists and admin has permission
+    const memberCheck = await query(`
+      SELECT fm.*, u.email 
+      FROM family_members fm
+      LEFT JOIN users u ON fm.user_id = u.id
+      WHERE fm.id = ? AND fm.family_owner_id = ?
+    `, [memberId, adminId]);
+
+    if (memberCheck.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Family member not found or you don't have permission." 
+      });
+    }
+
+    const member = memberCheck[0];
+    let affectedRows = 0;
+
+    if (sessionId) {
+      // Terminate specific session
+      const result = await query(`
+        UPDATE user_session 
+        SET is_active = FALSE, logout_time = NOW() 
+        WHERE id = ? AND user_id = ? AND is_active = TRUE
+      `, [sessionId, member.user_id]);
+      affectedRows = result.affectedRows;
+    } else {
+      // Terminate all sessions
+      const result = await query(`
+        UPDATE user_session 
+        SET is_active = FALSE, logout_time = NOW() 
+        WHERE user_id = ? AND is_active = TRUE
+      `, [member.user_id]);
+      affectedRows = result.affectedRows;
+    }
+
+    // Log the action
+    await query(`
+      INSERT INTO security_logs (
+        user_id, action, ip_address, status, details
+      ) VALUES (?, ?, ?, 'success', ?)
+    `, [
+      adminId,
+      sessionId ? 'terminate_family_session' : 'terminate_all_family_sessions',
+      req.ip || 'unknown',
+      JSON.stringify({
+        member_id: memberId,
+        member_email: member.email,
+        session_id: sessionId || 'all',
+        terminated_sessions: affectedRows,
+        terminated_at: new Date().toISOString()
+      })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: sessionId 
+        ? "Session terminated successfully." 
+        : "All sessions terminated successfully.",
+      terminated: true,
+      affected_sessions: affectedRows,
+      member_id: memberId
+    });
+  } catch (err) {
+    console.error("Error terminating family member sessions:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to terminate sessions." 
+    });
+  }
+};
+
+// ✅ Get top users by various criteria (Top Users Analytics) - FIXED VERSION
+const getTopUsers = async (req, res) => {
+  try {
+    const { criteria = 'watch_time', period = 'month', limit = 10 } = req.query;
+    
+    let sqlQuery = '';
+    const params = [];
+    let dateFilter = '';
+    
+    // Set date filter based on period
+    switch (period) {
+      case 'day':
+        dateFilter = "DATE(us.last_activity) = CURDATE()";
+        break;
+      case 'week':
+        dateFilter = "us.last_activity >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+        break;
+      case 'month':
+        dateFilter = "us.last_activity >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+        break;
+      case 'year':
+        dateFilter = "us.last_activity >= DATE_SUB(NOW(), INTERVAL 365 DAY)";
+        break;
+      default:
+        dateFilter = "1=1";
+    }
+    
+    // Build query based on criteria
+    switch (criteria) {
+      case 'watch_time':
+        sqlQuery = `
+          SELECT 
+            u.id,
+            u.email,
+            u.created_at,
+            u.subscription_plan,
+            COALESCE(SUM(
+              CASE 
+                WHEN cs.total_watch_time IS NOT NULL THEN cs.total_watch_time
+                WHEN kp.total_watch_seconds IS NOT NULL THEN ROUND(kp.total_watch_seconds / 60)
+                ELSE 0 
+              END
+            ), 0) as total_watch_minutes,
+            COUNT(DISTINCT us.id) as total_sessions,
+            (
+              SELECT COUNT(DISTINCT content_id) 
+              FROM kids_viewing_history kvh
+              LEFT JOIN kids_profiles kp ON kvh.kid_profile_id = kp.id
+              WHERE kp.parent_user_id = u.id
+            ) as unique_content_watched,
+            (
+              SELECT COUNT(*) 
+              FROM user_session 
+              WHERE user_id = u.id AND ${dateFilter.replace('us.last_activity', 'last_activity')}
+            ) as recent_sessions,
+            (
+              SELECT us2.status 
+              FROM user_subscriptions us2 
+              WHERE us2.user_id = u.id 
+              ORDER BY us2.start_date DESC 
+              LIMIT 1
+            ) as subscription_status,
+            (
+              SELECT s.price 
+              FROM user_subscriptions us2 
+              LEFT JOIN subscriptions s ON us2.subscription_id = s.id 
+              WHERE us2.user_id = u.id 
+              ORDER BY us2.start_date DESC 
+              LIMIT 1
+            ) as subscription_price
+          FROM users u
+          LEFT JOIN (
+            SELECT user_id, SUM(total_watch_time) as total_watch_time
+            FROM content_watch_sessions
+            WHERE ${dateFilter.replace('us.last_activity', 'last_activity_at')}
+            GROUP BY user_id
+          ) cs ON u.id = cs.user_id
+          LEFT JOIN (
+            SELECT 
+              kp.parent_user_id as user_id,
+              SUM(kvh.watch_duration_seconds) as total_watch_seconds
+            FROM kids_profiles kp
+            LEFT JOIN kids_viewing_history kvh ON kp.id = kvh.kid_profile_id
+            WHERE kvh.started_at >= DATE_SUB(NOW(), INTERVAL 
+              CASE ?
+                WHEN 'day' THEN 1 
+                WHEN 'week' THEN 7 
+                WHEN 'month' THEN 30 
+                WHEN 'year' THEN 365 
+                ELSE 30 
+              END DAY)
+            GROUP BY kp.parent_user_id
+          ) kp ON u.id = kp.user_id
+          LEFT JOIN user_session us ON u.id = us.user_id AND ${dateFilter}
+          WHERE u.is_active = TRUE
+          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          ORDER BY total_watch_minutes DESC
+          LIMIT ?
+        `;
+        params.push(period, parseInt(limit));
+        break;
+        
+      case 'sessions':
+        sqlQuery = `
+          SELECT 
+            u.id,
+            u.email,
+            u.created_at,
+            u.subscription_plan,
+            COUNT(DISTINCT us.id) as total_sessions,
+            SUM(CASE WHEN us.is_active = TRUE THEN 1 ELSE 0 END) as active_sessions,
+            COALESCE(SUM(
+              CASE 
+                WHEN cs.total_watch_time IS NOT NULL THEN cs.total_watch_time
+                WHEN kp.total_watch_seconds IS NOT NULL THEN ROUND(kp.total_watch_seconds / 60)
+                ELSE 0 
+              END
+            ), 0) as total_watch_minutes,
+            MAX(us.login_time) as last_session,
+            (
+              SELECT COUNT(DISTINCT device_id) 
+              FROM user_session 
+              WHERE user_id = u.id
+            ) as unique_devices,
+            (
+              SELECT COUNT(*) 
+              FROM security_logs 
+              WHERE user_id = u.id AND action = 'login'
+            ) as total_logins
+          FROM users u
+          LEFT JOIN user_session us ON u.id = us.user_id AND ${dateFilter}
+          LEFT JOIN (
+            SELECT user_id, SUM(total_watch_time) as total_watch_time
+            FROM content_watch_sessions
+            WHERE ${dateFilter.replace('us.last_activity', 'last_activity_at')}
+            GROUP BY user_id
+          ) cs ON u.id = cs.user_id
+          LEFT JOIN (
+            SELECT 
+              kp.parent_user_id as user_id,
+              SUM(kvh.watch_duration_seconds) as total_watch_seconds
+            FROM kids_profiles kp
+            LEFT JOIN kids_viewing_history kvh ON kp.id = kvh.kid_profile_id
+            WHERE kvh.started_at >= DATE_SUB(NOW(), INTERVAL 
+              CASE ?
+                WHEN 'day' THEN 1 
+                WHEN 'week' THEN 7 
+                WHEN 'month' THEN 30 
+                WHEN 'year' THEN 365 
+                ELSE 30 
+              END DAY)
+            GROUP BY kp.parent_user_id
+          ) kp ON u.id = kp.user_id
+          WHERE u.is_active = TRUE
+          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          ORDER BY total_sessions DESC
+          LIMIT ?
+        `;
+        params.push(period, parseInt(limit));
+        break;
+        
+      case 'subscription_value':
+        sqlQuery = `
+          SELECT 
+            u.id,
+            u.email,
+            u.created_at,
+            u.subscription_plan,
+            (
+              SELECT COALESCE(SUM(s.price), 0)
+              FROM user_subscriptions us2
+              LEFT JOIN subscriptions s ON us2.subscription_id = s.id
+              WHERE us2.user_id = u.id 
+              AND us2.status = 'active'
+              AND (us2.end_date IS NULL OR us2.end_date > NOW())
+            ) as total_subscription_value,
+            (
+              SELECT COUNT(*) 
+              FROM user_subscriptions 
+              WHERE user_id = u.id AND status = 'active'
+            ) as active_subscriptions,
+            (
+              SELECT MAX(start_date) 
+              FROM user_subscriptions 
+              WHERE user_id = u.id AND status = 'active'
+            ) as latest_subscription_start,
+            COALESCE(SUM(
+              CASE 
+                WHEN cs.total_watch_time IS NOT NULL THEN cs.total_watch_time
+                WHEN kp.total_watch_seconds IS NOT NULL THEN ROUND(kp.total_watch_seconds / 60)
+                ELSE 0 
+              END
+            ), 0) as total_watch_minutes,
+            COUNT(DISTINCT us.id) as total_sessions
+          FROM users u
+          LEFT JOIN user_session us ON u.id = us.user_id AND ${dateFilter}
+          LEFT JOIN (
+            SELECT user_id, SUM(total_watch_time) as total_watch_time
+            FROM content_watch_sessions
+            WHERE ${dateFilter.replace('us.last_activity', 'last_activity_at')}
+            GROUP BY user_id
+          ) cs ON u.id = cs.user_id
+          LEFT JOIN (
+            SELECT 
+              kp.parent_user_id as user_id,
+              SUM(kvh.watch_duration_seconds) as total_watch_seconds
+            FROM kids_profiles kp
+            LEFT JOIN kids_viewing_history kvh ON kp.id = kvh.kid_profile_id
+            WHERE kvh.started_at >= DATE_SUB(NOW(), INTERVAL 
+              CASE ?
+                WHEN 'day' THEN 1 
+                WHEN 'week' THEN 7 
+                WHEN 'month' THEN 30 
+                WHEN 'year' THEN 365 
+                ELSE 30 
+              END DAY)
+            GROUP BY kp.parent_user_id
+          ) kp ON u.id = kp.user_id
+          WHERE u.is_active = TRUE
+          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          ORDER BY total_subscription_value DESC
+          LIMIT ?
+        `;
+        params.push(period, parseInt(limit));
+        break;
+        
+      case 'recent_activity':
+        sqlQuery = `
+          SELECT 
+            u.id,
+            u.email,
+            u.created_at,
+            u.subscription_plan,
+            MAX(us.last_activity) as last_activity,
+            COUNT(DISTINCT us.id) as recent_sessions,
+            SUM(CASE WHEN us.is_active = TRUE THEN 1 ELSE 0 END) as active_sessions,
+            (
+              SELECT COUNT(*) 
+              FROM content_watch_sessions 
+              WHERE user_id = u.id 
+              AND last_activity_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            ) as daily_watch_sessions,
+            (
+              SELECT COUNT(*) 
+              FROM kids_viewing_history kvh
+              LEFT JOIN kids_profiles kp ON kvh.kid_profile_id = kp.id
+              WHERE kp.parent_user_id = u.id 
+              AND kvh.started_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            ) as daily_kid_sessions,
+            COALESCE(SUM(
+              CASE 
+                WHEN cs.total_watch_time IS NOT NULL THEN cs.total_watch_time
+                WHEN kp.total_watch_seconds IS NOT NULL THEN ROUND(kp.total_watch_seconds / 60)
+                ELSE 0 
+              END
+            ), 0) as total_watch_minutes
+          FROM users u
+          LEFT JOIN user_session us ON u.id = us.user_id AND us.last_activity >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+          LEFT JOIN (
+            SELECT user_id, SUM(total_watch_time) as total_watch_time
+            FROM content_watch_sessions
+            WHERE last_activity_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            GROUP BY user_id
+          ) cs ON u.id = cs.user_id
+          LEFT JOIN (
+            SELECT 
+              kp.parent_user_id as user_id,
+              SUM(kvh.watch_duration_seconds) as total_watch_seconds
+            FROM kids_profiles kp
+            LEFT JOIN kids_viewing_history kvh ON kp.id = kvh.kid_profile_id
+            WHERE kvh.started_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            GROUP BY kp.parent_user_id
+          ) kp ON u.id = kp.user_id
+          WHERE u.is_active = TRUE
+          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          ORDER BY last_activity DESC
+          LIMIT ?
+        `;
+        params.push(parseInt(limit));
+        break;
+        
+      case 'content_engagement':
+        sqlQuery = `
+          SELECT 
+            u.id,
+            u.email,
+            u.created_at,
+            u.subscription_plan,
+            (
+              SELECT COUNT(DISTINCT content_id) 
+              FROM kids_viewing_history kvh
+              LEFT JOIN kids_profiles kp ON kvh.kid_profile_id = kp.id
+              WHERE kp.parent_user_id = u.id
+            ) + (
+              SELECT COUNT(DISTINCT content_id) 
+              FROM content_watch_sessions 
+              WHERE user_id = u.id
+            ) as total_unique_content,
+            (
+              SELECT COUNT(*) 
+              FROM kids_viewing_history kvh
+              LEFT JOIN kids_profiles kp ON kvh.kid_profile_id = kp.id
+              WHERE kp.parent_user_id = u.id
+            ) + (
+              SELECT COUNT(*) 
+              FROM content_watch_sessions 
+              WHERE user_id = u.id
+            ) as total_viewing_sessions,
+            COALESCE(SUM(
+              CASE 
+                WHEN cs.total_watch_time IS NOT NULL THEN cs.total_watch_time
+                WHEN kp.total_watch_seconds IS NOT NULL THEN ROUND(kp.total_watch_seconds / 60)
+                ELSE 0 
+              END
+            ), 0) as total_watch_minutes,
+            (
+              SELECT AVG(percentage_watched) 
+              FROM kids_viewing_history kvh
+              LEFT JOIN kids_profiles kp ON kvh.kid_profile_id = kp.id
+              WHERE kp.parent_user_id = u.id
+            ) as avg_completion_rate
+          FROM users u
+          LEFT JOIN (
+            SELECT user_id, SUM(total_watch_time) as total_watch_time
+            FROM content_watch_sessions
+            WHERE ${dateFilter.replace('us.last_activity', 'last_activity_at')}
+            GROUP BY user_id
+          ) cs ON u.id = cs.user_id
+          LEFT JOIN (
+            SELECT 
+              kp.parent_user_id as user_id,
+              SUM(kvh.watch_duration_seconds) as total_watch_seconds
+            FROM kids_profiles kp
+            LEFT JOIN kids_viewing_history kvh ON kp.id = kvh.kid_profile_id
+            WHERE kvh.started_at >= DATE_SUB(NOW(), INTERVAL 
+              CASE ?
+                WHEN 'day' THEN 1 
+                WHEN 'week' THEN 7 
+                WHEN 'month' THEN 30 
+                WHEN 'year' THEN 365 
+                ELSE 30 
+              END DAY)
+            GROUP BY kp.parent_user_id
+          ) kp ON u.id = kp.user_id
+          WHERE u.is_active = TRUE
+          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          ORDER BY total_unique_content DESC, total_viewing_sessions DESC
+          LIMIT ?
+        `;
+        params.push(period, parseInt(limit));
+        break;
+        
+      default:
+        return res.status(400).json({
+          success: false,
+          message: "Invalid criteria. Use: watch_time, sessions, subscription_value, recent_activity, content_engagement"
+        });
+    }
+    
+    
+    // FIXED: Properly call the query function
+    const topUsers = await query(sqlQuery, params);
+    
+    // Format the response
+    const formattedUsers = topUsers.map(user => ({
+      id: user.id,
+      email: user.email,
+      username: user.email.split('@')[0],
+      created_at: user.created_at,
+      subscription_plan: user.subscription_plan || 'none',
+      total_watch_minutes: user.total_watch_minutes || 0,
+      total_sessions: user.total_sessions || 0,
+      active_sessions: user.active_sessions || 0,
+      recent_sessions: user.recent_sessions || 0,
+      total_subscription_value: user.total_subscription_value || 0,
+      active_subscriptions: user.active_subscriptions || 0,
+      total_unique_content: user.total_unique_content || 0,
+      total_viewing_sessions: user.total_viewing_sessions || 0,
+      avg_completion_rate: user.avg_completion_rate ? Math.round(user.avg_completion_rate) : 0,
+      unique_devices: user.unique_devices || 0,
+      total_logins: user.total_logins || 0,
+      daily_watch_sessions: user.daily_watch_sessions || 0,
+      daily_kid_sessions: user.daily_kid_sessions || 0,
+      last_activity: user.last_activity || user.created_at,
+      latest_subscription_start: user.latest_subscription_start,
+      subscription_status: user.subscription_status,
+      subscription_price: user.subscription_price
+    }));
+    
+    // Calculate overall stats
+    const totalWatchTime = formattedUsers.reduce((sum, user) => sum + (user.total_watch_minutes || 0), 0);
+    const totalSessions = formattedUsers.reduce((sum, user) => sum + (user.total_sessions || 0), 0);
+    const totalSubscriptionValue = formattedUsers.reduce((sum, user) => sum + (user.total_subscription_value || 0), 0);
+    const avgWatchTime = formattedUsers.length > 0 ? Math.round(totalWatchTime / formattedUsers.length) : 0;
+    
+    res.status(200).json({
+      success: true,
+      top_users: formattedUsers,
+      criteria: criteria,
+      period: period,
+      limit: parseInt(limit),
+      stats: {
+        total_watch_minutes: totalWatchTime,
+        total_sessions: totalSessions,
+        total_subscription_value: totalSubscriptionValue,
+        avg_watch_minutes: avgWatchTime,
+        total_users: formattedUsers.length
+      }
+    });
+    
+  } catch (err) {
+    console.error("Error fetching top users:", err);
+    console.error("Error stack:", err.stack);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch top users.",
+      error: err.message
+    });
+  }
+};
+
+// ✅ Get comprehensive user engagement analytics - FIXED
+const getUserEngagementAnalytics = async (req, res) => {
+  try {
+    const { period = 'month' } = req.query;
+    
+    let dateFilter = '';
+    switch (period) {
+      case 'day':
+        dateFilter = ">= CURDATE()";
+        break;
+      case 'week':
+        dateFilter = ">= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+        break;
+      case 'month':
+        dateFilter = ">= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+        break;
+      case 'year':
+        dateFilter = ">= DATE_SUB(NOW(), INTERVAL 365 DAY)";
+        break;
+      default:
+        dateFilter = ">= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+    }
+    
+    // Get user engagement stats
+    const sqlQuery = `
+      SELECT 
+        u.id,
+        u.email,
+        u.subscription_plan,
+        u.created_at,
+        (
+          SELECT COUNT(*) 
+          FROM user_session 
+          WHERE user_id = u.id AND login_time ${dateFilter}
+        ) as session_count,
+        (
+          SELECT SUM(total_watch_time) 
+          FROM content_watch_sessions 
+          WHERE user_id = u.id AND last_activity_at ${dateFilter}
+        ) as adult_watch_time,
+        (
+          SELECT SUM(kvh.watch_duration_seconds) / 60
+          FROM kids_viewing_history kvh
+          LEFT JOIN kids_profiles kp ON kvh.kid_profile_id = kp.id
+          WHERE kp.parent_user_id = u.id AND kvh.started_at ${dateFilter}
+        ) as kid_watch_time,
+        (
+          SELECT COUNT(DISTINCT content_id) 
+          FROM content_watch_sessions 
+          WHERE user_id = u.id AND last_activity_at ${dateFilter}
+        ) as adult_unique_content,
+        (
+          SELECT COUNT(DISTINCT kvh.content_id) 
+          FROM kids_viewing_history kvh
+          LEFT JOIN kids_profiles kp ON kvh.kid_profile_id = kp.id
+          WHERE kp.parent_user_id = u.id AND kvh.started_at ${dateFilter}
+        ) as kid_unique_content,
+        (
+          SELECT COUNT(*) 
+          FROM family_members 
+          WHERE user_id = u.id AND is_active = TRUE
+        ) as family_members_count,
+        (
+          SELECT COUNT(*) 
+          FROM kids_profiles 
+          WHERE parent_user_id = u.id AND is_active = TRUE
+        ) as kid_profiles_count
+      FROM users u
+      WHERE u.is_active = TRUE
+      ORDER BY u.created_at DESC
+      LIMIT 100
+    `;
+    
+    const engagementStats = await query(sqlQuery);
+    
+    // Calculate engagement scores
+    const usersWithScores = engagementStats.map(user => {
+      const totalWatchTime = (user.adult_watch_time || 0) + (user.kid_watch_time || 0);
+      const totalUniqueContent = (user.adult_unique_content || 0) + (user.kid_unique_content || 0);
+      const sessionCount = user.session_count || 0;
+      
+      // Calculate engagement score (0-100)
+      let engagementScore = 0;
+      
+      // Watch time contribution (max 40 points)
+      const watchTimeScore = Math.min(totalWatchTime / 100, 40);
+      
+      // Session frequency contribution (max 30 points)
+      const sessionScore = Math.min(sessionCount * 3, 30);
+      
+      // Content variety contribution (max 20 points)
+      const contentScore = Math.min(totalUniqueContent * 2, 20);
+      
+      // Recent activity contribution (max 10 points)
+      const createdDays = user.created_at 
+        ? Math.floor((new Date() - new Date(user.created_at)) / (1000 * 60 * 60 * 24))
+        : 365;
+      const recencyScore = Math.max(0, 10 - (createdDays / 100));
+      
+      engagementScore = Math.round(watchTimeScore + sessionScore + contentScore + recencyScore);
+      
+      return {
+        ...user,
+        total_watch_time: totalWatchTime,
+        total_unique_content: totalUniqueContent,
+        engagement_score: Math.min(engagementScore, 100),
+        watch_time_score: Math.round(watchTimeScore),
+        session_score: Math.round(sessionScore),
+        content_score: Math.round(contentScore),
+        recency_score: Math.round(recencyScore)
+      };
+    });
+    
+    // Sort by engagement score
+    const sortedUsers = usersWithScores.sort((a, b) => b.engagement_score - a.engagement_score);
+    
+    res.status(200).json({
+      success: true,
+      analytics: sortedUsers,
+      period: period,
+      total_users: sortedUsers.length
+    });
+    
+  } catch (err) {
+    console.error("Error fetching user engagement analytics:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch user engagement analytics." 
+    });
+  }
+};
+
+// ✅ Get top users summary (for dashboard) - FIXED
+const getTopUsersSummary = async (req, res) => {
+  try {
+    // Get top users by different criteria
+    const [topByWatchTime, topBySessions, topBySubscription, recentActive] = await Promise.all([
+      query(`
+        SELECT 
+          u.id,
+          u.email,
+          COALESCE(SUM(
+            CASE 
+              WHEN cs.total_watch_time IS NOT NULL THEN cs.total_watch_time
+              WHEN kp.total_watch_seconds IS NOT NULL THEN ROUND(kp.total_watch_seconds / 60)
+              ELSE 0 
+            END
+          ), 0) as total_watch_minutes
+        FROM users u
+        LEFT JOIN (
+          SELECT user_id, SUM(total_watch_time) as total_watch_time
+          FROM content_watch_sessions
+          WHERE last_activity_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+          GROUP BY user_id
+        ) cs ON u.id = cs.user_id
+        LEFT JOIN (
+          SELECT 
+            kp.parent_user_id as user_id,
+            SUM(kvh.watch_duration_seconds) as total_watch_seconds
+          FROM kids_profiles kp
+          LEFT JOIN kids_viewing_history kvh ON kp.id = kvh.kid_profile_id
+          WHERE kvh.started_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+          GROUP BY kp.parent_user_id
+        ) kp ON u.id = kp.user_id
+        WHERE u.is_active = TRUE
+        GROUP BY u.id, u.email
+        ORDER BY total_watch_minutes DESC
+        LIMIT 5
+      `),
+      
+      query(`
+        SELECT 
+          u.id,
+          u.email,
+          COUNT(DISTINCT us.id) as total_sessions
+        FROM users u
+        LEFT JOIN user_session us ON u.id = us.user_id 
+          AND us.login_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        WHERE u.is_active = TRUE
+        GROUP BY u.id, u.email
+        ORDER BY total_sessions DESC
+        LIMIT 5
+      `),
+      
+      query(`
+        SELECT 
+          u.id,
+          u.email,
+          (
+            SELECT COALESCE(SUM(s.price), 0)
+            FROM user_subscriptions us2
+            LEFT JOIN subscriptions s ON us2.subscription_id = s.id
+            WHERE us2.user_id = u.id 
+            AND us2.status = 'active'
+            AND (us2.end_date IS NULL OR us2.end_date > NOW())
+          ) as total_subscription_value
+        FROM users u
+        WHERE u.is_active = TRUE
+        ORDER BY total_subscription_value DESC
+        LIMIT 5
+      `),
+      
+      query(`
+        SELECT 
+          u.id,
+          u.email,
+          MAX(us.last_activity) as last_activity
+        FROM users u
+        LEFT JOIN user_session us ON u.id = us.user_id 
+          AND us.last_activity >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+        WHERE u.is_active = TRUE
+        GROUP BY u.id, u.email
+        ORDER BY last_activity DESC
+        LIMIT 5
+      `)
+    ]);
+    
+    res.status(200).json({
+      success: true,
+      summary: {
+        top_by_watch_time: topByWatchTime.map(u => ({
+          id: u.id,
+          email: u.email,
+          username: u.email.split('@')[0],
+          total_watch_minutes: u.total_watch_minutes || 0
+        })),
+        top_by_sessions: topBySessions.map(u => ({
+          id: u.id,
+          email: u.email,
+          username: u.email.split('@')[0],
+          total_sessions: u.total_sessions || 0
+        })),
+        top_by_subscription: topBySubscription.map(u => ({
+          id: u.id,
+          email: u.email,
+          username: u.email.split('@')[0],
+          total_subscription_value: u.total_subscription_value || 0
+        })),
+        recent_active: recentActive.map(u => ({
+          id: u.id,
+          email: u.email,
+          username: u.email.split('@')[0],
+          last_activity: u.last_activity
+        }))
+      }
+    });
+    
+  } catch (err) {
+    console.error("Error fetching top users summary:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch top users summary." 
+    });
+  }
+};
+
 
 
 module.exports = {
@@ -3024,12 +4697,23 @@ module.exports = {
   getAvailableGenres,
   completeOnboarding,
   getOnboardingStatus,
-    getKidProfiles,
+  getKidProfiles,
   getKidViewingHistory,
+  getFamilyMembers,
+  addFamilyMember,
+  removeFamilyMember,
+  updateFamilyMember,
+  getFamilyPinSecurity,
+  resetFamilyPin,
+  getFamilyPlanInfo,
+  getFamilyUsageAnalytics,
+  bulkFamilyOperations,
+  getFamilyMemberSessions,
+  terminateFamilyMemberSessions,
   getKidProfileDetails,
   deleteKidProfile,
-  getFamilyMembers,
-  inviteFamilyMember,
-  updateFamilyMember,
-  removeFamilyMember
+  getKidProfileById,
+  getTopUsers,
+  getUserEngagementAnalytics,
+  getTopUsersSummary
 };

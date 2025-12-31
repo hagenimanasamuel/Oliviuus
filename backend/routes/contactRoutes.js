@@ -11,6 +11,12 @@ const {
   getContactResponses,
   getContactInfo,
   updateContactInfo,
+    getFeedbacks,
+  getFeedbackById,
+  updateFeedbackStatus,
+  deleteFeedback,
+  exportFeedback,
+  getFeedbackStats
 } = require('../controllers/contactController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const adminMiddleware = require('../middlewares/adminMiddleware');
@@ -31,5 +37,13 @@ router.get('/info', getContactInfo);
 
 // Admin route - update contact info
 router.put('/admin/info', authMiddleware, adminMiddleware, updateContactInfo);
+
+// Admin feedback routes
+router.get('/admin/feedback', authMiddleware, adminMiddleware, getFeedbacks);
+router.get('/admin/feedback/stats', authMiddleware, adminMiddleware, getFeedbackStats);
+router.get('/admin/feedback/export', authMiddleware, adminMiddleware, exportFeedback);
+router.get('/admin/feedback/:id', authMiddleware, adminMiddleware, getFeedbackById);
+router.put('/admin/feedback/:id/status', authMiddleware, adminMiddleware, updateFeedbackStatus);
+router.delete('/admin/feedback/:id', authMiddleware, adminMiddleware, deleteFeedback);
 
 module.exports = router;

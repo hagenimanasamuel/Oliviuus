@@ -2871,6 +2871,202 @@ const insertGameSkillMappings = async () => {
   }
 };
 
+// ✅ Add this table creation function
+const createLivePresenceTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS live_presence (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      session_id VARCHAR(255) UNIQUE NOT NULL,
+      
+      -- User identification (can be NULL for anonymous)
+      user_id INT DEFAULT NULL,
+      user_type ENUM('authenticated', 'anonymous', 'kid_profile', 'family_member') DEFAULT 'authenticated',
+      
+      -- Session type
+      session_type ENUM('viewing', 'browsing', 'idle') DEFAULT 'browsing',
+      device_type ENUM('web', 'mobile', 'tablet', 'smarttv', 'desktop') DEFAULT 'web',
+      device_name VARCHAR(100),
+      
+      -- Content being watched (if any)
+      content_id INT DEFAULT NULL,
+      media_asset_id INT DEFAULT NULL,
+      content_type ENUM('movie', 'series', 'documentary', 'short_film', 'live_event', 'game') DEFAULT NULL,
+      content_title VARCHAR(255),
+      
+      -- Playback state
+      playback_time DECIMAL(10,2) DEFAULT 0,
+      duration DECIMAL(10,2) DEFAULT 0,
+      percentage_watched DECIMAL(5,2) DEFAULT 0,
+      
+      -- Location & Network
+      ip_address VARCHAR(45),
+      country_code VARCHAR(2),
+      region VARCHAR(100),
+      city VARCHAR(100),
+      
+      -- Connection info
+      connection_type VARCHAR(50), -- wifi, mobile, cable
+      bandwidth_estimate INT, -- kbps
+      
+      -- Activity tracking
+      last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      expires_at TIMESTAMP NULL,
+      
+      -- Session metadata
+      user_agent TEXT,
+      screen_resolution VARCHAR(50),
+      language_preference VARCHAR(10) DEFAULT 'en',
+      
+      -- Engagement metrics
+      total_watch_time_seconds INT DEFAULT 0,
+      total_actions INT DEFAULT 0, -- clicks, scrolls, etc.
+      page_views INT DEFAULT 0,
+      
+      -- Quality of service
+      buffering_count INT DEFAULT 0,
+      quality_changes INT DEFAULT 0,
+      current_quality ENUM('SD', 'HD', 'FHD', 'UHD') DEFAULT 'HD',
+      
+      -- Performance metrics
+      network_latency INT, -- ms
+      frame_rate DECIMAL(5,2), -- fps
+      
+      -- Status
+      is_active BOOLEAN DEFAULT TRUE,
+      disconnected_at TIMESTAMP NULL,
+      
+      INDEX idx_session_id (session_id),
+      INDEX idx_user_id (user_id),
+      INDEX idx_content_id (content_id),
+      INDEX idx_last_activity (last_activity),
+      INDEX idx_is_active (is_active),
+      INDEX idx_user_type (user_type),
+      INDEX idx_device_type (device_type),
+      INDEX idx_country_code (country_code),
+      INDEX idx_session_type (session_type),
+      INDEX idx_expires_at (expires_at),
+      
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+      FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE SET NULL,
+      FOREIGN KEY (media_asset_id) REFERENCES media_assets(id) ON DELETE SET NULL
+    );
+  `;
+
+  try {
+    await query(sql);
+    console.log("✅ live_presence table created");
+  } catch (err) {
+    console.error("❌ Error creating live_presence table:", err);
+  }
+};
+
+// ✅ Add this table for aggregated live stats
+const createLiveStatsSnapshotsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS live_stats_snapshots (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      
+      -- Total counts
+      total_live_users INT DEFAULT 0,
+      authenticated_users INT DEFAULT 0,
+      anonymous_users INT DEFAULT 0,
+      kid_profiles INT DEFAULT 0,
+      family_members INT DEFAULT 0,
+      
+      -- Activity breakdown
+      viewing_users INT DEFAULT 0,
+      browsing_users INT DEFAULT 0,
+      idle_users INT DEFAULT 0,
+      
+      -- Device breakdown
+      web_users INT DEFAULT 0,
+      mobile_users INT DEFAULT 0,
+      tablet_users INT DEFAULT 0,
+      smarttv_users INT DEFAULT 0,
+      desktop_users INT DEFAULT 0,
+      
+      -- Content breakdown
+      watching_movies INT DEFAULT 0,
+      watching_series INT DEFAULT 0,
+      playing_games INT DEFAULT 0,
+      
+      -- Geographic breakdown
+      countries_count INT DEFAULT 0,
+      top_countries JSON,
+      
+      -- Performance metrics
+      avg_bandwidth INT DEFAULT 0,
+      avg_latency INT DEFAULT 0,
+      avg_buffer_ratio DECIMAL(5,2) DEFAULT 0,
+      
+      -- Engagement metrics
+      avg_watch_time_minutes INT DEFAULT 0,
+      peak_concurrent_users INT DEFAULT 0,
+      
+      -- Time period
+      snapshot_type ENUM('real_time', 'hourly', 'daily') DEFAULT 'real_time',
+      time_bucket DATETIME,
+      
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      INDEX idx_snapshot_type (snapshot_type),
+      INDEX idx_created_at (created_at),
+      INDEX idx_time_bucket (time_bucket)
+    );
+  `;
+
+  try {
+    await query(sql);
+    console.log("✅ live_stats_snapshots table created");
+  } catch (err) {
+    console.error("❌ Error creating live_stats_snapshots table:", err);
+  }
+};
+
+// ✅ Add this table for live events (joins, leaves, actions)
+const createLiveEventsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS live_events (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      session_id VARCHAR(255) NOT NULL,
+      user_id INT DEFAULT NULL,
+      
+      event_type ENUM(
+        'user_joined',
+        'user_left',
+        'content_started',
+        'content_paused',
+        'content_resumed',
+        'content_completed',
+        'quality_changed',
+        'buffering_started',
+        'buffering_ended',
+        'device_changed',
+        'location_changed',
+        'heartbeat'
+      ) NOT NULL,
+      
+      event_data JSON,
+      metadata JSON,
+      
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      INDEX idx_session_id (session_id),
+      INDEX idx_user_id (user_id),
+      INDEX idx_event_type (event_type),
+      INDEX idx_created_at (created_at)
+    );
+  `;
+
+  try {
+    await query(sql);
+    console.log("✅ live_events table created");
+  } catch (err) {
+    console.error("❌ Error creating live_events table:", err);
+  }
+};
+
 
 const initializeDatabase = async () => {
   try {
@@ -2960,6 +3156,16 @@ const initializeDatabase = async () => {
     // ====================
     console.log("💻 Phase 12: Creating user session...");
     await createUserSessionTable(); // References users and kids_profiles
+
+    // ====================
+    // FINAL STEP: LIVE USER TRACKING TABLES
+    // ====================
+    console.log("📊 Creating live user tracking tables...");
+    await createLivePresenceTable();
+    await createLiveStatsSnapshotsTable();
+    await createLiveEventsTable();
+
+    console.log("✅ Live tracking tables created!");
     
     console.log("✅ All tables created successfully!");
     
