@@ -2,6 +2,8 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const { createServer } = require('http');
+const socketIo = require('socket.io');
 const {
   createUsersTable,
   createEmailVerificationsTable,
@@ -68,16 +70,12 @@ const gameRoutes = require('./routes/gameRoutes');
 const kidInsightsRoutes = require('./routes/kidInsightsRoutes');
 const { kidsActivityLogger } = require("./middlewares/kidsActivityLogger");
 const kidsSecurityRoutes = require("./routes/kidsSecurityRoutes");
+const liveUsersRoutes = require("./routes/liveUsersRoutes");
 
 const cookieParser = require("cookie-parser");
 
 const app = express();
-
-// Parse JSON
-app.use(express.json());
-
-// use cookie parser 
-app.use(cookieParser());
+const server = createServer(app);
 
 // Enhanced CORS headers configuration
 const allowedOrigins = [
@@ -87,6 +85,33 @@ const allowedOrigins = [
   "http://localhost:3000"
 ];
 
+// Socket.IO setup with CORS configuration
+const io = socketIo(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  }
+});
+
+// Parse JSON
+app.use(express.json());
+
+// use cookie parser 
+app.use(cookieParser());
+
+<<<<<<< HEAD
+// Enhanced CORS headers configuration
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN,
+  "https://oliviuus.com",
+  "http://localhost:5173",
+  "http://localhost:3000"
+];
+
+=======
+>>>>>>> 4fe8c967110212d758738346d8f3bf8bbd11263c
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -210,12 +235,217 @@ app.use((req, res, next) => {
 // kids activity logger middleware
 app.use(kidsActivityLogger);
 
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('🔌 New Socket.IO client connected:', socket.id);
+
+  // Extract auth token from handshake
+  const token = socket.handshake.auth.token || socket.handshake.query.token;
+  
+  // For now, allow connections without auth for testing
+  // In production, you should validate the token
+  if (!token) {
+    console.log('⚠️ Connection without token, allowing for testing');
+  }
+
+  // Join admin room for live updates
+  socket.on('join_admin_room', async () => {
+    socket.join('admin_room');
+    console.log(`👑 Socket ${socket.id} joined admin room`);
+    
+    // Send initial live stats
+    await emitLiveStats(socket);
+  });
+
+  // Handle user presence updates
+  socket.on('user_activity', async (data) => {
+    try {
+      const { sessionId, userId, activity, metadata } = data;
+      
+      // Update user presence in database
+      await updateUserPresence(sessionId, userId, activity, metadata);
+      
+      // Broadcast to admin room
+      io.to('admin_room').emit('user_activity_update', {
+        sessionId,
+        userId,
+        activity,
+        timestamp: new Date().toISOString(),
+        metadata
+      });
+
+      // Update stats if needed
+      if (['joined', 'left', 'content_started', 'content_ended'].includes(activity)) {
+        await emitLiveStats();
+      }
+    } catch (error) {
+      console.error('Error handling user activity:', error);
+    }
+  });
+
+  // Handle disconnect
+  socket.on('disconnect', () => {
+    console.log('🔌 Socket disconnected:', socket.id);
+  });
+});
+
+// Function to emit live stats to admin room (FIXED VERSION - No JSON_ARRAYAGG)
+async function emitLiveStats(targetSocket = null) {
+  try {
+    // Get current live stats - FIXED QUERY without JSON_ARRAYAGG
+    const stats = await query(`
+      SELECT 
+        COUNT(*) as total_live,
+        COUNT(CASE WHEN user_type = 'authenticated' THEN 1 END) as authenticated,
+        COUNT(CASE WHEN user_type = 'anonymous' THEN 1 END) as anonymous,
+        COUNT(CASE WHEN user_type = 'kid_profile' THEN 1 END) as kid_profiles,
+        COUNT(CASE WHEN user_type = 'family_member' THEN 1 END) as family_members,
+        COUNT(CASE WHEN session_type = 'viewing' THEN 1 END) as viewing,
+        COUNT(CASE WHEN session_type = 'browsing' THEN 1 END) as browsing,
+        COUNT(CASE WHEN session_type = 'idle' THEN 1 END) as idle,
+        COUNT(DISTINCT country_code) as countries,
+        COUNT(DISTINCT content_id) as unique_contents
+      FROM live_presence 
+      WHERE is_active = TRUE 
+      AND expires_at > NOW()
+    `);
+
+    // Get active users separately
+    const activeUsers = await query(`
+      SELECT 
+        session_id,
+        user_type,
+        session_type,
+        device_type,
+        content_title,
+        last_activity
+      FROM live_presence 
+      WHERE is_active = TRUE 
+      AND expires_at > NOW()
+      ORDER BY last_activity DESC
+      LIMIT 50
+    `);
+
+    const liveStats = {
+      timestamp: new Date().toISOString(),
+      ...stats[0],
+      active_users: activeUsers
+    };
+
+    if (targetSocket) {
+      targetSocket.emit('live_stats_update', liveStats);
+    } else {
+      io.to('admin_room').emit('live_stats_update', liveStats);
+    }
+  } catch (error) {
+    console.error('Error emitting live stats:', error);
+  }
+}
+
+// Function to update user presence (FIXED VERSION)
+async function updateUserPresence(sessionId, userId, activity, metadata = {}) {
+  try {
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 5 * 60 * 1000); // 5 minutes from now
+
+    switch (activity) {
+      case 'joined':
+        await query(`
+          INSERT INTO live_presence (
+            session_id, user_id, user_type, session_type,
+            device_type, device_name, ip_address, country_code,
+            region, city, joined_at, last_activity, is_active, expires_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE, ?)
+          ON DUPLICATE KEY UPDATE
+            last_activity = VALUES(last_activity),
+            is_active = TRUE,
+            expires_at = VALUES(expires_at)
+        `, [
+          sessionId, 
+          userId, 
+          metadata.user_type || 'anonymous',
+          metadata.session_type || 'browsing', 
+          metadata.device_type || 'web',
+          metadata.device_name || 'Unknown', 
+          metadata.ip_address,
+          metadata.country_code, 
+          metadata.region, 
+          metadata.city,
+          now, now, expiresAt
+        ]);
+        break;
+
+      case 'activity':
+        await query(`
+          UPDATE live_presence 
+          SET 
+            last_activity = ?,
+            session_type = ?,
+            content_id = ?,
+            content_title = ?,
+            content_type = ?,
+            playback_time = ?,
+            duration = ?,
+            percentage_watched = ?,
+            expires_at = ?
+          WHERE session_id = ?
+        `, [
+          now,
+          metadata.session_type,
+          metadata.content_id,
+          metadata.content_title,
+          metadata.content_type,
+          metadata.playback_time,
+          metadata.duration,
+          metadata.percentage_watched,
+          expiresAt,
+          sessionId
+        ]);
+        break;
+
+      case 'left':
+        await query(`
+          UPDATE live_presence 
+          SET 
+            is_active = FALSE,
+            disconnected_at = ?,
+            expires_at = ?
+          WHERE session_id = ?
+        `, [now, now, sessionId]);
+        break;
+    }
+
+    // Log the event
+    await query(`
+      INSERT INTO live_events (
+        session_id, user_id, event_type, event_data, metadata
+      ) VALUES (?, ?, ?, ?, ?)
+    `, [
+      sessionId, 
+      userId, 
+      activity,
+      JSON.stringify(metadata),
+      JSON.stringify({ timestamp: now.toISOString() })
+    ]);
+
+  } catch (error) {
+    console.error('Error updating user presence:', error);
+    throw error;
+  }
+}
+
+// Set up periodic stats emission
+setInterval(() => {
+  emitLiveStats();
+}, 5000); // Emit every 5 seconds
+
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/email-verification', emailVerificationRoutes);
+app.use("/api/user", liveUsersRoutes);
 app.use('/api/user', preferencesRoutes);
 app.use("/api/user/sessions", sessionRoutes);
-app.use("/api/user/", userRoutes);
+app.use("/api/user", userRoutes);
 app.use('/api/user', userPreferencesRoutes);
 app.use('/api/roles', rolesRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
@@ -254,6 +484,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: "ok", message: "API is running" });
 });
 
+// Socket.IO test endpoint
+app.get('/api/socket-test', (req, res) => {
+  res.json({ 
+    status: "ok", 
+    message: "Socket.IO server is running",
+    connectedClients: io.engine.clientsCount
+  });
+});
+
 // Initialize database and start server
 const startServer = async () => {
   try {
@@ -281,12 +520,13 @@ const startServer = async () => {
     console.log("🚀 Starting subscription monitor...");
     initializeSubscriptionMonitor();
     
-    // Step 4: Start the server
+    // Step 4: Start the server with Socket.IO
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT} with Socket.IO support`);
       console.log("✅ Database initialized successfully!");
       console.log("✅ Subscription monitor started");
+      console.log("✅ Socket.IO server started");
     });
     
   } catch (error) {

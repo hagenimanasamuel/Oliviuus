@@ -9,6 +9,7 @@ import { Wifi, WifiOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Logo from "./components/Logo";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import socketService from "./utils/socket";
 
 // ==================== ELEGANT LOADING SCREEN ====================
 const ElegantLoadingScreen = () => {
@@ -201,6 +202,157 @@ function AppContent() {
       />
     );
   };
+
+  // ==================== SOCKET.IO USER ACTIVITY TRACKING ====================
+  useEffect(() => {
+    const trackUserActivity = async () => {
+      const token = localStorage.getItem('token');
+      const userData = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      if (!token) return;
+
+      // Connect to Socket.IO
+      socketService.connect(token);
+
+      // Generate a unique session ID
+      const sessionId = localStorage.getItem('session_id') || 
+        `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      if (!localStorage.getItem('session_id')) {
+        localStorage.setItem('session_id', sessionId);
+      }
+
+      // Get user location (simplified - use a service in production)
+      const getLocation = async () => {
+        try {
+          const response = await fetch('https://ipapi.co/json/');
+          const data = await response.json();
+          return {
+            country_code: data.country_code || 'US',
+            region: data.region || 'Unknown',
+            city: data.city || 'Unknown',
+            ip_address: data.ip || 'unknown'
+          };
+        } catch (error) {
+          return {
+            country_code: 'US',
+            region: 'Unknown',
+            city: 'Unknown',
+            ip_address: 'unknown'
+          };
+        }
+      };
+
+      const location = await getLocation();
+
+      // Determine user type
+      let userType = 'anonymous';
+      if (userData.id) {
+        userType = 'authenticated';
+        if (userData.role === 'kid_profile') {
+          userType = 'kid_profile';
+        } else if (userData.role === 'family_member') {
+          userType = 'family_member';
+        }
+      }
+
+      // Determine device type
+      const getDeviceType = () => {
+        const ua = navigator.userAgent;
+        if (/Mobi|Android/i.test(ua)) return 'mobile';
+        if (/Tablet|iPad/i.test(ua)) return 'tablet';
+        if (/SmartTV|HbbTV|NetCast|BOXEE|Kylo|Roku|DLNADOC/i.test(ua)) return 'smarttv';
+        return 'web';
+      };
+
+      // Send join event
+      socketService.trackUserActivity(sessionId, userData.id, 'joined', {
+        user_type: userType,
+        session_type: 'browsing',
+        device_type: getDeviceType(),
+        device_name: navigator.userAgent.substring(0, 100),
+        ...location
+      });
+
+      // Track page visibility changes
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          socketService.trackUserActivity(sessionId, userData.id, 'activity', { 
+            session_type: 'idle' 
+          });
+        } else {
+          socketService.trackUserActivity(sessionId, userData.id, 'activity', { 
+            session_type: 'browsing' 
+          });
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
+      // Send periodic heartbeat
+      const heartbeatInterval = setInterval(() => {
+        socketService.trackUserActivity(sessionId, userData.id, 'activity', { 
+          session_type: document.hidden ? 'idle' : 'browsing' 
+        });
+      }, 30000); // Every 30 seconds
+
+      // Track page changes for SPA
+      const originalPushState = history.pushState;
+      const originalReplaceState = history.replaceState;
+      
+      const trackPageView = () => {
+        socketService.trackUserActivity(sessionId, userData.id, 'activity', {
+          session_type: 'browsing',
+          page_url: window.location.pathname,
+          page_title: document.title
+        });
+      };
+
+      history.pushState = function(...args) {
+        const result = originalPushState.apply(this, args);
+        trackPageView();
+        return result;
+      };
+
+      history.replaceState = function(...args) {
+        const result = originalReplaceState.apply(this, args);
+        trackPageView();
+        return result;
+      };
+
+      window.addEventListener('popstate', trackPageView);
+
+      // Handle beforeunload
+      const handleBeforeUnload = () => {
+        socketService.trackUserActivity(sessionId, userData.id, 'left');
+        // Note: This might not always fire, but that's okay - we have expiration
+      };
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+
+      return () => {
+        clearInterval(heartbeatInterval);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('popstate', trackPageView);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        
+        // Restore original history methods
+        history.pushState = originalPushState;
+        history.replaceState = originalReplaceState;
+        
+        // Send leave event
+        socketService.trackUserActivity(sessionId, userData.id, 'left');
+      };
+    };
+
+    // Only track if user is logged in or anonymous
+    trackUserActivity();
+
+    // Cleanup on unmount
+    return () => {
+      socketService.disconnect();
+    };
+  }, [user]);
 
   // Optimized state management
   const [deferredPrompt, setDeferredPrompt] = useState(null);

@@ -854,6 +854,599 @@ const updateContactInfo = async (req, res) => {
   }
 };
 
+// Admin: Get all feedback with filters, sorting, and pagination
+const getFeedbacks = async (req, res) => {
+  try {
+    // Extract query parameters
+    const {
+      page = 1,
+      limit = 20,
+      category,
+      feedback_type,
+      status,
+      platform,
+      rating,
+      search,
+      sortBy = 'created_at',
+      sortOrder = 'DESC',
+      date_start,
+      date_end,
+      allow_contact
+    } = req.query;
+
+    // Validate pagination
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const offset = (pageNum - 1) * limitNum;
+
+    if (pageNum < 1 || limitNum < 1 || limitNum > 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid pagination parameters'
+      });
+    }
+
+    // Validate sort order
+    const validSortOrders = ['ASC', 'DESC'];
+    if (!validSortOrders.includes(sortOrder.toUpperCase())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid sort order. Use ASC or DESC'
+      });
+    }
+
+    // Validate sort field
+    const validSortFields = [
+      'created_at', 'updated_at', 'user_name', 'user_email', 'rating',
+      'status', 'category', 'feedback_type', 'platform'
+    ];
+    if (!validSortFields.includes(sortBy)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid sort field'
+      });
+    }
+
+    // Build WHERE conditions
+    let whereConditions = [];
+    let queryParams = [];
+
+    // Category filter
+    if (category) {
+      const categories = category.split(',').map(c => c.trim());
+      const validCategories = [
+        'FEATURE_REQUEST', 'BUG_REPORT', 'STREAMING_ISSUE', 'CONTENT_SUGGESTION',
+        'ACCOUNT_ISSUE', 'PAYMENT_ISSUE', 'WEBSITE_APP_FEEDBACK', 'CUSTOMER_SERVICE',
+        'GENERAL_FEEDBACK', 'LIKE_DISLIKE'
+      ];
+      const filteredCategories = categories.filter(c => validCategories.includes(c));
+      
+      if (filteredCategories.length > 0) {
+        whereConditions.push(`category IN (${filteredCategories.map(() => '?').join(',')})`);
+        queryParams.push(...filteredCategories);
+      }
+    }
+
+    // Feedback type filter
+    if (feedback_type) {
+      const types = feedback_type.split(',').map(t => t.trim());
+      const validTypes = ['LIKE', 'DISLIKE', 'DETAILED'];
+      const filteredTypes = types.filter(t => validTypes.includes(t));
+      
+      if (filteredTypes.length > 0) {
+        whereConditions.push(`feedback_type IN (${filteredTypes.map(() => '?').join(',')})`);
+        queryParams.push(...filteredTypes);
+      }
+    }
+
+    // Status filter
+    if (status) {
+      const statuses = status.split(',').map(s => s.trim());
+      const validStatuses = ['NEW', 'REVIEWED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
+      const filteredStatuses = statuses.filter(s => validStatuses.includes(s));
+      
+      if (filteredStatuses.length > 0) {
+        whereConditions.push(`status IN (${filteredStatuses.map(() => '?').join(',')})`);
+        queryParams.push(...filteredStatuses);
+      }
+    }
+
+    // Platform filter
+    if (platform) {
+      const platforms = platform.split(',').map(p => p.trim());
+      const validPlatforms = ['WEB', 'ANDROID', 'IOS', 'SMART_TV', 'TABLET', 'DESKTOP_APP'];
+      const filteredPlatforms = platforms.filter(p => validPlatforms.includes(p));
+      
+      if (filteredPlatforms.length > 0) {
+        whereConditions.push(`platform IN (${filteredPlatforms.map(() => '?').join(',')})`);
+        queryParams.push(...filteredPlatforms);
+      }
+    }
+
+    // Rating filter
+    if (rating) {
+      const ratings = rating.split(',').map(r => r.trim());
+      const validRatings = ['1', '2', '3', '4', '5'];
+      const filteredRatings = ratings.filter(r => validRatings.includes(r));
+      
+      if (filteredRatings.length > 0) {
+        whereConditions.push(`rating IN (${filteredRatings.map(() => '?').join(',')})`);
+        queryParams.push(...filteredRatings);
+      }
+    }
+
+    // Allow contact filter
+    if (allow_contact === 'true') {
+      whereConditions.push(`allow_contact = TRUE`);
+    } else if (allow_contact === 'false') {
+      whereConditions.push(`allow_contact = FALSE`);
+    }
+
+    // Search filter (user_name, user_email, message)
+    if (search) {
+      whereConditions.push(`(user_name LIKE ? OR user_email LIKE ? OR message LIKE ?)`);
+      const searchTerm = `%${search}%`;
+      queryParams.push(searchTerm, searchTerm, searchTerm);
+    }
+
+    // Date range filter
+    if (date_start) {
+      whereConditions.push(`DATE(created_at) >= ?`);
+      queryParams.push(date_start);
+    }
+    if (date_end) {
+      whereConditions.push(`DATE(created_at) <= ?`);
+      queryParams.push(date_end);
+    }
+
+    // Build the final WHERE clause
+    const whereClause = whereConditions.length > 0 
+      ? `WHERE ${whereConditions.join(' AND ')}` 
+      : '';
+
+    // Count total records for pagination
+    const countSql = `SELECT COUNT(*) as total FROM feedback ${whereClause}`;
+    const countResult = await query(countSql, queryParams);
+    const total = countResult[0].total;
+    const totalPages = Math.ceil(total / limitNum);
+
+    // Build main query
+    const sql = `
+      SELECT 
+        id,
+        user_id,
+        user_email,
+        user_name,
+        category,
+        feedback_type,
+        rating,
+        message,
+        platform,
+        allow_contact,
+        status,
+        ip_address,
+        user_agent,
+        created_at,
+        updated_at
+      FROM feedback 
+      ${whereClause}
+      ORDER BY ${sortBy} ${sortOrder}
+      LIMIT ? OFFSET ?
+    `;
+
+    // Add pagination parameters
+    queryParams.push(limitNum, offset);
+
+    // Execute query
+    const feedbacks = await query(sql, queryParams);
+
+    // Prepare response
+    const response = {
+      success: true,
+      data: {
+        feedbacks,
+        pagination: {
+          currentPage: pageNum,
+          totalPages,
+          totalFeedbacks: total,
+          hasNext: pageNum < totalPages,
+          hasPrev: pageNum > 1,
+          limit: limitNum
+        },
+        filters: {
+          category: category || null,
+          feedback_type: feedback_type || null,
+          status: status || null,
+          platform: platform || null,
+          rating: rating || null,
+          search: search || null,
+          sortBy,
+          sortOrder: sortOrder.toUpperCase(),
+          date_start: date_start || null,
+          date_end: date_end || null,
+          allow_contact: allow_contact || null
+        }
+      }
+    };
+
+    res.json(response);
+
+  } catch (error) {
+    console.error('Get feedbacks error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch feedback'
+    });
+  }
+};
+
+// Admin: Get feedback by ID
+const getFeedbackById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const sql = `
+      SELECT 
+        id,
+        user_id,
+        user_email,
+        user_name,
+        category,
+        feedback_type,
+        rating,
+        message,
+        platform,
+        allow_contact,
+        status,
+        ip_address,
+        user_agent,
+        created_at,
+        updated_at
+      FROM feedback 
+      WHERE id = ?
+    `;
+
+    const feedbacks = await query(sql, [id]);
+
+    if (feedbacks.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Feedback not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: feedbacks[0]
+    });
+
+  } catch (error) {
+    console.error('Get feedback by ID error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch feedback'
+    });
+  }
+};
+
+// Admin: Update feedback status
+const updateFeedbackStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = ['NEW', 'REVIEWED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
+    
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status provided'
+      });
+    }
+
+    // Update status
+    const updateSql = `UPDATE feedback SET status = ?, updated_at = NOW() WHERE id = ?`;
+    
+    const result = await query(updateSql, [status, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Feedback not found'
+      });
+    }
+
+    // Fetch updated feedback
+    const feedback = await query('SELECT * FROM feedback WHERE id = ?', [id]);
+
+    res.json({
+      success: true,
+      message: 'Feedback status updated successfully',
+      data: feedback[0]
+    });
+
+  } catch (error) {
+    console.error('Update feedback status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update feedback status'
+    });
+  }
+};
+
+// Admin: Delete feedback
+const deleteFeedback = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await query('DELETE FROM feedback WHERE id = ?', [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Feedback not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Feedback deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Delete feedback error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete feedback'
+    });
+  }
+};
+
+// Export feedback as CSV
+const exportFeedback = async (req, res) => {
+  try {
+    const { category, feedback_type, status, platform, rating, search, date_start, date_end } = req.query;
+
+    // Build WHERE conditions (same as getFeedbacks)
+    let whereConditions = [];
+    let queryParams = [];
+
+    if (category) {
+      const categories = category.split(',').map(c => c.trim());
+      const validCategories = [
+        'FEATURE_REQUEST', 'BUG_REPORT', 'STREAMING_ISSUE', 'CONTENT_SUGGESTION',
+        'ACCOUNT_ISSUE', 'PAYMENT_ISSUE', 'WEBSITE_APP_FEEDBACK', 'CUSTOMER_SERVICE',
+        'GENERAL_FEEDBACK', 'LIKE_DISLIKE'
+      ];
+      const filteredCategories = categories.filter(c => validCategories.includes(c));
+      
+      if (filteredCategories.length > 0) {
+        whereConditions.push(`category IN (${filteredCategories.map(() => '?').join(',')})`);
+        queryParams.push(...filteredCategories);
+      }
+    }
+
+    if (feedback_type) {
+      const types = feedback_type.split(',').map(t => t.trim());
+      const validTypes = ['LIKE', 'DISLIKE', 'DETAILED'];
+      const filteredTypes = types.filter(t => validTypes.includes(t));
+      
+      if (filteredTypes.length > 0) {
+        whereConditions.push(`feedback_type IN (${filteredTypes.map(() => '?').join(',')})`);
+        queryParams.push(...filteredTypes);
+      }
+    }
+
+    if (status) {
+      const statuses = status.split(',').map(s => s.trim());
+      const validStatuses = ['NEW', 'REVIEWED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
+      const filteredStatuses = statuses.filter(s => validStatuses.includes(s));
+      
+      if (filteredStatuses.length > 0) {
+        whereConditions.push(`status IN (${filteredStatuses.map(() => '?').join(',')})`);
+        queryParams.push(...filteredStatuses);
+      }
+    }
+
+    if (platform) {
+      const platforms = platform.split(',').map(p => p.trim());
+      const validPlatforms = ['WEB', 'ANDROID', 'IOS', 'SMART_TV', 'TABLET', 'DESKTOP_APP'];
+      const filteredPlatforms = platforms.filter(p => validPlatforms.includes(p));
+      
+      if (filteredPlatforms.length > 0) {
+        whereConditions.push(`platform IN (${filteredPlatforms.map(() => '?').join(',')})`);
+        queryParams.push(...filteredPlatforms);
+      }
+    }
+
+    if (rating) {
+      const ratings = rating.split(',').map(r => r.trim());
+      const validRatings = ['1', '2', '3', '4', '5'];
+      const filteredRatings = ratings.filter(r => validRatings.includes(r));
+      
+      if (filteredRatings.length > 0) {
+        whereConditions.push(`rating IN (${filteredRatings.map(() => '?').join(',')})`);
+        queryParams.push(...filteredRatings);
+      }
+    }
+
+    if (search) {
+      whereConditions.push(`(user_name LIKE ? OR user_email LIKE ? OR message LIKE ?)`);
+      const searchTerm = `%${search}%`;
+      queryParams.push(searchTerm, searchTerm, searchTerm);
+    }
+
+    if (date_start) {
+      whereConditions.push(`DATE(created_at) >= ?`);
+      queryParams.push(date_start);
+    }
+    if (date_end) {
+      whereConditions.push(`DATE(created_at) <= ?`);
+      queryParams.push(date_end);
+    }
+
+    const whereClause = whereConditions.length > 0 
+      ? `WHERE ${whereConditions.join(' AND ')}` 
+      : '';
+
+    // Fetch feedback for export
+    const sql = `
+      SELECT 
+        id,
+        user_email,
+        user_name,
+        category,
+        feedback_type,
+        rating,
+        message,
+        platform,
+        allow_contact,
+        status,
+        ip_address,
+        created_at,
+        updated_at
+      FROM feedback 
+      ${whereClause}
+      ORDER BY created_at DESC
+    `;
+
+    const feedbacks = await query(sql, queryParams);
+
+    // Generate CSV
+    const headers = [
+      'ID',
+      'User Email',
+      'User Name',
+      'Category',
+      'Type',
+      'Rating',
+      'Message',
+      'Platform',
+      'Allow Contact',
+      'Status',
+      'IP Address',
+      'Created At',
+      'Updated At'
+    ];
+
+    let csvContent = headers.join(',') + '\n';
+
+    feedbacks.forEach(feedback => {
+      const row = [
+        feedback.id,
+        `"${(feedback.user_email || '').replace(/"/g, '""')}"`,
+        `"${(feedback.user_name || '').replace(/"/g, '""')}"`,
+        `"${(feedback.category || '').replace(/"/g, '""')}"`,
+        `"${(feedback.feedback_type || '').replace(/"/g, '""')}"`,
+        feedback.rating || '',
+        `"${(feedback.message || '').replace(/"/g, '""')}"`,
+        `"${(feedback.platform || '').replace(/"/g, '""')}"`,
+        feedback.allow_contact ? 'Yes' : 'No',
+        `"${(feedback.status || '').replace(/"/g, '""')}"`,
+        `"${(feedback.ip_address || '').replace(/"/g, '""')}"`,
+        `"${format(new Date(feedback.created_at), 'yyyy-MM-dd HH:mm:ss')}"`,
+        `"${feedback.updated_at ? format(new Date(feedback.updated_at), 'yyyy-MM-dd HH:mm:ss') : ''}"`
+      ];
+      csvContent += row.join(',') + '\n';
+    });
+
+    // Set response headers for CSV download
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=feedback_export_${Date.now()}.csv`);
+    res.send(csvContent);
+
+  } catch (error) {
+    console.error('Export feedback error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to export feedback'
+    });
+  }
+};
+
+// Feedback statistics
+const getFeedbackStats = async (req, res) => {
+  try {
+    const statsSql = `
+      SELECT 
+        COUNT(*) as total,
+        COUNT(CASE WHEN status = 'NEW' THEN 1 END) as new,
+        COUNT(CASE WHEN status = 'REVIEWED' THEN 1 END) as reviewed,
+        COUNT(CASE WHEN status = 'IN_PROGRESS' THEN 1 END) as in_progress,
+        COUNT(CASE WHEN status = 'RESOLVED' THEN 1 END) as resolved,
+        COUNT(CASE WHEN status = 'CLOSED' THEN 1 END) as closed,
+        COUNT(CASE WHEN feedback_type = 'LIKE' THEN 1 END) as likes,
+        COUNT(CASE WHEN feedback_type = 'DISLIKE' THEN 1 END) as dislikes,
+        COUNT(CASE WHEN feedback_type = 'DETAILED' THEN 1 END) as detailed,
+        COUNT(CASE WHEN allow_contact = TRUE THEN 1 END) as allow_contact
+      FROM feedback
+    `;
+
+    const categoryStatsSql = `
+      SELECT 
+        category,
+        COUNT(*) as count
+      FROM feedback 
+      GROUP BY category 
+      ORDER BY count DESC
+    `;
+
+    const platformStatsSql = `
+      SELECT 
+        platform,
+        COUNT(*) as count
+      FROM feedback 
+      GROUP BY platform 
+      ORDER BY count DESC
+    `;
+
+    const ratingStatsSql = `
+      SELECT 
+        rating,
+        COUNT(*) as count
+      FROM feedback 
+      WHERE rating IS NOT NULL
+      GROUP BY rating 
+      ORDER BY rating DESC
+    `;
+
+    const [stats, categoryStats, platformStats, ratingStats] = await Promise.all([
+      query(statsSql),
+      query(categoryStatsSql),
+      query(platformStatsSql),
+      query(ratingStatsSql)
+    ]);
+
+    // Calculate average rating
+    let avgRating = 0;
+    if (ratingStats.length > 0) {
+      const total = ratingStats.reduce((sum, item) => sum + (item.rating * item.count), 0);
+      const count = ratingStats.reduce((sum, item) => sum + item.count, 0);
+      avgRating = count > 0 ? total / count : 0;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        overview: {
+          ...stats[0],
+          avg_rating: parseFloat(avgRating.toFixed(2))
+        },
+        categories: categoryStats,
+        platforms: platformStats,
+        ratings: ratingStats
+      }
+    });
+
+  } catch (error) {
+    console.error('Get feedback stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch feedback statistics'
+    });
+  }
+};
+
 
 module.exports = {
   submitContact,
@@ -866,4 +1459,10 @@ module.exports = {
   getContactResponses,
   getContactInfo,
   updateContactInfo,
+    getFeedbacks,
+  getFeedbackById,
+  updateFeedbackStatus,
+  deleteFeedback,
+  exportFeedback,
+  getFeedbackStats
 };

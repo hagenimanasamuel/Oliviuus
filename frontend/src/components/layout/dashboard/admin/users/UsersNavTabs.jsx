@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback, useMemo } from "react";
-import { Users, Shield, Star, Users2, MoreHorizontal, Settings, Zap } from "lucide-react";
+import { Users, Shield, Star, Users2, MoreHorizontal, Settings, Zap, Trophy, Activity } from "lucide-react";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 
@@ -9,6 +9,8 @@ const RolesPermissions = React.lazy(() => import("../../../../../pages/Dashboard
 const Specials = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/Specials.jsx"));
 const FamilyPlan = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/FamilyPlan.jsx"));
 const BulkOperations = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/BulkOperations.jsx"));
+const TopUsers = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/TopUsers.jsx"));
+const LiveUsers = React.lazy(() => import("../../../../../pages/Dashboards/Admins/users/LiveUsers.jsx"));
 
 export default function UsersNavTabs() {
   const { t } = useTranslation();
@@ -25,7 +27,9 @@ export default function UsersNavTabs() {
       { id: "roles", label: t("usersTabs.rolesPermissions"), icon: Shield, component: <RolesPermissions /> },
       { id: "specials", label: t("usersTabs.specials"), icon: Star, component: <Specials /> },
       { id: "family", label: t("usersTabs.familyPlan"), icon: Users2, component: <FamilyPlan /> },
-      { id: "bulk", label: t("usersTabs.bulkOperations"), icon: Zap, component: <BulkOperations /> }
+      { id: "top", label: t("usersTabs.topUsers"), icon: Trophy, component: <TopUsers /> },
+      { id: "bulk", label: t("usersTabs.bulkOperations"), icon: Zap, component: <BulkOperations /> },
+      { id: "live", label: t("usersTabs.liveUsers"), icon: Activity, component: <LiveUsers /> }
     ],
     [t]
   );

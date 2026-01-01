@@ -65,19 +65,19 @@ const createEmailVerificationsTable = async () => {
 
 const createUserPreferencesTable = async () => {
   const sql = `
-    CREATE TABLE IF NOT EXISTS user_preferences (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      user_id INT NOT NULL,
-      genres JSON DEFAULT NULL,
-      language VARCHAR(10) DEFAULT 'en',
-      notifications BOOLEAN DEFAULT TRUE,
-      subtitles BOOLEAN DEFAULT TRUE,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      CONSTRAINT fk_user_preferences_user
-        FOREIGN KEY (user_id) REFERENCES users(id)
-        ON DELETE CASCADE
-    );
+  CREATE TABLE IF NOT EXISTS user_preferences (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        genres JSON,
+        language VARCHAR(10) DEFAULT 'en',
+        notifications BOOLEAN DEFAULT TRUE,
+        subtitles BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        CONSTRAINT fk_user_preferences_user
+          FOREIGN KEY (user_id) REFERENCES users(id)
+          ON DELETE CASCADE
+      );
   `;
   try {
     await query(sql);
@@ -139,9 +139,9 @@ const createSecurityLogsTable = async () => {
       user_id INT DEFAULT NULL,
       action VARCHAR(100) NOT NULL,
       ip_address VARCHAR(45) NOT NULL,
-      device_info JSON DEFAULT NULL,
+      device_info JSON, -- REMOVED DEFAULT NULL
       status ENUM('success', 'failed', 'blocked') NOT NULL,
-      details JSON DEFAULT NULL,
+      details JSON, -- REMOVED DEFAULT NULL
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       INDEX idx_user_id (user_id),
       INDEX idx_action (action),
@@ -167,19 +167,19 @@ const createSubscriptionsTables = async () => {
     CREATE TABLE IF NOT EXISTS subscriptions (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(50) NOT NULL UNIQUE,
-      name_translations JSON DEFAULT NULL,
+      name_translations JSON,
       type ENUM('mobile','basic','standard','family','free','custom') NOT NULL DEFAULT 'free',
       price INT NOT NULL DEFAULT 0,
       original_price INT DEFAULT NULL,
       description TEXT DEFAULT NULL,
-      description_translations JSON DEFAULT NULL,
+      description_translations JSON,
       tagline VARCHAR(255) DEFAULT NULL,
-      tagline_translations JSON DEFAULT NULL,
+      tagline_translations JSON,
       currency VARCHAR(3) DEFAULT 'RWF',
       devices_allowed JSON NOT NULL,
       max_sessions INT NOT NULL DEFAULT 1,
       max_devices_registered INT DEFAULT 10,
-      supported_platforms JSON DEFAULT NULL,
+      supported_platforms JSON,
       video_quality ENUM('SD','HD','FHD','UHD') DEFAULT 'SD',
       max_video_bitrate INT DEFAULT 2000,
       hdr_support BOOLEAN DEFAULT FALSE,
@@ -190,7 +190,7 @@ const createSubscriptionsTables = async () => {
       simultaneous_downloads INT DEFAULT 1,
       early_access BOOLEAN DEFAULT FALSE,
       exclusive_content BOOLEAN DEFAULT FALSE,
-      content_restrictions JSON DEFAULT NULL,
+      content_restrictions JSON,
       max_profiles INT DEFAULT 1,
       is_family_plan BOOLEAN DEFAULT FALSE,
       parental_controls BOOLEAN DEFAULT FALSE,
@@ -297,7 +297,7 @@ const createSubscriptionsTables = async () => {
     status ENUM('active', 'inactive', 'expired', 'failed') DEFAULT 'active',
     
     -- Metadata
-    metadata JSON DEFAULT NULL,
+    metadata JSON,
     
     -- Foreign key
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -539,7 +539,7 @@ const createNotificationsTable = async () => {
       title VARCHAR(255) NOT NULL,
       message TEXT NOT NULL,
       status ENUM('unread', 'read', 'archived') DEFAULT 'unread',
-      metadata JSON DEFAULT NULL,
+      metadata JSON,
       
       -- Icon field for frontend - remove any constraints
       icon VARCHAR(100) DEFAULT 'bell',
@@ -1189,7 +1189,7 @@ const createPeopleTables = async () => {
         
         -- Professional details
         primary_role ENUM('actor', 'director', 'producer', 'writer', 'cinematographer', 'composer', 'editor', 'other') NOT NULL,
-        other_roles JSON DEFAULT NULL,
+        other_roles JSON,
         
         -- Contact and representation (optional)
         agent_name VARCHAR(255),
@@ -1197,13 +1197,13 @@ const createPeopleTables = async () => {
         
         -- Media and assets
         profile_image_url VARCHAR(500),
-        gallery_images JSON DEFAULT NULL,
+        gallery_images JSON,
         
         -- Social media and links
         website_url VARCHAR(500),
         imdb_url VARCHAR(500),
         wikipedia_url VARCHAR(500),
-        social_links JSON DEFAULT NULL,
+        social_links JSON,
         
         -- Status and metadata
         is_active BOOLEAN DEFAULT TRUE,
@@ -1211,7 +1211,7 @@ const createPeopleTables = async () => {
         popularity_score INT DEFAULT 0,
         
         -- SEO and discovery
-        search_keywords JSON DEFAULT NULL,
+        search_keywords JSON,
         slug VARCHAR(255) UNIQUE NOT NULL,
         
         -- Timestamps
@@ -1460,7 +1460,7 @@ const createKidsTables = async () => {
         
         -- Custom age ratings (using actual ages like 11+, 13+, etc.)
         max_content_age_rating VARCHAR(10) DEFAULT '7+',
-        allowed_content_types JSON DEFAULT NULL,
+        allowed_content_types JSON,
         
         -- Appearance & Experience
         theme_color VARCHAR(50) DEFAULT 'blue',
@@ -1509,12 +1509,12 @@ const createKidsTables = async () => {
         allow_live_events BOOLEAN DEFAULT FALSE,
         
         -- Genre restrictions
-        blocked_genres JSON DEFAULT NULL,
-        allowed_genres JSON DEFAULT NULL,
+        blocked_genres JSON,
+        allowed_genres JSON,
         
         -- Specific content restrictions
-        blocked_content_ids JSON DEFAULT NULL, -- Specific content IDs to block
-        allowed_content_ids JSON DEFAULT NULL, -- Specific content IDs to allow (overrides)
+        blocked_content_ids JSON,
+        allowed_content_ids JSON,
         
         -- Search & Discovery restrictions
         allow_search BOOLEAN DEFAULT TRUE,
@@ -1621,12 +1621,12 @@ const createKidsTables = async () => {
         -- Daily limits
         daily_time_limit_minutes INT DEFAULT 120,
         current_daily_usage INT DEFAULT 0,
-        last_reset_date DATE DEFAULT NULL,
+        last_reset_date DATE DEFAULT CURDATE(),
         
         -- Weekly limits
         weekly_time_limit_minutes INT DEFAULT 600,
         current_weekly_usage INT DEFAULT 0,
-        last_weekly_reset DATE DEFAULT NULL,
+        last_weekly_reset DATE DEFAULT CURDATE(),
         
         -- Time window restrictions
         allowed_start_time TIME DEFAULT '07:00:00',
@@ -1819,7 +1819,7 @@ const createKidsTables = async () => {
         
         -- Activity details
         activity_type ENUM('search', 'content_view', 'content_attempt', 'time_limit', 'pin_entry', 'mode_switch') NOT NULL,
-        activity_details JSON DEFAULT NULL,
+        activity_details JSON,
         
         -- Content context
         content_id INT DEFAULT NULL,
@@ -1869,7 +1869,7 @@ const createKidsTables = async () => {
         
         -- Content context
         content_id INT DEFAULT NULL,
-        additional_data JSON DEFAULT NULL,
+        additional_data JSON,
         
         -- Delivery status
         status ENUM('pending', 'sent', 'read', 'dismissed') DEFAULT 'pending',
@@ -1919,10 +1919,10 @@ const createFamilyMembersTable = async () => {
       dashboard_type ENUM('normal', 'kid') DEFAULT 'normal',
       
       -- Access controls and restrictions
-      content_restrictions JSON DEFAULT NULL,
+      content_restrictions JSON, -- REMOVED DEFAULT NULL
       max_daily_watch_time INT DEFAULT NULL,
-      allowed_content_types JSON DEFAULT NULL,
-      blocked_categories JSON DEFAULT NULL,
+      allowed_content_types JSON, -- REMOVED DEFAULT NULL
+      blocked_categories JSON, -- REMOVED DEFAULT NULL
       
       -- Account suspension control
       is_suspended BOOLEAN DEFAULT FALSE,
@@ -1930,8 +1930,8 @@ const createFamilyMembersTable = async () => {
       suspension_reason VARCHAR(255) DEFAULT NULL,
       
       -- Sleep time restrictions
-      sleep_time_start TIME DEFAULT NULL, -- When account becomes inactive daily
-      sleep_time_end TIME DEFAULT NULL,   -- When account becomes active daily
+      sleep_time_start TIME DEFAULT NULL,
+      sleep_time_end TIME DEFAULT NULL,
       enforce_sleep_time BOOLEAN DEFAULT FALSE,
       
       -- Usage windows
@@ -1955,7 +1955,7 @@ const createFamilyMembersTable = async () => {
       last_accessed_at TIMESTAMP NULL DEFAULT NULL,
       
       -- Custom permissions
-      custom_permissions JSON DEFAULT NULL,
+      custom_permissions JSON, -- REMOVED DEFAULT NULL
       
       -- Timestamps
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -2003,7 +2003,7 @@ const createFamilyPinSecurityTable = async () => {
       pin_locked_until DATETIME DEFAULT NULL,
       
       -- PIN History (to prevent reuse)
-      previous_pins JSON DEFAULT NULL,
+      previous_pins JSON,
       
       -- Security Settings
       max_pin_attempts INT DEFAULT 5,
@@ -2122,7 +2122,7 @@ const createGameTables = async () => {
         is_active BOOLEAN DEFAULT TRUE,
         requires_internet BOOLEAN DEFAULT TRUE,
         game_component VARCHAR(100),
-        metadata JSON DEFAULT NULL,
+        metadata JSON,
         sort_order INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -2161,7 +2161,7 @@ const createGameTables = async () => {
         ip_address VARCHAR(45) DEFAULT NULL,
         
         -- Session data (temporary game state)
-        session_data JSON DEFAULT NULL,
+        session_data JSON,
         
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -2205,12 +2205,12 @@ const createGameTables = async () => {
         times_played INT DEFAULT 0,
         
         -- Game-specific save state
-        save_state JSON DEFAULT NULL,
+        save_state JSON,
         last_level_played INT DEFAULT 1,
         
         -- Achievements and unlockables
-        unlocked_features JSON DEFAULT NULL,
-        achievements_json JSON DEFAULT NULL,
+        unlocked_features JSON,
+        achievements_json JSON,
         
         -- Statistics
         average_session_time INT DEFAULT 0,
@@ -2264,7 +2264,7 @@ const createGameTables = async () => {
         accuracy_percentage DECIMAL(5,2) DEFAULT 0,
         
         -- Additional metrics (game-specific)
-        metrics_json JSON DEFAULT NULL,
+        metrics_json JSON,
         
         -- Completion flags
         is_high_score BOOLEAN DEFAULT FALSE,
@@ -2377,7 +2377,7 @@ const createGameTables = async () => {
         improvement_percentage DECIMAL(5,2) DEFAULT 0,
         
         -- Assessment history
-        assessments JSON DEFAULT NULL,
+        assessments JSON,
         
         -- Activity tracking
         last_assessed_date DATE,
@@ -2485,13 +2485,13 @@ const createGameTables = async () => {
         average_session_minutes INT DEFAULT 0,
         
         -- Progress highlights
-        new_achievements JSON DEFAULT NULL,
-        skill_improvements JSON DEFAULT NULL,
-        top_games JSON DEFAULT NULL,
+        new_achievements JSON,
+        skill_improvements JSON,
+        top_games JSON,
         
         -- Recommendations
-        recommendations JSON DEFAULT NULL,
-        suggested_games JSON DEFAULT NULL,
+        recommendations JSON,
+        suggested_games JSON,
         
         -- Report status
         status ENUM('generated', 'sent', 'viewed', 'archived') DEFAULT 'generated',
@@ -2535,7 +2535,7 @@ const createGameTables = async () => {
         last_reset_date DATE DEFAULT NULL,
         
         -- Per-game specific limits
-        per_game_limits JSON DEFAULT NULL,
+        per_game_limits JSON,
         
         -- Break settings
         game_break_reminder_minutes INT DEFAULT 20,
@@ -2871,6 +2871,202 @@ const insertGameSkillMappings = async () => {
   }
 };
 
+// ✅ Add this table creation function
+const createLivePresenceTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS live_presence (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      session_id VARCHAR(255) UNIQUE NOT NULL,
+      
+      -- User identification (can be NULL for anonymous)
+      user_id INT DEFAULT NULL,
+      user_type ENUM('authenticated', 'anonymous', 'kid_profile', 'family_member') DEFAULT 'authenticated',
+      
+      -- Session type
+      session_type ENUM('viewing', 'browsing', 'idle') DEFAULT 'browsing',
+      device_type ENUM('web', 'mobile', 'tablet', 'smarttv', 'desktop') DEFAULT 'web',
+      device_name VARCHAR(100),
+      
+      -- Content being watched (if any)
+      content_id INT DEFAULT NULL,
+      media_asset_id INT DEFAULT NULL,
+      content_type ENUM('movie', 'series', 'documentary', 'short_film', 'live_event', 'game') DEFAULT NULL,
+      content_title VARCHAR(255),
+      
+      -- Playback state
+      playback_time DECIMAL(10,2) DEFAULT 0,
+      duration DECIMAL(10,2) DEFAULT 0,
+      percentage_watched DECIMAL(5,2) DEFAULT 0,
+      
+      -- Location & Network
+      ip_address VARCHAR(45),
+      country_code VARCHAR(2),
+      region VARCHAR(100),
+      city VARCHAR(100),
+      
+      -- Connection info
+      connection_type VARCHAR(50), -- wifi, mobile, cable
+      bandwidth_estimate INT, -- kbps
+      
+      -- Activity tracking
+      last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      expires_at TIMESTAMP NULL,
+      
+      -- Session metadata
+      user_agent TEXT,
+      screen_resolution VARCHAR(50),
+      language_preference VARCHAR(10) DEFAULT 'en',
+      
+      -- Engagement metrics
+      total_watch_time_seconds INT DEFAULT 0,
+      total_actions INT DEFAULT 0, -- clicks, scrolls, etc.
+      page_views INT DEFAULT 0,
+      
+      -- Quality of service
+      buffering_count INT DEFAULT 0,
+      quality_changes INT DEFAULT 0,
+      current_quality ENUM('SD', 'HD', 'FHD', 'UHD') DEFAULT 'HD',
+      
+      -- Performance metrics
+      network_latency INT, -- ms
+      frame_rate DECIMAL(5,2), -- fps
+      
+      -- Status
+      is_active BOOLEAN DEFAULT TRUE,
+      disconnected_at TIMESTAMP NULL,
+      
+      INDEX idx_session_id (session_id),
+      INDEX idx_user_id (user_id),
+      INDEX idx_content_id (content_id),
+      INDEX idx_last_activity (last_activity),
+      INDEX idx_is_active (is_active),
+      INDEX idx_user_type (user_type),
+      INDEX idx_device_type (device_type),
+      INDEX idx_country_code (country_code),
+      INDEX idx_session_type (session_type),
+      INDEX idx_expires_at (expires_at),
+      
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+      FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE SET NULL,
+      FOREIGN KEY (media_asset_id) REFERENCES media_assets(id) ON DELETE SET NULL
+    );
+  `;
+
+  try {
+    await query(sql);
+    console.log("✅ live_presence table created");
+  } catch (err) {
+    console.error("❌ Error creating live_presence table:", err);
+  }
+};
+
+// ✅ Add this table for aggregated live stats
+const createLiveStatsSnapshotsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS live_stats_snapshots (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      
+      -- Total counts
+      total_live_users INT DEFAULT 0,
+      authenticated_users INT DEFAULT 0,
+      anonymous_users INT DEFAULT 0,
+      kid_profiles INT DEFAULT 0,
+      family_members INT DEFAULT 0,
+      
+      -- Activity breakdown
+      viewing_users INT DEFAULT 0,
+      browsing_users INT DEFAULT 0,
+      idle_users INT DEFAULT 0,
+      
+      -- Device breakdown
+      web_users INT DEFAULT 0,
+      mobile_users INT DEFAULT 0,
+      tablet_users INT DEFAULT 0,
+      smarttv_users INT DEFAULT 0,
+      desktop_users INT DEFAULT 0,
+      
+      -- Content breakdown
+      watching_movies INT DEFAULT 0,
+      watching_series INT DEFAULT 0,
+      playing_games INT DEFAULT 0,
+      
+      -- Geographic breakdown
+      countries_count INT DEFAULT 0,
+      top_countries JSON,
+      
+      -- Performance metrics
+      avg_bandwidth INT DEFAULT 0,
+      avg_latency INT DEFAULT 0,
+      avg_buffer_ratio DECIMAL(5,2) DEFAULT 0,
+      
+      -- Engagement metrics
+      avg_watch_time_minutes INT DEFAULT 0,
+      peak_concurrent_users INT DEFAULT 0,
+      
+      -- Time period
+      snapshot_type ENUM('real_time', 'hourly', 'daily') DEFAULT 'real_time',
+      time_bucket DATETIME,
+      
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      INDEX idx_snapshot_type (snapshot_type),
+      INDEX idx_created_at (created_at),
+      INDEX idx_time_bucket (time_bucket)
+    );
+  `;
+
+  try {
+    await query(sql);
+    console.log("✅ live_stats_snapshots table created");
+  } catch (err) {
+    console.error("❌ Error creating live_stats_snapshots table:", err);
+  }
+};
+
+// ✅ Add this table for live events (joins, leaves, actions)
+const createLiveEventsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS live_events (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      session_id VARCHAR(255) NOT NULL,
+      user_id INT DEFAULT NULL,
+      
+      event_type ENUM(
+        'user_joined',
+        'user_left',
+        'content_started',
+        'content_paused',
+        'content_resumed',
+        'content_completed',
+        'quality_changed',
+        'buffering_started',
+        'buffering_ended',
+        'device_changed',
+        'location_changed',
+        'heartbeat'
+      ) NOT NULL,
+      
+      event_data JSON,
+      metadata JSON,
+      
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      INDEX idx_session_id (session_id),
+      INDEX idx_user_id (user_id),
+      INDEX idx_event_type (event_type),
+      INDEX idx_created_at (created_at)
+    );
+  `;
+
+  try {
+    await query(sql);
+    console.log("✅ live_events table created");
+  } catch (err) {
+    console.error("❌ Error creating live_events table:", err);
+  }
+};
+
 
 const initializeDatabase = async () => {
   try {
@@ -2960,6 +3156,16 @@ const initializeDatabase = async () => {
     // ====================
     console.log("💻 Phase 12: Creating user session...");
     await createUserSessionTable(); // References users and kids_profiles
+
+    // ====================
+    // FINAL STEP: LIVE USER TRACKING TABLES
+    // ====================
+    console.log("📊 Creating live user tracking tables...");
+    await createLivePresenceTable();
+    await createLiveStatsSnapshotsTable();
+    await createLiveEventsTable();
+
+    console.log("✅ Live tracking tables created!");
     
     console.log("✅ All tables created successfully!");
     

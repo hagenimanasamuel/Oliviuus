@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 // Generate alphanumeric code (letters + numbers)
 const generateCode = (length = 6) => {
-  const chars = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZ123456789";
   let code = "";
   for (let i = 0; i < length; i++) {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -131,9 +131,9 @@ const saveUserInfo = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true, // MUST be true for sameSite: "none"
-      sameSite: "none", // Allow cross-domain
+      sameSite: "strict", // Allow cross-domain
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: ".oliviuus.com",
+      // domain: ".oliviuus.com",
     });
 
     // 8. Record session in user_session table (same logic as login)
@@ -428,9 +428,9 @@ const loginUser = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true, // MUST be true for sameSite: "none"
-      sameSite: "none", // Allow cross-domain
+      sameSite: "strict", // Allow cross-domain
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: ".oliviuus.com",
+      // domain: ".oliviuus.com",
     });
 
     // 5️⃣ Record session in user_session table
@@ -537,10 +537,10 @@ const googleAuth = async (req, res) => {
     // Set HttpOnly cookie
     res.cookie("token", jwtToken, {
       httpOnly: true,
-      secure: true, // MUST be true for sameSite: "none"
-      sameSite: "none", // Allow cross-domain
+      secure: false, // MUST be true for sameSite: "none"
+      sameSite: "strict", // Allow cross-domain
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: ".oliviuus.com",
+      // domain: ".oliviuus.com",
     });
 
     // Record session

@@ -22,7 +22,6 @@ router.post("/validate-stream", authMiddleware, async (req, res) => {
       });
     }
 
-    console.log(`🔒 [SECURITY API] Validation for user ${userId}, content ${contentId}`);
 
     const validationResult = await SecurityValidator.validateContentStreamAccess(
       userId,
@@ -47,7 +46,6 @@ router.post("/validate-stream", authMiddleware, async (req, res) => {
     );
 
     if (!validationResult.valid) {
-      console.log(`❌ [SECURITY API] Blocked user ${userId}: ${validationResult.code} - ${validationResult.message}`);
       return res.status(403).json({
         success: false,
         ...validationResult,
@@ -55,7 +53,6 @@ router.post("/validate-stream", authMiddleware, async (req, res) => {
       });
     }
 
-    console.log(`✅ [SECURITY API] Allowed user ${userId}: ${validationResult.details?.subscription?.plan_name}`);
     
     res.json({
       success: true,
@@ -87,7 +84,6 @@ router.post("/debug", authMiddleware, async (req, res) => {
     const userId = req.user.id;
     const { contentId, deviceId, deviceType } = req.body;
 
-    console.log('🔍🔍🔍 [SECURITY API DEBUG] Debug for user:', userId);
     
     const debugResult = await SecurityValidator.debugValidationFlow(
       userId,

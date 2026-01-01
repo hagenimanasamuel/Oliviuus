@@ -254,7 +254,26 @@
     "specials": "Specials",
     "familyPlan": "Family Plan",
     "bulkOperations": "Bulk Operations",
+    "topUsers": "Top Users",
+    "liveUsers": "Live Users",
     "more": "More"
+  },
+  "liveUsers": {
+    "title": "Live Users Dashboard",
+    "subtitle": "Real-time monitoring of all active users",
+    "overview": "Overview",
+    "liveUsers": "Live Users",
+    "map": "Map",
+    "analytics": "Analytics",
+    "warnings": "Warnings",
+    "totalLive": "Total Live",
+    "watching": "Watching Now",
+    "countries": "Countries",
+    "peakToday": "Peak Today",
+    "deviceDistribution": "Device Distribution",
+    "watchingNow": "Currently Watching",
+    "geographic": "Geographic Distribution",
+    "viewers": "viewers"
   },
   "passwordSettings": {
     "currentPassword": "Current Password",
