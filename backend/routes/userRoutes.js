@@ -56,12 +56,28 @@ const {
   terminateFamilyMemberSessions,
   getTopUsers,
   getUserEngagementAnalytics,
-  getTopUsersSummary
+  getTopUsersSummary,
+  updateUserPhone,
+  updateUserUsername,
+  updateUserName,
+  getUserIdentifiers,
 } = require("../controllers/userController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require('../middlewares/adminMiddleware');
 
 const router = express.Router();
+
+// Update user phone number
+router.put("/:userId/phone", authMiddleware, adminMiddleware, updateUserPhone);
+
+// Update user username
+router.put("/:userId/username", authMiddleware, adminMiddleware, updateUserUsername);
+
+// Update user name (first and last)
+router.put("/:userId/name", authMiddleware, adminMiddleware, updateUserName);
+
+// Get all user identifiers
+router.get("/:userId/identifiers", authMiddleware, adminMiddleware, getUserIdentifiers);
 
 // update the current user's password
 router.put("/update-password", authMiddleware, updatePassword);

@@ -10,7 +10,9 @@ const {
   updateKidAvatar,
   getKidViewingStats,
   resetKidViewingTime,
-  getKidWatchlist
+  getKidWatchlist,
+  reactivateKidProfile,
+  permanentDeleteKidProfile  
 } = require("../controllers/kidProfileController");
 
 const authMiddleware = require("../middlewares/authMiddleware");
@@ -33,5 +35,8 @@ router.put("/profiles/:kidId/avatar", validateParentOwnership, updateKidAvatar);
 router.get("/profiles/:kidId/stats", validateParentOwnership, getKidViewingStats);
 router.post("/profiles/:kidId/reset-time", validateParentOwnership, resetKidViewingTime);
 router.get("/profiles/:kidId/watchlist", validateParentOwnership, getKidWatchlist);
+router.post("/profiles/:kidId/reactivate", validateParentOwnership, reactivateKidProfile);
+router.post("/profiles/:kidId/permanent-delete", validateParentOwnership, permanentDeleteKidProfile);
+
 
 module.exports = router;

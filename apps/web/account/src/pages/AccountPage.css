@@ -1,0 +1,122 @@
+/* src/pages/AccountPage.css */
+.account-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.account-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(188, 139, 188, 0.2);
+}
+
+.account-header h1 {
+  font-size: 2.5rem;
+  color: #BC8BBC;
+  margin-bottom: 0.5rem;
+}
+
+.account-header p {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+.account-navigation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.nav-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(188, 139, 188, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  border-color: #BC8BBC;
+  box-shadow: 0 10px 20px rgba(188, 139, 188, 0.2);
+}
+
+.nav-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+  color: #fff;
+}
+
+.nav-card p {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.nav-link {
+  display: inline-block;
+  background: #BC8BBC;
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  background: #a572a5;
+  transform: scale(1.05);
+}
+
+.nav-link:disabled {
+  background: #555;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.account-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(188, 139, 188, 0.2);
+}
+
+.logout-button {
+  background: transparent;
+  color: #ff6b6b;
+  border: 1px solid #ff6b6b;
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.back-to-streaming {
+  color: #BC8BBC;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.back-to-streaming:hover {
+  color: #a572a5;
+}

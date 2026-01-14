@@ -84,7 +84,7 @@ const getKidProfileById = async (req, res) => {
   }
 };
 
-// ✅ Create new kid profile
+// ✅ Create new kid profile - FIXED VERSION
 const createKidProfile = async (req, res) => {
   try {
     const parentUserId = req.user.id;
@@ -112,6 +112,41 @@ const createKidProfile = async (req, res) => {
     if (!name || !birth_date) {
       return res.status(400).json({
         error: "Name and birth date are required"
+      });
+    }
+
+    // Validate name length
+    if (name.length < 2 || name.length > 50) {
+      return res.status(400).json({
+        error: "Name must be between 2 and 50 characters"
+      });
+    }
+
+    // ✅ FIX 1: Check if name already exists for THIS PARENT among ACTIVE kids only
+    const existingActiveKid = await query(
+      "SELECT id, name FROM kids_profiles WHERE parent_user_id = ? AND name = ? AND is_active = TRUE",
+      [parentUserId, name]
+    );
+
+    if (existingActiveKid.length > 0) {
+      return res.status(400).json({
+        error: "profile_name_exists",
+        message: `A kid profile with the name "${name}" already exists. Please choose a different name.`
+      });
+    }
+
+    // ✅ FIX 2: Check if there's an INACTIVE kid with the same name that we can reactivate
+    const existingInactiveKid = await query(
+      "SELECT id, name FROM kids_profiles WHERE parent_user_id = ? AND name = ? AND is_active = FALSE",
+      [parentUserId, name]
+    );
+
+    // If inactive kid exists with same name, offer to reactivate it
+    if (existingInactiveKid.length > 0) {
+      return res.status(400).json({
+        error: "inactive_profile_exists",
+        message: `A deactivated kid profile with the name "${name}" exists. Would you like to reactivate it instead?`,
+        deactivated_profile_id: existingInactiveKid[0].id
       });
     }
 
@@ -257,12 +292,160 @@ const createKidProfile = async (req, res) => {
     } catch (error) {
       await query("ROLLBACK");
       console.error("❌ Database error in createKidProfile:", error);
-      res.status(500).json({ error: "Database error creating kid profile" });
+      
+      // ✅ FIX 3: Handle duplicate entry error specifically
+      if (error.code === 'ER_DUP_ENTRY') {
+        return res.status(400).json({
+          error: "profile_name_exists",
+          message: `A kid profile with the name "${name}" already exists. This might be a deactivated profile.`
+        });
+      }
+      
+      res.status(500).json({ 
+        error: "database_error",
+        message: "Database error creating kid profile",
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
     }
 
   } catch (error) {
     console.error("❌ Error creating kid profile:", error);
-    res.status(500).json({ error: "Failed to create kid profile" });
+    res.status(500).json({ 
+      error: "server_error",
+      message: "Failed to create kid profile",
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+
+// ✅ Reactivate deactivated kid profile
+const reactivateKidProfile = async (req, res) => {
+  try {
+    const { kidId } = req.params;
+    const parentUserId = req.user.id;
+    const updates = req.body; // Optional updates for reactivation
+
+    // Check if the deactivated profile exists and belongs to parent
+    const deactivatedProfile = await query(
+      "SELECT id, name FROM kids_profiles WHERE id = ? AND parent_user_id = ? AND is_active = FALSE",
+      [kidId, parentUserId]
+    );
+
+    if (deactivatedProfile.length === 0) {
+      return res.status(404).json({ 
+        error: "profile_not_found",
+        message: "Deactivated profile not found or already active"
+      });
+    }
+
+    // Check profile limit before reactivating
+    const profileCount = await query(
+      "SELECT COUNT(*) as count FROM kids_profiles WHERE parent_user_id = ? AND is_active = TRUE",
+      [parentUserId]
+    );
+
+    const familyPlanCheck = await query(
+      `SELECT s.max_profiles 
+       FROM user_subscriptions us
+       JOIN subscriptions s ON us.subscription_id = s.id
+       WHERE us.user_id = ? AND us.status = 'active' AND us.end_date > NOW()
+       AND s.type = 'family'`,
+      [parentUserId]
+    );
+
+    if (familyPlanCheck.length === 0) {
+      return res.status(403).json({
+        error: "family_plan_required",
+        message: "Family plan subscription required"
+      });
+    }
+
+    const maxProfiles = familyPlanCheck[0].max_profiles || 4;
+    if (profileCount[0].count >= maxProfiles) {
+      return res.status(403).json({
+        error: "profile_limit_reached",
+        message: `Maximum ${maxProfiles} kid profiles allowed on your plan`
+      });
+    }
+
+    // Start transaction
+    await query("START TRANSACTION");
+
+    try {
+      // Prepare update fields
+      const allowedUpdates = [
+        'birth_date', 'daily_time_limit_minutes', 'require_pin_to_exit',
+        'theme_color', 'interface_mode', 'avatar_url'
+      ];
+
+      const setClause = ['is_active = TRUE'];
+      const values = [];
+
+      allowedUpdates.forEach(field => {
+        if (updates[field] !== undefined) {
+          setClause.push(`${field} = ?`);
+          values.push(updates[field]);
+        }
+      });
+
+      values.push(kidId, parentUserId);
+
+      // Reactivate the profile
+      await query(
+        `UPDATE kids_profiles 
+         SET ${setClause.join(', ')}, updated_at = NOW() 
+         WHERE id = ? AND parent_user_id = ?`,
+        values
+      );
+
+      // Update viewing time limits if provided
+      if (updates.daily_time_limit_minutes !== undefined) {
+        await query(
+          `UPDATE viewing_time_limits 
+           SET daily_time_limit_minutes = ?, updated_at = NOW() 
+           WHERE kid_profile_id = ?`,
+          [updates.daily_time_limit_minutes, kidId]
+        );
+      }
+
+      await query("COMMIT");
+
+      // Fetch reactivated profile
+      const reactivatedProfile = await query(
+        `SELECT 
+          kp.*,
+          kcr.max_age_rating,
+          kcr.blocked_genres,
+          kcr.allowed_genres,
+          vtl.daily_time_limit_minutes as effective_daily_limit
+         FROM kids_profiles kp
+         LEFT JOIN kids_content_restrictions kcr ON kp.id = kcr.kid_profile_id
+         LEFT JOIN viewing_time_limits vtl ON kp.id = vtl.kid_profile_id
+         WHERE kp.id = ?`,
+        [kidId]
+      );
+
+      res.json({
+        message: "Kid profile reactivated successfully",
+        profile: reactivatedProfile[0]
+      });
+
+    } catch (error) {
+      await query("ROLLBACK");
+      console.error("❌ Database error reactivating profile:", error);
+      res.status(500).json({ 
+        error: "database_error",
+        message: "Failed to reactivate profile"
+      });
+    }
+
+  } catch (error) {
+    console.error("❌ Error reactivating kid profile:", error);
+    res.status(500).json({ 
+      error: "server_error",
+      message: "Failed to reactivate profile"
+    });
   }
 };
 
@@ -603,6 +786,103 @@ const getKidWatchlist = async (req, res) => {
   }
 };
 
+// ✅ Permanently delete kid profile (hard delete)
+const permanentDeleteKidProfile = async (req, res) => {
+  try {
+    const { kidId } = req.params;
+    const parentUserId = req.user.id;
+
+    // Check if profile exists and belongs to parent
+    const kidProfile = await query(
+      "SELECT id, name FROM kids_profiles WHERE id = ? AND parent_user_id = ?",
+      [kidId, parentUserId]
+    );
+
+    if (kidProfile.length === 0) {
+      return res.status(404).json({ 
+        error: "profile_not_found",
+        message: "Kid profile not found"
+      });
+    }
+
+    // Start transaction for permanent deletion
+    await query("START TRANSACTION");
+
+    try {
+      // Get profile name for logging
+      const profileName = kidProfile[0].name;
+
+      // 1. Delete from kids_watchlist
+      await query("DELETE FROM kids_watchlist WHERE kid_profile_id = ?", [kidId]);
+      
+      // 2. Delete from kids_viewing_history
+      await query("DELETE FROM kids_viewing_history WHERE kid_profile_id = ?", [kidId]);
+      
+      // 3. Delete from viewing_time_limits
+      await query("DELETE FROM viewing_time_limits WHERE kid_profile_id = ?", [kidId]);
+      
+      // 4. Delete from kids_content_restrictions
+      await query("DELETE FROM kids_content_restrictions WHERE kid_profile_id = ?", [kidId]);
+      
+      // 5. Delete from kids_sessions
+      await query("DELETE FROM kids_sessions WHERE kid_profile_id = ?", [kidId]);
+      
+      // 6. Delete from kids_activity_logs
+      await query("DELETE FROM kids_activity_logs WHERE kid_profile_id = ?", [kidId]);
+      
+      // 7. Delete from kids_ratings_feedback
+      await query("DELETE FROM kids_ratings_feedback WHERE kid_profile_id = ?", [kidId]);
+      
+      // 8. Delete from approved_content_overrides
+      await query("DELETE FROM approved_content_overrides WHERE kid_profile_id = ?", [kidId]);
+      
+      // 9. Delete from kids_recommendations
+      await query("DELETE FROM kids_recommendations WHERE kid_profile_id = ?", [kidId]);
+      
+      // 10. Finally delete from kids_profiles
+      await query("DELETE FROM kids_profiles WHERE id = ?", [kidId]);
+
+      await query("COMMIT");
+
+      // Log the action
+      await query(
+        `INSERT INTO security_logs 
+         (user_id, action, ip_address, status, details) 
+         VALUES (?, 'kid_profile_permanent_delete', ?, 'success', ?)`,
+        [
+          parentUserId,
+          req.headers["x-forwarded-for"] || req.connection.remoteAddress || "Unknown",
+          JSON.stringify({
+            profile_id: kidId,
+            profile_name: profileName,
+            timestamp: new Date().toISOString()
+          })
+        ]
+      );
+
+      res.json({
+        message: "Kid profile permanently deleted",
+        deleted_profile: profileName
+      });
+
+    } catch (error) {
+      await query("ROLLBACK");
+      console.error("❌ Database error in permanent deletion:", error);
+      res.status(500).json({ 
+        error: "database_error",
+        message: "Failed to permanently delete profile"
+      });
+    }
+
+  } catch (error) {
+    console.error("❌ Error in permanent deletion:", error);
+    res.status(500).json({ 
+      error: "server_error",
+      message: "Failed to delete profile"
+    });
+  }
+};
+
 module.exports = {
   getKidProfiles,
   getKidProfileById,
@@ -612,5 +892,7 @@ module.exports = {
   updateKidAvatar,
   getKidViewingStats,
   resetKidViewingTime,
-  getKidWatchlist
+  getKidWatchlist,
+  reactivateKidProfile,
+  permanentDeleteKidProfile 
 };

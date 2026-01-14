@@ -591,10 +591,85 @@ const removeFamilyMemberPin = async (req, res) => {
   }
 };
 
+// 6. Remove Master PIN completely (delete PIN protection)
+const removeMasterPin = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    // Validate user can manage PINs (family plan owner OR parent role)
+    const accessValidation = await validatePinManagementAccess(userId);
+    
+    if (!accessValidation.valid) {
+      return res.status(403).json({ error: accessValidation.error });
+    }
+
+    // Get the actual parent user ID (family owner for parent role users)
+    const parentUserId = accessValidation.isFamilyPlanOwner ? userId : accessValidation.familyOwnerId;
+
+    // Check if parental controls record exists
+    const existingControls = await query(
+      "SELECT id FROM parental_controls WHERE parent_user_id = ? AND master_pin_code IS NOT NULL",
+      [parentUserId]
+    );
+
+    if (existingControls.length === 0) {
+      return res.status(404).json({ error: "No PIN found to remove" });
+    }
+
+    // Remove the PIN by setting it to NULL
+    await query(
+      "UPDATE parental_controls SET master_pin_code = NULL, updated_at = NOW() WHERE parent_user_id = ?",
+      [parentUserId]
+    );
+
+    // Log the action
+    await query(`
+      INSERT INTO security_logs 
+      (user_id, action, ip_address, status, details) 
+      VALUES (?, 'remove_master_pin', ?, 'success', ?)
+    `, [
+      userId,
+      req.headers["x-forwarded-for"] || req.connection.remoteAddress || "Unknown",
+      JSON.stringify({
+        action: 'master_pin_removed',
+        is_family_plan_owner: accessValidation.isFamilyPlanOwner,
+        is_parent_role: accessValidation.isParentRole,
+        parent_user_id: parentUserId,
+        timestamp: new Date().toISOString()
+      })
+    ]);
+
+    res.status(200).json({
+      message: "Master PIN removed successfully",
+      master_pin_set: false
+    });
+
+  } catch (error) {
+    console.error("❌ [DEBUG] Error removing master PIN:", error);
+    
+    // Log the error
+    await query(`
+      INSERT INTO security_logs 
+      (user_id, action, ip_address, status, details) 
+      VALUES (?, 'remove_master_pin', ?, 'failed', ?)
+    `, [
+      userId,
+      req.headers["x-forwarded-for"] || req.connection.remoteAddress || "Unknown",
+      JSON.stringify({
+        error: error.message,
+        timestamp: new Date().toISOString()
+      })
+    ]);
+
+    res.status(500).json({ error: "Failed to remove master PIN" });
+  }
+};
+
 module.exports = {
   setMasterPin,
   verifyPin,
   getPinStatus,
   setFamilyMemberPin,
-  removeFamilyMemberPin
+  removeFamilyMemberPin,
+  removeMasterPin
 };

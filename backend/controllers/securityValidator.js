@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const geoip = require("geoip-lite");
 
 /**
- * PRODUCTION SECURITY VALIDATOR - KID-FRIENDLY VERSION
+ * PRODUCTION SECURITY VALIDATOR - UPDATED FOR MULTI-IDENTIFIER SYSTEM
  */
 class SecurityValidator {
   constructor() {
@@ -50,14 +50,103 @@ class SecurityValidator {
   }
 
   /**
-   * MAIN VALIDATION ENTRY POINT
+   * GET USER IDENTIFIER - SUPPORTS MULTI-IDENTIFIER SYSTEM
    */
-  async validateContentStreamAccess(userId, contentId, deviceId, deviceType, ipAddress = null) {
+  async getUserIdentifier(userData) {
     try {
-      console.log(`🔐 [SECURITY] Starting validation for user: ${userId}, content: ${contentId}`);
+      // If we have direct userId
+      if (userData.userId) {
+        return { type: 'user_id', value: userData.userId };
+      }
+      
+      // If we have oliviuus_id (new system)
+      if (userData.oliviuus_id) {
+        return { type: 'oliviuus_id', value: userData.oliviuus_id };
+      }
+      
+      // If we have kid_profile_id
+      if (userData.kid_profile_id) {
+        return { type: 'kid_profile_id', value: userData.kid_profile_id };
+      }
+      
+      // If we have family_member_id
+      if (userData.family_member_id) {
+        return { type: 'family_member_id', value: userData.family_member_id };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('❌ [SECURITY] Error getting user identifier:', error);
+      return null;
+    }
+  }
 
-      // 1. USER VALIDATION
-      const userValidation = await this.validateUserBasic(userId);
+  /**
+   * GET ACTUAL USER ID FROM ANY IDENTIFIER
+   */
+  async getActualUserId(identifier) {
+    try {
+      if (!identifier) return null;
+      
+      switch (identifier.type) {
+        case 'user_id':
+          return identifier.value;
+          
+        case 'oliviuus_id':
+          const userByOliviuusId = await query(
+            'SELECT id FROM users WHERE oliviuus_id = ? AND is_active = true',
+            [identifier.value]
+          );
+          return userByOliviuusId[0]?.id || null;
+          
+        case 'kid_profile_id':
+          const kidProfile = await query(
+            'SELECT user_id FROM kid_profiles WHERE id = ? AND is_active = true',
+            [identifier.value]
+          );
+          return kidProfile[0]?.user_id || null;
+          
+        case 'family_member_id':
+          const familyMember = await query(
+            'SELECT user_id FROM family_members WHERE id = ? AND is_active = true AND is_suspended = false',
+            [identifier.value]
+          );
+          return familyMember[0]?.user_id || null;
+          
+        default:
+          return null;
+      }
+    } catch (error) {
+      console.error('❌ [SECURITY] Error getting actual user ID:', error);
+      return null;
+    }
+  }
+
+  /**
+   * MAIN VALIDATION ENTRY POINT - UPDATED FOR MULTI-IDENTIFIER
+   */
+  async validateContentStreamAccess(userId, contentId, deviceId, deviceType, ipAddress = null, userData = {}) {
+    try {
+      console.log(`🔐 [SECURITY] Starting validation for user data:`, userData);
+
+      // 🆕 Get user identifier and actual user ID
+      const identifier = await this.getUserIdentifier(userData);
+      const actualUserId = await this.getActualUserId(identifier);
+      
+      console.log(`🔐 [SECURITY] Identifier: ${identifier?.type}, Actual User ID: ${actualUserId}`);
+
+      // If we can't determine the user, handle appropriately
+      let effectiveUserId = actualUserId || userId;
+      
+      if (!effectiveUserId) {
+        return this.buildErrorResponse('USER_NOT_FOUND', 'User identification failed', {
+          identifier_data: userData,
+          requires_login: true
+        });
+      }
+
+      // 1. USER VALIDATION - UPDATED FOR MULTI-IDENTIFIER
+      const userValidation = await this.validateUserBasic(effectiveUserId, identifier);
       if (!userValidation.valid) {
         return this.buildErrorResponse('USER_INVALID', userValidation.message, userValidation.details);
       }
@@ -68,8 +157,8 @@ class SecurityValidator {
         return this.buildErrorResponse('CONTENT_INVALID', contentValidation.message, contentValidation.details);
       }
 
-      // 3. SUBSCRIPTION VALIDATION
-      const subscriptionValidation = await this.validateSubscriptionProper(userId);
+      // 3. SUBSCRIPTION VALIDATION - UPDATED FOR MULTI-IDENTIFIER
+      const subscriptionValidation = await this.validateSubscriptionProper(effectiveUserId, identifier);
       if (!subscriptionValidation.valid) {
         return this.buildErrorResponse(
           subscriptionValidation.code || 'SUBSCRIPTION_REQUIRED',
@@ -81,7 +170,7 @@ class SecurityValidator {
       const subscription = subscriptionValidation.subscription;
 
       // 4. DEVICE LIMIT CHECK
-      const deviceLimitCheck = await this.checkDeviceLimits(userId, subscription, deviceId, deviceType);
+      const deviceLimitCheck = await this.checkDeviceLimits(effectiveUserId, subscription, deviceId, deviceType);
       if (!deviceLimitCheck.valid) {
         return this.buildErrorResponse(
           'DEVICE_LIMIT_REACHED',
@@ -91,7 +180,7 @@ class SecurityValidator {
       }
 
       // 5. SIMULTANEOUS STREAM LIMIT CHECK
-      const streamLimitCheck = await this.checkSimultaneousStreams(userId, subscription);
+      const streamLimitCheck = await this.checkSimultaneousStreams(effectiveUserId, subscription);
       if (!streamLimitCheck.valid) {
         return this.buildErrorResponse(
           'STREAM_LIMIT_REACHED',
@@ -101,13 +190,14 @@ class SecurityValidator {
       }
 
       // 6. KID/FAMILY RESTRICTIONS - Only check if user is actually a kid
-      const isKidUser = await this.isUserAKid(userId);
+      const isKidUser = await this.isUserAKid(effectiveUserId, identifier);
       if (isKidUser) {
         const kidRestrictionCheck = await this.checkKidAndFamilyRestrictions(
-          userId, 
+          effectiveUserId, 
           contentId, 
           contentValidation.content,
-          subscription
+          subscription,
+          identifier
         );
         if (!kidRestrictionCheck.valid) {
           return this.buildErrorResponse(
@@ -117,11 +207,11 @@ class SecurityValidator {
           );
         }
       } else {
-        console.log(`✅ [SECURITY] User ${userId} is not a kid profile, skipping kid restrictions`);
+        console.log(`✅ [SECURITY] User ${effectiveUserId} is not a kid profile, skipping kid restrictions`);
       }
 
       // 7. TIME RESTRICTIONS CHECK
-      const timeRestrictionCheck = await this.checkTimeRestrictions(userId);
+      const timeRestrictionCheck = await this.checkTimeRestrictions(effectiveUserId);
       if (!timeRestrictionCheck.valid) {
         return this.buildErrorResponse(
           'TIME_RESTRICTION',
@@ -151,7 +241,7 @@ class SecurityValidator {
       }
 
       // ALL CHECKS PASSED
-      console.log(`✅ [SECURITY] All checks passed for user ${userId}`);
+      console.log(`✅ [SECURITY] All checks passed for user ${effectiveUserId}`);
       
       return {
         success: true,
@@ -170,7 +260,8 @@ class SecurityValidator {
             created: new Date().toISOString(),
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
           },
-          security_level: 'enhanced'
+          security_level: 'enhanced',
+          user_identifier: identifier
         }
       };
 
@@ -192,10 +283,34 @@ class SecurityValidator {
   }
 
   /**
-   * CHECK IF USER IS A KID - SIMPLIFIED
+   * CHECK IF USER IS A KID - UPDATED FOR MULTI-IDENTIFIER
    */
-  async isUserAKid(userId) {
+  async isUserAKid(userId, identifier = null) {
     try {
+      // If we have identifier that's already kid-related, return true
+      if (identifier && identifier.type === 'kid_profile_id') {
+        console.log(`👶 [SECURITY] User ${userId} is a kid profile (from identifier)`);
+        return true;
+      }
+      
+      if (identifier && identifier.type === 'family_member_id') {
+        // Check if this family member is a kid
+        const familyMember = await query(`
+          SELECT dashboard_type 
+          FROM family_members 
+          WHERE id = ? 
+            AND dashboard_type = 'kid'
+            AND is_active = TRUE
+            AND is_suspended = FALSE
+          LIMIT 1
+        `, [identifier.value]);
+        
+        if (familyMember.length > 0) {
+          console.log(`👶 [SECURITY] User ${userId} is a family member kid`);
+          return true;
+        }
+      }
+
       // Check if user is a family member with dashboard_type = 'kid'
       const kidFamilyMember = await query(`
         SELECT id FROM family_members 
@@ -236,10 +351,606 @@ class SecurityValidator {
   }
 
   /**
-   * KID & FAMILY RESTRICTIONS CHECK - KID-FRIENDLY VERSION
-   * Only checks age rating and general blocked categories
+   * USER BASIC VALIDATION - UPDATED FOR MULTI-IDENTIFIER SYSTEM
    */
-  async checkKidAndFamilyRestrictions(userId, contentId, content, subscription) {
+  async validateUserBasic(userId, identifier = null) {
+    try {
+      const users = await query(`
+        SELECT 
+          id, 
+          email, 
+          phone,
+          username,
+          oliviuus_id,
+          is_active, 
+          email_verified,
+          phone_verified,
+          username_verified,
+          subscription_plan,
+          role,
+          created_at,
+          updated_at
+        FROM users 
+        WHERE id = ?
+      `, [userId]);
+
+      if (users.length === 0) {
+        return { 
+          valid: false, 
+          message: 'User account not found',
+          details: { user_exists: false }
+        };
+      }
+
+      const user = users[0];
+
+      // Account active check
+      if (!user.is_active) {
+        return { 
+          valid: false, 
+          message: 'Account has been deactivated',
+          details: { 
+            is_active: false,
+            contact_support: true
+          }
+        };
+      }
+
+      // 🆕 VERIFICATION CHECK FOR MULTI-IDENTIFIER SYSTEM
+      // Users can be verified by email, phone, or username
+      let isVerified = false;
+      let verifiedMethod = null;
+      
+      if (user.email_verified && user.email) {
+        isVerified = true;
+        verifiedMethod = 'email';
+      } else if (user.phone_verified && user.phone) {
+        isVerified = true;
+        verifiedMethod = 'phone';
+      } else if (user.username_verified && user.username) {
+        isVerified = true;
+        verifiedMethod = 'username';
+      }
+
+      // 🆕 FOR OLI VIUUS ID USERS (new system), WE DON'T REQUIRE EMAIL VERIFICATION
+      if (user.oliviuus_id && (user.phone_verified || user.username_verified)) {
+        console.log(`✅ [SECURITY] Oliviuus ID user ${user.oliviuus_id} verified via ${user.phone_verified ? 'phone' : 'username'}`);
+        isVerified = true;
+        verifiedMethod = user.phone_verified ? 'phone' : 'username';
+      }
+
+      if (!isVerified) {
+        // 🆕 USER-FRIENDLY MESSAGE BASED ON USER TYPE
+        let verificationMessage = 'Account verification required';
+        let verificationDetails = {};
+        
+        if (user.email) {
+          verificationMessage = 'Email verification required';
+          verificationDetails = { 
+            email_verified: false,
+            email: user.email,
+            verification_method: 'email'
+          };
+        } else if (user.phone) {
+          verificationMessage = 'Phone verification required';
+          verificationDetails = { 
+            phone_verified: false,
+            phone: user.phone,
+            verification_method: 'phone'
+          };
+        } else if (user.username) {
+          verificationMessage = 'Username verification required';
+          verificationDetails = { 
+            username_verified: false,
+            username: user.username,
+            verification_method: 'username'
+          };
+        }
+
+        return { 
+          valid: false, 
+          message: verificationMessage,
+          details: verificationDetails
+        };
+      }
+
+      // 🆕 FOR USERS WITHOUT EMAIL (PHONE/USERNAME ONLY), CHECK IF THEY HAVE AT LEAST ONE VERIFIED IDENTIFIER
+      if (!user.email && !user.phone && !user.username) {
+        return { 
+          valid: false, 
+          message: 'Account needs at least one verified identifier (email, phone, or username)',
+          details: { 
+            has_email: !!user.email,
+            has_phone: !!user.phone,
+            has_username: !!user.username,
+            requires_identifier: true
+          }
+        };
+      }
+
+      return { 
+        valid: true, 
+        user: {
+          id: user.id,
+          email: user.email,
+          phone: user.phone,
+          username: user.username,
+          oliviuus_id: user.oliviuus_id,
+          is_active: user.is_active,
+          email_verified: user.email_verified,
+          phone_verified: user.phone_verified,
+          username_verified: user.username_verified,
+          subscription_plan: user.subscription_plan,
+          role: user.role,
+          verified_method: verifiedMethod,
+          account_age_days: Math.floor((new Date() - new Date(user.created_at)) / (1000 * 60 * 60 * 24))
+        }
+      };
+    } catch (error) {
+      console.error('❌ [SECURITY] User validation error:', error);
+      return { 
+        valid: false,
+        message: 'User validation failed',
+        details: { validation_error: true }
+      };
+    }
+  }
+
+  /**
+   * SUBSCRIPTION VALIDATION - UPDATED FOR MULTI-IDENTIFIER
+   */
+  async validateSubscriptionProper(userId, identifier = null) {
+    try {
+      console.log(`🔍 [SECURITY] Checking subscription for user ${userId} (identifier: ${identifier?.type})`);
+      
+      // 🆕 HANDLE KID PROFILE IDENTIFIER SPECIALLY
+      if (identifier && identifier.type === 'kid_profile_id') {
+        console.log(`👶 [SECURITY] Processing kid profile ${identifier.value}`);
+        
+        // Get the parent user ID for this kid profile
+        const kidProfile = await query(`
+          SELECT 
+            kp.user_id,
+            kp.is_active,
+            u.subscription_plan as parent_plan
+          FROM kid_profiles kp
+          LEFT JOIN users u ON kp.user_id = u.id
+          WHERE kp.id = ? 
+            AND kp.is_active = TRUE
+          LIMIT 1
+        `, [identifier.value]);
+
+        if (kidProfile.length > 0) {
+          const parentUserId = kidProfile[0].user_id;
+          console.log(`👶 [SECURITY] Kid profile belongs to parent user ${parentUserId}`);
+          
+          // Validate parent's subscription
+          return await this.validateParentSubscriptionForKid(parentUserId);
+        }
+      }
+      
+      // 🆕 HANDLE FAMILY MEMBER IDENTIFIER
+      if (identifier && identifier.type === 'family_member_id') {
+        console.log(`👨‍👩‍👧‍👦 [SECURITY] Processing family member ${identifier.value}`);
+        
+        const familyMember = await query(`
+          SELECT 
+            fm.family_owner_id,
+            fm.dashboard_type,
+            fm.has_family_plan_access,
+            u.email as owner_email
+          FROM family_members fm
+          LEFT JOIN users u ON fm.family_owner_id = u.id
+          WHERE fm.id = ? 
+            AND fm.is_active = TRUE 
+            AND fm.is_suspended = FALSE
+            AND fm.invitation_status = 'accepted'
+          LIMIT 1
+        `, [identifier.value]);
+
+        if (familyMember.length > 0) {
+          const familyOwnerId = familyMember[0].family_owner_id;
+          const hasFamilyPlanAccess = familyMember[0].has_family_plan_access;
+          
+          if (hasFamilyPlanAccess) {
+            console.log(`✅ [SECURITY] Family member has family plan access`);
+            
+            // Get family owner's subscription
+            const ownerSubscription = await query(`
+              SELECT 
+                us.*, 
+                s.name as plan_name,
+                s.type as plan_type,
+                s.max_sessions,
+                s.max_family_members,
+                s.is_family_plan,
+                DATEDIFF(us.end_date, NOW()) as days_remaining
+              FROM user_subscriptions us
+              LEFT JOIN subscriptions s ON us.subscription_id = s.id
+              WHERE us.user_id = ? 
+                AND us.status = 'active'
+                AND (us.end_date IS NULL OR us.end_date > NOW())
+                AND us.cancelled_at IS NULL
+                AND s.is_family_plan = TRUE
+              LIMIT 1
+            `, [familyOwnerId]);
+
+            if (ownerSubscription.length > 0) {
+              const sub = ownerSubscription[0];
+              return { 
+                valid: true, 
+                subscription: {
+                  id: sub.id,
+                  plan_name: sub.plan_name,
+                  plan_type: sub.plan_type,
+                  is_family_plan: true,
+                  is_family_shared: true,
+                  family_owner_id: familyOwnerId,
+                  family_owner_email: familyMember[0].owner_email,
+                  max_devices: this.MAX_FAMILY_DEVICES[sub.plan_type] || 6,
+                  max_simultaneous_streams: this.MAX_SIMULTANEOUS_STREAMS[sub.plan_type] || 4,
+                  end_date: sub.end_date,
+                  days_remaining: sub.days_remaining,
+                  source: 'family_member_access'
+                }
+              };
+            }
+          }
+        }
+      }
+
+      // 🆕 REGULAR USER VALIDATION (with oliviuus_id support)
+      return await this.validateRegularUserSubscription(userId);
+      
+    } catch (error) {
+      console.error('❌ [SECURITY] Subscription validation error:', error);
+      return { 
+        valid: false,
+        code: 'SUBSCRIPTION_REQUIRED',
+        message: 'Unable to verify subscription',
+        details: { validation_error: true }
+      };
+    }
+  }
+
+  /**
+   * VALIDATE PARENT SUBSCRIPTION FOR KID PROFILE
+   */
+  async validateParentSubscriptionForKid(parentUserId) {
+    try {
+      // Check parent's active subscription
+      const activeSubscriptions = await query(`
+        SELECT 
+          us.*, 
+          s.name as plan_name,
+          s.type as plan_type,
+          s.max_sessions,
+          s.max_family_members,
+          s.is_family_plan,
+          DATEDIFF(us.end_date, NOW()) as days_remaining
+        FROM user_subscriptions us
+        LEFT JOIN subscriptions s ON us.subscription_id = s.id
+        WHERE us.user_id = ? 
+          AND us.status = 'active'
+          AND (us.end_date IS NULL OR us.end_date > NOW())
+          AND us.cancelled_at IS NULL
+        ORDER BY us.created_at DESC
+        LIMIT 1
+      `, [parentUserId]);
+
+      if (activeSubscriptions.length > 0) {
+        const sub = activeSubscriptions[0];
+        console.log(`✅ [SECURITY] Parent user ${parentUserId} has active subscription: ${sub.plan_name}`);
+        
+        return { 
+          valid: true, 
+          subscription: {
+            id: sub.id,
+            plan_name: sub.plan_name,
+            plan_type: sub.plan_type,
+            is_family_plan: sub.is_family_plan,
+            max_devices: sub.max_sessions,
+            max_simultaneous_streams: sub.max_sessions,
+            max_family_members: sub.max_family_members,
+            end_date: sub.end_date,
+            days_remaining: sub.days_remaining,
+            source: 'parent_subscription_for_kid'
+          }
+        };
+      }
+
+      // Check if parent has family plan access
+      const familyPlanAccess = await query(`
+        SELECT 
+          us.*, 
+          s.name as plan_name,
+          s.type as plan_type
+        FROM family_members fm
+        INNER JOIN user_subscriptions us ON fm.family_owner_id = us.user_id
+        INNER JOIN subscriptions s ON us.subscription_id = s.id
+        WHERE fm.user_id = ?
+          AND fm.invitation_status = 'accepted'
+          AND fm.is_active = TRUE
+          AND fm.is_suspended = FALSE
+          AND us.status = 'active'
+          AND (us.end_date IS NULL OR us.end_date > NOW())
+          AND s.is_family_plan = TRUE
+        LIMIT 1
+      `, [parentUserId]);
+
+      if (familyPlanAccess.length > 0) {
+        const family = familyPlanAccess[0];
+        return { 
+          valid: true, 
+          subscription: {
+            id: family.id,
+            plan_name: family.plan_name,
+            plan_type: family.plan_type,
+            is_family_plan: true,
+            is_family_shared: true,
+            max_devices: this.MAX_FAMILY_DEVICES[family.plan_type] || 6,
+            max_simultaneous_streams: this.MAX_SIMULTANEOUS_STREAMS[family.plan_type] || 4,
+            source: 'family_access_for_parent'
+          }
+        };
+      }
+
+      // Check parent's subscription_plan as fallback
+      const parentUser = await query(`
+        SELECT subscription_plan, created_at
+        FROM users 
+        WHERE id = ?
+      `, [parentUserId]);
+
+      const parentPlan = parentUser[0]?.subscription_plan;
+      
+      if (parentPlan === 'free_trial') {
+        const userAge = await query(`
+          SELECT TIMESTAMPDIFF(DAY, created_at, NOW()) as days_old
+          FROM users 
+          WHERE id = ?
+        `, [parentUserId]);
+
+        if (userAge[0]?.days_old <= 7) {
+          return { 
+            valid: true, 
+            subscription: {
+              plan_name: 'Free Trial',
+              plan_type: 'free_trial',
+              is_trial: true,
+              max_devices: 1,
+              max_simultaneous_streams: 1,
+              days_remaining: 7 - (userAge[0]?.days_old || 0),
+              source: 'parent_trial_for_kid'
+            }
+          };
+        }
+      }
+
+      return { 
+        valid: false, 
+        message: 'Parent subscription required for kid profile',
+        code: 'SUBSCRIPTION_REQUIRED',
+        details: { 
+          parent_has_subscription: false,
+          requires_parent_subscription: true
+        }
+      };
+
+    } catch (error) {
+      console.error('❌ [SECURITY] Parent subscription validation error:', error);
+      return { 
+        valid: false,
+        code: 'SUBSCRIPTION_REQUIRED',
+        message: 'Unable to verify parent subscription',
+        details: { validation_error: true }
+      };
+    }
+  }
+
+  /**
+   * VALIDATE REGULAR USER SUBSCRIPTION
+   */
+  async validateRegularUserSubscription(userId) {
+    try {
+      // Check user_subscriptions table
+      const activeSubscriptions = await query(`
+        SELECT 
+          us.*, 
+          s.name as plan_name,
+          s.type as plan_type,
+          s.max_sessions,
+          s.max_family_members,
+          s.is_family_plan,
+          DATEDIFF(us.end_date, NOW()) as days_remaining
+        FROM user_subscriptions us
+        LEFT JOIN subscriptions s ON us.subscription_id = s.id
+        WHERE us.user_id = ? 
+          AND us.status = 'active'
+          AND (us.end_date IS NULL OR us.end_date > NOW())
+          AND us.cancelled_at IS NULL
+        ORDER BY us.created_at DESC
+        LIMIT 1
+      `, [userId]);
+
+      if (activeSubscriptions.length > 0) {
+        const sub = activeSubscriptions[0];
+        console.log(`✅ [SECURITY] User ${userId} has active subscription: ${sub.plan_name}`);
+        
+        // Check if trial has ended
+        if (sub.trial_end_date && new Date(sub.trial_end_date) < new Date()) {
+          console.log(`❌ [SECURITY] User ${userId} trial ended: ${sub.trial_end_date}`);
+          return { 
+            valid: false, 
+            message: 'Your free trial has ended',
+            code: 'SUBSCRIPTION_REQUIRED',
+            details: { 
+              trial_end_date: sub.trial_end_date,
+              trial_expired: true
+            }
+          };
+        }
+
+        return { 
+          valid: true, 
+          subscription: {
+            id: sub.id,
+            plan_name: sub.plan_name,
+            plan_type: sub.plan_type,
+            is_family_plan: sub.is_family_plan,
+            max_devices: sub.max_sessions,
+            max_simultaneous_streams: sub.max_sessions,
+            max_family_members: sub.max_family_members,
+            end_date: sub.end_date,
+            days_remaining: sub.days_remaining,
+            source: 'user_subscriptions'
+          }
+        };
+      }
+
+      // Check family access
+      const familyAccess = await query(`
+        SELECT 
+          fm.*,
+          us.id as owner_subscription_id,
+          us.status as owner_subscription_status,
+          us.end_date as owner_subscription_end,
+          s.name as owner_plan_name,
+          s.type as owner_plan_type,
+          s.is_family_plan,
+          u.email as owner_email
+        FROM family_members fm
+        INNER JOIN user_subscriptions us ON fm.family_owner_id = us.user_id
+        INNER JOIN subscriptions s ON us.subscription_id = s.id
+        INNER JOIN users u ON fm.family_owner_id = u.id
+        WHERE fm.user_id = ?
+          AND fm.invitation_status = 'accepted'
+          AND fm.is_active = TRUE
+          AND fm.is_suspended = FALSE
+          AND us.status = 'active'
+          AND (us.end_date IS NULL OR us.end_date > NOW())
+          AND s.is_family_plan = TRUE
+        LIMIT 1
+      `, [userId]);
+
+      if (familyAccess.length > 0) {
+        const family = familyAccess[0];
+        console.log(`✅ [SECURITY] User ${userId} has family access via ${family.owner_email}`);
+        
+        return { 
+          valid: true, 
+          subscription: {
+            id: family.owner_subscription_id,
+            plan_name: family.owner_plan_name,
+            plan_type: family.owner_plan_type,
+            is_family_plan: true,
+            is_family_shared: true,
+            family_owner_id: family.family_owner_id,
+            family_owner_email: family.owner_email,
+            max_devices: this.MAX_FAMILY_DEVICES[family.owner_plan_type] || 6,
+            max_simultaneous_streams: this.MAX_SIMULTANEOUS_STREAMS[family.owner_plan_type] || 4,
+            end_date: family.owner_subscription_end,
+            source: 'family_members'
+          }
+        };
+      }
+
+      // Check users table subscription_plan as fallback
+      console.log(`🔍 [SECURITY] Checking users.subscription_plan for user ${userId}`);
+      const user = await query(`
+        SELECT subscription_plan, created_at
+        FROM users 
+        WHERE id = ?
+      `, [userId]);
+
+      const userPlan = user[0]?.subscription_plan;
+      
+      const paidPlans = ['free_trial', 'basic', 'standard', 'premium', 'custom', 'family'];
+      
+      if (userPlan && paidPlans.includes(userPlan)) {
+        console.log(`⚠️ [SECURITY] User ${userId} has subscription_plan: ${userPlan} but no active user_subscription`);
+        
+        // For free_trial, check if it's a new user (within 7 days)
+        if (userPlan === 'free_trial') {
+          const userAge = await query(`
+            SELECT TIMESTAMPDIFF(DAY, created_at, NOW()) as days_old
+            FROM users 
+            WHERE id = ?
+          `, [userId]);
+
+          if (userAge[0]?.days_old > 7) {
+            console.log(`❌ [SECURITY] User ${userId} free trial expired (${userAge[0].days_old} days old)`);
+            return { 
+              valid: false, 
+              message: 'Your free trial has expired',
+              code: 'SUBSCRIPTION_REQUIRED',
+              details: { 
+                trial_expired: true,
+                days_old: userAge[0].days_old
+              }
+            };
+          }
+          
+          console.log(`✅ [SECURITY] User ${userId} is within free trial period (${userAge[0]?.days_old} days)`);
+          return { 
+            valid: true, 
+            subscription: {
+              plan_name: 'Free Trial',
+              plan_type: 'free_trial',
+              is_trial: true,
+              max_devices: 1,
+              max_simultaneous_streams: 1,
+              days_remaining: 7 - (userAge[0]?.days_old || 0),
+              source: 'users_table_trial'
+            }
+          };
+        }
+        
+        // For other paid plans in users table but no user_subscription
+        console.log(`❌ [SECURITY] User ${userId} has plan ${userPlan} but no active subscription record`);
+        return { 
+          valid: false, 
+          message: 'Subscription payment required',
+          code: 'SUBSCRIPTION_REQUIRED',
+          details: { 
+            user_plan: userPlan,
+            missing_subscription_record: true,
+            requires_payment: true
+          }
+        };
+      }
+
+      // NO SUBSCRIPTION FOUND ANYWHERE
+      console.log(`❌ [SECURITY] User ${userId} has NO subscription`);
+      return { 
+        valid: false, 
+        message: 'Subscription required to access content',
+        code: 'SUBSCRIPTION_REQUIRED',
+        details: { 
+          has_personal_subscription: false,
+          has_family_access: false,
+          user_plan: userPlan || 'none',
+          subscription_required: true,
+          allow_subscription: true,
+          trial_available: userPlan === 'none'
+        }
+      };
+
+    } catch (error) {
+      console.error('❌ [SECURITY] Regular user subscription validation error:', error);
+      return { 
+        valid: false,
+        code: 'SUBSCRIPTION_REQUIRED',
+        message: 'Unable to verify subscription',
+        details: { validation_error: true }
+      };
+    }
+  }
+
+  /**
+   * KID & FAMILY RESTRICTIONS CHECK - UPDATED FOR MULTI-IDENTIFIER
+   */
+  async checkKidAndFamilyRestrictions(userId, contentId, content, subscription, identifier = null) {
     try {
       console.log(`👶 [SECURITY] SIMPLE KID CHECK for user ${userId}`);
 
@@ -248,46 +959,68 @@ class SecurityValidator {
       let kidData = null;
       let kidProfileId = null;
 
-      // Check if family member kid
-      const familyMemberKid = await query(`
-        SELECT 
-          fm.*,
-          fm.content_restrictions,
-          fm.dashboard_type
-        FROM family_members fm
-        WHERE fm.user_id = ?
-          AND fm.invitation_status = 'accepted'
-          AND fm.is_active = TRUE
-          AND fm.is_suspended = FALSE
-          AND fm.dashboard_type = 'kid'
-        LIMIT 1
-      `, [userId]);
-
-      if (familyMemberKid.length > 0) {
-        kidType = 'family_member';
-        kidData = familyMemberKid[0];
-        console.log(`👶 [SECURITY] User ${userId} is a family member kid`);
-      } else {
-        // Check if user is in kid mode via user_session
-        const userSession = await query(`
+      // 🆕 HANDLE KID PROFILE IDENTIFIER
+      if (identifier && identifier.type === 'kid_profile_id') {
+        kidType = 'kid_profile';
+        kidProfileId = identifier.value;
+        
+        const kidProfile = await query(`
           SELECT 
-            us.session_mode,
-            us.active_kid_profile_id,
+            kp.*,
             kp.max_content_age_rating,
             kp.calculated_age
-          FROM user_session us
-          LEFT JOIN kids_profiles kp ON us.active_kid_profile_id = kp.id
-          WHERE us.user_id = ?
-            AND us.is_active = TRUE
-            AND (us.session_mode = 'kid' OR us.active_kid_profile_id IS NOT NULL)
+          FROM kid_profiles kp
+          WHERE kp.id = ?
+            AND kp.is_active = TRUE
+          LIMIT 1
+        `, [kidProfileId]);
+        
+        if (kidProfile.length > 0) {
+          kidData = kidProfile[0];
+          console.log(`👶 [SECURITY] Kid profile ${kidProfileId}, age: ${kidData.calculated_age}`);
+        }
+      } else {
+        // Check if family member kid
+        const familyMemberKid = await query(`
+          SELECT 
+            fm.*,
+            fm.content_restrictions,
+            fm.dashboard_type
+          FROM family_members fm
+          WHERE fm.user_id = ?
+            AND fm.invitation_status = 'accepted'
+            AND fm.is_active = TRUE
+            AND fm.is_suspended = FALSE
+            AND fm.dashboard_type = 'kid'
           LIMIT 1
         `, [userId]);
 
-        if (userSession.length > 0 && userSession[0].active_kid_profile_id) {
-          kidType = 'kid_profile';
-          kidData = userSession[0];
-          kidProfileId = kidData.active_kid_profile_id;
-          console.log(`👶 [SECURITY] User ${userId} is in kid mode with profile ID: ${kidProfileId}, age: ${kidData.calculated_age}`);
+        if (familyMemberKid.length > 0) {
+          kidType = 'family_member';
+          kidData = familyMemberKid[0];
+          console.log(`👶 [SECURITY] User ${userId} is a family member kid`);
+        } else {
+          // Check if user is in kid mode via user_session
+          const userSession = await query(`
+            SELECT 
+              us.session_mode,
+              us.active_kid_profile_id,
+              kp.max_content_age_rating,
+              kp.calculated_age
+            FROM user_session us
+            LEFT JOIN kid_profiles kp ON us.active_kid_profile_id = kp.id
+            WHERE us.user_id = ?
+              AND us.is_active = TRUE
+              AND (us.session_mode = 'kid' OR us.active_kid_profile_id IS NOT NULL)
+            LIMIT 1
+          `, [userId]);
+
+          if (userSession.length > 0 && userSession[0].active_kid_profile_id) {
+            kidType = 'kid_profile';
+            kidData = userSession[0];
+            kidProfileId = kidData.active_kid_profile_id;
+            console.log(`👶 [SECURITY] User ${userId} is in kid mode with profile ID: ${kidProfileId}, age: ${kidData.calculated_age}`);
+          }
         }
       }
 
@@ -486,7 +1219,7 @@ class SecurityValidator {
           kp.bedtime_start,
           kp.bedtime_end
         FROM user_session us
-        LEFT JOIN kids_profiles kp ON us.active_kid_profile_id = kp.id
+        LEFT JOIN kid_profiles kp ON us.active_kid_profile_id = kp.id
         WHERE us.user_id = ?
           AND us.is_active = TRUE
           AND (us.session_mode = 'kid' OR us.active_kid_profile_id IS NOT NULL)
@@ -1074,307 +1807,6 @@ async checkDeviceLimits(userId, subscription, deviceId, deviceType) {
   }
 
   /**
-   * TIME CONVERSION HELPERS
-   */
-  timeToMinutes(timeString) {
-    if (!timeString) return 0;
-    const [hours, minutes] = timeString.split(':').map(Number);
-    return hours * 60 + minutes;
-  }
-
-  minutesToTime(minutes) {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-  }
-
-  isTimeInWindow(currentTime, windowStart, windowEnd) {
-    if (windowStart <= windowEnd) {
-      return currentTime >= windowStart && currentTime < windowEnd;
-    } else {
-      return currentTime >= windowStart || currentTime < windowEnd;
-    }
-  }
-
-  /**
-   * USER BASIC VALIDATION
-   */
-  async validateUserBasic(userId) {
-    try {
-      const users = await query(`
-        SELECT 
-          id, 
-          email, 
-          is_active, 
-          email_verified,
-          subscription_plan,
-          role,
-          created_at,
-          updated_at
-        FROM users 
-        WHERE id = ?
-      `, [userId]);
-
-      if (users.length === 0) {
-        return { 
-          valid: false, 
-          message: 'User account not found',
-          details: { user_exists: false }
-        };
-      }
-
-      const user = users[0];
-
-      // Account active check
-      if (!user.is_active) {
-        return { 
-          valid: false, 
-          message: 'Account has been deactivated',
-          details: { 
-            is_active: false,
-            contact_support: true
-          }
-        };
-      }
-
-      // Email verification check
-      if (!user.email_verified) {
-        return { 
-          valid: false, 
-          message: 'Email verification required',
-          details: { 
-            email_verified: false,
-            email: user.email
-          }
-        };
-      }
-
-      return { 
-        valid: true, 
-        user: {
-          id: user.id,
-          email: user.email,
-          is_active: user.is_active,
-          email_verified: user.email_verified,
-          subscription_plan: user.subscription_plan,
-          role: user.role,
-          account_age_days: Math.floor((new Date() - new Date(user.created_at)) / (1000 * 60 * 60 * 24))
-        }
-      };
-    } catch (error) {
-      console.error('❌ [SECURITY] User validation error:', error);
-      return { 
-        valid: false,
-        message: 'User validation failed',
-        details: { validation_error: true }
-      };
-    }
-  }
-
-  /**
-   * SUBSCRIPTION VALIDATION
-   */
-  async validateSubscriptionProper(userId) {
-    try {
-      console.log(`🔍 [SECURITY] Checking subscription for user ${userId}`);
-      
-      // Check if user has ANY active subscription in user_subscriptions table
-      const activeSubscriptions = await query(`
-        SELECT 
-          us.*, 
-          s.name as plan_name,
-          s.type as plan_type,
-          s.max_sessions,
-          s.max_family_members,
-          s.is_family_plan,
-          DATEDIFF(us.end_date, NOW()) as days_remaining
-        FROM user_subscriptions us
-        LEFT JOIN subscriptions s ON us.subscription_id = s.id
-        WHERE us.user_id = ? 
-          AND us.status = 'active'
-          AND (us.end_date IS NULL OR us.end_date > NOW())
-          AND us.cancelled_at IS NULL
-        ORDER BY us.created_at DESC
-        LIMIT 1
-      `, [userId]);
-
-      if (activeSubscriptions.length > 0) {
-        const sub = activeSubscriptions[0];
-        console.log(`✅ [SECURITY] User ${userId} has active subscription: ${sub.plan_name}`);
-        
-        // Check if trial has ended
-        if (sub.trial_end_date && new Date(sub.trial_end_date) < new Date()) {
-          console.log(`❌ [SECURITY] User ${userId} trial ended: ${sub.trial_end_date}`);
-          return { 
-            valid: false, 
-            message: 'Your free trial has ended',
-            code: 'SUBSCRIPTION_REQUIRED',
-            details: { 
-              trial_end_date: sub.trial_end_date,
-              trial_expired: true
-            }
-          };
-        }
-
-        return { 
-          valid: true, 
-          subscription: {
-            id: sub.id,
-            plan_name: sub.plan_name,
-            plan_type: sub.plan_type,
-            is_family_plan: sub.is_family_plan,
-            max_devices: sub.max_sessions,
-            max_simultaneous_streams: sub.max_sessions,
-            max_family_members: sub.max_family_members,
-            end_date: sub.end_date,
-            days_remaining: sub.days_remaining,
-            source: 'user_subscriptions'
-          }
-        };
-      }
-
-      // No personal subscription found, check family access
-      console.log(`🔍 [SECURITY] No personal subscription for user ${userId}, checking family...`);
-      
-      const familyAccess = await query(`
-        SELECT 
-          fm.*,
-          us.id as owner_subscription_id,
-          us.status as owner_subscription_status,
-          us.end_date as owner_subscription_end,
-          s.name as owner_plan_name,
-          s.type as owner_plan_type,
-          s.is_family_plan,
-          u.email as owner_email
-        FROM family_members fm
-        INNER JOIN user_subscriptions us ON fm.family_owner_id = us.user_id
-        INNER JOIN subscriptions s ON us.subscription_id = s.id
-        INNER JOIN users u ON fm.family_owner_id = u.id
-        WHERE fm.user_id = ?
-          AND fm.invitation_status = 'accepted'
-          AND fm.is_active = TRUE
-          AND fm.is_suspended = FALSE
-          AND us.status = 'active'
-          AND (us.end_date IS NULL OR us.end_date > NOW())
-          AND s.is_family_plan = TRUE
-        LIMIT 1
-      `, [userId]);
-
-      if (familyAccess.length > 0) {
-        const family = familyAccess[0];
-        console.log(`✅ [SECURITY] User ${userId} has family access via ${family.owner_email}`);
-        
-        return { 
-          valid: true, 
-          subscription: {
-            id: family.owner_subscription_id,
-            plan_name: family.owner_plan_name,
-            plan_type: family.owner_plan_type,
-            is_family_plan: true,
-            is_family_shared: true,
-            family_owner_id: family.family_owner_id,
-            family_owner_email: family.owner_email,
-            max_devices: this.MAX_FAMILY_DEVICES[family.owner_plan_type] || 6,
-            max_simultaneous_streams: this.MAX_SIMULTANEOUS_STREAMS[family.owner_plan_type] || 4,
-            end_date: family.owner_subscription_end,
-            source: 'family_members'
-          }
-        };
-      }
-
-      // Check users table subscription_plan as fallback
-      console.log(`🔍 [SECURITY] Checking users.subscription_plan for user ${userId}`);
-      const user = await query(`
-        SELECT subscription_plan 
-        FROM users 
-        WHERE id = ?
-      `, [userId]);
-
-      const userPlan = user[0]?.subscription_plan;
-      
-      const paidPlans = ['free_trial', 'basic', 'standard', 'premium', 'custom', 'family'];
-      
-      if (userPlan && paidPlans.includes(userPlan)) {
-        console.log(`⚠️ [SECURITY] User ${userId} has subscription_plan: ${userPlan} but no active user_subscription`);
-        
-        // For free_trial, check if it's a new user (within 7 days)
-        if (userPlan === 'free_trial') {
-          const userAge = await query(`
-            SELECT TIMESTAMPDIFF(DAY, created_at, NOW()) as days_old
-            FROM users 
-            WHERE id = ?
-          `, [userId]);
-
-          if (userAge[0]?.days_old > 7) {
-            console.log(`❌ [SECURITY] User ${userId} free trial expired (${userAge[0].days_old} days old)`);
-            return { 
-              valid: false, 
-              message: 'Your free trial has expired',
-              code: 'SUBSCRIPTION_REQUIRED',
-              details: { 
-                trial_expired: true,
-                days_old: userAge[0].days_old
-              }
-            };
-          }
-          
-          console.log(`✅ [SECURITY] User ${userId} is within free trial period (${userAge[0]?.days_old} days)`);
-          return { 
-            valid: true, 
-            subscription: {
-              plan_name: 'Free Trial',
-              plan_type: 'free_trial',
-              is_trial: true,
-              max_devices: 1,
-              max_simultaneous_streams: 1,
-              days_remaining: 7 - (userAge[0]?.days_old || 0),
-              source: 'users_table_trial'
-            }
-          };
-        }
-        
-        // For other paid plans in users table but no user_subscription
-        console.log(`❌ [SECURITY] User ${userId} has plan ${userPlan} but no active subscription record`);
-        return { 
-          valid: false, 
-          message: 'Subscription payment required',
-          code: 'SUBSCRIPTION_REQUIRED',
-          details: { 
-            user_plan: userPlan,
-            missing_subscription_record: true,
-            requires_payment: true
-          }
-        };
-      }
-
-      // NO SUBSCRIPTION FOUND ANYWHERE
-      console.log(`❌ [SECURITY] User ${userId} has NO subscription`);
-      return { 
-        valid: false, 
-        message: 'Subscription required to access content',
-        code: 'SUBSCRIPTION_REQUIRED',
-        details: { 
-          has_personal_subscription: false,
-          has_family_access: false,
-          user_plan: userPlan || 'none',
-          subscription_required: true,
-          allow_subscription: true,
-          trial_available: userPlan === 'none'
-        }
-      };
-
-    } catch (error) {
-      console.error('❌ [SECURITY] Subscription validation error:', error);
-      return { 
-        valid: false,
-        code: 'SUBSCRIPTION_REQUIRED',
-        message: 'Unable to verify subscription',
-        details: { validation_error: true }
-      };
-    }
-  }
-
-  /**
    * CONTENT BASIC VALIDATION
    */
   async validateContentBasic(contentId) {
@@ -1471,6 +1903,29 @@ async checkDeviceLimits(userId, subscription, deviceId, deviceType) {
   }
 
   /**
+   * TIME CONVERSION HELPERS
+   */
+  timeToMinutes(timeString) {
+    if (!timeString) return 0;
+    const [hours, minutes] = timeString.split(':').map(Number);
+    return hours * 60 + minutes;
+  }
+
+  minutesToTime(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+  }
+
+  isTimeInWindow(currentTime, windowStart, windowEnd) {
+    if (windowStart <= windowEnd) {
+      return currentTime >= windowStart && currentTime < windowEnd;
+    } else {
+      return currentTime >= windowStart || currentTime < windowEnd;
+    }
+  }
+
+  /**
    * HELPER METHODS
    */
   buildErrorResponse(code, message, details = {}) {
@@ -1499,17 +1954,27 @@ async checkDeviceLimits(userId, subscription, deviceId, deviceType) {
   }
 
   /**
-   * DEBUG METHOD
+   * DEBUG METHOD - UPDATED FOR MULTI-IDENTIFIER
    */
-  async debugValidationFlow(userId, contentId, deviceId, deviceType, ipAddress) {
+  async debugValidationFlow(userId, contentId, deviceId, deviceType, ipAddress, userData = {}) {
     try {
-      console.log('\n🔍🔍🔍 [SECURITY DEBUG] Starting debug for user:', userId);
+      console.log('\n🔍🔍🔍 [SECURITY DEBUG] Starting debug for user data:', userData);
+      
+      // 🆕 Get identifier and actual user ID
+      const identifier = await this.getUserIdentifier(userData);
+      const actualUserId = await this.getActualUserId(identifier);
+      const effectiveUserId = actualUserId || userId;
+      
+      console.log(`🔍 [SECURITY DEBUG] Effective User ID: ${effectiveUserId}`);
       
       const results = {
-        user_basic: await this.validateUserBasic(userId),
-        subscription: await this.validateSubscriptionProper(userId),
+        user_identifier: identifier,
+        actual_user_id: actualUserId,
+        effective_user_id: effectiveUserId,
+        user_basic: effectiveUserId ? await this.validateUserBasic(effectiveUserId, identifier) : { valid: false, message: 'No user ID found' },
+        subscription: effectiveUserId ? await this.validateSubscriptionProper(effectiveUserId, identifier) : { valid: false, message: 'No user ID found' },
         content_basic: await this.validateContentBasic(contentId),
-        is_kid_user: await this.isUserAKid(userId),
+        is_kid_user: effectiveUserId ? await this.isUserAKid(effectiveUserId, identifier) : false,
         device_limits: null,
         stream_limits: null,
         kid_restrictions: null,
@@ -1518,20 +1983,21 @@ async checkDeviceLimits(userId, subscription, deviceId, deviceType) {
         content_rights: null
       };
 
-      if (results.subscription.valid) {
-        results.device_limits = await this.checkDeviceLimits(userId, results.subscription.subscription, deviceId, deviceType);
-        results.stream_limits = await this.checkSimultaneousStreams(userId, results.subscription.subscription);
+      if (results.subscription.valid && results.subscription.subscription) {
+        results.device_limits = await this.checkDeviceLimits(effectiveUserId, results.subscription.subscription, deviceId, deviceType);
+        results.stream_limits = await this.checkSimultaneousStreams(effectiveUserId, results.subscription.subscription);
         
         if (results.is_kid_user && results.content_basic.valid) {
           results.kid_restrictions = await this.checkKidAndFamilyRestrictions(
-            userId, 
+            effectiveUserId, 
             contentId, 
             results.content_basic.content,
-            results.subscription.subscription
+            results.subscription.subscription,
+            identifier
           );
         }
         
-        results.time_restrictions = await this.checkTimeRestrictions(userId);
+        results.time_restrictions = await this.checkTimeRestrictions(effectiveUserId);
         
         if (results.content_basic.valid) {
           results.geo_restrictions = await this.checkGeographicalRestrictions(contentId, results.content_basic.content, ipAddress);

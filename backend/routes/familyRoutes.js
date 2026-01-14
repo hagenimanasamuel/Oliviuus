@@ -12,14 +12,15 @@ const {
   leaveFamily,
   getMyFamilyStatus,
   checkFamilyMembership,
-  getFamilyDashboardAccess
+  getFamilyDashboardAccess,
 } = require("../controllers/familyController");
 const {
   setMasterPin,
   setFamilyMemberPin,
   verifyPin,
   removeFamilyMemberPin,
-  getPinStatus
+  getPinStatus,
+  removeMasterPin
 } = require("../controllers/familyPinController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
@@ -50,5 +51,6 @@ router.post("/pin/member/set", setFamilyMemberPin);
 router.post("/pin/verify", verifyPin);
 router.post("/pin/member/remove", removeFamilyMemberPin);
 router.get("/pin/status", getPinStatus);
+router.post("/pin/master/remove", removeMasterPin);
 
 module.exports = router;

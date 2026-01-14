@@ -22,21 +22,112 @@ const query = (sql, values) => {
 };
 
 const createUsersTable = async () => {
-  const sql = `
-    CREATE TABLE IF NOT EXISTS users (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      email VARCHAR(255) UNIQUE,
-      password VARCHAR(255),
-      email_verified BOOLEAN DEFAULT true,
-      is_active BOOLEAN DEFAULT true,
-      subscription_plan ENUM('none', 'free_trial', 'basic', 'standard', 'premium', 'custom') DEFAULT 'none',
-      role ENUM('viewer', 'admin') DEFAULT 'viewer',
-      profile_avatar_url VARCHAR(255) DEFAULT NULL,
-      onboarding_completed BOOLEAN DEFAULT FALSE,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-  `;
+const sql = `
+  CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    
+    -- Private internal identifier (OLV-USR-XXXXXXXX)
+    oliviuus_id VARCHAR(16) UNIQUE NOT NULL,  -- REMOVED DEFAULT HERE
+    
+    -- Public username (what user chooses as display name)
+    username VARCHAR(50) UNIQUE,
+    
+    -- Multiple contact identifiers
+    email VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci UNIQUE,
+    phone VARCHAR(20) UNIQUE,
+    
+    -- Authentication
+    password VARCHAR(255),
+    
+    -- Verification status
+    email_verified BOOLEAN DEFAULT false,
+    phone_verified BOOLEAN DEFAULT false,
+    username_verified BOOLEAN DEFAULT true,
+    
+    -- Account status
+    is_active BOOLEAN DEFAULT true,
+    is_locked BOOLEAN DEFAULT false,
+    is_deleted BOOLEAN DEFAULT false,
+    deleted_at TIMESTAMP NULL DEFAULT NULL,
+    
+    -- Basic profile info
+    first_name VARCHAR(255),
+    last_name VARCHAR(255) NULL,
+    profile_avatar_url VARCHAR(500) DEFAULT NULL,
+    date_of_birth DATE DEFAULT NULL,
+    gender ENUM('Male', 'Female', 'Non-binary', 'Other', 'Prefer not to say') DEFAULT NULL,
+    
+    -- User role across all Oliviuus products
+    role ENUM('admin', 'viewer') DEFAULT 'viewer',
+    
+    -- Global account tier
+    global_account_tier ENUM('free', 'basic', 'premium', 'enterprise') DEFAULT 'free',
+    subscription_plan VARCHAR(50) DEFAULT 'none',
+    
+    -- Security
+    two_factor_enabled BOOLEAN DEFAULT false,
+    two_factor_method ENUM('email', 'phone', 'authenticator') DEFAULT NULL,
+    last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    failed_login_attempts INT DEFAULT 0,
+    last_failed_login TIMESTAMP NULL DEFAULT NULL,
+    account_lock_until TIMESTAMP NULL DEFAULT NULL,
+    
+    -- Device info
+    primary_device_type ENUM('web', 'mobile', 'tablet', 'smarttv', 'desktop') DEFAULT 'web',
+    primary_device_name VARCHAR(100) DEFAULT NULL,
+    
+    -- Marketing preferences
+    marketing_consent BOOLEAN DEFAULT true,
+    newsletter_subscribed BOOLEAN DEFAULT true,
+    
+    -- Audit and metadata
+    created_by VARCHAR(50) DEFAULT 'self',
+    referral_code VARCHAR(50) UNIQUE DEFAULT (SUBSTRING(MD5(UUID()), 1, 10)),
+    referred_by INT DEFAULT NULL,
+    registration_source VARCHAR(100) DEFAULT 'web',
+    registration_ip VARCHAR(45) DEFAULT NULL,
+    registration_user_agent TEXT DEFAULT NULL,
+    
+    
+    -- Timestamps
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login_at TIMESTAMP NULL DEFAULT NULL,
+    last_active_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    email_verified_at TIMESTAMP NULL DEFAULT NULL,
+    phone_verified_at TIMESTAMP NULL DEFAULT NULL,
+    profile_completed_at TIMESTAMP NULL DEFAULT NULL,
+    onboarding_completed BOOLEAN DEFAULT FALSE,
+    
+    -- Constraints
+    CONSTRAINT chk_has_identifier CHECK (
+      email IS NOT NULL OR 
+      phone IS NOT NULL OR 
+      username IS NOT NULL
+    ),
+    CONSTRAINT chk_oliviuus_id_format CHECK (
+      oliviuus_id REGEXP '^OLV-USR-[0-9A-F]{8}$'
+    ),
+    
+    -- Indexes
+    INDEX idx_users_email (email),
+    INDEX idx_users_phone (phone),
+    INDEX idx_users_username (username),
+    INDEX idx_users_oliviuus_id (oliviuus_id),
+    INDEX idx_users_is_active (is_active),
+    INDEX idx_users_role (role),
+    INDEX idx_users_created_at (created_at),
+    INDEX idx_users_tier (global_account_tier),
+    INDEX idx_users_last_active (last_active_at),
+    INDEX idx_users_full_name (first_name, last_name),
+    INDEX idx_users_referral_code (referral_code),
+    INDEX idx_users_referred_by (referred_by),
+    INDEX idx_users_gender (gender),
+    INDEX idx_users_date_of_birth (date_of_birth),
+    INDEX idx_users_status_composite (is_active, is_locked, is_deleted),
+    INDEX idx_users_registration_source (registration_source)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Global SSO users table for all Oliviuus products';
+`;
   try {
     await query(sql);
     console.log("✅ Users table is ready");
@@ -45,21 +136,56 @@ const createUsersTable = async () => {
   }
 };
 
-const createEmailVerificationsTable = async () => {
+const createVerificationsTable = async () => {
   const sql = `
-    CREATE TABLE IF NOT EXISTS email_verifications (
+    CREATE TABLE IF NOT EXISTS verifications (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      email VARCHAR(255) NOT NULL,
-      code VARCHAR(10) NOT NULL,
-      expires_at DATETIME NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+      
+      -- What we're verifying
+      identifier VARCHAR(255) NOT NULL,
+      identifier_type ENUM('email', 'phone') NOT NULL,
+      
+      -- The code
+      code VARCHAR(12) NOT NULL,
+      
+      -- Status
+      is_verified BOOLEAN DEFAULT FALSE,
+      attempts INT DEFAULT 0,
+
+      -- Last attempt timestamp 
+      last_attempt_at TIMESTAMP NULL DEFAULT NULL,
+      
+      -- User reference (if exists)
+      user_id INT DEFAULT NULL,
+      
+      -- Expiry
+      expires_at TIMESTAMP NOT NULL,
+      
+      -- Timestamps
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      verified_at TIMESTAMP NULL,
+      
+      -- Foreign key
+      CONSTRAINT fk_verifications_user
+        FOREIGN KEY (user_id) 
+        REFERENCES users(id) 
+        ON DELETE CASCADE,
+      
+      -- Indexes
+      INDEX idx_verifications_identifier (identifier),
+      INDEX idx_verifications_identifier_type (identifier_type),
+      INDEX idx_verifications_code (code),
+      INDEX idx_verifications_user_id (user_id),
+      INDEX idx_verifications_expires_at (expires_at),
+      INDEX idx_verifications_is_verified (is_verified)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
   `;
+  
   try {
     await query(sql);
-    console.log("✅ email_verifications table is ready");
+    console.log("✅ Clean verifications table created");
   } catch (err) {
-    console.error("❌ Error creating email_verifications table:", err);
+    console.error("❌ Error creating verifications table:", err);
   }
 };
 
@@ -107,6 +233,7 @@ const sql = `
     
     session_mode ENUM('parent', 'kid') NULL,
     active_kid_profile_id INT NULL,
+    is_guest_mode BOOLEAN DEFAULT FALSE,
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -3077,7 +3204,7 @@ const initializeDatabase = async () => {
     // ====================
     console.log("📦 Phase 1: Creating core tables...");
     await createUsersTable(); // Must be FIRST - everything references this
-    await createEmailVerificationsTable();
+    await createVerificationsTable();
     await createRolesTable();
     await createContactInfoTable(); // No foreign keys
     
@@ -3201,13 +3328,23 @@ const initializeDatabase = async () => {
   }
 };
 
+// Helper function to generate valid oliviuus_id
+const generateOliviuusId = () => {
+  const crypto = require('crypto');
+  // Generate 4 random bytes (8 hex characters)
+  const randomBytes = crypto.randomBytes(4);
+  // Convert to hex and make uppercase
+  const hexString = randomBytes.toString('hex').toUpperCase();
+  return `OLV-USR-${hexString}`;
+};
+
 
 
 module.exports = {
   db,
   query,
   createUsersTable,
-  createEmailVerificationsTable,
+  createVerificationsTable,
   createUserPreferencesTable,
   createUserSessionTable,
   createSubscriptionsTables,

@@ -60,17 +60,39 @@ const getUsers = async (req, res) => {
     const last_login = req.query.last_login || "";
 
     let sql = `
-      SELECT u.*, 
+      SELECT 
+        u.id,
+        u.oliviuus_id,
+        u.username,
+        u.email,
+        u.phone,
+        u.first_name,
+        u.last_name,
+        u.profile_avatar_url,
+        u.email_verified,
+        u.phone_verified,
+        u.username_verified,
+        u.is_active,
+        u.is_locked,
+        u.role,
+        u.global_account_tier,
+        u.created_at,
+        u.updated_at,
+        u.last_login_at,
+        u.last_active_at,
+        u.onboarding_completed,
         MAX(s.logout_time) AS last_login_time
       FROM users u
       LEFT JOIN user_session s ON u.id = s.user_id
-      WHERE 1=1
+      WHERE u.is_deleted = false
     `;
     const params = [];
 
     if (search) {
-      sql += " AND u.email LIKE ?";
-      params.push(`%${search}%`);
+      // Search in multiple fields: email, phone, username, first_name, last_name
+      sql += " AND (u.email LIKE ? OR u.phone LIKE ? OR u.username LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR CONCAT(u.first_name, ' ', u.last_name) LIKE ?)";
+      const searchParam = `%${search}%`;
+      params.push(searchParam, searchParam, searchParam, searchParam, searchParam, searchParam);
     }
 
     if (role) {
@@ -126,7 +148,7 @@ const getUsers = async (req, res) => {
           params.push(startDate);
           break;
         case "never":
-          sql += " AND s.logout_time IS NULL";
+          sql += " AND s.logout_time IS NULL AND u.last_login_at IS NULL";
           break;
       }
     }
@@ -141,16 +163,37 @@ const getUsers = async (req, res) => {
         sql += " ORDER BY u.created_at ASC";
         break;
       case "email_asc":
-        sql += " ORDER BY u.email ASC";
+        sql += " ORDER BY u.email ASC NULLS LAST";
         break;
       case "email_desc":
-        sql += " ORDER BY u.email DESC";
+        sql += " ORDER BY u.email DESC NULLS LAST";
+        break;
+      case "phone_asc":
+        sql += " ORDER BY u.phone ASC NULLS LAST";
+        break;
+      case "phone_desc":
+        sql += " ORDER BY u.phone DESC NULLS LAST";
+        break;
+      case "username_asc":
+        sql += " ORDER BY u.username ASC NULLS LAST";
+        break;
+      case "username_desc":
+        sql += " ORDER BY u.username DESC NULLS LAST";
+        break;
+      case "name_asc":
+        sql += " ORDER BY u.first_name ASC, u.last_name ASC NULLS LAST";
+        break;
+      case "name_desc":
+        sql += " ORDER BY u.first_name DESC, u.last_name DESC NULLS LAST";
         break;
       case "role":
         sql += " ORDER BY u.role ASC";
         break;
       case "last_login":
-        sql += " ORDER BY last_login_time DESC";
+        sql += " ORDER BY COALESCE(MAX(s.logout_time), u.last_login_at, u.created_at) DESC";
+        break;
+      case "active":
+        sql += " ORDER BY u.is_active DESC, u.created_at DESC";
         break;
       default:
         sql += " ORDER BY u.created_at DESC";
@@ -162,20 +205,37 @@ const getUsers = async (req, res) => {
 
     const users = await query(sql, params);
 
-    let countSql = "SELECT COUNT(*) as total FROM users u WHERE 1=1";
+    // Process users to add display_name for frontend
+    const processedUsers = users.map(user => ({
+      ...user,
+      // Add display_name for easy frontend access
+      display_name: user.username || 
+                    (user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : null) ||
+                    user.email?.split('@')[0] ||
+                    user.phone ||
+                    'User'
+    }));
+
+    // Get total count
+    let countSql = "SELECT COUNT(*) as total FROM users u WHERE u.is_deleted = false";
     const countParams = [];
+    
     if (search) {
-      countSql += " AND u.email LIKE ?";
-      countParams.push(`%${search}%`);
+      countSql += " AND (u.email LIKE ? OR u.phone LIKE ? OR u.username LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR CONCAT(u.first_name, ' ', u.last_name) LIKE ?)";
+      const searchParam = `%${search}%`;
+      countParams.push(searchParam, searchParam, searchParam, searchParam, searchParam, searchParam);
     }
+    
     if (role) {
       countSql += " AND u.role = ?";
       countParams.push(role);
     }
+    
     if (status) {
       countSql += " AND u.is_active = ?";
       countParams.push(status === "active" ? 1 : 0);
     }
+    
     if (date_start && date_end) {
       countSql += " AND DATE(u.created_at) BETWEEN ? AND ?";
       countParams.push(date_start, date_end);
@@ -188,11 +248,22 @@ const getUsers = async (req, res) => {
     }
 
     const countRes = await query(countSql, countParams);
-    const total = countRes[0]?.total || users.length;
+    const total = countRes[0]?.total || processedUsers.length;
 
-    res.status(200).json({ users, total });
+    res.status(200).json({ 
+      success: true,
+      users: processedUsers, 
+      total,
+      limit,
+      offset 
+    });
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch users." });
+    console.error("Error fetching users:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to fetch users.",
+      error: err.message 
+    });
   }
 };
 
@@ -306,6 +377,140 @@ const updateUserEmail = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: "Failed to update email." });
+  }
+};
+
+
+// ✅ ADMIN: Update user phone number
+const updateUserPhone = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({ message: "Phone number is required" });
+    }
+
+    // Check if phone already exists (optional, but recommended for uniqueness)
+    const existingUser = await query(
+      "SELECT id FROM users WHERE phone = ? AND id != ?",
+      [phone, userId]
+    );
+
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: "Phone number already exists" });
+    }
+
+    // Update phone and reset verification status
+    await query(
+      "UPDATE users SET phone = ?, phone_verified = FALSE, phone_verified_at = NULL, updated_at = NOW() WHERE id = ?",
+      [phone, userId]
+    );
+
+    res.status(200).json({
+      message: "Phone number updated successfully.",
+      phone,
+      phone_verified: false
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update phone number." });
+  }
+};
+
+// ✅ ADMIN: Update user username
+const updateUserUsername = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { username } = req.body;
+
+    if (!username || username.trim().length < 3) {
+      return res.status(400).json({ message: "Username must be at least 3 characters" });
+    }
+
+    // Check if username already exists
+    const existingUser = await query(
+      "SELECT id FROM users WHERE username = ? AND id != ?",
+      [username, userId]
+    );
+
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    // Update username
+    await query(
+      "UPDATE users SET username = ?, updated_at = NOW() WHERE id = ?",
+      [username, userId]
+    );
+
+    res.status(200).json({
+      message: "Username updated successfully.",
+      username
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update username." });
+  }
+};
+
+// ✅ ADMIN: Update user name (first and last name)
+const updateUserName = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { first_name, last_name } = req.body;
+
+    // Both fields are optional - user can update one or both
+    if (!first_name && !last_name) {
+      return res.status(400).json({ message: "At least first name or last name is required" });
+    }
+
+    // Update name fields (NULL is allowed)
+    await query(
+      "UPDATE users SET first_name = ?, last_name = ?, updated_at = NOW() WHERE id = ?",
+      [first_name || null, last_name || null, userId]
+    );
+
+    res.status(200).json({
+      message: "Name updated successfully.",
+      first_name: first_name || null,
+      last_name: last_name || null
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update name." });
+  }
+};
+
+// ✅ Get user identifiers (email, phone, username)
+const getUserIdentifiers = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await query(`
+      SELECT 
+        id,
+        email,
+        phone,
+        username,
+        first_name,
+        last_name,
+        oliviuus_id,
+        email_verified,
+        phone_verified,
+        username_verified,
+        profile_avatar_url
+      FROM users 
+      WHERE id = ?
+    `, [userId]);
+
+    if (user.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      identifiers: user[0]
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch user identifiers." });
   }
 };
 
@@ -2453,7 +2658,7 @@ const handleBulkDelete = async (userIds, results) => {
       await query("DELETE FROM notifications WHERE user_id = ?", [userId]);
       await query("DELETE FROM security_logs WHERE user_id = ?", [userId]);
       await query("DELETE FROM user_subscriptions WHERE user_id = ?", [userId]);
-      await query("DELETE FROM email_verifications WHERE email = (SELECT email FROM users WHERE id = ?)", [userId]);
+      await query("DELETE FROM verifications WHERE email = (SELECT email FROM users WHERE id = ?)", [userId]);
       await query("DELETE FROM password_resets WHERE user_id = ?", [userId]);
       await query("DELETE FROM users WHERE id = ?", [userId]);
 
@@ -4715,5 +4920,9 @@ module.exports = {
   getKidProfileById,
   getTopUsers,
   getUserEngagementAnalytics,
-  getTopUsersSummary
+  getTopUsersSummary,
+  updateUserPhone,
+  updateUserUsername,
+  updateUserName,
+  getUserIdentifiers,
 };

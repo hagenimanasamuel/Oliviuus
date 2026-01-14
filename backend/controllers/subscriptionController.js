@@ -4,6 +4,127 @@ const { query } = require("../config/dbConfig");
 class EnhancedSubscriptionController {
 
   /**
+   * 🛡️ Get user identifier for subscription queries
+   */
+  static async getUserIdentifier(req) {
+    // Check if it's a kid profile
+    if (req.user?.kid_profile_id) {
+      return { 
+        type: 'kid_profile',
+        id: req.user.kid_profile_id 
+      };
+    }
+    
+    // Check if it's a family member (not owner)
+    if (req.user?.family_member_id && !req.user?.is_family_owner) {
+      return { 
+        type: 'family_member',
+        id: req.user.family_member_id 
+      };
+    }
+    
+    // Check if user has oliviuus_id (new system)
+    if (req.user?.oliviuus_id) {
+      return { 
+        type: 'oliviuus_user',
+        id: req.user.id,
+        oliviuus_id: req.user.oliviuus_id 
+      };
+    }
+    
+    // Legacy user (without oliviuus_id)
+    if (req.user?.id) {
+      return { 
+        type: 'legacy_user',
+        id: req.user.id 
+      };
+    }
+    
+    // No user found
+    return { 
+      type: 'unknown',
+      id: null 
+    };
+  }
+
+  /**
+   * 🛡️ Build WHERE clause based on user identifier type
+   */
+  static buildUserWhereClause(identifier) {
+    switch(identifier.type) {
+      case 'kid_profile':
+        // Kid profiles don't have direct subscriptions - use parent user
+        return {
+          sql: 'kp.user_id = u.id AND kp.id = ?',
+          params: [identifier.id],
+          join: 'LEFT JOIN kid_profiles kp ON kp.user_id = u.id'
+        };
+        
+      case 'family_member':
+        // Family members use family owner's subscription
+        return {
+          sql: 'fm.user_id = u.id AND fm.id = ?',
+          params: [identifier.id],
+          join: 'LEFT JOIN family_members fm ON fm.user_id = u.id'
+        };
+        
+      case 'oliviuus_user':
+        // Users with oliviuus_id
+        return {
+          sql: 'u.oliviuus_id = ?',
+          params: [identifier.oliviuus_id],
+          join: ''
+        };
+        
+      case 'legacy_user':
+      default:
+        // Legacy users using user ID
+        return {
+          sql: 'u.id = ?',
+          params: [identifier.id],
+          join: ''
+        };
+    }
+  }
+
+  /**
+   * 🛡️ Get actual user ID for subscription operations
+   */
+  static async getActualUserId(identifier) {
+    switch(identifier.type) {
+      case 'kid_profile':
+        // Get parent user ID for kid profile
+        const kidProfile = await query(
+          'SELECT user_id FROM kid_profiles WHERE id = ?',
+          [identifier.id]
+        );
+        return kidProfile[0]?.user_id || null;
+        
+      case 'family_member':
+        // Get family member's user ID
+        const familyMember = await query(
+          'SELECT user_id FROM family_members WHERE id = ?',
+          [identifier.id]
+        );
+        return familyMember[0]?.user_id || null;
+        
+      case 'oliviuus_user':
+        // Get user ID from oliviuus_id
+        const userByOliviuusId = await query(
+          'SELECT id FROM users WHERE oliviuus_id = ?',
+          [identifier.oliviuus_id]
+        );
+        return userByOliviuusId[0]?.id || null;
+        
+      case 'legacy_user':
+        return identifier.id;
+        
+      default:
+        return null;
+    }
+  }
+
+  /**
    * 🛡️ Format time remaining for display
    */
   static formatTimeRemaining(secondsRemaining, secondsUntilStart) {
@@ -41,12 +162,11 @@ class EnhancedSubscriptionController {
 // 🛡️ Get current user's active subscription with FAMILY PLAN support
 const getCurrentSubscription = async (req, res) => {
   try {
-    const userId = req.user.id;
-
+    // 🆕 Get user identifier
+    const identifier = await EnhancedSubscriptionController.getUserIdentifier(req);
 
     // 🆕 CHECK FOR FAMILY PLAN ACCESS FIRST
     if (req.user.has_family_plan_access) {
-      
       const familyPlanData = {
         id: 'family_plan',
         subscription_name: 'Family Plan',
@@ -82,7 +202,25 @@ const getCurrentSubscription = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        data: familyPlanData
+        data: familyPlanData,
+        user_identifier: identifier
+      });
+    }
+
+    // 🆕 Build user-specific WHERE clause and get actual user ID
+    const userWhere = EnhancedSubscriptionController.buildUserWhereClause(identifier);
+    const actualUserId = await EnhancedSubscriptionController.getActualUserId(identifier);
+
+    if (!actualUserId) {
+      return res.status(200).json({
+        success: true,
+        data: null,
+        message: 'No user found for the given identifier',
+        user_identifier: identifier,
+        debug: {
+          identifier_type: identifier.type,
+          actual_user_id: actualUserId
+        }
       });
     }
 
@@ -142,7 +280,9 @@ const getCurrentSubscription = async (req, res) => {
         
       FROM user_subscriptions us
       LEFT JOIN subscriptions s ON us.subscription_id = s.id
-      WHERE us.user_id = ? 
+      LEFT JOIN users u ON us.user_id = u.id
+      ${userWhere.join}
+      WHERE us.user_id = ?
         AND us.status IN ('active', 'trialing', 'past_due')
       ORDER BY 
         -- 🎯 PRIORITY: Currently active > Scheduled > Expired/Grace
@@ -156,7 +296,7 @@ const getCurrentSubscription = async (req, res) => {
       LIMIT 3
     `;
 
-    const subscriptions = await query(sql, [userId]);
+    const subscriptions = await query(sql, [actualUserId]);
 
     // 🛡️ FILTER LOGIC: Only return subscriptions that should grant CURRENT access
     let validSubscription = null;
@@ -171,15 +311,17 @@ const getCurrentSubscription = async (req, res) => {
 
     // 🛡️ RESPONSE HANDLING
     if (!validSubscription) {
-      
       return res.status(200).json({
         success: true,
         data: null,
         message: 'No active subscription found',
+        user_identifier: identifier,
         debug: {
           total_subscriptions: subscriptions?.length || 0,
           available_states: subscriptions?.map(sub => sub.real_time_status) || [],
-          server_time: new Date().toISOString()
+          server_time: new Date().toISOString(),
+          identifier_type: identifier.type,
+          actual_user_id: actualUserId
         }
       });
     }
@@ -196,7 +338,7 @@ const getCurrentSubscription = async (req, res) => {
         is_expired: validSubscription.seconds_remaining <= 0,
         is_scheduled: validSubscription.seconds_until_start > 0,
         starts_in_seconds: Math.max(0, validSubscription.seconds_until_start),
-        formatted: formatTimeRemaining(validSubscription.seconds_remaining, validSubscription.seconds_until_start)
+        formatted: EnhancedSubscriptionController.formatTimeRemaining(validSubscription.seconds_remaining, validSubscription.seconds_until_start)
       },
       is_currently_active: validSubscription.is_currently_active === 1,
       is_scheduled: validSubscription.is_scheduled === 1,
@@ -210,7 +352,8 @@ const getCurrentSubscription = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: enhancedSubscription
+      data: enhancedSubscription,
+      user_identifier: identifier
     });
 
   } catch (error) {
@@ -219,6 +362,7 @@ const getCurrentSubscription = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch current subscription',
+      user_identifier: req.user ? await EnhancedSubscriptionController.getUserIdentifier(req) : null,
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
@@ -227,7 +371,8 @@ const getCurrentSubscription = async (req, res) => {
 // 🛡️ Real-time subscription status check with FAMILY PLAN support
 const checkSubscriptionStatus = async (req, res) => {
   try {
-    const userId = req.user.id;
+    // 🆕 Get user identifier
+    const identifier = await EnhancedSubscriptionController.getUserIdentifier(req);
 
     // 🆕 CHECK FOR FAMILY PLAN ACCESS FIRST
     if (req.user.has_family_plan_access) {
@@ -247,7 +392,26 @@ const checkSubscriptionStatus = async (req, res) => {
             is_currently_active: true,
             is_scheduled: false
           }
-        }
+        },
+        user_identifier: identifier
+      });
+    }
+
+    // 🆕 Get actual user ID
+    const actualUserId = await EnhancedSubscriptionController.getActualUserId(identifier);
+
+    if (!actualUserId) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          has_active_subscription: false,
+          has_scheduled_subscription: false,
+          can_access_premium: false,
+          is_in_grace_period: false,
+          is_family_plan_access: false,
+          current_subscription: null
+        },
+        user_identifier: identifier
       });
     }
 
@@ -280,7 +444,7 @@ const checkSubscriptionStatus = async (req, res) => {
       LIMIT 1
     `;
 
-    const subscriptions = await query(sql, [userId]);
+    const subscriptions = await query(sql, [actualUserId]);
 
     const hasSubscription = subscriptions && subscriptions.length > 0;
     const currentSubscription = hasSubscription ? subscriptions[0] : null;
@@ -305,7 +469,8 @@ const checkSubscriptionStatus = async (req, res) => {
           is_currently_active: currentSubscription.is_currently_active === 1,
           is_scheduled: currentSubscription.is_scheduled === 1
         } : null
-      }
+      },
+      user_identifier: identifier
     });
 
   } catch (error) {
@@ -313,6 +478,7 @@ const checkSubscriptionStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to check subscription status',
+      user_identifier: req.user ? await EnhancedSubscriptionController.getUserIdentifier(req) : null,
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
@@ -321,7 +487,8 @@ const checkSubscriptionStatus = async (req, res) => {
 // 🛡️ Enhanced session limit check with FAMILY PLAN support
 const quickSessionLimitCheck = async (req, res) => {
   try {
-    const userId = req.user.id;
+    // 🆕 Get user identifier
+    const identifier = await EnhancedSubscriptionController.getUserIdentifier(req);
 
     // 🆕 CHECK FOR FAMILY PLAN ACCESS FIRST
     if (req.user.has_family_plan_access) {
@@ -332,7 +499,7 @@ const quickSessionLimitCheck = async (req, res) => {
            AND is_active = true 
            AND session_mode IS NOT NULL  -- NEW: Only count sessions with mode selected
            AND last_activity > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 MINUTE)`,
-        [userId]
+        [req.user.id]
       );
       
       const activeSessions = familySessionCount[0]?.active_count || 0;
@@ -348,7 +515,8 @@ const quickSessionLimitCheck = async (req, res) => {
             maxAllowed: maxFamilySessions,
             planType: 'family',
             requiresSubscription: false
-          }
+          },
+          user_identifier: identifier
         });
       }
 
@@ -360,7 +528,53 @@ const quickSessionLimitCheck = async (req, res) => {
           maxAllowed: maxFamilySessions,
           planType: 'family',
           isFamilyPlan: true
-        }
+        },
+        user_identifier: identifier
+      });
+    }
+
+    // 🆕 Get actual user ID
+    const actualUserId = await EnhancedSubscriptionController.getActualUserId(identifier);
+
+    if (!actualUserId) {
+      // Apply free tier limits for unknown users
+      const freeSessionCount = await query(
+        `SELECT COUNT(*) as active_count 
+         FROM user_session 
+         WHERE user_id = ? 
+           AND is_active = true 
+           AND session_mode IS NOT NULL
+           AND last_activity > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 MINUTE)`,
+        [req.user.id || 0]
+      );
+      
+      const activeSessions = freeSessionCount[0]?.active_count || 0;
+      const maxFreeSessions = 1;
+
+      if (activeSessions >= maxFreeSessions) {
+        return res.status(429).json({
+          success: false,
+          error: 'SESSION_LIMIT_EXCEEDED',
+          message: `You have ${activeSessions} active session(s). Free tier allows only ${maxFreeSessions} simultaneous session.`,
+          details: {
+            currentSessions: activeSessions,
+            maxAllowed: maxFreeSessions,
+            planType: 'free',
+            requiresSubscription: true
+          },
+          user_identifier: identifier
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          canWatch: true,
+          currentSessions: activeSessions,
+          maxAllowed: maxFreeSessions,
+          planType: 'free'
+        },
+        user_identifier: identifier
       });
     }
 
@@ -380,7 +594,7 @@ const quickSessionLimitCheck = async (req, res) => {
       LIMIT 1
     `;
 
-    const subscriptions = await query(subscriptionQuery, [userId]);
+    const subscriptions = await query(subscriptionQuery, [actualUserId]);
 
     // 🛡️ If no valid active subscription, apply free tier limits
     if (!subscriptions || subscriptions.length === 0 || subscriptions[0].is_currently_active === 0) {
@@ -391,7 +605,7 @@ const quickSessionLimitCheck = async (req, res) => {
            AND is_active = true 
            AND session_mode IS NOT NULL  -- NEW: Only count sessions with mode selected
            AND last_activity > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 MINUTE)`,
-        [userId]
+        [actualUserId]
       );
       const activeSessions = freeSessionCount[0]?.active_count || 0;
       const maxFreeSessions = 1;
@@ -406,7 +620,8 @@ const quickSessionLimitCheck = async (req, res) => {
             maxAllowed: maxFreeSessions,
             planType: 'free',
             requiresSubscription: true
-          }
+          },
+          user_identifier: identifier
         });
       }
 
@@ -417,7 +632,8 @@ const quickSessionLimitCheck = async (req, res) => {
           currentSessions: activeSessions,
           maxAllowed: maxFreeSessions,
           planType: 'free'
-        }
+        },
+        user_identifier: identifier
       });
     }
 
@@ -434,7 +650,7 @@ const quickSessionLimitCheck = async (req, res) => {
         AND last_activity > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 MINUTE)
     `;
 
-    const sessionCount = await query(sessionCountQuery, [userId]);
+    const sessionCount = await query(sessionCountQuery, [actualUserId]);
     const activeSessions = sessionCount[0]?.active_count || 0;
 
     const canWatch = activeSessions < maxSessions;
@@ -449,7 +665,8 @@ const quickSessionLimitCheck = async (req, res) => {
           maxAllowed: maxSessions,
           planType: planType,
           manageUrl: '/account/settings#sessions'
-        }
+        },
+        user_identifier: identifier
       });
     }
 
@@ -460,7 +677,8 @@ const quickSessionLimitCheck = async (req, res) => {
         currentSessions: activeSessions,
         maxAllowed: maxSessions,
         planType: planType
-      }
+      },
+      user_identifier: identifier
     });
 
   } catch (error) {
@@ -474,7 +692,8 @@ const quickSessionLimitCheck = async (req, res) => {
         maxAllowed: 1,
         planType: 'free',
         error: true
-      }
+      },
+      user_identifier: req.user ? await EnhancedSubscriptionController.getUserIdentifier(req) : null
     });
   }
 };
@@ -949,10 +1168,24 @@ const updateSubscriptionPlan = async (req, res) => {
   }
 };
 
-// Get user's subscription history
+// 🛡️ Get user's subscription history with multi-identifier support
 const getSubscriptionHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    // 🆕 Get user identifier
+    const identifier = await EnhancedSubscriptionController.getUserIdentifier(req);
+    
+    // 🆕 Get actual user ID
+    const actualUserId = await EnhancedSubscriptionController.getActualUserId(identifier);
+
+    if (!actualUserId) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        count: 0,
+        user_identifier: identifier,
+        message: 'User not found for the given identifier'
+      });
+    }
 
     const sql = `
       SELECT 
@@ -966,34 +1199,39 @@ const getSubscriptionHistory = async (req, res) => {
       ORDER BY us.created_at DESC
     `;
 
-    const subscriptions = await query(sql, [userId]);
+    const subscriptions = await query(sql, [actualUserId]);
 
     res.status(200).json({
       success: true,
       data: subscriptions || [],
-      count: subscriptions?.length || 0
+      count: subscriptions?.length || 0,
+      user_identifier: identifier
     });
 
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch subscription history',
+      user_identifier: req.user ? await EnhancedSubscriptionController.getUserIdentifier(req) : null,
       error: error.message
     });
   }
 };
 
-// 🛡️ Create subscription with future start date support
+// 🛡️ Create subscription with future start date support and multi-identifier
 const createSubscription = async (req, res) => {
   try {
-    const userId = req.user.id;
+    // 🆕 Get user identifier
+    const identifier = await EnhancedSubscriptionController.getUserIdentifier(req);
+    
     const { subscription_id, auto_renew = true, start_date = null } = req.body;
 
     // Validate input
     if (!subscription_id) {
       return res.status(400).json({
         success: false,
-        message: 'Subscription ID is required'
+        message: 'Subscription ID is required',
+        user_identifier: identifier
       });
     }
 
@@ -1006,11 +1244,23 @@ const createSubscription = async (req, res) => {
     if (!planResult || planResult.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Subscription plan not found or inactive'
+        message: 'Subscription plan not found or inactive',
+        user_identifier: identifier
       });
     }
 
     const plan = planResult[0];
+
+    // 🆕 Get actual user ID
+    const actualUserId = await EnhancedSubscriptionController.getActualUserId(identifier);
+
+    if (!actualUserId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found for the given identifier',
+        user_identifier: identifier
+      });
+    }
 
     // 🛡️ Check if user already has an active subscription using SERVER time
     const activeSubs = await query(
@@ -1019,7 +1269,7 @@ const createSubscription = async (req, res) => {
        AND status = 'active' 
        AND start_date <= UTC_TIMESTAMP()
        AND end_date > UTC_TIMESTAMP()`,
-      [userId]
+      [actualUserId]
     );
 
     if (activeSubs && activeSubs.length > 0) {
@@ -1029,7 +1279,8 @@ const createSubscription = async (req, res) => {
         error: {
           code: 'ACTIVE_SUBSCRIPTION_EXISTS',
           details: 'Cannot create new subscription while another is active'
-        }
+        },
+        user_identifier: identifier
       });
     }
 
@@ -1047,7 +1298,8 @@ const createSubscription = async (req, res) => {
     if (startDate > maxFutureStart) {
       return res.status(400).json({
         success: false,
-        message: `Subscription start date cannot be more than ${maxFutureStartDays} days in the future`
+        message: `Subscription start date cannot be more than ${maxFutureStartDays} days in the future`,
+        user_identifier: identifier
       });
     }
 
@@ -1063,7 +1315,7 @@ const createSubscription = async (req, res) => {
     `;
 
     const insertParams = [
-      userId,
+      actualUserId,
       subscription_id,
       plan.name,
       plan.price,
@@ -1098,7 +1350,8 @@ const createSubscription = async (req, res) => {
         ...newSubscription[0],
         is_currently_active: newSubscription[0].is_currently_active === 1,
         is_scheduled: newSubscription[0].is_scheduled === 1
-      }
+      },
+      user_identifier: identifier
     });
 
   } catch (error) {
@@ -1106,21 +1359,36 @@ const createSubscription = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to create subscription',
+      user_identifier: req.user ? await EnhancedSubscriptionController.getUserIdentifier(req) : null,
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
 
-// Cancel user subscription
+// Cancel user subscription with multi-identifier support
 const cancelSubscription = async (req, res) => {
   try {
-    const userId = req.user.id;
+    // 🆕 Get user identifier
+    const identifier = await EnhancedSubscriptionController.getUserIdentifier(req);
+    
     const { subscription_id, reason = 'user_cancelled' } = req.body;
 
     if (!subscription_id) {
       return res.status(400).json({
         success: false,
-        message: 'Subscription ID is required'
+        message: 'Subscription ID is required',
+        user_identifier: identifier
+      });
+    }
+
+    // 🆕 Get actual user ID
+    const actualUserId = await EnhancedSubscriptionController.getActualUserId(identifier);
+
+    if (!actualUserId) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found for the given identifier',
+        user_identifier: identifier
       });
     }
 
@@ -1128,13 +1396,14 @@ const cancelSubscription = async (req, res) => {
     const subscriptionResult = await query(
       `SELECT id FROM user_subscriptions 
        WHERE id = ? AND user_id = ? AND status = 'active'`,
-      [subscription_id, userId]
+      [subscription_id, actualUserId]
     );
 
     if (!subscriptionResult || subscriptionResult.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Active subscription not found'
+        message: 'Active subscription not found',
+        user_identifier: identifier
       });
     }
 
@@ -1143,18 +1412,20 @@ const cancelSubscription = async (req, res) => {
       `UPDATE user_subscriptions 
        SET status = 'cancelled', cancelled_at = UTC_TIMESTAMP(), cancellation_reason = ?, auto_renew = false
        WHERE id = ? AND user_id = ?`,
-      [reason, subscription_id, userId]
+      [reason, subscription_id, actualUserId]
     );
 
     res.status(200).json({
       success: true,
-      message: 'Subscription cancelled successfully'
+      message: 'Subscription cancelled successfully',
+      user_identifier: identifier
     });
 
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Failed to cancel subscription',
+      user_identifier: req.user ? await EnhancedSubscriptionController.getUserIdentifier(req) : null,
       error: error.message
     });
   }
@@ -1163,6 +1434,9 @@ const cancelSubscription = async (req, res) => {
 // Get available subscription plans for users (only visible ones)
 const getAvailablePlans = async (req, res) => {
   try {
+    // 🆕 Get user identifier (optional for this endpoint)
+    const identifier = req.user ? await EnhancedSubscriptionController.getUserIdentifier(req) : null;
+
     const plans = await query(`
       SELECT * FROM subscriptions 
       WHERE is_active = true AND is_visible = true
@@ -1180,19 +1454,60 @@ const getAvailablePlans = async (req, res) => {
     res.status(200).json({
       success: true,
       data: parsedPlans,
-      count: parsedPlans.length
+      count: parsedPlans.length,
+      user_identifier: identifier
     });
 
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch available plans',
+      user_identifier: req.user ? await EnhancedSubscriptionController.getUserIdentifier(req) : null,
       error: error.message
     });
   }
 };
 
+// 🆕 Middleware to handle user identifier from query params
+const handleUserIdentifier = async (req, res, next) => {
+  try {
+    // If user is already set by auth middleware, use it
+    if (req.user) {
+      return next();
+    }
+
+    // Extract identifier from query params
+    const { user_id, kid_profile_id, family_member_id, oliviuus_id } = req.query;
+    
+    // Create a minimal user object based on identifier
+    if (kid_profile_id) {
+      req.user = { kid_profile_id: parseInt(kid_profile_id) };
+    } else if (family_member_id) {
+      req.user = { 
+        family_member_id: parseInt(family_member_id),
+        has_family_plan_access: req.query.has_family_plan_access === 'true',
+        family_owner_id: req.query.family_owner_id ? parseInt(req.query.family_owner_id) : null
+      };
+    } else if (oliviuus_id) {
+      req.user = { 
+        oliviuus_id,
+        id: req.query.user_id ? parseInt(req.query.user_id) : null
+      };
+    } else if (user_id) {
+      req.user = { id: parseInt(user_id) };
+    }
+    
+    next();
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: 'Invalid user identifier'
+    });
+  }
+};
+
 module.exports = {
+  EnhancedSubscriptionController,
   seedSubscriptionPlans,
   resetSubscriptionPlans,
   getSubscriptionPlans,
@@ -1205,4 +1520,5 @@ module.exports = {
   getAvailablePlans,
   checkSubscriptionStatus,
   quickSessionLimitCheck,
+  handleUserIdentifier
 };

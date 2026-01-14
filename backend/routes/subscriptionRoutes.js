@@ -13,6 +13,8 @@ const {
   getAvailablePlans,
   checkSubscriptionStatus,
   quickSessionLimitCheck,
+  handleUserIdentifier, // 🆕 ADD THIS IMPORT
+  EnhancedSubscriptionController // 🆕 ADD THIS IMPORT
 } = require("../controllers/subscriptionController");
 const { getPublicSubscriptionPlans } = require("../controllers/publicSubscriptionController");
 const CustomerManagementController = require("../controllers/customerManagementController");
@@ -26,14 +28,52 @@ const router = express.Router();
 // ✅ Public route - Get subscription plans (No auth required)
 router.get("/public", getPublicSubscriptionPlans);
 
-// ✅ User subscription routes (Authenticated users)
-router.get("/user/current", authMiddleware, getCurrentSubscription);
-router.get("/user/history", authMiddleware, getSubscriptionHistory);
-router.get("/user/status", authMiddleware, checkSubscriptionStatus);
-router.get("/user/available-plans", authMiddleware, getAvailablePlans);
-router.post("/user/subscribe", authMiddleware, createSubscription);
-router.post("/user/cancel", authMiddleware, cancelSubscription);
-router.get("/user/sessions/quick-check", authMiddleware, quickSessionLimitCheck);
+// 🆕 Combined identifier middleware for subscription routes
+const subscriptionAuthMiddleware = (req, res, next) => {
+  // First try to use auth middleware
+  authMiddleware(req, res, (err) => {
+    if (err) {
+      // If auth fails, try to get identifier from query params
+      return handleUserIdentifier(req, res, next);
+    }
+    // If auth succeeds, proceed
+    next();
+  });
+};
+
+// ✅ User subscription routes (Authenticated users OR identifier-based access)
+router.get("/user/current", subscriptionAuthMiddleware, getCurrentSubscription);
+router.get("/user/history", subscriptionAuthMiddleware, getSubscriptionHistory);
+router.get("/user/status", subscriptionAuthMiddleware, checkSubscriptionStatus);
+router.get("/user/available-plans", subscriptionAuthMiddleware, getAvailablePlans);
+router.post("/user/subscribe", subscriptionAuthMiddleware, createSubscription);
+router.post("/user/cancel", subscriptionAuthMiddleware, cancelSubscription);
+router.get("/user/sessions/quick-check", subscriptionAuthMiddleware, quickSessionLimitCheck);
+
+// 🆕 New route to get user identifier info (for debugging)
+router.get("/user/identifier-info", subscriptionAuthMiddleware, async (req, res) => {
+  try {
+    const identifier = await EnhancedSubscriptionController.getUserIdentifier(req);
+    const actualUserId = await EnhancedSubscriptionController.getActualUserId(identifier);
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        identifier,
+        actual_user_id: actualUserId,
+        auth_method: req.user ? 'auth_middleware' : 'identifier_middleware',
+        request_method: req.method,
+        endpoint: req.originalUrl
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get identifier info',
+      error: error.message
+    });
+  }
+});
 
 // Plan selection before payment
 router.post("/select", authMiddleware, async (req, res) => {
@@ -87,7 +127,7 @@ router.post("/select", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Admin routes (Admin only)
+// ✅ Admin routes (Admin only) - Keep authMiddleware only
 router.post("/seed", authMiddleware, adminMiddleware, seedSubscriptionPlans);
 router.post("/reset", authMiddleware, adminMiddleware, resetSubscriptionPlans);
 router.get("/", authMiddleware, adminMiddleware, getSubscriptionPlans);
@@ -107,5 +147,20 @@ router.get("/admin/billing/invoices/:invoiceId", authMiddleware, adminMiddleware
 // Subscription Analytics Routes
 router.get("/admin/analytics/overview", authMiddleware, adminMiddleware, SubscriptionAnalyticsController.getSubscriptionAnalytics);
 router.get("/admin/analytics/real-time", authMiddleware, adminMiddleware, SubscriptionAnalyticsController.getRealTimeMetrics);
+
+// 🆕 Health check for subscription routes
+router.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Subscription routes are healthy',
+    timestamp: new Date().toISOString(),
+    version: '2.0.0',
+    features: {
+      multi_identifier_support: true,
+      user_types: ['legacy_user', 'oliviuus_user', 'kid_profile', 'family_member'],
+      auth_methods: ['jwt_auth', 'identifier_params']
+    }
+  });
+});
 
 module.exports = router;

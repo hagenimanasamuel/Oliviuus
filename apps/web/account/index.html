@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- ============ THEME & DESCRIPTION ============ -->
+  <meta name="theme-color" content="#BC8BBC" />
+  <meta name="description" content="Oliviuus Account Center - Single Sign-On for managing your streaming account, security settings, and authentication." />
+  
+  <!-- ============ ICONS & FAVICONS ============ -->
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png" />
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png" />
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png" />
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />
+  
+  <!-- Favicons for various browsers -->
+  <link rel="icon" type="image/svg+xml" href="/oliviuus_logo_transparent.png" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  
+  <!-- Windows Tiles -->
+  <meta name="msapplication-TileColor" content="#BC8BBC" />
+  <meta name="msapplication-TileImage" content="/pwa-144x144.png" />
+  
+  <!-- Safari Pinned Tab -->
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#BC8BBC" />
+  
+  <!-- Mobile App Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Oliviuus Account" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Oliviuus Account" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  
+  <!-- ============ SEO & SOCIAL META TAGS ============ -->
+  
+  <!-- Basic SEO -->
+  <meta name="keywords" content="Oliviuus account, login, sign up, password reset, two-factor authentication, account security, single sign-on, streaming account management, Rwandan streaming platform" />
+  <meta name="author" content="Oliviuus" />
+  <meta name="robots" content="index, follow" />
+  <meta name="googlebot" content="index, follow" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Oliviuus Account Center - Secure Login & Account Management" />
+  <meta property="og:description" content="Manage your Oliviuus streaming account securely. Single sign-on for authentication, security settings, password management, and account preferences." />
+  <meta property="og:image" content="/oliviuus-account-og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Oliviuus Account Center" />
+  <meta property="og:url" content="https://account.oliviuus.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Oliviuus Account" />
+  <meta property="og:locale" content="en_US" />
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@oliviuus" />
+  <meta name="twitter:creator" content="@oliviuus" />
+  <meta name="twitter:title" content="Oliviuus Account Center" />
+  <meta name="twitter:description" content="Secure account management for your Oliviuus streaming experience." />
+  <meta name="twitter:image" content="/oliviuus-account-twitter-card.png" />
+  <meta name="twitter:image:alt" content="Oliviuus Account Management" />
+  
+  <!-- ============ PAGE TITLE ============ -->
+  <title>Oliviuus Account | Secure Signin & Account Management</title>
+  
+  <!-- ============ FONTS & STYLES ============ -->
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" />
+  
+  <!-- Preload critical assets -->
+  <link rel="preload" href="/oliviuus_logo_transparent.png" as="image" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" as="style" />
+  
+  <!-- ============ ADDITIONAL META TAGS ============ -->
+  
+  <!-- Content Security Policy (if needed) -->
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;"> -->
+  
+  <!-- Cache Control -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  
+  <!-- Security Headers (if applicable) -->
+  <!-- <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block" /> -->
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://account.oliviuus.com" />
+</head>
+
+<body>
+  <!-- Loading fallback for slow connections -->
+  <noscript>
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+      <div style="text-align: center; padding: 2rem;">
+        <h1 style="color: #BC8BBC; margin-bottom: 1rem;">Oliviuus Account Center</h1>
+        <p>JavaScript is required to access your account. Please enable JavaScript in your browser settings for a secure login experience.</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem; color: #aaa;">
+          For assistance, contact <a href="mailto:support@oliviuus.com" style="color: #BC8BBC;">support@oliviuus.com</a>
+        </p>
+      </div>
+    </div>
+  </noscript>
+  
+  <!-- React Root -->
+  <div id="root"></div>
+  
+  <!-- App Script -->
+  <script type="module" src="/src/main.jsx"></script>
+  
+  <!-- Security Script (optional for auth-focused app) -->
+  <script>
+    // Security enhancement for auth pages
+    window.addEventListener('pageshow', function(event) {
+      // Clear sensitive data if page was restored from back-forward cache
+      if (event.persisted) {
+        console.log('Auth page restored from cache - security check');
+        // You might want to trigger a re-validation here
+      }
+    });
+  </script>
+</body>
+</html>

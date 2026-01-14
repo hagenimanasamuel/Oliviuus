@@ -1,12 +1,65 @@
 // controllers/kidController.js
 const { query } = require("../config/dbConfig");
 
+// Add this helper function at the top:
+const getKidUserInfo = async (kidProfile, profileType) => {
+  if (profileType === 'family_member') {
+    const userInfo = await getUserDisplayInfo(kidProfile.user_id || kidProfile.id);
+    return {
+      name: userInfo?.display_name || kidProfile.name || 'Family Member',
+      display_name: userInfo?.display_name || kidProfile.name || 'Family Member',
+      identifier: userInfo?.primary_identifier || 'No identifier',
+      profile_avatar_url: userInfo?.profile_avatar_url || kidProfile.avatar_url,
+      max_age_rating: kidProfile.max_age_rating || '7+',
+      theme_color: kidProfile.theme_color || 'blue',
+      is_family_member: true,
+      user_id: kidProfile.user_id || kidProfile.id
+    };
+  } else {
+    return {
+      name: kidProfile.name,
+      display_name: kidProfile.name,
+      identifier: `Kid Profile #${kidProfile.id || kidProfile.kid_profile_id}`,
+      profile_avatar_url: kidProfile.avatar_url,
+      max_age_rating: kidProfile.max_content_age_rating || kidProfile.max_age_rating || '7+',
+      theme_color: kidProfile.theme_color || 'blue',
+      is_family_member: false,
+      parent_user_id: kidProfile.parent_user_id
+    };
+  }
+};
+
 // PRODUCTION NOTE: Cache configuration for kid content
 // Cache durations are optimized for kid content which changes less frequently
 const kidCacheConfig = {
   landingContent: 10 * 60 * 1000, // 10 minutes - landing page content
   contentList: 5 * 60 * 1000,    // 5 minutes - content lists
   singleContent: 2 * 60 * 1000,  // 2 minutes - single content
+};
+
+// Validate family member access
+const validateFamilyMemberAccess = async (familyMemberId) => {
+  try {
+    const queryStr = `
+      SELECT 
+        fm.*,
+        u.is_active as user_active,
+        u.is_deleted as user_deleted
+      FROM family_members fm
+      JOIN users u ON fm.user_id = u.id
+      WHERE fm.user_id = ? 
+        AND fm.is_active = TRUE
+        AND fm.invitation_status = 'accepted'
+        AND u.is_active = TRUE
+        AND u.is_deleted = FALSE
+    `;
+    
+    const [familyMember] = await query(queryStr, [familyMemberId]);
+    return familyMember || null;
+  } catch (error) {
+    console.error('Error validating family member access:', error);
+    return null;
+  }
 };
 
 // In-memory cache for kid content
@@ -297,6 +350,27 @@ const buildGenreExclusionCondition = (blockedGenres) => {
   const params = [blockedGenres];
 
   return { condition: conditions.join(' AND '), params };
+};
+
+// Helper to get user display info for family members
+const getUserDisplayInfo = async (userId) => {
+  try {
+    const userQuery = `
+      SELECT 
+        id,
+        COALESCE(username, email, phone, CONCAT('User-', id)) as display_name,
+        COALESCE(email, phone, username, 'No identifier') as primary_identifier,
+        profile_avatar_url
+      FROM users 
+      WHERE id = ? AND is_active = TRUE AND is_deleted = FALSE
+    `;
+    
+    const [user] = await query(userQuery, [userId]);
+    return user || null;
+  } catch (error) {
+    console.error('Error fetching user display info:', error);
+    return null;
+  }
 };
 
 // Get kid hero content - featured or highest quality content for landing page
@@ -609,6 +683,10 @@ const getKidLandingContent = async (req, res) => {
     const processedFun = processContentGenresCategories(categorized.fun);
     const processedRecent = processContentGenresCategories(categorized.recent);
 
+    // Determine profile type and get user info
+    const profileType = getKidProfileType(kidProfile);
+    const kidUserInfo = await getKidUserInfo(kidProfile, profileType);
+
     // Create response data structure
     const responseData = {
       hero: processedHero ? sanitizeKidContent(processedHero) : null,
@@ -616,14 +694,7 @@ const getKidLandingContent = async (req, res) => {
       educational: processedEducational.map(item => sanitizeKidContent(item)),
       fun: processedFun.map(item => sanitizeKidContent(item)),
       recent: processedRecent.map(item => sanitizeKidContent(item)),
-      kid_info: {
-        name: kidProfile.name,
-        max_age_rating: '12+ (Kid Safe)', // General for all kids
-        theme_color: kidProfile.theme_color || 'blue',
-        is_family_member: kidProfile.is_family_member || false,
-        allowed_ratings: KID_ALLOWED_AGE_RATINGS,
-        blocked_ratings: KID_BLOCKED_AGE_RATINGS
-      },
+      kid_info: kidUserInfo,
       last_updated: new Date().toISOString(),
       sections_count: {
         hero: processedHero ? 1 : 0,
@@ -755,49 +826,29 @@ const trackKidContentView = async (req, res) => {
   }
 };
 
-// Determine kid profile type (family member vs kid profile)
+// Determine kid profile type (family member vs kid profile) - UPDATED
 const getKidProfileType = (kidProfile) => {
-  // Method 1: Check explicit flags FIRST
-  if (kidProfile.is_family_member === true) {
+  if (!kidProfile) return 'kid_profile';
+  
+  // Method 1: Check explicit flags
+  if (kidProfile.is_family_member === true || kidProfile.dashboard_type === 'kid') {
     return 'family_member';
   }
   
-  if (kidProfile.dashboard_type === 'kid') {
-    return 'family_member';
-  }
-  
-  // Method 2: Check for user_id (family members should have this)
+  // Method 2: Check for user_id (family members have this)
   if (kidProfile.user_id) {
     return 'family_member';
   }
   
-  // Method 3: Check for kid-specific fields
-  if (kidProfile.kid_profile_id) {
-    // Convert to string to safely check if it starts with 'family_'
-    const kidProfileIdStr = String(kidProfile.kid_profile_id);
-    if (kidProfileIdStr.startsWith('family_')) {
-      return 'family_member';
-    }
-  }
-  
-  // Method 4: Regular kid profile
-  if (kidProfile.kid_profile_id && !kidProfile.user_id) {
+  // Method 3: Regular kid profile
+  if (kidProfile.kid_profile_id || kidProfile.parent_user_id) {
     return 'kid_profile';
   }
   
-  // Method 5: Check parent_user_id (kid profiles have this)
-  if (kidProfile.parent_user_id && !kidProfile.user_id) {
-    return 'kid_profile';
-  }
-  
-  // Method 6: Check if it's a synthetic ID from family member
-  if (kidProfile.id && typeof kidProfile.id === 'string' && kidProfile.id.startsWith('family_')) {
-    return 'family_member';
-  }
-  
-  // Method 7: Default based on ID type
+  // Method 4: Check ID format
   if (kidProfile.id) {
-    if (typeof kidProfile.id === 'number' || /^\d+$/.test(String(kidProfile.id))) {
+    const idStr = String(kidProfile.id);
+    if (idStr.startsWith('family_') || /^fm_\d+$/.test(idStr)) {
       return 'family_member';
     }
   }
@@ -880,6 +931,10 @@ const getKidLikedContent = async (req, res) => {
         });
       }
       
+      // Get user display info for family member
+      const userInfo = await getUserDisplayInfo(userId);
+      const displayName = userInfo?.display_name || kidProfile.name || 'Family Member';
+      
       const likesQuery = `
         SELECT 
           c.*,
@@ -913,76 +968,30 @@ const getKidLikedContent = async (req, res) => {
       
       queryParams = [process.env.R2_PUBLIC_URL_ID, userId];
       likedContent = await query(likesQuery, queryParams);
-    }
 
-    // Sanitize for kids
-    const sanitizeContent = (content) => {
-      // Process genres
-      let genres = [];
-      if (content.genre_names) {
-        genres = content.genre_names.split(',').map((name, index) => ({
-          id: content.genre_ids ? content.genre_ids.split(',')[index] : index,
-          name: name.trim()
-        }));
-      }
-      
-      // Process categories
-      let categories = [];
-      if (content.category_names) {
-        categories = content.category_names.split(',').map((name, index) => ({
-          id: content.category_ids ? content.category_ids.split(',')[index] : index,
-          name: name.trim()
-        }));
-      }
-      
-      // Ensure content is kid-safe
-      const isKidSafe = !KID_BLOCKED_AGE_RATINGS.includes(content.age_rating || '');
-      const allowedAgeRating = KID_ALLOWED_AGE_RATINGS.includes(content.age_rating || 'G');
-      
-      return {
-        id: content.id,
-        title: content.title,
-        content_type: content.content_type,
-        description: content.short_description || content.description || '',
-        short_description: content.short_description || '',
-        duration_minutes: content.duration_minutes,
-        release_date: content.release_date,
-        age_rating: content.age_rating || 'G',
-        average_rating: content.average_rating || 0,
-        view_count: content.view_count || 0,
-        primary_image_url: content.primary_image_url,
-        genres: genres,
-        categories: categories,
-        liked_at: content.liked_at,
-        reaction: content.reaction || 'like',
-        is_kid_safe: isKidSafe && allowedAgeRating,
-        media_assets: content.primary_image_url ? [{
-          asset_type: 'thumbnail',
-          url: content.primary_image_url,
-          is_primary: 1,
-          upload_status: 'completed'
-        }] : []
-      };
-    };
+      // Update the response section:
+      const processedContent = likedContent.map(sanitizeContent);
 
-    const processedContent = likedContent.map(sanitizeContent);
-
-    res.json({
-      success: true,
-      data: {
-        favorites: processedContent, // Changed from 'liked_content' to 'favorites' for frontend compatibility
-        total: processedContent.length,
-        profile_type: profileType,
-        kid_info: {
-          name: kidProfile.name,
-          total_liked: processedContent.length,
-          user_id: kidProfile.user_id,
-          kid_profile_id: kidProfile.kid_profile_id,
-          parent_user_id: kidProfile.parent_user_id,
-          is_family_member: kidProfile.is_family_member || false
+      res.json({
+        success: true,
+        data: {
+          favorites: processedContent,
+          total: processedContent.length,
+          profile_type: profileType,
+          kid_info: {
+            name: profileType === 'family_member' ? displayName : kidProfile.name,
+            total_liked: processedContent.length,
+            user_id: kidProfile.user_id,
+            kid_profile_id: kidProfile.kid_profile_id,
+            parent_user_id: kidProfile.parent_user_id,
+            is_family_member: profileType === 'family_member',
+            // Add display info for family members
+            display_name: profileType === 'family_member' ? displayName : kidProfile.name,
+            identifier: profileType === 'family_member' ? (userInfo?.primary_identifier || 'No identifier') : null
+          }
         }
-      }
-    });
+      });
+    }
 
   } catch (error) {
     res.status(500).json({
@@ -1064,6 +1073,9 @@ const getKidWatchLaterContent = async (req, res) => {
           error: 'User ID not found for family member'
         });
       }
+      
+      // Get user display info
+      const userInfo = await getUserDisplayInfo(userId);
       
       const watchlistQuery = `
         SELECT 
@@ -1230,6 +1242,17 @@ const toggleKidLikedContent = async (req, res) => {
     } else {
       // Family member - use user_likes table
       const userId = kidProfile.user_id || kidProfile.id;
+      
+      // Check if family member user exists
+      const userExistsQuery = 'SELECT id FROM users WHERE id = ? AND is_active = TRUE AND is_deleted = FALSE';
+      const userExists = await query(userExistsQuery, [userId]);
+      
+      if (userExists.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Family member user not found or inactive'
+        });
+      }
       
       existingQuery = 'SELECT id FROM user_likes WHERE user_id = ? AND content_id = ? AND is_active = TRUE';
       

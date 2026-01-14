@@ -11,3 +11,5 @@ router.post("/logout", authMiddleware, logoutSession);
 router.post("/logout-all", authMiddleware, logoutAllOtherSessions);
 
 module.exports = router;
+
+

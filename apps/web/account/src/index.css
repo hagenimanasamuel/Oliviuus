@@ -1,0 +1,92 @@
+/* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Tailwind CSS with theme configuration */
+@import "tailwindcss";
+
+@theme {
+  /* Font configuration */
+  --font-family-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --font-family-serif: 'Poppins', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-family-mono: 'Poppins', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  
+  /* Color scheme for dark mode */
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-border: #27272a;
+  --color-ring: #9333ea;
+  --color-primary: #9333ea;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #27272a;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #27272a;
+  --color-muted-foreground: #a1a1aa;
+  --color-accent: #27272a;
+  --color-accent-foreground: #ffffff;
+  --color-card: #09090b;
+  --color-card-foreground: #ffffff;
+  --color-popover: #09090b;
+  --color-popover-foreground: #ffffff;
+}
+
+/* Force dark mode globally */
+:root {
+  color-scheme: dark;
+  background-color: #000;
+  color: #fff;
+}
+
+/* Apply Poppins globally */
+* {
+  font-family: var(--font-family-sans);
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  /* Allow body to scroll normally, not fixed */
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* IMPORTANT: Remove the auth-page scroll blocking during auth */
+body.auth-page,
+html.auth-page {
+  overflow: hidden !important; /* Still block during auth, but allow scroll within container */
+}
+
+/* Remove the fixed positioning that blocks scrolling */
+@media (max-width: 640px) {
+  body, html {
+    width: 100vw;
+    height: 100vh;
+    overscroll-behavior: none;
+    /* Remove position: fixed that blocks scrolling */
+  }
+}
+
+/* Optional: Improve dark mode experience */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Optional: Custom scrollbar for dark mode */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}

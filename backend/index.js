@@ -6,7 +6,7 @@ const { createServer } = require('http');
 const socketIo = require('socket.io');
 const {
   createUsersTable,
-  createEmailVerificationsTable,
+  createVerificationsTable,
   createUserPreferencesTable,
   createUserSessionTable,
   createSubscriptionsTables,
@@ -82,7 +82,8 @@ const allowedOrigins = [
   process.env.CLIENT_ORIGIN,
   "https://oliviuus.com",
   "http://localhost:5173",
-  "http://localhost:3000"
+  "http://localhost:3000",
+  "http://localhost:3001"
 ];
 
 // Socket.IO setup with CORS configuration
@@ -103,7 +104,6 @@ app.use(cookieParser());
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.indexOf(origin) === -1) {
@@ -115,18 +115,17 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE', 'PATCH'],
   
-  // Enhanced allowedHeaders for production use
   allowedHeaders: [
     // Essential headers
     'Content-Type',
     'Authorization',
     'X-Requested-With',
     
-    // Cache control (you already had these)
+    // Cache control
     'Cache-Control',
     'Pragma',
     
-    // Additional standard headers for better compatibility
+    // Additional standard headers
     'Accept',
     'Accept-Language',
     'Accept-Encoding',
@@ -135,10 +134,16 @@ app.use(cors({
     'X-CSRF-Token',
     'X-XSRF-Token',
     
-    // Custom application headers
+    // Custom application headers 
     'X-Client-Version',
     'X-API-Key',
     'X-Request-ID',
+    
+    // Custom headers 
+    'X-Device-ID',         
+    'X-Device-Type',       
+    'X-Has-Download-Manager',
+    'X-Security-Level',     
     
     // File upload headers
     'Content-Disposition',
@@ -165,44 +170,31 @@ app.use(cors({
     // Analytics/telemetry
     'User-Agent',
     'Referer',
-    'DNT', // Do Not Track
+    'DNT',
   ],
   
-  // Enhanced exposedHeaders for production use
   exposedHeaders: [
-    // You already had these
+    // Keep  existing exposedHeaders...
     'Set-Cookie',
     'Date',
     'ETag',
-    
-    // Additional headers clients should be able to access
     'Content-Length',
     'Content-Type',
     'Content-Disposition',
-    
-    // Cache information
     'Last-Modified',
     'Cache-Control',
     'Expires',
-    
-    // Rate limiting information
     'X-RateLimit-Limit',
     'X-RateLimit-Remaining',
     'X-RateLimit-Reset',
-    
-    // Application-specific headers
     'X-Request-ID',
     'X-Response-Time',
     'X-Powered-By',
-    
-    // Pagination headers
     'Link',
     'X-Total-Count',
     'X-Total-Pages',
     'X-Current-Page',
     'X-Per-Page',
-    
-    // Security headers
     'Strict-Transport-Security',
     'X-Content-Type-Options',
     'X-Frame-Options',
@@ -510,7 +502,7 @@ const startServer = async () => {
     initializeSubscriptionMonitor();
     
     // Step 4: Start the server with Socket.IO
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT || 3120;
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT} with Socket.IO support`);
       console.log("✅ Database initialized successfully!");
