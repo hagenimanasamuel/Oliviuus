@@ -102,6 +102,17 @@ app.use(express.json());
 // use cookie parser 
 app.use(cookieParser());
 
+<<<<<<< HEAD
+// Enhanced CORS headers configuration
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN,
+  "https://oliviuus.com",
+  "http://localhost:5173",
+  "http://localhost:3000"
+];
+
+=======
+>>>>>>> 4fe8c967110212d758738346d8f3bf8bbd11263c
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
