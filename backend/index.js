@@ -5,32 +5,16 @@ require('dotenv').config();
 const { createServer } = require('http');
 const socketIo = require('socket.io');
 const {
-  createUsersTable,
-  createVerificationsTable,
-  createUserPreferencesTable,
-  createUserSessionTable,
-  createSubscriptionsTables,
-  createRolesTable,
-  createRoleFeaturesTable,
-  createPasswordResetsTable,
-  createContactsTable,
-  createContactResponsesTable,
-  createContactInfoTable,
-  createNotificationsTable,
-  createSecurityLogsTable,
-  createContentTables,
-  createPeopleTables,
-  createUserPreferencesTables,
-  createWatchTrackingTables,
-  createShareTables,
-  createKidsTables,
-  createFamilyMembersTable,
-  createFamilyPinSecurityTable,
-  createFeedbackTable,
-  createGameTables,
   initializeDatabase, 
   query
 } = require('./config/dbConfig');
+
+// iSanzure database imports
+const { 
+  isanzureDb,
+  isanzureQuery,
+  initializeIsanzureDatabase
+} = require('./config/isanzureDbConfig');
 const { initializeSubscriptionMonitor } = require('./controllers/subscriptionMonitorController');
 const createAdminSeed = require('./seeds/seedAdmin');
 const authRoutes = require('./routes/authRoutes');
@@ -71,6 +55,14 @@ const kidInsightsRoutes = require('./routes/kidInsightsRoutes');
 const { kidsActivityLogger } = require("./middlewares/kidsActivityLogger");
 const kidsSecurityRoutes = require("./routes/kidsSecurityRoutes");
 const liveUsersRoutes = require("./routes/liveUsersRoutes");
+const freePlansRoutes = require("./controllers/freePlansRoutes");
+
+
+// Isanzure specific
+const isanzureRoutes = require('./routes/isanzure/isanzureRoutes');
+const propertyRoutes = require('./routes/isanzure/propertyRoutes');
+const publicPropertyRoutes = require('./routes/isanzure/publicPropertyRoutes');
+const isanzureSearchRoutes = require('./routes/isanzure/searchRoutes');
 
 const cookieParser = require("cookie-parser");
 
@@ -83,7 +75,8 @@ const allowedOrigins = [
   "https://oliviuus.com",
   "http://localhost:5173",
   "http://localhost:3000",
-  "http://localhost:3001"
+  "http://localhost:3001",
+  "http://localhost:3002"
 ];
 
 // Socket.IO setup with CORS configuration
@@ -102,17 +95,6 @@ app.use(express.json());
 // use cookie parser 
 app.use(cookieParser());
 
-<<<<<<< HEAD
-// Enhanced CORS headers configuration
-const allowedOrigins = [
-  process.env.CLIENT_ORIGIN,
-  "https://oliviuus.com",
-  "http://localhost:5173",
-  "http://localhost:3000"
-];
-
-=======
->>>>>>> 4fe8c967110212d758738346d8f3bf8bbd11263c
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -131,6 +113,9 @@ app.use(cors({
     'Content-Type',
     'Authorization',
     'X-Requested-With',
+    
+    // ✅ ADD THIS HEADER:
+    'X-App-Name',
     
     // Cache control
     'Cache-Control',
@@ -185,7 +170,6 @@ app.use(cors({
   ],
   
   exposedHeaders: [
-    // Keep  existing exposedHeaders...
     'Set-Cookie',
     'Date',
     'ETag',
@@ -470,6 +454,13 @@ app.use('/api/security', securityRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/parent/kid-insights', kidInsightsRoutes);
 app.use("/api/kids", kidsSecurityRoutes);
+app.use("/api/admin/subscriptions/free-plans", freePlansRoutes);
+
+// Isanzure Specific
+app.use('/api/isanzure', isanzureRoutes);
+app.use('/api/properties', propertyRoutes);
+app.use('/api/public/properties', publicPropertyRoutes);
+app.use('/api/isanzure/search', isanzureSearchRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -488,7 +479,7 @@ app.get('/api/socket-test', (req, res) => {
 // Initialize database and start server
 const startServer = async () => {
   try {
-    console.log("🔧 Initializing database...");
+    console.log("🔧 Initializing databases...");
     
     // Step 1: Initialize database tables
     const dbInitialized = await initializeDatabase();
@@ -497,8 +488,13 @@ const startServer = async () => {
       console.error("❌ Failed to initialize database. Server cannot start.");
       process.exit(1);
     }
+
+    // Step 2: Initialize iSanzure database
+    console.log("🏡 Initializing iSanzure database...");
+    await initializeIsanzureDatabase();
+    console.log("✅ iSanzure database initialized");
     
-    // Step 2: Create admin seed (AFTER tables are created)
+    // Step 3: Create admin seed (AFTER tables are created)
     console.log("👑 Creating admin user...");
     try {
       await createAdminSeed();
@@ -508,12 +504,12 @@ const startServer = async () => {
       // Don't fail the server if admin seed fails - it might already exist
     }
     
-    // Step 3: Start subscription monitor
+    // Step 4: Start subscription monitor
     console.log("🚀 Starting subscription monitor...");
     initializeSubscriptionMonitor();
     
-    // Step 4: Start the server with Socket.IO
-    const PORT = process.env.PORT || 3120;
+    // Step 5: Start the server with Socket.IO
+    const PORT = process.env.PORT || 3122;
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT} with Socket.IO support`);
       console.log("✅ Database initialized successfully!");

@@ -79,47 +79,142 @@ const getSystemOverview = async (req, res) => {
       ORDER BY subscriber_count DESC
     `);
 
-    // 7. Recent Activities (Last 7 days)
-    const recentActivities = await query(`
-      (SELECT 'user_registered' as type, email as description, created_at as timestamp
-       FROM users 
-       WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-       ORDER BY created_at DESC 
-       LIMIT 5)
-      
-      UNION ALL
-      
-      (SELECT 'subscription_created' as type, 
-              CONCAT('New ', subscription_name, ' subscription') as description, 
-              created_at as timestamp
-       FROM user_subscriptions 
-       WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-       ORDER BY created_at DESC 
-       LIMIT 5)
-      
-      UNION ALL
-      
-      (SELECT 'payment_completed' as type,
-              CONCAT('Payment of ', amount, ' ', currency) as description,
-              created_at as timestamp
-       FROM payment_transactions 
-       WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-       ORDER BY created_at DESC 
-       LIMIT 5)
-      
-      UNION ALL
-      
-      (SELECT 'support_ticket' as type,
-              CONCAT('New ticket: ', subject) as description,
-              created_at as timestamp
-       FROM contacts 
-       WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND status = 'new'
-       ORDER BY created_at DESC 
-       LIMIT 5)
-      
-      ORDER BY timestamp DESC 
-      LIMIT 15
-    `);
+// 7. Recent Activities (Last 7 days) - FIXED COLLATION ISSUE
+const recentActivities = await query(`
+  -- User Registrations with flexible identifiers
+  (SELECT 
+    'user_registered' as type, 
+    CONVERT(
+      CONCAT(
+        'New user: ',
+        CASE 
+          WHEN username IS NOT NULL THEN CONCAT('@', username)
+          WHEN first_name IS NOT NULL THEN CONCAT(first_name, ' ', COALESCE(last_name, ''))
+          WHEN email IS NOT NULL THEN SUBSTRING_INDEX(email, '@', 1)
+          WHEN phone IS NOT NULL THEN CONCAT('User (', RIGHT(phone, 4), ')')
+          ELSE 'User'
+        END
+      ) USING utf8mb4
+    ) as description,
+    created_at as timestamp,
+    id as user_id,
+    email,
+    phone,
+    username,
+    first_name,
+    last_name
+   FROM users 
+   WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+   ORDER BY created_at DESC 
+   LIMIT 5)
+  
+  UNION ALL
+  
+  -- Subscription created with user info
+  (SELECT 
+    'subscription_created' as type, 
+    CONVERT(
+      CONCAT(
+        'New subscription by ',
+        CASE 
+          WHEN u.username IS NOT NULL THEN CONCAT('@', u.username)
+          WHEN u.first_name IS NOT NULL THEN CONCAT(u.first_name, ' ', COALESCE(u.last_name, ''))
+          WHEN u.email IS NOT NULL THEN SUBSTRING_INDEX(u.email, '@', 1)
+          WHEN u.phone IS NOT NULL THEN CONCAT('User (', RIGHT(u.phone, 4), ')')
+          ELSE 'User'
+        END,
+        ': ',
+        s.name
+      ) USING utf8mb4
+    ) as description,
+    us.created_at as timestamp,
+    us.user_id as user_id,
+    u.email,
+    u.phone,
+    u.username,
+    u.first_name,
+    u.last_name
+   FROM user_subscriptions us
+   JOIN users u ON us.user_id = u.id
+   JOIN subscriptions s ON us.subscription_id = s.id
+   WHERE us.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+   ORDER BY us.created_at DESC 
+   LIMIT 5)
+  
+  UNION ALL
+  
+  -- Payment completed with user info
+  (SELECT 
+    'payment_completed' as type,
+    CONVERT(
+      CONCAT(
+        'Payment of ', 
+        pt.amount, ' ', 
+        pt.currency,
+        ' by ',
+        CASE 
+          WHEN u.username IS NOT NULL THEN CONCAT('@', u.username)
+          WHEN u.first_name IS NOT NULL THEN CONCAT(u.first_name, ' ', COALESCE(u.last_name, ''))
+          WHEN u.email IS NOT NULL THEN SUBSTRING_INDEX(u.email, '@', 1)
+          WHEN u.phone IS NOT NULL THEN CONCAT('User (', RIGHT(u.phone, 4), ')')
+          ELSE 'User'
+        END
+      ) USING utf8mb4
+    ) as description,
+    pt.created_at as timestamp,
+    pt.user_id as user_id,
+    u.email,
+    u.phone,
+    u.username,
+    u.first_name,
+    u.last_name
+   FROM payment_transactions pt
+   LEFT JOIN users u ON pt.user_id = u.id
+   WHERE pt.status = 'completed' 
+     AND pt.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+   ORDER BY pt.created_at DESC 
+   LIMIT 5)
+  
+  UNION ALL
+  
+  -- Support tickets with user info
+  (SELECT 
+    'support_ticket' as type,
+    CONVERT(
+      CONCAT(
+        'New ticket: ',
+        c.subject,
+        CASE 
+          WHEN u.id IS NOT NULL THEN CONCAT(' by ', 
+            CASE 
+              WHEN u.username IS NOT NULL THEN CONCAT('@', u.username)
+              WHEN u.first_name IS NOT NULL THEN CONCAT(u.first_name, ' ', COALESCE(u.last_name, ''))
+              WHEN u.email IS NOT NULL THEN SUBSTRING_INDEX(u.email, '@', 1)
+              WHEN u.phone IS NOT NULL THEN CONCAT('User (', RIGHT(u.phone, 4), ')')
+              ELSE 'User'
+            END
+          )
+          ELSE ''
+        END
+      ) USING utf8mb4
+    ) as description,
+    c.created_at as timestamp,
+    c.user_id as user_id,
+    u.email,
+    u.phone,
+    u.username,
+    u.first_name,
+    u.last_name
+   FROM contacts c
+   LEFT JOIN users u ON c.user_id = u.id
+   WHERE c.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) 
+     AND c.status = 'new'
+   ORDER BY c.created_at DESC 
+   LIMIT 5)
+  
+  ORDER BY timestamp DESC 
+  LIMIT 15
+`);
 
     // 8. System Health Metrics - FIXED: Use correct table names
     const systemHealth = await query(`
@@ -131,6 +226,22 @@ const getSystemOverview = async (req, res) => {
         (SELECT COUNT(*) FROM notifications WHERE status = 'unread') as unread_notifications
     `);
 
+    // Format the activities for frontend
+    const formattedActivities = recentActivities.map(activity => ({
+      type: activity.type,
+      description: activity.description,
+      timestamp: activity.timestamp,
+      user: activity.user_id ? {
+        id: activity.user_id,
+        email: activity.email,
+        phone: activity.phone,
+        username: activity.username,
+        first_name: activity.first_name,
+        last_name: activity.last_name
+      } : null
+    }));
+
+
     res.json({
       success: true,
       data: {
@@ -140,7 +251,7 @@ const getSystemOverview = async (req, res) => {
         supportStats: supportStats[0],
         securityStats: securityStats[0],
         planDistribution,
-        recentActivities,
+        recentActivities: formattedActivities, // Use formatted activities
         systemHealth: systemHealth[0],
         lastUpdated: new Date().toISOString()
       }

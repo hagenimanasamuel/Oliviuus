@@ -29,7 +29,10 @@ import {
   RefreshCw,
   Loader2,
   Menu,
-  X
+  X,
+  Mail,
+  Phone,
+  User as UserIcon
 } from "lucide-react";
 import api from "../../../../api/axios";
 
@@ -81,13 +84,80 @@ export default function TopUsers() {
     setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
   };
 
+  // Helper function to get user display name
+  const getUserDisplayName = (user) => {
+    if (!user) return 'User';
+    
+    // Priority: username > full name > email prefix > phone > fallback
+    if (user.username) return user.username;
+    
+    if (user.first_name) {
+      return `${user.first_name} ${user.last_name || ''}`.trim();
+    }
+    
+    if (user.email) {
+      return user.email.split('@')[0];
+    }
+    
+    if (user.phone) {
+      return `User (${user.phone.substring(user.phone.length - 4)})`;
+    }
+    
+    return 'User';
+  };
+
+  // Helper function to get user primary identifier
+  const getUserPrimaryIdentifier = (user) => {
+    if (!user) return 'No identifier';
+    
+    // Show the primary identifier
+    if (user.email) return user.email;
+    if (user.phone) return user.phone;
+    if (user.username) return `@${user.username}`;
+    
+    return 'No identifier';
+  };
+
+  // Helper function to get user identifier type
+  const getUserIdentifierType = (user) => {
+    if (!user) return 'unknown';
+    
+    if (user.email) return 'email';
+    if (user.phone) return 'phone';
+    if (user.username) return 'username';
+    
+    return 'unknown';
+  };
+
+  // Helper function to get user identifier icon
+  const getUserIdentifierIcon = (user) => {
+    const type = getUserIdentifierType(user);
+    switch (type) {
+      case 'email': return <Mail className="h-3 w-3" />;
+      case 'phone': return <Phone className="h-3 w-3" />;
+      case 'username': return <UserIcon className="h-3 w-3" />;
+      default: return <UserIcon className="h-3 w-3" />;
+    }
+  };
+
   const fetchTopUsers = async () => {
     try {
       setLoading(true);
       const response = await api.get(`/user/top-users?criteria=${activeTab}&period=${selectedPeriod}&limit=${limit}`);
       
       if (response.data.success) {
-        setTopUsers(response.data.top_users || []);
+        const users = response.data.top_users || [];
+        
+        // Process users to add display names and identifier info
+        const processedUsers = users.map(user => ({
+          ...user,
+          display_name: getUserDisplayName(user),
+          primary_identifier: getUserPrimaryIdentifier(user),
+          identifier_type: getUserIdentifierType(user),
+          identifier_icon: getUserIdentifierIcon(user)
+        }));
+        
+        setTopUsers(processedUsers);
         setStats(response.data.stats || {
           total_watch_minutes: 0,
           total_sessions: 0,
@@ -110,7 +180,17 @@ export default function TopUsers() {
       const response = await api.get(`/user/user-engagement?period=${selectedPeriod}`);
       
       if (response.data.success) {
-        setEngagementData(response.data.analytics || []);
+        const engagement = response.data.analytics || [];
+        
+        // Process engagement data to add user info
+        const processedEngagement = engagement.map(item => ({
+          ...item,
+          display_name: getUserDisplayName(item),
+          primary_identifier: getUserPrimaryIdentifier(item),
+          identifier_type: getUserIdentifierType(item)
+        }));
+        
+        setEngagementData(processedEngagement);
       }
     } catch (error) {
       console.error("Error fetching engagement data:", error);
@@ -123,7 +203,30 @@ export default function TopUsers() {
     try {
       const response = await api.get('/user/top-users-summary');
       if (response.data.success) {
-        setSummaryData(response.data.summary);
+        const summary = response.data.summary;
+        
+        // Process each category to add display names
+        const processedSummary = {
+          ...summary,
+          top_by_watch_time: summary.top_by_watch_time?.map(user => ({
+            ...user,
+            display_name: getUserDisplayName(user)
+          })) || [],
+          top_by_sessions: summary.top_by_sessions?.map(user => ({
+            ...user,
+            display_name: getUserDisplayName(user)
+          })) || [],
+          top_by_subscription: summary.top_by_subscription?.map(user => ({
+            ...user,
+            display_name: getUserDisplayName(user)
+          })) || [],
+          recent_active: summary.recent_active?.map(user => ({
+            ...user,
+            display_name: getUserDisplayName(user)
+          })) || []
+        };
+        
+        setSummaryData(processedSummary);
       }
     } catch (error) {
       console.error("Error fetching summary data:", error);
@@ -136,11 +239,27 @@ export default function TopUsers() {
       return;
     }
 
-    const headers = ["Rank", "Email", "Username", "Watch Time (min)", "Total Sessions", "Subscription Value (RWF)", "Subscription Plan", "Last Activity"];
+    const headers = [
+      "Rank", 
+      "Display Name", 
+      "Email", 
+      "Phone", 
+      "Username", 
+      "Identifier Type",
+      "Watch Time (min)", 
+      "Total Sessions", 
+      "Subscription Value (RWF)", 
+      "Subscription Plan", 
+      "Last Activity"
+    ];
+    
     const csvData = topUsers.map((user, index) => [
       index + 1,
-      user.email,
-      user.username,
+      user.display_name,
+      user.email || '',
+      user.phone || '',
+      user.username || '',
+      user.identifier_type,
       user.total_watch_minutes || 0,
       user.total_sessions || 0,
       formatCurrency(user.total_subscription_value || 0, true),
@@ -205,11 +324,20 @@ export default function TopUsers() {
     return num.toString();
   };
 
-  const filteredUsers = topUsers.filter(user => 
-    searchTerm === "" || 
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.username.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter users by search term across all identifier fields
+  const filteredUsers = topUsers.filter(user => {
+    if (searchTerm === "") return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (user.email && user.email.toLowerCase().includes(searchLower)) ||
+      (user.phone && user.phone.toLowerCase().includes(searchLower)) ||
+      (user.username && user.username.toLowerCase().includes(searchLower)) ||
+      (user.display_name && user.display_name.toLowerCase().includes(searchLower)) ||
+      (user.first_name && user.first_name.toLowerCase().includes(searchLower)) ||
+      (user.last_name && user.last_name.toLowerCase().includes(searchLower))
+    );
+  });
 
   if (loading && !summaryData) {
     return (
@@ -423,7 +551,7 @@ export default function TopUsers() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3 md:h-4 md:w-4" />
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder="Search users by name, email, phone, or username..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-8 md:pl-10 pr-4 py-1.5 md:py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#BC8BBC] focus:border-transparent text-xs md:text-sm"
@@ -470,8 +598,10 @@ export default function TopUsers() {
                             {index + 1}
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">{user.username}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]">{user.email}</div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">{user.display_name}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]">
+                              {user.primary_identifier}
+                            </div>
                           </div>
                         </div>
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs ${engagement.color}`}>
@@ -503,7 +633,7 @@ export default function TopUsers() {
                       
                       <div className="flex justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
                         <button
-                          onClick={() => showToast(`Viewing ${user.email}`, "info")}
+                          onClick={() => showToast(`Viewing ${user.primary_identifier}`, "info")}
                           className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                         >
                           View Details
@@ -565,14 +695,40 @@ export default function TopUsers() {
                       <td className="px-4 py-3 md:px-6 md:py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-[#E6D0E6] flex items-center justify-center mr-2 md:mr-3">
-                            <Users className="h-4 w-4 md:h-5 md:w-5 text-[#8A4B8A]" />
+                            {user.email ? (
+                              <Mail className="h-4 w-4 md:h-5 md:w-5 text-[#8A4B8A]" />
+                            ) : user.phone ? (
+                              <Phone className="h-4 w-4 md:h-5 md:w-5 text-[#8A4B8A]" />
+                            ) : (
+                              <UserIcon className="h-4 w-4 md:h-5 md:w-5 text-[#8A4B8A]" />
+                            )}
                           </div>
                           <div>
                             <div className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px] md:max-w-none">
-                              {user.username}
+                              {user.display_name}
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[120px] md:max-w-none">
-                              {user.email}
+                              {user.primary_identifier}
+                            </div>
+                            <div className="flex items-center mt-0.5 space-x-2">
+                              {user.email && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                  <Mail className="h-2 w-2 mr-1" />
+                                  Email
+                                </span>
+                              )}
+                              {user.phone && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                  <Phone className="h-2 w-2 mr-1" />
+                                  Phone
+                                </span>
+                              )}
+                              {user.username && !user.email && !user.phone && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                                  <UserIcon className="h-2 w-2 mr-1" />
+                                  Username
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -672,19 +828,24 @@ export default function TopUsers() {
                       <td className="px-4 py-3 md:px-6 md:py-4 whitespace-nowrap">
                         <div className="flex items-center space-x-1 md:space-x-2">
                           <button
-                            onClick={() => showToast(`Viewing ${user.email}`, "info")}
+                            onClick={() => showToast(`Viewing ${user.primary_identifier}`, "info")}
                             className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
                           </button>
-                          <button
-                            onClick={() => showToast(`Notification sent to ${user.email}`, "info")}
-                            className="p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400"
-                            title="Send Notification"
-                          >
-                            <Zap className="h-4 w-4" />
-                          </button>
+                          {user.email && (
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(user.email);
+                                showToast("Email copied", "success");
+                              }}
+                              className="p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400"
+                              title="Copy Email"
+                            >
+                              <Mail className="h-4 w-4" />
+                            </button>
+                          )}
                           <div className="relative">
                             <button
                               onClick={(e) => {
@@ -699,7 +860,7 @@ export default function TopUsers() {
                             <div className="action-menu hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
                               <button
                                 onClick={() => {
-                                  showToast(`Analyzing ${user.username}'s behavior`, "info");
+                                  showToast(`Analyzing ${user.display_name}'s behavior`, "info");
                                   document.querySelectorAll('.action-menu').forEach(m => m.classList.add('hidden'));
                                 }}
                                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -709,14 +870,22 @@ export default function TopUsers() {
                               </button>
                               <button
                                 onClick={() => {
-                                  navigator.clipboard.writeText(user.email);
-                                  showToast("Email copied", "success");
+                                  if (user.email) {
+                                    navigator.clipboard.writeText(user.email);
+                                    showToast("Email copied", "success");
+                                  } else if (user.phone) {
+                                    navigator.clipboard.writeText(user.phone);
+                                    showToast("Phone copied", "success");
+                                  } else if (user.username) {
+                                    navigator.clipboard.writeText(user.username);
+                                    showToast("Username copied", "success");
+                                  }
                                   document.querySelectorAll('.action-menu').forEach(m => m.classList.add('hidden'));
                                 }}
                                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                               >
                                 <Users className="h-4 w-4 mr-2" />
-                                Copy Email
+                                Copy Identifier
                               </button>
                             </div>
                           </div>
@@ -787,10 +956,10 @@ export default function TopUsers() {
                       </div>
                       <div>
                         <div className="text-xs md:text-sm font-medium text-gray-900 dark:text-white truncate max-w-[80px] md:max-w-none">
-                          {user.email.split('@')[0]}
+                          {user.display_name}
                         </div>
                         <div className="text-xs text-gray-600 dark:text-gray-400 hidden md:block">
-                          {user.email}
+                          {user.primary_identifier}
                         </div>
                       </div>
                     </div>
@@ -849,7 +1018,7 @@ export default function TopUsers() {
                         {index + 1}
                       </div>
                       <span className="text-xs md:text-sm text-gray-700 dark:text-gray-300 truncate max-w-[70px] md:max-w-[100px]">
-                        {user.username}
+                        {user.display_name}
                       </span>
                     </div>
                     <div className="text-xs md:text-sm font-medium text-gray-900 dark:text-white">
@@ -874,7 +1043,7 @@ export default function TopUsers() {
                         {index + 1}
                       </div>
                       <span className="text-xs md:text-sm text-gray-700 dark:text-gray-300 truncate max-w-[70px] md:max-w-[100px]">
-                        {user.username}
+                        {user.display_name}
                       </span>
                     </div>
                     <div className="text-xs md:text-sm font-medium text-gray-900 dark:text-white">
@@ -899,7 +1068,7 @@ export default function TopUsers() {
                         {index + 1}
                       </div>
                       <span className="text-xs md:text-sm text-gray-700 dark:text-gray-300 truncate max-w-[70px] md:max-w-[100px]">
-                        {user.username}
+                        {user.display_name}
                       </span>
                     </div>
                     <div className="text-xs md:text-sm font-medium text-gray-900 dark:text-white">
@@ -924,7 +1093,7 @@ export default function TopUsers() {
                         {index + 1}
                       </div>
                       <span className="text-xs md:text-sm text-gray-700 dark:text-gray-300 truncate max-w-[70px] md:max-w-[100px]">
-                        {user.username}
+                        {user.display_name}
                       </span>
                     </div>
                     <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">

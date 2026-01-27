@@ -4,11 +4,46 @@ import {
   CheckCircle, XCircle, Clock, Download, Upload,
   ChevronDown, ChevronUp, AlertTriangle, Info, RefreshCw,
   LogOut, Calendar, UserX, UserCheck, Ban, Play, Pause,
-  Settings, Plus, Minus, Eye, EyeOff, Lock, Unlock
+  Settings, Plus, Minus, Eye, EyeOff, Lock, Unlock, Phone,
+  Search, User
 } from "lucide-react";
 import clsx from "clsx";
 import api from "../../../../api/axios";
 import { useTranslation } from "react-i18next";
+
+// Helper function to get user display name
+const getUserDisplayName = (userData) => {
+  if (!userData) return 'User';
+  
+  // Priority: username > full name > email prefix > phone > fallback
+  if (userData.username) return userData.username;
+  
+  if (userData.first_name) {
+    return `${userData.first_name} ${userData.last_name || ''}`.trim();
+  }
+  
+  if (userData.email) {
+    return userData.email.split('@')[0];
+  }
+  
+  if (userData.phone) {
+    return `User (${userData.phone.substring(userData.phone.length - 4)})`;
+  }
+  
+  return 'User';
+};
+
+// Helper function to get user identifier
+const getUserIdentifier = (userData) => {
+  if (!userData) return 'No identifier';
+  
+  // Show the primary identifier
+  if (userData.email) return userData.email;
+  if (userData.phone) return userData.phone;
+  if (userData.username) return `@${userData.username}`;
+  
+  return 'No identifier';
+};
 
 const BulkOperations = () => {
   const { t } = useTranslation();
@@ -122,15 +157,34 @@ const BulkOperations = () => {
     { value: "clear_old", label: "Clear Old Sessions", description: "Remove sessions older than 30 days" }
   ];
 
-  // Fetch all users
+  // Fetch all users with multiple identifiers support
   const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await api.get('/user', {
-        params: { limit: 1000 }
+        params: { 
+          limit: 1000,
+          include_display_name: true // Request backend to include display_name
+        }
       });
-      setAllUsers(response.data.users || []);
-      setFilteredUsers(response.data.users || []);
+      
+      const users = response.data.users || [];
+      
+      // Process users to ensure they have display_name
+      const processedUsers = users.map(user => ({
+        ...user,
+        display_name: user.display_name || getUserDisplayName(user),
+        identifier: getUserIdentifier(user),
+        // Ensure we have fallback values for all fields
+        email: user.email || null,
+        phone: user.phone || null,
+        username: user.username || null,
+        first_name: user.first_name || null,
+        last_name: user.last_name || null
+      }));
+      
+      setAllUsers(processedUsers);
+      setFilteredUsers(processedUsers);
     } catch (error) {
       console.error("❌ Failed to fetch users:", error);
       setAllUsers([]);
@@ -144,14 +198,14 @@ const BulkOperations = () => {
   const fetchSubscriptionPlans = useCallback(async () => {
     try {
       setIsLoadingPlans(true);
-      const response = await api.get('/user/subscription/plans');
-      const plans = response.data.plans || [];
+      const response = await api.get('/subscriptions/plans');
+      const plans = response.data.subscriptions || response.data.plans || [];
       
       const mappedPlans = plans.map(plan => ({
-        value: plan.type,
+        value: plan.type || plan.name,
         label: plan.name,
-        price: plan.price,
-        currency: plan.currency,
+        price: plan.price || 0,
+        currency: plan.currency || 'RWF',
         description: plan.description,
         is_free: plan.price === 0
       }));
@@ -181,16 +235,27 @@ const BulkOperations = () => {
     fetchSubscriptionPlans();
   }, [fetchUsers, fetchSubscriptionPlans]);
 
-  // Apply filters
+  // Apply filters with multiple identifier support
   useEffect(() => {
     let filtered = allUsers;
     
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(user => 
-        user.email.toLowerCase().includes(searchTerm) ||
-        (user.name && user.name.toLowerCase().includes(searchTerm))
-      );
+      filtered = filtered.filter(user => {
+        // Search in all possible fields
+        const searchFields = [
+          user.email?.toLowerCase() || '',
+          user.phone?.toLowerCase() || '',
+          user.username?.toLowerCase() || '',
+          user.first_name?.toLowerCase() || '',
+          user.last_name?.toLowerCase() || '',
+          user.display_name?.toLowerCase() || '',
+          // Search in email prefix
+          user.email?.split('@')[0]?.toLowerCase() || ''
+        ];
+        
+        return searchFields.some(field => field.includes(searchTerm));
+      });
     }
 
     if (filters.role) {
@@ -205,6 +270,7 @@ const BulkOperations = () => {
 
     if (filters.subscription) {
       filtered = filtered.filter(user => 
+        user.global_account_tier === filters.subscription || 
         user.subscription_plan === filters.subscription
       );
     }
@@ -284,7 +350,7 @@ const BulkOperations = () => {
       
     } catch (error) {
       console.error("❌ Bulk operation failed:", error);
-      alert(error.response?.data?.message || "Operation failed");
+      alert(error.response?.data?.message || error.response?.data?.error || "Operation failed");
     } finally {
       setIsProcessing(false);
     }
@@ -296,7 +362,7 @@ const BulkOperations = () => {
       total: selectedUsers.length,
       active: selectedUserObjects.filter(user => user.is_active).length,
       admins: selectedUserObjects.filter(user => user.role === 'admin').length,
-      premium: selectedUserObjects.filter(user => user.subscription_plan === 'premium').length
+      premium: selectedUserObjects.filter(user => user.global_account_tier === 'premium' || user.subscription_plan === 'premium').length
     };
   };
 
@@ -305,6 +371,54 @@ const BulkOperations = () => {
   const getPlanLabel = (planType) => {
     const plan = subscriptionPlans.find(p => p.value === planType);
     return plan ? `${plan.label} - ${plan.currency} ${plan.price}` : planType;
+  };
+
+  // Render user identifier based on available data
+  const renderUserIdentifier = (user) => {
+    if (user.email) {
+      return (
+        <div className="flex items-center gap-1 text-gray-900 dark:text-white">
+          <Mail className="w-3 h-3 lg:w-4 lg:h-4" />
+          <span className="truncate">{user.email}</span>
+        </div>
+      );
+    }
+    
+    if (user.phone) {
+      return (
+        <div className="flex items-center gap-1 text-gray-900 dark:text-white">
+          <Phone className="w-3 h-3 lg:w-4 lg:h-4" />
+          <span className="truncate">{user.phone}</span>
+        </div>
+      );
+    }
+    
+    if (user.username) {
+      return (
+        <div className="flex items-center gap-1 text-gray-900 dark:text-white">
+          <User className="w-3 h-3 lg:w-4 lg:h-4" />
+          <span className="truncate">@{user.username}</span>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="text-gray-500 dark:text-gray-400 italic">
+        No identifier
+      </div>
+    );
+  };
+
+  // Render user name info
+  const renderUserName = (user) => {
+    if (user.first_name) {
+      return (
+        <span className="text-gray-900 dark:text-white">
+          {user.first_name} {user.last_name || ''}
+        </span>
+      );
+    }
+    return null;
   };
 
   return (
@@ -328,7 +442,7 @@ const BulkOperations = () => {
         </div>
       </div>
 
-      {/* Operation Type Selection - MOVED TO TOP */}
+      {/* Operation Type Selection */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 lg:p-6">
         <h3 className="text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-3 lg:mb-4">
           Operation Type
@@ -378,11 +492,12 @@ const BulkOperations = () => {
                   Search Users
                 </label>
                 <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 lg:w-5 lg:h-5" />
                   <input
                     type="text"
                     value={filters.search}
                     onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                    placeholder="Search by email or name..."
+                    placeholder="Search by email, phone, username, or name..."
                     className="w-full pl-10 pr-4 py-2 lg:py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-base"
                   />
                 </div>
@@ -463,10 +578,25 @@ const BulkOperations = () => {
                         />
                         
                         <div className="flex-1 min-w-0">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2 lg:mb-3">
+                          {/* Display Name */}
+                          <div className="mb-2">
                             <p className="text-sm lg:text-base font-medium text-gray-900 dark:text-white truncate">
-                              {user.email}
+                              {user.display_name}
                             </p>
+                            {renderUserName(user) && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {renderUserName(user)}
+                              </p>
+                            )}
+                          </div>
+                          
+                          {/* Identifiers */}
+                          <div className="mb-3 lg:mb-4">
+                            {renderUserIdentifier(user)}
+                          </div>
+                          
+                          {/* Tags and metadata */}
+                          <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-4">
                             <div className="flex flex-wrap gap-2">
                               <span className={clsx(
                                 "px-2 py-1 rounded-full text-xs font-medium flex-shrink-0",
@@ -484,12 +614,16 @@ const BulkOperations = () => {
                               )}>
                                 {user.is_active ? 'Active' : 'Inactive'}
                               </span>
+                              {user.global_account_tier && user.global_account_tier !== 'free' && (
+                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 flex-shrink-0">
+                                  {user.global_account_tier}
+                                </span>
+                              )}
                             </div>
-                          </div>
-                          
-                          <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-4 text-xs lg:text-sm text-gray-500">
-                            <span className="truncate">Subscription: {user.subscription_plan || 'none'}</span>
-                            <span className="truncate">Joined: {new Date(user.created_at).toLocaleDateString()}</span>
+                            
+                            <span className="text-xs text-gray-500 truncate">
+                              Joined: {new Date(user.created_at).toLocaleDateString()}
+                            </span>
                           </div>
                         </div>
                       </div>

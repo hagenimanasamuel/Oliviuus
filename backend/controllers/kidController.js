@@ -1,69 +1,14 @@
 // controllers/kidController.js
 const { query } = require("../config/dbConfig");
 
-// Add this helper function at the top:
-const getKidUserInfo = async (kidProfile, profileType) => {
-  if (profileType === 'family_member') {
-    const userInfo = await getUserDisplayInfo(kidProfile.user_id || kidProfile.id);
-    return {
-      name: userInfo?.display_name || kidProfile.name || 'Family Member',
-      display_name: userInfo?.display_name || kidProfile.name || 'Family Member',
-      identifier: userInfo?.primary_identifier || 'No identifier',
-      profile_avatar_url: userInfo?.profile_avatar_url || kidProfile.avatar_url,
-      max_age_rating: kidProfile.max_age_rating || '7+',
-      theme_color: kidProfile.theme_color || 'blue',
-      is_family_member: true,
-      user_id: kidProfile.user_id || kidProfile.id
-    };
-  } else {
-    return {
-      name: kidProfile.name,
-      display_name: kidProfile.name,
-      identifier: `Kid Profile #${kidProfile.id || kidProfile.kid_profile_id}`,
-      profile_avatar_url: kidProfile.avatar_url,
-      max_age_rating: kidProfile.max_content_age_rating || kidProfile.max_age_rating || '7+',
-      theme_color: kidProfile.theme_color || 'blue',
-      is_family_member: false,
-      parent_user_id: kidProfile.parent_user_id
-    };
-  }
-};
-
-// PRODUCTION NOTE: Cache configuration for kid content
-// Cache durations are optimized for kid content which changes less frequently
+// Cache configuration for kid content
 const kidCacheConfig = {
-  landingContent: 10 * 60 * 1000, // 10 minutes - landing page content
-  contentList: 5 * 60 * 1000,    // 5 minutes - content lists
-  singleContent: 2 * 60 * 1000,  // 2 minutes - single content
-};
-
-// Validate family member access
-const validateFamilyMemberAccess = async (familyMemberId) => {
-  try {
-    const queryStr = `
-      SELECT 
-        fm.*,
-        u.is_active as user_active,
-        u.is_deleted as user_deleted
-      FROM family_members fm
-      JOIN users u ON fm.user_id = u.id
-      WHERE fm.user_id = ? 
-        AND fm.is_active = TRUE
-        AND fm.invitation_status = 'accepted'
-        AND u.is_active = TRUE
-        AND u.is_deleted = FALSE
-    `;
-    
-    const [familyMember] = await query(queryStr, [familyMemberId]);
-    return familyMember || null;
-  } catch (error) {
-    console.error('Error validating family member access:', error);
-    return null;
-  }
+  landingContent: 10 * 60 * 1000, // 10 minutes
+  contentList: 5 * 60 * 1000,    // 5 minutes
+  singleContent: 2 * 60 * 1000,  // 2 minutes
 };
 
 // In-memory cache for kid content
-// PRODUCTION NOTE: Consider Redis for distributed cache in production
 const kidContentCache = new Map();
 
 // Generate cache keys for kid content
@@ -78,7 +23,6 @@ const isCacheStale = (cacheEntry, cacheDuration) => {
 };
 
 // Clear related kid cache entries
-// PRODUCTION NOTE: Called when content is updated or preferences change
 const clearKidRelatedCache = (contentId = null, kidProfileId = '') => {
   const keysToDelete = [];
 
@@ -90,9 +34,10 @@ const clearKidRelatedCache = (contentId = null, kidProfileId = '') => {
   }
 
   keysToDelete.forEach(key => kidContentCache.delete(key));
+  console.log(`Cleared ${keysToDelete.length} kid cache entries`);
 };
 
-// Safe data parsing function for kid preferences and blocked content
+// Safe data parsing function
 const safeDataParse = (dataString, defaultValue = []) => {
   if (!dataString) return defaultValue;
 
@@ -110,13 +55,14 @@ const safeDataParse = (dataString, defaultValue = []) => {
       }
       return [dataString.trim()];
     } catch (error) {
+      console.error('Data parse error:', error);
       return defaultValue;
     }
   }
 };
 
-// PRODUCTION NOTE: Age rating system for kids - strictly enforced
-// Kids only see content rated as appropriate for their age group
+// Age rating system for kids
+// Kids only see content rated "all", "G", "TV-Y", "TV-Y7", "TV-G", "PG" (for older kids)
 const KID_ALLOWED_AGE_RATINGS = [
   'all',        // For all ages
   'G',          // General Audience
@@ -127,7 +73,7 @@ const KID_ALLOWED_AGE_RATINGS = [
   '7+', '8+', '9+', '10+', '11+', '12+' // Custom age ratings
 ];
 
-// PRODUCTION CRITICAL: Blocked age ratings for kids (never show these)
+// Blocked age ratings for kids (never show these)
 const KID_BLOCKED_AGE_RATINGS = [
   'TV-14',
   'TV-MA',
@@ -141,7 +87,7 @@ const KID_BLOCKED_AGE_RATINGS = [
   'MA'
 ];
 
-// Educational/Learning content detection - used for learning page
+// Educational/Learning content detection
 const EDUCATIONAL_CATEGORIES = [
   'Educational',
   'Documentary',
@@ -200,7 +146,7 @@ const FUN_GENRES = [
   'Action'
 ];
 
-// Educational categories and genres for learning page - comprehensive list
+// Educational categories and genres for learning page
 const EDUCATIONAL_CATEGORIES_FULL = [
   'Educational', 'Documentary', 'Science', 'History',
   'Nature', 'Learning', 'Education', 'Technology',
@@ -217,7 +163,7 @@ const EDUCATIONAL_GENRES_FULL = [
   'Crafts', 'Cooking', 'Sports'
 ];
 
-// Filter and sanitize content for kids - removes sensitive/irrelevant data
+// Filter and sanitize content for kids
 const sanitizeKidContent = (content) => {
   return {
     id: content.id,
@@ -238,13 +184,13 @@ const sanitizeKidContent = (content) => {
     categories: content.categories || [],
     trailer: content.trailer || null,
     primary_image_url: content.primary_image_url,
-    // Add educational/fun flags for frontend categorization
+    // Add educational/fun flags for frontend
     is_educational: content.is_educational || false,
     is_fun: content.is_fun || false
   };
 };
 
-// Check if content is educational based on categories, genres, and keywords
+// Check if content is educational
 const isContentEducational = (content) => {
   try {
     // Check categories
@@ -274,11 +220,12 @@ const isContentEducational = (content) => {
       searchText.includes(keyword.toLowerCase())
     );
   } catch (error) {
+    console.error('Error checking educational content:', error);
     return false;
   }
 };
 
-// Check if content is fun/entertainment based on categories and genres
+// Check if content is fun/entertainment
 const isContentFun = (content) => {
   try {
     // Check categories
@@ -303,11 +250,12 @@ const isContentFun = (content) => {
 
     return false;
   } catch (error) {
+    console.error('Error checking fun content:', error);
     return false;
   }
 };
 
-// Get trailer for kid content from media_assets table
+// Get trailer for kid content
 const getTrailerForKidContent = async (contentId) => {
   try {
     const trailers = await query(`
@@ -324,13 +272,14 @@ const getTrailerForKidContent = async (contentId) => {
 
     return trailers[0] || null;
   } catch (error) {
+    console.error('Error fetching trailer for kid content:', contentId, error);
     return null;
   }
 };
 
-// Build age rating condition for SQL queries
-// PRODUCTION CRITICAL: This ensures kids only see age-appropriate content
+// Build age rating condition (GENERAL FOR ALL KIDS)
 const buildAgeRatingCondition = () => {
+  // KIDS ONLY SEE THESE RATINGS - NO EXCEPTIONS
   const allowedRatings = KID_ALLOWED_AGE_RATINGS.map(() => '?').join(',');
   const blockedRatings = KID_BLOCKED_AGE_RATINGS.map(() => '?').join(',');
 
@@ -340,7 +289,7 @@ const buildAgeRatingCondition = () => {
   };
 };
 
-// Build blocked genres condition based on kid's preferences
+// Build blocked genres condition
 const buildGenreExclusionCondition = (blockedGenres) => {
   if (!blockedGenres || blockedGenres.length === 0) {
     return { condition: '1=1', params: [] };
@@ -352,33 +301,12 @@ const buildGenreExclusionCondition = (blockedGenres) => {
   return { condition: conditions.join(' AND '), params };
 };
 
-// Helper to get user display info for family members
-const getUserDisplayInfo = async (userId) => {
-  try {
-    const userQuery = `
-      SELECT 
-        id,
-        COALESCE(username, email, phone, CONCAT('User-', id)) as display_name,
-        COALESCE(email, phone, username, 'No identifier') as primary_identifier,
-        profile_avatar_url
-      FROM users 
-      WHERE id = ? AND is_active = TRUE AND is_deleted = FALSE
-    `;
-    
-    const [user] = await query(userQuery, [userId]);
-    return user || null;
-  } catch (error) {
-    console.error('Error fetching user display info:', error);
-    return null;
-  }
-};
-
-// Get kid hero content - featured or highest quality content for landing page
+// Get kid hero content - SIMPLIFIED VERSION
 const getKidHeroContent = async (kidProfile) => {
   try {
     const blockedGenres = safeDataParse(kidProfile.blocked_genres, []);
 
-    // Build conditions for age-appropriate content
+    // Build conditions
     const ageCondition = buildAgeRatingCondition();
     const genreCondition = buildGenreExclusionCondition(blockedGenres);
 
@@ -388,9 +316,10 @@ const getKidHeroContent = async (kidProfile) => {
       ...genreCondition.params
     ];
 
+    // Try to get featured content first
     let heroContent = null;
 
-    // 1. Try featured content first (prioritizes featured items)
+    // 1. Try featured content
     const featuredResult = await query(`
       SELECT DISTINCT
         c.*,
@@ -430,7 +359,7 @@ const getKidHeroContent = async (kidProfile) => {
     if (featuredResult.length > 0) {
       heroContent = featuredResult[0];
     } else {
-      // 2. Fallback to any kid-safe content if no featured content available
+      // 2. Try any kid-safe content
       const anyContent = await query(`
         SELECT DISTINCT
           c.*,
@@ -450,7 +379,7 @@ const getKidHeroContent = async (kidProfile) => {
               AND ma.upload_status = 'completed'
             ORDER BY ma.is_primary DESC, ma.created_at DESC
             LIMIT 1
-        ) as primary_image_url
+          ) as primary_image_url
         FROM contents c
         LEFT JOIN content_rights cr ON c.id = cr.content_id
         LEFT JOIN content_genres cg ON c.id = cg.content_id
@@ -470,17 +399,18 @@ const getKidHeroContent = async (kidProfile) => {
     }
 
     if (heroContent) {
-      // Get trailer for hero content
+      // Get trailer
       heroContent.trailer = await getTrailerForKidContent(heroContent.id);
     }
 
     return heroContent;
   } catch (error) {
+    console.error('Error getting kid hero content:', error);
     return null;
   }
 };
 
-// Get all kid-safe content with filtering applied
+// Get ALL kid-safe content (for all sections)
 const getKidSafeContent = async (kidProfile, limit = 20) => {
   try {
     const blockedGenres = safeDataParse(kidProfile.blocked_genres, []);
@@ -538,7 +468,7 @@ const getKidSafeContent = async (kidProfile, limit = 20) => {
     if (results.length > 0) {
       for (let item of results) {
         item.trailer = await getTrailerForKidContent(item.id);
-        // Add educational/fun flags for frontend categorization
+        // Add educational/fun flags
         item.is_educational = isContentEducational(item);
         item.is_fun = isContentFun(item);
       }
@@ -546,11 +476,12 @@ const getKidSafeContent = async (kidProfile, limit = 20) => {
 
     return results;
   } catch (error) {
+    console.error('Error getting kid-safe content:', error);
     return [];
   }
 };
 
-// Categorize content into sections for landing page
+// Categorize content into sections
 const categorizeKidContent = (allContent) => {
   const featured = [];
   const educational = [];
@@ -562,7 +493,7 @@ const categorizeKidContent = (allContent) => {
     new Date(b.created_at || b.release_date || 0) - new Date(a.created_at || a.release_date || 0)
   );
 
-  // Categorize each content item
+  // Categorize each content
   allContent.forEach(content => {
     // Featured: Has featured flag OR high views
     if (content.featured || content.view_count > 100) {
@@ -598,7 +529,7 @@ const categorizeKidContent = (allContent) => {
         .slice(0, needed);
       section.push(...backupContent);
     }
-    return section.slice(0, 12); // Limit to 12 items per section
+    return section.slice(0, 12); // Limit to 12 items
   };
 
   return {
@@ -609,7 +540,7 @@ const categorizeKidContent = (allContent) => {
   };
 };
 
-// Get kid landing page content - main endpoint for kid dashboard
+// Get kid landing page content
 const getKidLandingContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -625,8 +556,8 @@ const getKidLandingContent = async (req, res) => {
     const cacheEntry = kidContentCache.get(cacheKey);
     const forceRefresh = req.query.refresh === 'true';
 
-    // Return cached content if available and not stale
     if (!forceRefresh && cacheEntry && !isCacheStale(cacheEntry, kidCacheConfig.landingContent)) {
+      console.log('Serving kid landing content from cache');
       return res.json({
         success: true,
         data: cacheEntry.data,
@@ -636,7 +567,7 @@ const getKidLandingContent = async (req, res) => {
     }
 
     // Get ALL kid-safe content
-    const allKidContent = await getKidSafeContent(kidProfile, 50);
+    const allKidContent = await getKidSafeContent(kidProfile, 50); // Get up to 50 items
 
     if (allKidContent.length === 0) {
       return res.status(404).json({
@@ -683,18 +614,21 @@ const getKidLandingContent = async (req, res) => {
     const processedFun = processContentGenresCategories(categorized.fun);
     const processedRecent = processContentGenresCategories(categorized.recent);
 
-    // Determine profile type and get user info
-    const profileType = getKidProfileType(kidProfile);
-    const kidUserInfo = await getKidUserInfo(kidProfile, profileType);
-
-    // Create response data structure
+    // Create response data
     const responseData = {
       hero: processedHero ? sanitizeKidContent(processedHero) : null,
       featured: processedFeatured.map(item => sanitizeKidContent(item)),
       educational: processedEducational.map(item => sanitizeKidContent(item)),
       fun: processedFun.map(item => sanitizeKidContent(item)),
       recent: processedRecent.map(item => sanitizeKidContent(item)),
-      kid_info: kidUserInfo,
+      kid_info: {
+        name: kidProfile.name,
+        max_age_rating: '12+ (Kid Safe)', // General for all kids
+        theme_color: kidProfile.theme_color || 'blue',
+        is_family_member: kidProfile.is_family_member || false,
+        allowed_ratings: KID_ALLOWED_AGE_RATINGS,
+        blocked_ratings: KID_BLOCKED_AGE_RATINGS
+      },
       last_updated: new Date().toISOString(),
       sections_count: {
         hero: processedHero ? 1 : 0,
@@ -705,7 +639,7 @@ const getKidLandingContent = async (req, res) => {
       }
     };
 
-    // Update cache for future requests
+    // Update cache
     kidContentCache.set(cacheKey, {
       data: responseData,
       timestamp: Date.now()
@@ -719,6 +653,7 @@ const getKidLandingContent = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error fetching kid landing content:', error);
     res.status(500).json({
       error: 'Unable to load kid content at this time',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -726,7 +661,7 @@ const getKidLandingContent = async (req, res) => {
   }
 };
 
-// Get all kid content (listing) - placeholder for future implementation
+// Get all kid content (listing)
 const getAllKidContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -758,6 +693,7 @@ const getAllKidContent = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getAllKidContent:', error);
     res.status(500).json({
       error: 'Unable to process request',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -765,7 +701,7 @@ const getAllKidContent = async (req, res) => {
   }
 };
 
-// Get kid content by ID - placeholder for future implementation
+// Get kid content by ID
 const getKidContentById = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -779,6 +715,7 @@ const getKidContentById = async (req, res) => {
 
     const { contentId } = req.params;
 
+    // For now, return info about landing-only functionality
     res.json({
       success: true,
       message: 'Single kid content view will be implemented in next update. Use landing-content endpoint for now.',
@@ -792,13 +729,14 @@ const getKidContentById = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getKidContentById:', error);
     res.status(500).json({
       error: 'Unable to process request'
     });
   }
 };
 
-// Track kid content view - placeholder for future implementation
+// Track kid content view
 const trackKidContentView = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -810,6 +748,7 @@ const trackKidContentView = async (req, res) => {
       });
     }
 
+    // For now, return success message
     res.json({
       success: true,
       message: 'View tracking will be implemented in next update.',
@@ -820,35 +759,56 @@ const trackKidContentView = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in trackKidContentView:', error);
     res.status(500).json({
       error: 'Unable to track view'
     });
   }
 };
 
-// Determine kid profile type (family member vs kid profile) - UPDATED
+// Determine kid profile type
 const getKidProfileType = (kidProfile) => {
-  if (!kidProfile) return 'kid_profile';
-  
-  // Method 1: Check explicit flags
-  if (kidProfile.is_family_member === true || kidProfile.dashboard_type === 'kid') {
+  // Method 1: Check explicit flags FIRST
+  if (kidProfile.is_family_member === true) {
     return 'family_member';
   }
   
-  // Method 2: Check for user_id (family members have this)
+  if (kidProfile.dashboard_type === 'kid') {
+    return 'family_member';
+  }
+  
+  // Method 2: Check for user_id (family members should have this)
   if (kidProfile.user_id) {
     return 'family_member';
   }
   
-  // Method 3: Regular kid profile
-  if (kidProfile.kid_profile_id || kidProfile.parent_user_id) {
+  // Method 3: Check for kid-specific fields
+  if (kidProfile.kid_profile_id) {
+    // Convert to string to safely check if it starts with 'family_'
+    const kidProfileIdStr = String(kidProfile.kid_profile_id);
+    if (kidProfileIdStr.startsWith('family_')) {
+      return 'family_member';
+    }
+  }
+  
+  // Method 4: Regular kid profile
+  if (kidProfile.kid_profile_id && !kidProfile.user_id) {
     return 'kid_profile';
   }
   
-  // Method 4: Check ID format
+  // Method 5: Check parent_user_id (kid profiles have this)
+  if (kidProfile.parent_user_id && !kidProfile.user_id) {
+    return 'kid_profile';
+  }
+  
+  // Method 6: Check if it's a synthetic ID from family member
+  if (kidProfile.id && typeof kidProfile.id === 'string' && kidProfile.id.startsWith('family_')) {
+    return 'family_member';
+  }
+  
+  // Method 7: Default based on ID type
   if (kidProfile.id) {
-    const idStr = String(kidProfile.id);
-    if (idStr.startsWith('family_') || /^fm_\d+$/.test(idStr)) {
+    if (typeof kidProfile.id === 'number' || /^\d+$/.test(String(kidProfile.id))) {
       return 'family_member';
     }
   }
@@ -856,7 +816,7 @@ const getKidProfileType = (kidProfile) => {
   return 'kid_profile'; // Default
 };
 
-// Get kid liked content (from kids_ratings_feedback or user_likes based on profile type)
+// Get kid liked content (from kids_ratings_feedback)
 const getKidLikedContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -931,10 +891,6 @@ const getKidLikedContent = async (req, res) => {
         });
       }
       
-      // Get user display info for family member
-      const userInfo = await getUserDisplayInfo(userId);
-      const displayName = userInfo?.display_name || kidProfile.name || 'Family Member';
-      
       const likesQuery = `
         SELECT 
           c.*,
@@ -968,32 +924,85 @@ const getKidLikedContent = async (req, res) => {
       
       queryParams = [process.env.R2_PUBLIC_URL_ID, userId];
       likedContent = await query(likesQuery, queryParams);
-
-      // Update the response section:
-      const processedContent = likedContent.map(sanitizeContent);
-
-      res.json({
-        success: true,
-        data: {
-          favorites: processedContent,
-          total: processedContent.length,
-          profile_type: profileType,
-          kid_info: {
-            name: profileType === 'family_member' ? displayName : kidProfile.name,
-            total_liked: processedContent.length,
-            user_id: kidProfile.user_id,
-            kid_profile_id: kidProfile.kid_profile_id,
-            parent_user_id: kidProfile.parent_user_id,
-            is_family_member: profileType === 'family_member',
-            // Add display info for family members
-            display_name: profileType === 'family_member' ? displayName : kidProfile.name,
-            identifier: profileType === 'family_member' ? (userInfo?.primary_identifier || 'No identifier') : null
-          }
-        }
-      });
     }
 
+    // Sanitize for kids
+    const sanitizeContent = (content) => {
+      // Process genres
+      let genres = [];
+      if (content.genre_names) {
+        genres = content.genre_names.split(',').map((name, index) => ({
+          id: content.genre_ids ? content.genre_ids.split(',')[index] : index,
+          name: name.trim()
+        }));
+      }
+      
+      // Process categories
+      let categories = [];
+      if (content.category_names) {
+        categories = content.category_names.split(',').map((name, index) => ({
+          id: content.category_ids ? content.category_ids.split(',')[index] : index,
+          name: name.trim()
+        }));
+      }
+      
+      // Ensure content is kid-safe
+      const isKidSafe = !KID_BLOCKED_AGE_RATINGS.includes(content.age_rating || '');
+      const allowedAgeRating = KID_ALLOWED_AGE_RATINGS.includes(content.age_rating || 'G');
+      
+      return {
+        id: content.id,
+        title: content.title,
+        content_type: content.content_type,
+        description: content.short_description || content.description || '',
+        short_description: content.short_description || '',
+        duration_minutes: content.duration_minutes,
+        release_date: content.release_date,
+        age_rating: content.age_rating || 'G',
+        average_rating: content.average_rating || 0,
+        view_count: content.view_count || 0,
+        primary_image_url: content.primary_image_url,
+        genres: genres,
+        categories: categories,
+        liked_at: content.liked_at,
+        reaction: content.reaction || 'like',
+        is_kid_safe: isKidSafe && allowedAgeRating,
+        media_assets: content.primary_image_url ? [{
+          asset_type: 'thumbnail',
+          url: content.primary_image_url,
+          is_primary: 1,
+          upload_status: 'completed'
+        }] : []
+      };
+    };
+
+    const processedContent = likedContent.map(sanitizeContent);
+
+    res.json({
+      success: true,
+      data: {
+        favorites: processedContent, // Changed from 'liked_content' to 'favorites' for frontend compatibility
+        total: processedContent.length,
+        profile_type: profileType,
+        kid_info: {
+          name: kidProfile.name,
+          total_liked: processedContent.length,
+          user_id: kidProfile.user_id,
+          kid_profile_id: kidProfile.kid_profile_id,
+          parent_user_id: kidProfile.parent_user_id,
+          is_family_member: kidProfile.is_family_member || false
+        }
+      }
+    });
+
   } catch (error) {
+    console.error('Error fetching kid liked content:', error);
+    
+    if (error.sql) {
+      console.error('SQL Error:', error.sql);
+      console.error('SQL Parameters:', error.params);
+    }
+    
     res.status(500).json({
       success: false,
       error: 'Unable to fetch liked content',
@@ -1073,9 +1082,6 @@ const getKidWatchLaterContent = async (req, res) => {
           error: 'User ID not found for family member'
         });
       }
-      
-      // Get user display info
-      const userInfo = await getUserDisplayInfo(userId);
       
       const watchlistQuery = `
         SELECT 
@@ -1175,6 +1181,7 @@ const getKidWatchLaterContent = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error fetching kid watchlist:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch watchlist',
@@ -1243,17 +1250,6 @@ const toggleKidLikedContent = async (req, res) => {
       // Family member - use user_likes table
       const userId = kidProfile.user_id || kidProfile.id;
       
-      // Check if family member user exists
-      const userExistsQuery = 'SELECT id FROM users WHERE id = ? AND is_active = TRUE AND is_deleted = FALSE';
-      const userExists = await query(userExistsQuery, [userId]);
-      
-      if (userExists.length === 0) {
-        return res.status(404).json({
-          success: false,
-          error: 'Family member user not found or inactive'
-        });
-      }
-      
       existingQuery = 'SELECT id FROM user_likes WHERE user_id = ? AND content_id = ? AND is_active = TRUE';
       
       if (reaction === 'like' || reaction === 'love') {
@@ -1307,6 +1303,7 @@ const toggleKidLikedContent = async (req, res) => {
     }
 
   } catch (error) {
+    console.error('Error updating kid liked content:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to update liked content'
@@ -1375,6 +1372,7 @@ const toggleKidWatchLaterContent = async (req, res) => {
     }
 
   } catch (error) {
+    console.error('Error updating kid watchlist:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to update watchlist'
@@ -1417,6 +1415,7 @@ const removeKidLikedContent = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error removing from kid liked content:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to remove from liked content'
@@ -1459,6 +1458,7 @@ const removeKidWatchLaterContent = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error removing from kid watchlist:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to remove from watchlist'
@@ -1466,7 +1466,7 @@ const removeKidWatchLaterContent = async (req, res) => {
   }
 };
 
-// Get batch kid likes status for multiple content items
+// Get batch kid likes status
 const getBatchKidLikesStatus = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1550,6 +1550,7 @@ const getBatchKidLikesStatus = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error fetching likes status:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch likes status'
@@ -1557,7 +1558,7 @@ const getBatchKidLikesStatus = async (req, res) => {
   }
 };
 
-// Get kid filters - placeholder for future implementation
+// Get kid filters
 const getKidFilters = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1600,13 +1601,14 @@ const getKidFilters = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getKidFilters:', error);
     res.status(500).json({
       error: 'Unable to load filters'
     });
   }
 };
 
-// Get kid viewing history - placeholder for future implementation
+// Get kid viewing history
 const getKidViewingHistory = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1631,13 +1633,14 @@ const getKidViewingHistory = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getKidViewingHistory:', error);
     res.status(500).json({
       error: 'Unable to fetch viewing history'
     });
   }
 };
 
-// Clear kid viewing history - placeholder for future implementation
+// Clear kid viewing history
 const clearKidViewingHistory = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1658,13 +1661,14 @@ const clearKidViewingHistory = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in clearKidViewingHistory:', error);
     res.status(500).json({
       error: 'Unable to clear viewing history'
     });
   }
 };
 
-// Get kid recommendations - placeholder for future implementation
+// Get kid recommendations
 const getKidRecommendations = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1689,13 +1693,14 @@ const getKidRecommendations = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getKidRecommendations:', error);
     res.status(500).json({
       error: 'Unable to fetch recommendations'
     });
   }
 };
 
-// Get kid dashboard stats - placeholder for future implementation
+// Get kid dashboard stats
 const getKidDashboardStats = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1723,13 +1728,14 @@ const getKidDashboardStats = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getKidDashboardStats:', error);
     res.status(500).json({
       error: 'Unable to fetch dashboard stats'
     });
   }
 };
 
-// Get kid content preferences - placeholder for future implementation
+// Get kid content preferences
 const getKidContentPreferences = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1759,6 +1765,7 @@ const getKidContentPreferences = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getKidContentPreferences:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch preferences'
@@ -1766,7 +1773,7 @@ const getKidContentPreferences = async (req, res) => {
   }
 };
 
-// Get batch kid preferences - placeholder for future implementation
+// Get batch kid preferences
 const getBatchKidPreferences = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1805,6 +1812,7 @@ const getBatchKidPreferences = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getBatchKidPreferences:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch batch preferences'
@@ -1812,7 +1820,7 @@ const getBatchKidPreferences = async (req, res) => {
   }
 };
 
-// Search kid content - placeholder for future implementation
+// Search kid content
 const searchKidContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1852,6 +1860,7 @@ const searchKidContent = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in searchKidContent:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to perform search'
@@ -1859,7 +1868,7 @@ const searchKidContent = async (req, res) => {
   }
 };
 
-// Get kid trending content - placeholder for future implementation
+// Get kid trending content
 const getKidTrendingContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -1887,6 +1896,7 @@ const getKidTrendingContent = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getKidTrendingContent:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch trending content'
@@ -1894,7 +1904,7 @@ const getKidTrendingContent = async (req, res) => {
   }
 };
 
-// Get kid learning content - educational content specifically for learning page
+// Get kid learning content
 const getKidLearningContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -2036,7 +2046,7 @@ const getKidLearningContent = async (req, res) => {
           WHERE kvh.content_id = c.id 
             AND kvh.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         ) as recent_views,
-        -- Educational score calculation for better sorting
+        -- Educational score calculation
         (
           CASE 
             WHEN cat.name IN (${EDUCATIONAL_CATEGORIES_FULL.map(() => '?').join(',')}) THEN 3
@@ -2156,6 +2166,7 @@ const getKidLearningContent = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error fetching kid learning content:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch learning content',
@@ -2164,7 +2175,7 @@ const getKidLearningContent = async (req, res) => {
   }
 };
 
-// Get kid songs and music content - specialized endpoint for music content
+// Get kid songs and music content
 const getKidSongsMusicContent = async (req, res) => {
   try {
     const kidProfile = req.kid_profile;
@@ -2476,6 +2487,7 @@ const getKidSongsMusicContent = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error fetching kid songs and music content:', error);
     res.status(500).json({
       success: false,
       error: 'Unable to fetch songs and music content',

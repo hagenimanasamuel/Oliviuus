@@ -1,38 +1,53 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
 import { 
-  User, Mail, Phone, Calendar, Shield, LogOut, 
-  Edit, Key, Globe, CreditCard, Bell, Settings,
-  CheckCircle, XCircle, Clock, UserCheck, Users,
-  Monitor, Tablet, Smartphone, MapPin, Crown,
-  Eye, EyeOff, Lock
+  LogOut, User, Mail, Phone, Calendar, CheckCircle, 
+  XCircle, Edit, Globe, Settings, Shield, Bell,
+  Smartphone, Monitor, ExternalLink, ChevronRight,
+  Sparkles, Star, Key, UserCheck, BadgeCheck,
+  MoreVertical, Home, Grid, LayoutDashboard
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const AccountPage = () => {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("overview");
+  const { user, loading, logoutUser } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [accountStats, setAccountStats] = useState({
-    unreadNotifications: 0,
-    activeSessions: 0,
-    kidProfiles: 0,
-    familyMembers: 0
-  });
+  const [activeSection, setActiveSection] = useState("profile");
+
+  // Apps configuration
+  const apps = [
+    {
+      id: "oliviuus",
+      name: "Oliviuus",
+      description: "Main platform with all features",
+      icon: Sparkles,
+      color: "bg-gradient-to-br from-purple-500 to-indigo-600",
+      textColor: "text-purple-600 dark:text-purple-400",
+      url: "http://localhost:5173",
+      status: "active",
+      category: "main"
+    },
+    {
+      id: "isanzure",
+      name: "iSanzure",
+      description: "Healthcare & wellness platform",
+      icon: Shield,
+      color: "bg-gradient-to-br from-teal-500 to-emerald-600",
+      textColor: "text-teal-600 dark:text-teal-400",
+      url: "http://localhost:3002",
+      status: "active",
+      category: "health"
+    }
+  ];
 
   // Detect theme
   useEffect(() => {
     const detectTheme = () => {
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setIsDarkMode(true);
-      } else {
-        setIsDarkMode(false);
-      }
+      const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDarkMode(isDark);
     };
 
     detectTheme();
@@ -42,68 +57,12 @@ const AccountPage = () => {
     return () => mediaQuery.removeEventListener('change', detectTheme);
   }, []);
 
-  // Fetch user data
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get("/auth/me", { withCredentials: true });
-      
-      if (response.data.success) {
-        const data = response.data;
-        setUserData(data.user);
-        
-        // Update account stats
-        setAccountStats({
-          unreadNotifications: data.notifications?.unread_count || 0,
-          activeSessions: data.sessions?.filter(s => s.is_active)?.length || 0,
-          kidProfiles: data.kid_profiles?.length || 0,
-          familyMembers: data.family_members?.length || 0
-        });
-        
-        // Set user preferences
-        if (data.preferences?.language) {
-          // Apply language if needed
-        }
-      } else {
-        setError("Failed to load account information");
-      }
-    } catch (err) {
-      console.error("Failed to fetch user data:", err);
-      if (err.response?.status === 401) {
-        // Not logged in, redirect to auth
-        navigate("/auth");
-      } else {
-        setError("Failed to load account information. Please try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await api.post("/auth/logout", {}, { withCredentials: true });
-      // Clear any client-side state
-      setUserData(null);
-      // Redirect to home page
-      navigate("/");
-    } catch (err) {
-      console.error("Logout error:", err);
-      // Still redirect even if logout fails
-      navigate("/");
-    }
-  };
-
   const formatDate = (dateString) => {
     if (!dateString) return "Not set";
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric'
     });
   };
@@ -112,7 +71,6 @@ const AccountPage = () => {
     if (!dateString) return "Never";
     const date = new Date(dateString);
     return date.toLocaleString('en-US', {
-      year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -120,64 +78,27 @@ const AccountPage = () => {
     });
   };
 
-  const getDeviceIcon = (deviceType) => {
-    switch (deviceType?.toLowerCase()) {
-      case 'mobile':
-      case 'smartphone':
-        return <Smartphone className="w-4 h-4" />;
-      case 'tablet':
-        return <Tablet className="w-4 h-4" />;
-      case 'desktop':
-      case 'pc':
-        return <Monitor className="w-4 h-4" />;
-      default:
-        return <Monitor className="w-4 h-4" />;
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      navigate("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+      navigate("/");
     }
   };
 
-  const getSubscriptionBadgeColor = (planType) => {
-    switch (planType?.toLowerCase()) {
-      case 'premium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-      case 'family':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
-      case 'pro':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
-    }
+  const navigateToApp = (url) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const getRoleBadge = (role) => {
-    switch (role) {
-      case 'admin':
-        return (
-          <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-            isDarkMode ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-700'
-          }`}>
-            <Crown className="w-3 h-3" />
-            Administrator
-          </div>
-        );
-      case 'owner':
-        return (
-          <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-            isDarkMode ? 'bg-purple-900/30 text-purple-300' : 'bg-purple-100 text-purple-700'
-          }`}>
-            <Users className="w-3 h-3" />
-            Family Owner
-          </div>
-        );
-      default:
-        return (
-          <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-            isDarkMode ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-700'
-          }`}>
-            <User className="w-3 h-3" />
-            Member
-          </div>
-        );
-    }
+  const getAccountAge = () => {
+    if (!user?.created_at) return "New";
+    const created = new Date(user.created_at);
+    const now = new Date();
+    const diffTime = Math.abs(now - created);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return `${diffDays} days`;
   };
 
   if (loading) {
@@ -185,41 +106,27 @@ const AccountPage = () => {
       <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading your account...</p>
+          <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading your account...</p>
+          <p className={`text-sm mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Please wait a moment</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (!user) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className="text-center max-w-md p-8">
-          <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Oops!</h1>
-          <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{error}</p>
+          <User className="w-20 h-20 text-gray-400 dark:text-gray-600 mx-auto mb-6" />
+          <h1 className={`text-2xl font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Account Access Required</h1>
+          <p className={`mb-8 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            Please sign in to access your account information.
+          </p>
           <button
             onClick={() => navigate("/auth")}
-            className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
+            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg hover:shadow-xl"
           >
-            Sign In
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!userData) {
-    return (
-      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className="text-center">
-          <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>No user data available</p>
-          <button
-            onClick={() => navigate("/auth")}
-            className="mt-4 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
-          >
-            Go to Sign In
+            Sign In to Continue
           </button>
         </div>
       </div>
@@ -229,612 +136,414 @@ const AccountPage = () => {
   return (
     <>
       <Helmet>
-        <title>My Account - Oliviuus</title>
-        <meta name="description" content="Manage your Oliviuus account, profile, and settings" />
+        <title>Account • Oliviuus</title>
+        <meta name="description" content="Manage your Oliviuus account and connected applications" />
       </Helmet>
 
       <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-        {/* Header */}
-        <div className={`border-b ${isDarkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-bold">My Account</h1>
-                <p className={`mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Manage your profile and settings
-                </p>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <div className="text-right hidden md:block">
-                  <p className="font-medium">{userData.first_name} {userData.last_name}</p>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {userData.oliviuus_id}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowLogoutConfirm(true)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                    isDarkMode 
-                      ? 'bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300 border border-red-800' 
-                      : 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200'
-                  }`}
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
-              </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="mt-6 flex flex-wrap gap-2">
-              {["overview", "profile", "security", "subscription", "sessions", "family"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors capitalize ${
-                    activeTab === tab
-                      ? 'bg-purple-600 text-white'
-                      : isDarkMode
-                        ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {tab === "overview" && "Overview"}
-                  {tab === "profile" && "Profile"}
-                  {tab === "security" && "Security"}
-                  {tab === "subscription" && "Subscription"}
-                  {tab === "sessions" && "Sessions"}
-                  {tab === "family" && "Family"}
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* Floating Background Elements */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 dark:bg-purple-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-teal-300 dark:bg-teal-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30"></div>
         </div>
 
-        {/* Main Content */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Sidebar - User Summary */}
-            <div className="lg:col-span-1">
-              <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                {/* Profile Header */}
-                <div className="text-center mb-6">
-                  <div className="relative inline-block">
-                    <img
-                      src={userData.profile_avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.oliviuus_id}`}
-                      alt="Profile"
-                      className="w-32 h-32 rounded-full mx-auto border-4 border-purple-500"
-                    />
-                    <button className={`absolute bottom-2 right-2 p-2 rounded-full ${
-                      isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-100'
-                    } shadow-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-                      <Edit className="w-4 h-4" />
+        {/* Main Content Container */}
+        <div className="relative container mx-auto px-4 py-8 max-w-6xl">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className={`p-2 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+                  <User className="w-6 h-6 text-purple-600" />
+                </div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                  My Account
+                </h1>
+              </div>
+              <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Manage your profile and connected applications
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="font-semibold text-lg">{user.first_name} {user.last_name}</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'User'} Account
+                </p>
+              </div>
+              <button
+                onClick={() => setShowLogoutConfirm(true)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-200 transform hover:-translate-y-0.5 ${
+                  isDarkMode 
+                    ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700 hover:border-gray-600 shadow-lg hover:shadow-xl' 
+                    : 'bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl'
+                }`}
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
+            </div>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex flex-wrap gap-2 mb-8">
+            <button
+              onClick={() => setActiveSection("profile")}
+              className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
+                activeSection === "profile"
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25'
+                  : isDarkMode
+                    ? 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 border border-gray-200'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              Profile
+            </button>
+            <button
+              onClick={() => setActiveSection("apps")}
+              className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
+                activeSection === "apps"
+                  ? 'bg-gradient-to-r from-teal-500 to-emerald-600 text-white shadow-lg shadow-teal-500/25'
+                  : isDarkMode
+                    ? 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 border border-gray-200'
+              }`}
+            >
+              <Grid className="w-4 h-4" />
+              Applications
+            </button>
+          </div>
+
+          {/* Profile Section */}
+          {activeSection === "profile" && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Profile Card */}
+              <div className="lg:col-span-2">
+                <div className={`rounded-2xl p-8 ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border border-gray-700' : 'bg-white border border-gray-200'} shadow-xl`}>
+                  <div className="flex items-start justify-between mb-8">
+                    <div>
+                      <h2 className="text-2xl font-bold mb-2">Personal Information</h2>
+                      <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Your account details and verification status
+                      </p>
+                    </div>
+                    <button className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} transition-colors`}>
+                      <Edit className="w-5 h-5" />
                     </button>
                   </div>
-                  
-                  <h2 className="text-xl font-bold mt-4">
-                    {userData.first_name} {userData.last_name}
-                  </h2>
-                  <p className={`mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    @{userData.username}
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-2 justify-center">
-                    {getRoleBadge(userData.role)}
-                    {userData.is_family_member && (
-                      <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                        isDarkMode ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-700'
-                      }`}>
-                        <Users className="w-3 h-3" />
-                        Family Member
-                      </div>
-                    )}
-                  </div>
-                </div>
 
-                {/* Account Stats */}
-                <div className="space-y-4 mb-6">
-                  <h3 className="font-semibold text-gray-500 dark:text-gray-400 text-sm uppercase tracking-wide">Account Overview</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className={`p-3 rounded-lg text-center ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
-                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                        {accountStats.kidProfiles}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Kid Profiles</div>
-                    </div>
-                    <div className={`p-3 rounded-lg text-center ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
-                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {accountStats.familyMembers}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Family Members</div>
-                    </div>
-                    <div className={`p-3 rounded-lg text-center ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
-                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                        {accountStats.activeSessions}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Active Sessions</div>
-                    </div>
-                    <div className={`p-3 rounded-lg text-center ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
-                      <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                        {accountStats.unreadNotifications}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Notifications</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="space-y-4">
-                  <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Member Since</span>
-                      <Calendar className="w-4 h-4" />
-                    </div>
-                    <span className="font-medium">{formatDate(userData.created_at)}</span>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {accountStats.meta?.account_age_days || 'New'} days
-                    </div>
-                  </div>
-
-                  <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Last Active</span>
-                      <Clock className="w-4 h-4" />
-                    </div>
-                    <span className="font-medium">{formatDateTime(userData.last_active_at || userData.last_login_at)}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Content Area */}
-            <div className="lg:col-span-2">
-              {/* Overview Tab */}
-              {activeTab === "overview" && (
-                <div className="space-y-6">
-                  {/* Welcome Card */}
-                  <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                      <UserCheck className="w-5 h-5 text-purple-500" />
-                      Welcome to Your Account
-                    </h3>
-                    <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      Hello {userData.first_name}! Here's a quick overview of your account status and information.
-                    </p>
-                  </div>
-
-                  {/* Account Details Card */}
-                  <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                    <h3 className="text-lg font-bold mb-6">Account Details</h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Personal Info */}
-                      <div className="space-y-4">
-                        <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-sm uppercase tracking-wide">Personal Information</h4>
-                        
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Personal Details */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                          <User className="w-6 h-6 text-purple-600" />
+                        </div>
                         <div>
-                          <label className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Oliviuus ID</label>
-                          <div className="mt-1 font-mono text-lg font-bold text-purple-600 dark:text-purple-400 flex items-center gap-2">
-                            <Lock className="w-4 h-4" />
-                            {userData.oliviuus_id}
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Full Name</p>
+                          <p className="font-semibold text-lg">{user.first_name} {user.last_name || ''}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                          <BadgeCheck className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Username</p>
+                          <p className="font-semibold text-lg">@{user.username}</p>
+                        </div>
+                      </div>
+
+                      {user.date_of_birth && (
+                        <div className="flex items-center gap-4">
+                          <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                            <Calendar className="w-6 h-6 text-green-600" />
+                          </div>
+                          <div>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Date of Birth</p>
+                            <p className="font-semibold text-lg">{formatDate(user.date_of_birth)}</p>
                           </div>
                         </div>
+                      )}
+                    </div>
 
-                        <div>
-                          <label className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Full Name</label>
-                          <div className="mt-1 font-medium flex items-center gap-2">
-                            <User className="w-4 h-4" />
-                            {userData.first_name} {userData.last_name || ''}
-                          </div>
+                    {/* Contact Details */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                          <Mail className="w-6 h-6 text-red-600" />
                         </div>
-
-                        {userData.date_of_birth && (
-                          <div>
-                            <label className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Date of Birth</label>
-                            <div className="mt-1 font-medium flex items-center gap-2">
-                              <Calendar className="w-4 h-4" />
-                              {formatDate(userData.date_of_birth)}
-                            </div>
-                          </div>
-                        )}
-
-                        {userData.gender && (
-                          <div>
-                            <label className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Gender</label>
-                            <div className="mt-1 font-medium capitalize">
-                              {userData.gender}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Contact & Verification */}
-                      <div className="space-y-4">
-                        <h4 className="font-semibold text-gray-500 dark:text-gray-400 text-sm uppercase tracking-wide">Contact & Verification</h4>
-                        
-                        <div>
+                        <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <label className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Email Address</label>
-                            {userData.email_verified ? (
-                              <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Email Address</p>
+                            {user.email_verified ? (
+                              <span className="flex items-center gap-1 text-xs bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-1 rounded-full">
                                 <CheckCircle className="w-3 h-3" />
                                 Verified
                               </span>
                             ) : (
-                              <span className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
+                              <span className="flex items-center gap-1 text-xs bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded-full">
                                 <XCircle className="w-3 h-3" />
-                                Not Verified
+                                Unverified
                               </span>
                             )}
                           </div>
-                          <div className="mt-1 font-medium flex items-center gap-2">
-                            <Mail className="w-4 h-4" />
-                            {userData.email || "Not set"}
-                          </div>
+                          <p className="font-semibold text-lg truncate">{user.email || "Not set"}</p>
                         </div>
+                      </div>
 
-                        <div>
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                          <Phone className="w-6 h-6 text-teal-600" />
+                        </div>
+                        <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <label className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Phone Number</label>
-                            {userData.phone_verified ? (
-                              <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Phone Number</p>
+                            {user.phone_verified ? (
+                              <span className="flex items-center gap-1 text-xs bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-1 rounded-full">
                                 <CheckCircle className="w-3 h-3" />
                                 Verified
                               </span>
-                            ) : userData.phone ? (
-                              <span className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
+                            ) : user.phone ? (
+                              <span className="flex items-center gap-1 text-xs bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded-full">
                                 <XCircle className="w-3 h-3" />
-                                Not Verified
+                                Unverified
                               </span>
                             ) : null}
                           </div>
-                          <div className="mt-1 font-medium flex items-center gap-2">
-                            <Phone className="w-4 h-4" />
-                            {userData.phone || "Not set"}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Username</label>
-                          <div className="mt-1 font-medium">
-                            @{userData.username}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Account Status</label>
-                          <div className="mt-1 flex items-center gap-2">
-                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
-                              userData.is_active
-                                ? isDarkMode ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-700'
-                                : isDarkMode ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-700'
-                            }`}>
-                              <div className={`w-2 h-2 rounded-full ${userData.is_active ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                              {userData.is_active ? 'Active' : 'Inactive'}
-                            </div>
-                            {userData.is_locked && (
-                              <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                                isDarkMode ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-700'
-                              }`}>
-                                <Shield className="w-3 h-3" />
-                                Locked
-                              </div>
-                            )}
-                          </div>
+                          <p className="font-semibold text-lg">{user.phone || "Not set"}</p>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Quick Actions */}
-                  <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                    <h3 className="text-lg font-bold mb-6">Quick Actions</h3>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <button className={`p-4 rounded-lg text-left transition-colors ${
-                        isDarkMode 
-                          ? 'bg-gray-700 hover:bg-gray-600 border border-gray-600' 
-                          : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
-                      }`}>
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-100 text-purple-600'}`}>
-                            <Edit className="w-5 h-5" />
-                          </div>
-                          <span className="font-medium">Edit Profile</span>
-                        </div>
-                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Update your personal information
-                        </p>
-                      </button>
-
-                      <button className={`p-4 rounded-lg text-left transition-colors ${
-                        isDarkMode 
-                          ? 'bg-gray-700 hover:bg-gray-600 border border-gray-600' 
-                          : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
-                      }`}>
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-600'}`}>
-                            <Key className="w-5 h-5" />
-                          </div>
-                          <span className="font-medium">Change Password</span>
-                        </div>
-                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Update your account password
-                        </p>
-                      </button>
-
-                      <button className={`p-4 rounded-lg text-left transition-colors ${
-                        isDarkMode 
-                          ? 'bg-gray-700 hover:bg-gray-600 border border-gray-600' 
-                          : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
-                      }`}>
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-yellow-900/50 text-yellow-300' : 'bg-yellow-100 text-yellow-600'}`}>
-                            <CreditCard className="w-5 h-5" />
-                          </div>
-                          <span className="font-medium">Subscription</span>
-                        </div>
-                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Manage your subscription plan
-                        </p>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Sessions Tab */}
-              {activeTab === "sessions" && (
-                <div className="space-y-6">
-                  <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                      <Monitor className="w-5 h-5 text-blue-500" />
-                      Active Sessions
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      {accountStats.activeSessions > 0 ? (
-                        <div className="space-y-3">
-                          <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            You have {accountStats.activeSessions} active session{accountStats.activeSessions !== 1 ? 's' : ''}
-                          </div>
-                          {accountStats.sessions?.filter(s => s.is_active).map((session, index) => (
-                            <div key={session.id || index} className={`p-4 rounded-lg border ${
-                              isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-200 bg-gray-50'
-                            }`}>
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-3">
-                                  {getDeviceIcon(session.device_type)}
-                                  <div>
-                                    <div className="font-medium">{session.device_name || 'Unknown Device'}</div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                      <MapPin className="w-3 h-3" />
-                                      {session.location || 'Location unknown'}
-                                    </div>
-                                  </div>
-                                </div>
-                                {session.session_mode === 'kid' && (
-                                  <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                                    isDarkMode ? 'bg-purple-900/30 text-purple-300' : 'bg-purple-100 text-purple-700'
-                                  }`}>
-                                    <User className="w-3 h-3" />
-                                    Kid Mode
-                                  </div>
-                                )}
-                              </div>
-                              
-                              <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
-                                <div>
-                                  <div className="text-gray-500 dark:text-gray-400">Login Time</div>
-                                  <div>{formatDateTime(session.login_time)}</div>
-                                </div>
-                                <div>
-                                  <div className="text-gray-500 dark:text-gray-400">Last Activity</div>
-                                  <div>{formatDateTime(session.last_activity)}</div>
-                                </div>
-                              </div>
-                              
-                              <button className="mt-4 text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
-                                Terminate Session
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8">
-                          <Monitor className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                          <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                            No active sessions found
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Subscription Tab */}
-              {activeTab === "subscription" && (
-                <div className="space-y-6">
-                  <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                      <CreditCard className="w-5 h-5 text-green-500" />
-                      Subscription & Billing
-                    </h3>
-                    
-                    <div className="space-y-6">
-                      <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-700/50 border border-gray-600' : 'bg-gray-50 border border-gray-200'}`}>
-                        <div className="flex items-center justify-between mb-4">
-                          <div>
-                            <h4 className="font-bold text-lg">Current Plan</h4>
-                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                              Manage your subscription and billing details
-                            </p>
-                          </div>
-                          <div className={`px-4 py-2 rounded-full font-medium ${getSubscriptionBadgeColor(userData.subscription?.plan_type)}`}>
-                            {userData.subscription?.plan_name || 'Free Plan'}
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">Status</div>
-                            <div className={`font-medium ${
-                              userData.subscription?.has_active_subscription 
-                                ? 'text-green-600 dark:text-green-400' 
-                                : 'text-gray-600 dark:text-gray-400'
-                            }`}>
-                              {userData.subscription?.has_active_subscription ? 'Active' : 'Inactive'}
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">Plan Type</div>
-                            <div className="font-medium capitalize">
-                              {userData.subscription?.plan_type || 'free'}
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">Max Profiles</div>
-                            <div className="font-medium">
-                              {userData.subscription?.max_profiles || 1}
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">Family Plan</div>
-                            <div className="font-medium">
-                              {userData.subscription?.is_family_plan ? 'Yes' : 'No'}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {userData.subscription?.end_date && (
-                          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <div className="text-sm text-gray-500 dark:text-gray-400">Renewal Date</div>
-                            <div className="font-medium">
-                              {formatDate(userData.subscription.end_date)}
-                            </div>
-                          </div>
-                        )}
+                  {/* Account Status */}
+                  <div className={`mt-8 p-6 rounded-xl ${isDarkMode ? 'bg-gray-700/50' : 'bg-gradient-to-r from-gray-50 to-gray-100'} border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
+                    <h3 className="font-bold text-lg mb-4">Account Status</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      <div className="text-center">
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Account Type</p>
+                        <p className="font-bold text-lg">{user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Standard'}</p>
                       </div>
-                      
-                      <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
-                        <div className="flex items-start gap-3">
-                          <Globe className="w-5 h-5 text-blue-500 mt-0.5" />
-                          <div>
-                            <h5 className="font-medium mb-1">Family Plan Access</h5>
-                            <p className={`text-sm ${isDarkMode ? 'text-blue-300' : 'text-blue-700'}`}>
-                              {userData.subscription?.has_family_access 
-                                ? 'You have access to family plan features and can add family members.'
-                                : 'Upgrade to a family plan to add family members and share your subscription.'}
-                            </p>
-                          </div>
+                      <div className="text-center">
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Status</p>
+                        <div className="flex items-center justify-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${user.is_active ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                          <span className="font-bold text-lg">{user.is_active ? 'Active' : 'Inactive'}</span>
                         </div>
+                      </div>
+                      <div className="text-center">
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Member Since</p>
+                        <p className="font-bold text-lg">{user.created_at ? formatDate(user.created_at) : 'N/A'}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Account Age</p>
+                        <p className="font-bold text-lg">{getAccountAge()}</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
 
-              {/* Family Tab */}
-              {activeTab === "family" && (
-                <div className="space-y-6">
-                  <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-purple-500" />
-                      Family Management
-                    </h3>
-                    
-                    {userData.is_family_member ? (
-                      <div className="space-y-4">
-                        <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-purple-900/20 border border-purple-800' : 'bg-purple-50 border border-purple-200'}`}>
-                          <div className="flex items-start gap-3">
-                            <Users className="w-5 h-5 text-purple-500 mt-0.5" />
-                            <div>
-                              <h5 className="font-medium mb-1">Family Member Account</h5>
-                              <p className={`text-sm ${isDarkMode ? 'text-purple-300' : 'text-purple-700'}`}>
-                                You are part of a family plan managed by another account.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">Member Role</div>
-                            <div className="font-medium capitalize">{userData.member_role || 'member'}</div>
-                          </div>
-                          
-                          <div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">Dashboard Type</div>
-                            <div className="font-medium capitalize">{userData.dashboard_type || 'normal'}</div>
-                          </div>
-                        </div>
+              {/* Profile Sidebar */}
+              <div className="space-y-8">
+                {/* Profile Picture Card */}
+                <div className={`rounded-2xl p-6 ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border border-gray-700' : 'bg-white border border-gray-200'} shadow-xl`}>
+                  <div className="text-center">
+                    <div className="relative inline-block mb-6">
+                      <img
+                        src={user.profile_avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}&background=6366f1&color=fff`}
+                        alt="Profile"
+                        className="w-32 h-32 rounded-2xl border-4 border-white shadow-2xl"
+                      />
+                      <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+                        <Star className="w-5 h-5 text-white" />
                       </div>
-                    ) : userData.subscription?.is_family_plan ? (
-                      <div className="space-y-4">
-                        <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-green-900/20 border border-green-800' : 'bg-green-50 border border-green-200'}`}>
-                          <div className="flex items-start gap-3">
-                            <Crown className="w-5 h-5 text-green-500 mt-0.5" />
-                            <div>
-                              <h5 className="font-medium mb-1">Family Plan Owner</h5>
-                              <p className={`text-sm ${isDarkMode ? 'text-green-300' : 'text-green-700'}`}>
-                                You are the owner of a family plan. You can add and manage family members.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">Total Family Members</div>
-                            <div className="font-medium text-2xl">{accountStats.familyMembers}</div>
-                          </div>
-                          
-                          <div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">Available Slots</div>
-                            <div className="font-medium text-2xl">
-                              {Math.max(0, (userData.subscription?.max_profiles || 1) - (accountStats.familyMembers + 1))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8">
-                        <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <h4 className="text-lg font-medium mb-2">No Family Plan</h4>
-                        <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                          You don't have a family plan subscription yet.
-                        </p>
-                        <button className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors">
-                          Upgrade to Family Plan
-                        </button>
-                      </div>
-                    )}
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">{user.first_name} {user.last_name}</h3>
+                    <p className={`mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>@{user.username}</p>
+                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                      <UserCheck className="w-4 h-4" />
+                      <span className="text-sm font-medium">Verified User</span>
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {/* Profile & Security Tabs - simplified for now */}
-              {(activeTab === "profile" || activeTab === "security") && (
-                <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                  <h3 className="text-lg font-bold mb-4 capitalize flex items-center gap-2">
-                    {activeTab === "profile" ? <User className="w-5 h-5 text-blue-500" /> : <Shield className="w-5 h-5 text-red-500" />}
-                    {activeTab} Settings
+                {/* Quick Actions */}
+                <div className={`rounded-2xl p-6 ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border border-gray-700' : 'bg-white border border-gray-200'} shadow-xl`}>
+                  <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                    <Settings className="w-5 h-5" />
+                    Quick Actions
                   </h3>
-                  <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {activeTab === "profile" && "Manage your profile information, preferences, and personal details."}
-                    {activeTab === "security" && "Configure security settings, two-factor authentication, and login history."}
-                  </p>
-                  <div className={`mt-4 p-4 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                      This section is under development. More features coming soon!
+                  <div className="space-y-3">
+                    <button className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
+                      isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                          <Key className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">Change Password</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                    <button className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
+                      isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                          <Globe className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">Language & Region</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                    <button className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
+                      isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                          <Bell className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">Notifications</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Apps Section */}
+          {activeSection === "apps" && (
+            <div className={`rounded-2xl p-8 ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border border-gray-700' : 'bg-white border border-gray-200'} shadow-xl`}>
+              <div className="mb-10">
+                <h2 className="text-2xl font-bold mb-3">Connected Applications</h2>
+                <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Access all your connected platforms with a single account
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {apps.map((app) => {
+                  const Icon = app.icon;
+                  return (
+                    <div
+                      key={app.id}
+                      className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:scale-[1.02] ${
+                        isDarkMode 
+                          ? 'bg-gray-800 border-gray-700 hover:border-purple-500/50' 
+                          : 'bg-white border-gray-200 hover:border-purple-300'
+                      } shadow-lg hover:shadow-2xl cursor-pointer`}
+                      onClick={() => navigateToApp(app.url)}
+                    >
+                      <div className="p-8">
+                        <div className="flex items-start justify-between mb-6">
+                          <div className="flex items-center gap-4">
+                            <div className={`${app.color} w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg`}>
+                              <Icon className="w-7 h-7 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold mb-1">{app.name}</h3>
+                              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                {app.description}
+                              </p>
+                            </div>
+                          </div>
+                          <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                            <ExternalLink className="w-4 h-4" />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
+                            app.status === 'active' 
+                              ? 'bg-green-500/10 text-green-600 dark:text-green-400' 
+                              : 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+                          }`}>
+                            <div className={`w-2 h-2 rounded-full ${app.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}></div>
+                            {app.status === 'active' ? 'Active' : 'Maintenance'}
+                          </div>
+                          <span className={`text-sm font-medium ${app.textColor}`}>
+                            {app.category === 'main' ? 'Primary Platform' : 'Specialized Service'}
+                          </span>
+                        </div>
+
+                        <div className="mt-6 flex items-center gap-4">
+                          <div className="flex-1">
+                            <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-600'} mb-1`}>Platform URL</p>
+                            <p className="text-sm font-mono truncate">{app.url}</p>
+                          </div>
+                          <button className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                            isDarkMode 
+                              ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+                              : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                          }`}>
+                            Launch
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Hover effect line */}
+                      <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${app.id === 'oliviuus' ? 'from-purple-600 to-indigo-600' : 'from-teal-500 to-emerald-600'} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300`}></div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Additional Info */}
+              <div className={`mt-10 p-6 rounded-xl ${isDarkMode ? 'bg-gray-700/50 border border-gray-600' : 'bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200'}`}>
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
+                    <LayoutDashboard className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg mb-2">Single Sign-On Enabled</h4>
+                    <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      You can seamlessly access all connected applications with your Oliviuus account.
+                      No need to sign in separately to each platform.
                     </p>
                   </div>
                 </div>
-              )}
+              </div>
+            </div>
+          )}
+
+          {/* Stats Bar */}
+          <div className={`mt-8 rounded-2xl p-6 ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm border border-gray-700' : 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100'} shadow-xl`}>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-white'} shadow-lg mb-3`}>
+                  <Monitor className="w-6 h-6 text-purple-600" />
+                </div>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Active Sessions</p>
+                <p className="text-2xl font-bold">1</p>
+              </div>
+              <div className="text-center">
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-white'} shadow-lg mb-3`}>
+                  <Smartphone className="w-6 h-6 text-teal-600" />
+                </div>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Connected Apps</p>
+                <p className="text-2xl font-bold">2</p>
+              </div>
+              <div className="text-center">
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-white'} shadow-lg mb-3`}>
+                  <UserCheck className="w-6 h-6 text-green-600" />
+                </div>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Verifications</p>
+                <p className="text-2xl font-bold">{[user.email_verified, user.phone_verified].filter(Boolean).length}/2</p>
+              </div>
+              <div className="text-center">
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-white'} shadow-lg mb-3`}>
+                  <Calendar className="w-6 h-6 text-blue-600" />
+                </div>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Last Active</p>
+                <p className="text-lg font-bold">{formatDateTime(user.last_active_at || user.last_login_at)}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -842,22 +551,25 @@ const AccountPage = () => {
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`rounded-xl p-6 max-w-md w-full ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-            <div className="text-center mb-6">
-              <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
-                <LogOut className="w-8 h-8 text-red-600 dark:text-red-400" />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className={`rounded-2xl p-8 max-w-md w-full transform transition-all duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-2xl`}>
+            <div className="text-center mb-8">
+              <div className="mx-auto w-20 h-20 flex items-center justify-center rounded-2xl bg-gradient-to-br from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30 mb-6">
+                <LogOut className="w-10 h-10 text-red-600 dark:text-red-400" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Sign Out</h3>
-              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <h3 className="text-2xl font-bold mb-3">Sign Out Confirmation</h3>
+              <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Are you sure you want to sign out of your account?
+              </p>
+              <p className={`text-sm mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                You'll need to sign in again to access your account.
               </p>
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <button
                 onClick={() => setShowLogoutConfirm(false)}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
+                className={`flex-1 py-4 px-6 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${
                   isDarkMode 
                     ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -867,7 +579,7 @@ const AccountPage = () => {
               </button>
               <button
                 onClick={handleLogout}
-                className="flex-1 py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+                className="flex-1 py-4 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 Yes, Sign Out
               </button>

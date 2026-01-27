@@ -615,6 +615,39 @@
     "fullLibrary": "Accès à l'ensemble de la bibliothèque de contenu",
     "prioritySupport": "Support client prioritaire",
     "parentalControls": "Contrôles parentaux pour la sécurité familiale",
+    "freePlans": {
+      "header": "Offres gratuites",
+      "checking": "Vérification des offres gratuites...",
+      "activePlan": "Offre gratuite active",
+      "availablePlans": "Offres gratuites disponibles",
+      "availablePlansCount": "{{count}} offre{{s}} gratuite{{s}} disponible{{s}}",
+      "noPlans": "Aucune offre gratuite disponible",
+      "clickToView": "Cliquez pour voir",
+      "loading": "Chargement des offres gratuites...",
+      "loadingError": "Erreur lors du chargement des offres gratuites",
+      "networkError": "Erreur réseau",
+      "alreadyActive": "Vous avez déjà une offre gratuite active",
+      "checkBackLater": "Revenez plus tard pour de nouvelles offres",
+      "yourActivePlan": "Votre offre gratuite active",
+      "activate": "Activer",
+      "activateSuccess": "Offre gratuite activée avec succès !",
+      "activationError": "Erreur lors de l’activation de l’offre gratuite. Veuillez réessayer.",
+      "viewAllDetails": "Voir tous les détails et conditions",
+      "planInfo": "{{name}} • {{days}} jour{{s}}",
+      "timeRemaining": "{{time}} restant",
+      "trialBadge": "Essai",
+      "expires": "Expire",
+      "invalidDate": "Date invalide",
+      "expired": "Expiré",
+      "timeFormats": {
+        "months": "{{count}} mois",
+        "weeks": "{{count}} semaine{{s}}",
+        "days": "{{count}} jour{{s}}",
+        "hours": "{{count}} heure{{s}}",
+        "minutes": "{{count}} minute{{s}}",
+        "lessThanMinute": "Moins d'une minute"
+      }
+    },
     "quality": {
       "SD": "SD (480p)",
       "HD": "HD (720p)",
@@ -1840,7 +1873,8 @@
       "close": "Fermer",
       "goBack": "Retour",
       "tryAgain": "Réessayer",
-      "copied": "Copié !"
+      "copied": "Copié !",
+      "refresh": "Actualiser"
     },
     "video": "Vidéo"
   },
@@ -5763,7 +5797,68 @@
     "addNewPlan": "Ajouter un nouveau plan",
     "supportDescription": "Des problèmes avec votre abonnement ? Notre équipe est là pour vous aider.",
     "subscriptionSupport": "Support abonnement",
-    "subscriptionSupportDescription": "Besoin d’aide pour votre abonnement ? Contactez notre support pour la facturation, les changements de plan ou toute autre question."
+    "subscriptionSupportDescription": "Besoin d’aide pour votre abonnement ? Contactez notre support pour la facturation, les changements de plan ou toute autre question.",
+    "noSubscription": {
+      "title": "Aucun Abonnement Actif",
+      "description": "Commencez avec Oliviuus Premium pour accéder à du contenu et des fonctionnalités exclusifs."
+    },
+
+    "expired": {
+      "title": "Abonnement Expiré",
+      "description": "Votre abonnement a pris fin. Renouvelez-le pour continuer à profiter des fonctionnalités Premium."
+    },
+
+    "cancelled": {
+      "title": "Abonnement Annulé",
+      "description": "Votre abonnement a été annulé.",
+      "descriptionWithDate": "Votre abonnement a été annulé le {{date}}.",
+      "details": "Détails de l'Abonnement Annulé"
+    },
+
+    "cancelledDetails": "Détails de l'Abonnement Annulé",
+    "accessUntil": "Accès Jusqu'au",
+
+    "scheduled": {
+      "description": "Votre plan commencera dans {{days}} jours le {{date}}",
+      "support": "Des questions sur votre abonnement planifié ? Contactez notre équipe d'assistance."
+    },
+
+    "scheduleDetails": "Détails du Calendrier",
+    "endedOn": "Terminé Le",
+    "lastPayment": "Dernier Paiement",
+
+    "trial": {
+      "description": "Vous êtes actuellement en période d'essai gratuit. Passez à une offre payante pour continuer après la fin de l'essai.",
+      "ends": "Fin de l'Essai"
+    },
+
+    "gracePeriod": {
+      "description": "Votre paiement est en retard. Veuillez mettre à jour votre moyen de paiement pour éviter une interruption du service."
+    },
+
+    "active": {
+      "description": "Votre abonnement est actif et en règle."
+    },
+
+    "benefits": {
+      "title": "Avantages de l'Abonnement",
+      "hdQuality": "Qualité HD & 4K Ultra HD",
+      "multipleDevices": "Regardez sur plusieurs appareils",
+      "offlineDownloads": "Téléchargez pour regarder hors ligne",
+      "noAds": "Streaming sans publicité"
+    },
+
+    "getStarted": "Commencer",
+    "renewNow": "Renouveler Maintenant",
+    "startNewPlan": "Démarrer un Nouveau Plan",
+
+    "timeRemaining": "Temps Restant",
+    "checkingStatus": "Vérification du statut de l'abonnement...",
+
+    "includedFeatures": "Fonctionnalités Incluses",
+
+    "questions": "Des Questions ?",
+    "scheduledSupport": "Des questions sur votre abonnement planifié ? Contactez notre équipe d'assistance."
   },
   "planChangeModal": {
     "title": "Mettre à niveau votre plan",

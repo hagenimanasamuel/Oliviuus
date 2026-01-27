@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, useCallback, useMemo } from "react";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Calendar, Clock, Gift, Users, Zap } from "lucide-react";
 import clsx from "clsx";
 
 // Lazy-loaded components
@@ -8,6 +8,7 @@ const PlanSeeder = React.lazy(() => import("./PlanSeeder"));
 const SubscriptionAnalytics = React.lazy(() => import("./SubscriptionAnalytics"));
 const CustomerManagement = React.lazy(() => import("./CustomerManagement"));
 const BillingManagement = React.lazy(() => import("./BillingManagement"));
+const FreePlansManagement = React.lazy(() => import("./FreePlansManagement"));
 
 export default function SubscriptionsNavTabs() {
   // Restore tab from URL hash
@@ -19,6 +20,7 @@ export default function SubscriptionsNavTabs() {
   const tabs = useMemo(
     () => [
       { id: "plans", label: "Manage Plans", component: <SubscriptionPlans /> },
+      { id: "free-plans", label: "Free Plans", component: <FreePlansManagement />, icon: <Gift size={16} /> },
       { id: "seeder", label: "Initialize Plans", component: <PlanSeeder /> },
       { id: "customers", label: "Customers", component: <CustomerManagement /> },
       { id: "billing", label: "Billing & Invoices", component: <BillingManagement /> },
@@ -71,7 +73,8 @@ export default function SubscriptionsNavTabs() {
     tabs.forEach((tab) => {
       const tempBtn = document.createElement("button");
       tempBtn.className = "flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap";
-      tempBtn.innerHTML = `${tab.label}`;
+      const iconHtml = tab.icon ? `<div class="flex items-center">${tab.icon.outerHTML || ''}</div>` : '';
+      tempBtn.innerHTML = `${iconHtml}<span>${tab.label}</span>`;
       tempContainer.appendChild(tempBtn);
     });
 
@@ -152,6 +155,7 @@ export default function SubscriptionsNavTabs() {
                 : "text-gray-600 dark:text-gray-400 hover:text-[#BC8BBC] dark:hover:text-[#BC8BBC]"
             )}
           >
+            {tab.icon && <span>{tab.icon}</span>}
             {tab.label}
           </button>
         ))}
@@ -179,12 +183,13 @@ export default function SubscriptionsNavTabs() {
                       setShowMore(false);
                     }}
                     className={clsx(
-                      "block w-full text-left px-4 py-2 text-sm transition",
+                      "flex items-center gap-2 w-full text-left px-4 py-2 text-sm transition",
                       selectedTab === tab.id
                         ? "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
                         : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                     )}
                   >
+                    {tab.icon && <span>{tab.icon}</span>}
                     {tab.label}
                   </button>
                 ))}

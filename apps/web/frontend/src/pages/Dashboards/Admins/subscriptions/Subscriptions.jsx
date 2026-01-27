@@ -10,7 +10,7 @@ export default function Subscriptions() {
             Subscription Plans Management
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Manage and configure all subscription plans for your streaming service
+            Manage and configure all subscription plans for Oliviuus.
           </p>
         </div>
         <SubscriptionsNavTabs />

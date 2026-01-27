@@ -101,7 +101,7 @@ class SecurityValidator {
           
         case 'kid_profile_id':
           const kidProfile = await query(
-            'SELECT user_id FROM kid_profiles WHERE id = ? AND is_active = true',
+            'SELECT user_id FROM kids_profiles WHERE id = ? AND is_active = true',
             [identifier.value]
           );
           return kidProfile[0]?.user_id || null;
@@ -513,7 +513,7 @@ class SecurityValidator {
             kp.user_id,
             kp.is_active,
             u.subscription_plan as parent_plan
-          FROM kid_profiles kp
+          FROM kids_profiles kp
           LEFT JOIN users u ON kp.user_id = u.id
           WHERE kp.id = ? 
             AND kp.is_active = TRUE
@@ -969,7 +969,7 @@ class SecurityValidator {
             kp.*,
             kp.max_content_age_rating,
             kp.calculated_age
-          FROM kid_profiles kp
+          FROM kids_profiles kp
           WHERE kp.id = ?
             AND kp.is_active = TRUE
           LIMIT 1
@@ -1008,7 +1008,7 @@ class SecurityValidator {
               kp.max_content_age_rating,
               kp.calculated_age
             FROM user_session us
-            LEFT JOIN kid_profiles kp ON us.active_kid_profile_id = kp.id
+            LEFT JOIN kids_profiles kp ON us.active_kid_profile_id = kp.id
             WHERE us.user_id = ?
               AND us.is_active = TRUE
               AND (us.session_mode = 'kid' OR us.active_kid_profile_id IS NOT NULL)
@@ -1219,7 +1219,7 @@ class SecurityValidator {
           kp.bedtime_start,
           kp.bedtime_end
         FROM user_session us
-        LEFT JOIN kid_profiles kp ON us.active_kid_profile_id = kp.id
+        LEFT JOIN kids_profiles kp ON us.active_kid_profile_id = kp.id
         WHERE us.user_id = ?
           AND us.is_active = TRUE
           AND (us.session_mode = 'kid' OR us.active_kid_profile_id IS NOT NULL)

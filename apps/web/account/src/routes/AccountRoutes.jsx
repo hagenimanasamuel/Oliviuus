@@ -1,9 +1,10 @@
 // src/routes/AccountRoutes.jsx
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import AuthForm from '../pages/Auth/AuthForm.jsx';
+import { useAuth } from '../context/AuthContext'; 
 
-// Only import AccountPage for now - others will be added later
+// Lazy load components
 const AccountPage = lazy(() => import('../pages/AccountPage.jsx'));
 
 // Simple loading component
@@ -27,7 +28,7 @@ const LoadingFallback = () => (
         animation: 'spin 1s linear infinite',
         margin: '0 auto 15px'
       }}></div>
-      <p style={{ margin: 0, fontSize: '0.9rem' }}>Loading Oliviuus Account...</p>
+      <p style={{ margin: 0, fontSize: '0.9rem' }}>Oliviuus Account...</p>
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
@@ -38,19 +39,57 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingFallback />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  return children;
+};
+
+// Public Route Component (for auth pages)
+const PublicRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingFallback />;
+  }
+
+  // If user is logged in and tries to access auth page, redirect to home
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
 export default function AccountRoutes() {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
-        {/* Main Account Page */}
-        <Route path="/account" element={<AccountPage />} />
-        
-        {/* Default route redirects to /account */}
-        <Route path="/" element={<Navigate to="/account" replace />} />
-        <Route path="/auth" element={<AuthForm />} />
-        
-        {/* Catch-all route redirects to /account */}
-        <Route path="*" element={<Navigate to="/account" replace />} />
+        {/* Protected route - requires authentication */}
+        <Route path="/" element={
+          <ProtectedRoute>
+            <AccountPage />
+          </ProtectedRoute>
+        } />
+
+        {/* Public route - only accessible when not logged in */}
+        <Route path="/auth" element={
+          <PublicRoute>
+            <AuthForm />
+          </PublicRoute>
+        } />
+
+        {/* Catch-all route - redirect based on auth status */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
   );

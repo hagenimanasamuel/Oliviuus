@@ -14,12 +14,10 @@ export const AuthProvider = ({ children }) => {
   const [showProfileSelector, setShowProfileSelector] = useState(false);
   const [availableKidProfiles, setAvailableKidProfiles] = useState([]);
   const [familyMemberData, setFamilyMemberData] = useState(null);
-  const [subscriptionData, setSubscriptionData] = useState(null);
   const [hasMadeProfileSelection, setHasMadeProfileSelection] = useState(
     () => localStorage.getItem('hasMadeProfileSelection') === 'true'
   );
-  const [userSessions, setUserSessions] = useState([]);
-  const [kidProfiles, setKidProfiles] = useState([]);
+  const [authError, setAuthError] = useState(null);
 
   const refreshAuth = async () => {
     try {
@@ -35,7 +33,9 @@ export const AuthProvider = ({ children }) => {
     const lang = userData?.preferences?.language || currentLanguage;
     i18n.changeLanguage(lang);
     setCurrentLanguage(lang);
-    localStorage.setItem("lang", lang);
+    if (!userData) {
+      localStorage.setItem("lang", lang);
+    }
   };
 
   const setProfileSelectionMade = (value) => {
@@ -47,169 +47,94 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Helper to get display name from new user schema
+  const getUserDisplayName = (userData) => {
+    if (!userData) return 'User';
+    
+    if (userData.username) return userData.username;
+    if (userData.first_name) {
+      return `${userData.first_name} ${userData.last_name || ''}`.trim();
+    }
+    if (userData.email) return userData.email.split('@')[0];
+    if (userData.phone) return `User (${userData.phone.substring(-4)})`;
+    if (userData.oliviuus_id) return `User ${userData.oliviuus_id.substring(-4)}`;
+    return 'User';
+  };
+
   const fetchUser = async () => {
     try {
+      console.log('🔍 Fetching user data...');
       const res = await axios.get("/auth/me", {
         withCredentials: true
       });
       
-      console.log("🔍 FetchUser response:", res.data);
-      
-      if (res.data && (res.data.success || res.data.id)) {
-        const data = res.data;
-        
-        // ✅ COMPATIBILITY: Handle both old and new response formats
-        let userData, preferences, subscription, sessions, kidProfilesList, currentSession;
-        
-        // OLD FORMAT (has sessions at root level)
-        if (data.sessions && data.current_session_token) {
-          userData = {
-            id: data.id,
-            email: data.email,
-            role: data.role,
-            username: data.username,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            phone: data.phone,
-            profile_avatar_url: data.profile_avatar_url,
-            created_at: data.created_at,
-            updated_at: data.updated_at,
-            email_verified: data.email_verified,
-            phone_verified: data.phone_verified,
-            sessions: data.sessions,
-            current_session_token: data.current_session_token,
-            preferences: data.preferences
-          };
-          preferences = data.preferences;
-          sessions = data.sessions;
-        } 
-        // NEW FORMAT (structured response)
-        else if (data.success && data.user) {
-          userData = data.user;
-          preferences = data.preferences;
-          subscription = data.subscription;
-          sessions = data.sessions || data.user.sessions || [];
-          kidProfilesList = data.kid_profiles || [];
-          currentSession = data.current_session;
-          
-          // Ensure sessions are in userData for UserSessions component
-          if (!userData.sessions) {
-            userData.sessions = sessions;
-          }
-          if (!userData.current_session_token && data.user.current_session_token) {
-            userData.current_session_token = data.user.current_session_token;
-          }
-        }
-        
-        if (!userData) {
-          setUser(null);
-          return null;
-        }
+      console.log('✅ User data response:', res.data);
 
-        // Merge preferences with user data
-        const mergedUser = {
+      // 🆕 ADAPTED FOR NEW RESPONSE STRUCTURE
+      let userData = res.data;
+      
+      // Handle both old and new response formats
+      if (res.data.success && res.data.user) {
+        userData = res.data.user;
+      }
+      
+      if (userData && userData.id) {
+        // 🆕 Add display name for new user schema
+        const enhancedUserData = {
           ...userData,
-          preferences: preferences || {}
+          display_name: getUserDisplayName(userData)
         };
 
         setUser((prev) => {
-          if (JSON.stringify(prev) !== JSON.stringify(mergedUser)) {
-            applyLanguage(mergedUser);
-            return mergedUser;
+          if (JSON.stringify(prev) !== JSON.stringify(enhancedUserData)) {
+            applyLanguage(enhancedUserData);
+            return enhancedUserData;
           }
           return prev;
         });
-
-        // Set other data
-        setSubscriptionData(subscription);
-        setKidProfiles(kidProfilesList || []);
-        setUserSessions(sessions || []);
-
-        // Check if user is a family member
-        if (userData.is_family_member || userData.family_owner_id) {
-          const familyData = {
-            family_owner_id: userData.family_owner_id,
-            member_role: userData.member_role,
-            dashboard_type: userData.dashboard_type,
-            family_members: data.family_members || []
-          };
-          setFamilyMemberData(familyData);
-        } else {
-          setFamilyMemberData(null);
-        }
-
-        // Return data for further processing
-        return {
-          user: mergedUser,
-          currentSession,
-          subscription,
-          kidProfiles: kidProfilesList,
-          sessions: sessions,
-          isFamilyMember: userData.is_family_member || userData.family_owner_id,
-          familyData: (userData.is_family_member || userData.family_owner_id) ? {
-            family_owner_id: userData.family_owner_id,
-            member_role: userData.member_role,
-            dashboard_type: userData.dashboard_type
-          } : null
-        };
+        
+        setAuthError(null);
+        return enhancedUserData;
       } else {
+        console.log('❌ No valid user data in response');
         setUser(null);
         return null;
       }
     } catch (err) {
-      console.error("Fetch user error:", err);
+      console.error("❌ Error fetching user:", err.response?.data || err.message);
+      
       if (err.response?.status === 401) {
-        handleLogout();
+        setUser(null);
+        setKidProfile(null);
+        setFamilyMemberData(null);
+        setShowProfileSelector(false);
+        setProfileSelectionMade(false);
+        setAuthError('session_expired');
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       }
       return null;
     }
   };
 
-  // ✅ OLD checkSessionMode function (for compatibility)
-  const checkSessionMode = async () => {
+  const checkFamilyMembership = async (userId) => {
     try {
-      const res = await axios.get("/kids/current", {
+      const response = await axios.get(`/family/members/check/${userId}`, {
         withCredentials: true
       });
 
-      // Handle family members with kid dashboard
-      if (res.data && res.data.active_kid_profile?.is_family_member) {
-        setKidProfile(res.data.active_kid_profile);
-        setShowProfileSelector(false);
-        setProfileSelectionMade(true);
-        return { isKidMode: true, kidProfile: res.data.active_kid_profile };
-      }
-
-      // Regular kid mode check
-      if (res.data && res.data.session_mode === 'kid' && res.data.active_kid_profile) {
-        setKidProfile(res.data.active_kid_profile);
-        setShowProfileSelector(false);
-        setProfileSelectionMade(true);
-        return { isKidMode: true, kidProfile: res.data.active_kid_profile };
+      if (response.data.success && response.data.is_family_member) {
+        setFamilyMemberData(response.data.family_data);
+        return response.data.family_data;
       } else {
-        setKidProfile(null);
-        return { isKidMode: false, kidProfile: null };
+        setFamilyMemberData(null);
+        return null;
       }
     } catch (error) {
-      console.error("Session mode check error:", error);
-      setKidProfile(null);
-      return { isKidMode: false, kidProfile: null };
+      setFamilyMemberData(null);
+      return null;
     }
   };
 
-  // ✅ OLD checkProfileSelectionRequired function
-  const checkProfileSelectionRequired = async () => {
-    try {
-      const selectionRes = await axios.get("/kids/check-selection", {
-        withCredentials: true
-      });
-      return selectionRes.data.requires_profile_selection;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  // ✅ OLD getAvailableProfiles function
   const getAvailableProfiles = async () => {
     try {
       const profilesRes = await axios.get("/profile/profiles/available", {
@@ -248,42 +173,138 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ OLD determineDashboardType function
+  const checkSessionMode = async () => {
+    try {
+      const res = await axios.get("/kids/current", {
+        withCredentials: true
+      });
+
+      console.log('👶 Session mode response:', res.data);
+
+      // 🆕 ADAPTED FOR NEW RESPONSE STRUCTURE
+      let sessionData = res.data;
+      if (res.data.success && res.data.data) {
+        sessionData = res.data.data;
+      }
+
+      // Handle family members with kid dashboard
+      if (sessionData && sessionData.active_kid_profile?.is_family_member) {
+        const kidProfile = sessionData.active_kid_profile;
+        setKidProfile(kidProfile);
+        setShowProfileSelector(false);
+        setProfileSelectionMade(true);
+        return { isKidMode: true, kidProfile };
+      }
+
+      // Regular kid mode check
+      if (sessionData && sessionData.session_mode === 'kid' && sessionData.active_kid_profile) {
+        const kidProfile = sessionData.active_kid_profile;
+        setKidProfile(kidProfile);
+        setShowProfileSelector(false);
+        setProfileSelectionMade(true);
+        return { isKidMode: true, kidProfile };
+      } else {
+        setKidProfile(null);
+        return { isKidMode: false, kidProfile: null };
+      }
+    } catch (error) {
+      console.error("Session mode check error:", error);
+      setKidProfile(null);
+      return { isKidMode: false, kidProfile: null };
+    }
+  };
+
+  const checkProfileSelectionRequired = async () => {
+    try {
+      const selectionRes = await axios.get("/kids/check-selection", {
+        withCredentials: true
+      });
+      
+      // 🆕 ADAPTED FOR NEW RESPONSE STRUCTURE
+      if (selectionRes.data.success) {
+        return selectionRes.data.data?.requires_profile_selection || false;
+      }
+      return selectionRes.data.requires_profile_selection || false;
+    } catch (error) {
+      console.error("❌ Error checking profile selection:", error);
+      return false;
+    }
+  };
+
   const determineDashboardType = (userData, familyData, sessionInfo) => {
+    console.log('🎯 Determining dashboard type:', {
+      userRole: userData?.role,
+      familyDashboardType: familyData?.dashboard_type,
+      isKidMode: sessionInfo?.isKidMode
+    });
+
     // If family member with kid dashboard type
     if (familyData && familyData.dashboard_type === 'kid') {
+      console.log('✅ Dashboard type: kid (family member)');
       return 'kid';
     }
     
     // If in kid mode via session
-    if (sessionInfo.isKidMode) return 'kid';
+    if (sessionInfo?.isKidMode) {
+      console.log('✅ Dashboard type: kid (regular session)');
+      return 'kid';
+    }
 
     // Regular user dashboard types
-    if (userData.role === 'admin') return 'admin';
+    if (userData?.role === 'admin') {
+      console.log('✅ Dashboard type: admin');
+      return 'admin';
+    }
+    
+    // 🆕 Handle guest mode
+    if (userData?.guestMode) {
+      console.log('✅ Dashboard type: guest');
+      return 'guest';
+    }
+    
+    console.log('✅ Dashboard type: viewer');
     return 'viewer';
   };
 
-  // ✅ OLD loadUserData function structure
   const loadUserData = async () => {
     try {
       setLoading(true);
-      const result = await fetchUser();
+      const userData = await fetchUser();
 
-      if (result && result.user) {
-        const familyData = result.familyData;
+      if (userData) {
+        console.log('👤 User data loaded:', {
+          id: userData.id,
+          username: userData.username,
+          email: userData.email,
+          role: userData.role
+        });
+
+        const familyData = await checkFamilyMembership(userData.id);
         const sessionInfo = await checkSessionMode();
+        
+        console.log('📋 Session info:', sessionInfo);
+        console.log('🏠 Family data:', familyData);
         
         // IMPORTANT: If family member with kid dashboard, create kid profile
         if (familyData && familyData.dashboard_type === 'kid' && !sessionInfo.kidProfile) {
+          console.log('👶 Creating simulated kid profile for family member');
+          
           const simulatedKidProfile = {
             is_family_member: true,
             family_owner_id: familyData.family_owner_id,
             member_role: familyData.member_role,
             dashboard_type: 'kid',
-            name: result.user.email?.split('@')[0] || 'Kid',
+            name: getUserDisplayName(userData),
+            display_name: getUserDisplayName(userData),
             max_age_rating: '7+',
-            id: result.user.id
+            id: userData.id,
+            // Include user identifiers
+            user_id: userData.id,
+            oliviuus_id: userData.oliviuus_id,
+            username: userData.username,
+            email: userData.email
           };
+          
           setKidProfile(simulatedKidProfile);
           setShowProfileSelector(false);
           setProfileSelectionMade(true);
@@ -293,13 +314,14 @@ export const AuthProvider = ({ children }) => {
           sessionInfo.kidProfile = simulatedKidProfile;
         }
         
-        const dashboardType = determineDashboardType(result.user, familyData, sessionInfo);
+        const dashboardType = determineDashboardType(userData, familyData, sessionInfo);
+        console.log('🎯 Final dashboard type:', dashboardType);
 
         if (dashboardType === 'kid') {
           setShowProfileSelector(false);
           setProfileSelectionMade(true);
         } else {
-          if (result.user.role === 'viewer' && !hasMadeProfileSelection) {
+          if (userData.role === 'viewer' && !hasMadeProfileSelection) {
             const requiresSelection = await checkProfileSelectionRequired();
             const profiles = await getAvailableProfiles();
 
@@ -316,23 +338,38 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } else {
-        handleLogout();
+        setUser(null);
+        setKidProfile(null);
+        setFamilyMemberData(null);
+        setShowProfileSelector(false);
+        setAvailableKidProfiles([]);
+        setProfileSelectionMade(false);
+        applyLanguage(null);
       }
     } catch (err) {
       console.error("Error loading user data:", err);
-      handleLogout();
+      setUser(null);
+      setKidProfile(null);
+      setFamilyMemberData(null);
+      setShowProfileSelector(false);
+      setAvailableKidProfiles([]);
+      setProfileSelectionMade(false);
+      applyLanguage(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ OLD enterKidMode function
   const enterKidMode = async (kidProfileId) => {
     try {
+      console.log('👶 Entering kid mode for profile:', kidProfileId);
       const res = await axios.post("/kids/enter", {
         kid_profile_id: kidProfileId
       }, { withCredentials: true });
 
+      console.log('✅ Enter kid mode response:', res.data);
+
+      // 🆕 ADAPTED FOR NEW RESPONSE STRUCTURE
       if (res.data.success) {
         await loadUserData();
         return true;
@@ -344,13 +381,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ OLD exitKidMode function
   const exitKidMode = async () => {
     try {
+      console.log('👋 Exiting kid mode...');
       const res = await axios.post("/kids/exit", {}, {
         withCredentials: true
       });
 
+      console.log('✅ Exit kid mode response:', res.data);
+
+      // 🆕 ADAPTED FOR NEW RESPONSE STRUCTURE
       if (res.data.success) {
         await loadUserData();
         return true;
@@ -362,12 +402,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ OLD handleProfileSelection function
   const handleProfileSelection = async (profile) => {
+    console.log('🎯 Profile selected:', profile);
     setShowProfileSelector(false);
     setProfileSelectionMade(true);
 
     if (profile.type === 'main') {
+      console.log('🔄 Redirecting to main account...');
       window.location.href = "/";
     } else {
       await enterKidMode(profile.id);
@@ -389,15 +430,27 @@ export const AuthProvider = ({ children }) => {
     setShowProfileSelector(false);
   };
 
-  // ✅ OLD loginUser function
   const loginUser = async (userData) => {
-    setUser(userData);
-    applyLanguage(userData);
+    console.log('🔑 Logging in user:', {
+      id: userData.id,
+      username: userData.username,
+      email: userData.email
+    });
+    
+    // 🆕 Add display name for new schema
+    const enhancedUserData = {
+      ...userData,
+      display_name: getUserDisplayName(userData)
+    };
+    
+    setUser(enhancedUserData);
+    applyLanguage(enhancedUserData);
     setKidProfile(null);
     setFamilyMemberData(null);
     setShowProfileSelector(false);
     setAvailableKidProfiles([]);
     setProfileSelectionMade(false);
+    setAuthError(null);
 
     try {
       const selectionRes = await axios.get("/kids/check-selection", {
@@ -416,34 +469,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ OLD logoutUser function
   const logoutUser = async () => {
     try {
       if (kidProfile) {
+        console.log('👋 Exiting kid mode first...');
         await exitKidMode();
       }
+      
+      console.log('🚪 Logging out...');
       await axios.post("/auth/logout", {}, { withCredentials: true });
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      handleLogout();
+      console.log('🧹 Clearing auth state');
+      setUser(null);
+      setKidProfile(null);
+      setFamilyMemberData(null);
+      setShowProfileSelector(false);
+      setAvailableKidProfiles([]);
+      setProfileSelectionMade(false);
+      applyLanguage(null);
+      setAuthError(null);
     }
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setKidProfile(null);
-    setFamilyMemberData(null);
-    setSubscriptionData(null);
-    setShowProfileSelector(false);
-    setAvailableKidProfiles([]);
-    setUserSessions([]);
-    setKidProfiles([]);
-    setProfileSelectionMade(false);
-    applyLanguage(null);
-    
-    // Clear token cookie
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   };
 
   const changeLanguage = (lang) => {
@@ -454,56 +501,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ Get active sessions for UserSessions component
-  const getActiveSessions = () => {
-    return userSessions.filter(session => session.is_active);
-  };
-
-  // ✅ Helper functions for sessions
-  const terminateSession = async (sessionId) => {
-    try {
-      const res = await axios.post(`/user/sessions/logout`, 
-        { session_id: sessionId },
-        { withCredentials: true }
-      );
-      
-      if (res.data.success) {
-        await loadUserData();
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Error terminating session:", error);
-      return false;
-    }
-  };
-
-  const terminateAllOtherSessions = async () => {
-    try {
-      const res = await axios.post("/user/sessions/logout-all", {}, {
-        withCredentials: true
-      });
-      
-      if (res.data.success) {
-        await loadUserData();
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Error terminating all sessions:", error);
-      return false;
-    }
+  // Clear auth error
+  const clearAuthError = () => {
+    setAuthError(null);
   };
 
   useEffect(() => {
+    console.log('🔧 AuthContext mounted, loading user data...');
     loadUserData();
   }, []);
 
-  // ✅ Combined kid mode check - includes family members with kid dashboard
+  // Combined kid mode check
   const isKidMode = !!kidProfile || (familyMemberData && familyMemberData.dashboard_type === 'kid');
+  
+  // 🆕 Check guest mode
+  const isGuestMode = user?.guestMode || false;
+  
+  // 🆕 Get user display name
+  const userDisplayName = getUserDisplayName(user);
 
   const contextValue = {
-    // OLD AuthContext properties (for compatibility)
     user,
     loading,
     loginUser,
@@ -514,6 +531,7 @@ export const AuthProvider = ({ children }) => {
     refreshAuth: refreshAuth,
     kidProfile,
     isKidMode,
+    isGuestMode, // 🆕
     showProfileSelector,
     availableKidProfiles,
     enterKidMode,
@@ -522,31 +540,9 @@ export const AuthProvider = ({ children }) => {
     hideProfileSelection,
     familyMemberData,
     selectProfile: handleProfileSelection,
-    
-    // NEW properties
-    subscription: subscriptionData,
-    sessions: userSessions,
-    activeSessions: getActiveSessions(),
-    kidProfiles: kidProfiles,
-    
-    // Helper functions
-    terminateSession,
-    terminateAllOtherSessions,
-    updateUserProfile: async (profileData) => {
-      try {
-        const res = await axios.put("/user/profile", profileData, {
-          withCredentials: true
-        });
-        if (res.data.success) {
-          await loadUserData();
-          return true;
-        }
-        return false;
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        return false;
-      }
-    }
+    userDisplayName, // 🆕
+    authError, // 🆕
+    clearAuthError // 🆕
   };
 
   return (

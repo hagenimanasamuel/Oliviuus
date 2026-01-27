@@ -2508,169 +2508,112 @@ const logSuccessfulLogin = async (userId, identifier, ip_address, device_name, d
   }
 };
 
-// ✅ GET logged in user with enhanced data
+// ✅ UPDATED getMe function - More defensive
 const getMe = async (req, res) => {
   try {
-    console.log('\n🔍 GETME ENDPOINT CALLED ===========================');
-    console.log('🍪 Cookies received:', req.cookies);
-    console.log('📋 Cookie header:', req.headers.cookie);
-    console.log('🔑 req.user:', req.user);
-    console.log('🌐 Origin:', req.headers.origin);
+    console.log('\n🔍 GETME ENDPOINT ===========================');
     
-    // Check if user is authenticated via cookie
-    if (!req.user) {
-      console.log('❌ No user in request - checking token from cookie...');
-      
-      // Try to get token from cookie
-      const token = req.cookies?.token;
-      console.log('🔑 Token from cookie:', token ? 'Present' : 'Missing');
-      
-      if (!token) {
-        console.log('❌ No token in cookies');
-        return res.status(401).json({
-          success: false,
-          error: "No authentication token found",
-          debug: {
-            cookies: req.cookies,
-            cookieHeader: req.headers.cookie,
-            message: "Please log in again"
-          }
-        });
-      }
-      
-      // Verify the token manually
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log('✅ Token verified manually:', decoded);
-        req.user = { id: decoded.id }; // Set req.user manually
-      } catch (jwtErr) {
-        console.log('❌ Token verification failed:', jwtErr.message);
-        return res.status(401).json({
-          success: false,
-          error: "Invalid or expired token",
-          debug: { tokenError: jwtErr.message }
-        });
-      }
+    if (!req.user || !req.user.id) {
+      console.log('❌ No user in request - auth middleware might have failed');
+      return res.status(401).json({
+        success: false,
+        authenticated: false,
+        error: "Not authenticated"
+      });
     }
     
     const userId = req.user.id;
-    const currentToken = req.cookies?.token;
     
-    console.log('👤 User ID:', userId);
-    console.log('🔑 Current token exists:', !!currentToken);
-
-    // SIMPLIFIED QUERY - First get basic user info
-    console.log('📊 Fetching basic user info...');
-    const basicUserRows = await query(`
-      SELECT 
-        id, oliviuus_id, username, email, phone, first_name, last_name,
-        profile_avatar_url, date_of_birth, gender, role, 
-        email_verified, phone_verified, global_account_tier,
-        created_at, updated_at, last_login_at, last_active_at,
-        is_active, is_deleted
-      FROM users 
-      WHERE id = ? AND is_active = TRUE AND is_deleted = FALSE
-    `, [userId]);
-
-    if (basicUserRows.length === 0) {
-      console.log('❌ User not found or inactive/deleted:', userId);
-      return res.status(404).json({
-        success: false,
-        error: "User not found or account is inactive",
-        debug: { userId, message: "User record not found in database" }
-      });
-    }
-
-    const user = basicUserRows[0];
-    console.log('✅ User found:', { 
-      id: user.id, 
-      username: user.username,
-      email: user.email?.substring(0, 3) + '...',
-      role: user.role 
+    console.log('👤 User from authMiddleware:', {
+      id: req.user.id,
+      username: req.user.username,
+      email: req.user.email?.substring(0, 3) + '...',
+      role: req.user.role
     });
 
-    // Fetch user preferences
-    console.log('📊 Fetching user preferences...');
+    // Get user preferences
     const prefRows = await query(
-      `SELECT * FROM user_preferences WHERE user_id = ?`,
+      `SELECT language, genres, notifications, subtitles 
+       FROM user_preferences 
+       WHERE user_id = ?`,
       [userId]
     );
-    const preferences = prefRows[0] || { language: 'en' };
-
-    // ✅ ADDED: Fetch all sessions for this user (like old endpoint)
-    console.log('📊 Fetching user sessions...');
-    const sessionRows = await query(
-      `SELECT id, session_token, device_name, device_type, ip_address, location, 
-              login_time, last_activity, is_active, logout_time, user_agent, device_id
+    
+    const preferences = prefRows[0] || { 
+      language: 'en', 
+      notifications: true, 
+      subtitles: true 
+    };
+    
+    // Get active sessions
+    const allSessions = await query(
+      `SELECT 
+        id, 
+        session_token, 
+        device_name, 
+        device_type, 
+        ip_address,
+        login_time, 
+        last_activity, 
+        is_active,
+        user_agent,
+        token_expires,
+        is_guest_mode
        FROM user_session
-       WHERE user_id = ?
+       WHERE user_id = ? 
+         AND is_active = TRUE
+         AND token_expires > NOW()
        ORDER BY last_activity DESC`,
       [userId]
     );
-
-    console.log('📊 Found sessions:', sessionRows.length);
-
-    // ✅ FIXED: Include sessions and current_session_token in response
-    const result = {
+    
+    console.log('📊 Active sessions found:', allSessions.length);
+    
+    // Build response
+    const response = {
       success: true,
-      message: "User data retrieved successfully",
+      authenticated: true,
+      message: "User authenticated successfully",
       user: {
-        id: user.id,
-        oliviuus_id: user.oliviuus_id,
-        username: user.username,
-        email: user.email,
-        phone: user.phone,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        profile_avatar_url: user.profile_avatar_url,
-        date_of_birth: user.date_of_birth,
-        gender: user.gender,
-        role: user.role,
-        email_verified: user.email_verified,
-        phone_verified: user.phone_verified,
-        global_account_tier: user.global_account_tier,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-        last_login_at: user.last_login_at,
-        last_active_at: user.last_active_at,
-        // ✅ ADDED: Include sessions array in user object
-        sessions: sessionRows,
-        // ✅ ADDED: Include current session token
-        current_session_token: currentToken
-      },
-      preferences: preferences,
-      debug: {
-        cookiePresent: !!req.cookies?.token,
-        cookieHeaderPresent: !!req.headers.cookie,
-        requestOrigin: req.headers.origin,
-        sessionCount: sessionRows.length
+        // Basic info from auth middleware
+        ...req.user,
+        
+        // Sessions
+        sessions: allSessions,
+        current_session_token: req.cookies?.token || null,
+        active_sessions_count: allSessions.length,
+        
+        // Preferences
+        preferences: preferences,
+        
+        // Session info
+        session_info: {
+          device_name: req.session?.device_name,
+          device_type: req.session?.device_type,
+          ip_address: req.session?.ip_address,
+          login_time: req.session?.login_time,
+          expires_at: req.session?.token_expires
+        }
       }
     };
-
-    console.log('✅ GETME response ready:', {
-      success: true,
-      userId: user.id,
-      username: user.username,
-      sessions: sessionRows.length,
-      hasCurrentToken: !!currentToken
-    });
-
-    res.json(result);
-
+    
+    console.log('✅ GETME response ready for user:', req.user.username);
+    res.json(response);
+    
   } catch (err) {
-    console.error("\n❌❌❌ ERROR IN getMe ❌❌❌");
-    console.error("Error message:", err.message);
-    console.error("Error stack:", err.stack);
+    console.error("\n❌ ERROR IN getMe:", err.message);
+    console.error(err.stack);
     
     res.status(500).json({
       success: false,
-      error: "Something went wrong, please try again.",
-      debug: { error: err.message }
+      authenticated: false,
+      error: "Failed to retrieve user data",
+      message: "Please try again"
     });
   }
 };
 
-// ✅ LOGOUT user
+// ✅ LOGOUT user - Updated for new system
 const logout = async (req, res) => {
   try {
     const token = req.cookies?.token;
@@ -2691,21 +2634,22 @@ const logout = async (req, res) => {
 
     const userId = decoded.id;
 
-    // Clear both adult and kid sessions
-    await Promise.all([
-      // Clear adult session
-      query(
-        "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE user_id = ? AND is_active = TRUE",
-        [userId]
-      ),
-      // Clear kid sessions
-      query(
-        "UPDATE kids_sessions SET is_active = FALSE, logout_time = NOW() WHERE parent_user_id = ? AND is_active = TRUE",
-        [userId]
-      )
-    ]);
+    // Invalidate the session in database
+    await query(
+      "UPDATE user_session SET is_active = FALSE, logout_time = NOW() WHERE session_token = ?",
+      [token]
+    );
 
-    res.clearCookie("token");
+    // Clear cookie with consistent options
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      path: '/',
+      ...(isProduction && { domain: process.env.COOKIE_DOMAIN || '.oliviuus.com' })
+    });
+
     res.json({ success: true, message: "Logged out successfully" });
 
   } catch (error) {
@@ -2716,34 +2660,37 @@ const logout = async (req, res) => {
   }
 };
 
-// ✅ LOGIN user with guest mode support
+// ✅ COMPLETE FIXED loginUser FUNCTION with guaranteed session saving
 const loginUser = async (req, res) => {
+  console.log('🔐 LOGIN ATTEMPT STARTED ===========================');
+  
   const { identifier, password, device_name, device_type, user_agent, redirectUrl, guestMode = false } = req.body;
 
-  console.log('🔐 LOGIN ATTEMPT STARTED ===========================');
   console.log('📋 Login request body:', { 
     identifier: identifier ? identifier.substring(0, 3) + '...' : 'undefined',
     passwordLength: password ? password.length : 0,
-    device_name,
-    device_type,
-    redirectUrl,
-    guestMode
+    device_name: device_name || 'Unknown',
+    device_type: device_type || 'desktop',
+    redirectUrl: redirectUrl || '/',
+    guestMode: guestMode
   });
 
+  // Validate required fields
   if (!identifier || !password) {
-    return res.status(400).json({ error: "Identifier and password are required" });
+    return res.status(400).json({ 
+      success: false,
+      error: "Identifier and password are required" 
+    });
   }
 
   try {
     const ip_address = req.headers["x-forwarded-for"] || req.connection.remoteAddress || "Unknown";
     console.log('🌐 Client IP:', ip_address);
 
-    // 1️⃣ Determine identifier type and build query
+    // 1️⃣ Determine identifier type
     const { queryCondition, queryValue, identifierType } = determineLoginIdentifier(identifier);
-    console.log('🔍 Identifier analysis:', { queryCondition, identifierType, queryValue });
     
-    // 2️⃣ Check user with the determined condition
-    console.log('📊 Executing user query...');
+    // 2️⃣ Check user
     const rows = await query(
       `SELECT id, oliviuus_id, username, email, phone, password, role, is_active, 
               email_verified, phone_verified, profile_avatar_url, global_account_tier,
@@ -2752,165 +2699,193 @@ const loginUser = async (req, res) => {
       [queryValue]
     );
 
-    console.log('📋 User query result:', rows.length > 0 ? 'User found' : 'No user found');
-
     if (!rows || rows.length === 0) {
       await handleFailedLoginAttempt(null, identifier, ip_address, device_name, device_type, 'invalid_identifier');
-      return res.status(400).json({ error: "Invalid identifier or password" });
+      return res.status(400).json({ 
+        success: false,
+        error: "Invalid identifier or password" 
+      });
     }
 
     const user = rows[0];
-    console.log('👤 User found:', { 
-      id: user.id, 
-      username: user.username,
-      email: user.email?.substring(0, 3) + '...',
-      role: user.role,
-      is_active: user.is_active 
-    });
 
-    // 3️⃣ Check if account is active
+    // 3️⃣ Check account status
     if (!user.is_active) {
-      console.log('❌ Account is inactive');
       await handleFailedLoginAttempt(user.id, identifier, ip_address, device_name, device_type, 'account_disabled');
       return res.status(403).json({ 
+        success: false,
         error: "Account is disabled. Please contact support." 
       });
     }
 
-    // 4️⃣ For email/phone login, check if verified
+    // 4️⃣ Check email/phone verification
     if (identifierType === 'email' && !user.email_verified) {
-      console.log('❌ Email not verified');
       return res.status(403).json({ 
+        success: false,
         error: "Email not verified. Please verify your email first.",
         requires_verification: true,
-        identifier: user.email
+        identifier: user.email,
+        identifier_type: 'email'
       });
     }
 
     if (identifierType === 'phone' && !user.phone_verified) {
-      console.log('❌ Phone not verified');
       return res.status(403).json({ 
+        success: false,
         error: "Phone not verified. Please verify your phone first.",
         requires_verification: true,
-        identifier: user.phone
+        identifier: user.phone,
+        identifier_type: 'phone'
       });
     }
 
     // 5️⃣ Compare password
-    console.log('🔑 Comparing passwords...');
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('🔑 Password match result:', isMatch ? '✅ Password correct' : '❌ Password incorrect');
     
     if (!isMatch) {
       await handleFailedLoginAttempt(user.id, identifier, ip_address, device_name, device_type, 'invalid_password');
-      return res.status(400).json({ error: "Invalid identifier or password" });
+      return res.status(400).json({ 
+        success: false,
+        error: "Invalid identifier or password"
+      });
     }
 
-    // 6️⃣ Generate JWT token
+    // 6️⃣ Generate JWT token - SIMPLIFIED
     console.log('🔐 Generating JWT token...');
+    const tokenPayload = {
+      id: user.id, 
+      oliviuus_id: user.oliviuus_id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      account_type: identifierType,
+      guestMode: guestMode
+    };
+    
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        role: user.role, 
-        oliviuus_id: user.oliviuus_id,
-        username: user.username,
-        account_type: identifierType,
-        guestMode: guestMode // Add guest mode flag to token
-      },
+      tokenPayload,
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
     
-    console.log('🔐 Token generated successfully');
+    console.log('🔐 Token generated (first 50 chars):', token.substring(0, 50) + '...');
+    console.log('🔐 Token full length:', token.length);
 
-    // 7️⃣ SET COOKIE WITH GUEST MODE SUPPORT ===========================
-    console.log('\n🍪 COOKIE SETUP ===========================');
+    // 7️⃣ **CRITICAL FIX: SAVE SESSION TO DATABASE FIRST**
+    console.log('\n💾 SAVING SESSION TO DATABASE (FIRST) ===============');
+    
+    // Calculate token expiration
+    const tokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    
+    // Clean any existing sessions for this device
+    await query(
+      `UPDATE user_session 
+       SET is_active = FALSE, logout_time = NOW() 
+       WHERE user_id = ? AND device_type = ? AND ip_address = ? AND is_active = TRUE`,
+      [user.id, device_type || 'desktop', ip_address]
+    );
+
+    // **SAVE SESSION TO DATABASE WITH THE EXACT TOKEN**
+    let sessionId;
+    try {
+      const insertResult = await query(
+        `INSERT INTO user_session 
+         (user_id, session_token, device_name, device_type, ip_address, 
+          user_agent, token_expires, is_guest_mode, login_time, last_activity)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+        [
+          user.id,
+          token, // ← EXACT TOKEN that will be in cookie
+          device_name || "Unknown",
+          device_type || "desktop",
+          ip_address,
+          user_agent || "Unknown",
+          tokenExpires,
+          guestMode ? 1 : 0
+        ]
+      );
+      
+      sessionId = insertResult.insertId;
+      console.log('✅ Session saved to database. Session ID:', sessionId);
+      console.log('✅ Token stored in DB (first 50 chars):', token.substring(0, 50) + '...');
+      
+      // **VERIFY** the session was saved correctly
+      const verifySession = await query(
+        `SELECT id, session_token, user_id, token_expires 
+         FROM user_session WHERE id = ?`,
+        [sessionId]
+      );
+      
+      if (verifySession.length > 0) {
+        const savedSession = verifySession[0];
+        console.log('✅ Session verification:', {
+          sessionId: savedSession.id,
+          userId: savedSession.user_id,
+          tokenInDBLength: savedSession.session_token.length,
+          tokenExpires: savedSession.token_expires,
+          tokensMatch: savedSession.session_token === token ? '✅ YES' : '❌ NO'
+        });
+        
+        if (savedSession.session_token !== token) {
+          console.error('❌ CRITICAL ERROR: Token mismatch between cookie and database!');
+          console.error('Cookie token (first 50):', token.substring(0, 50));
+          console.error('DB token (first 50):', savedSession.session_token.substring(0, 50));
+        }
+      }
+      
+    } catch (dbError) {
+      console.error('❌ Database error saving session:', dbError.message);
+      console.error('SQL Error details:', dbError.sqlMessage || 'No SQL message');
+      throw new Error('Failed to save session to database');
+    }
+
+    // 8️⃣ Set cookie - AFTER session is saved
+    console.log('\n🍪 SETTING COOKIE (AFTER DB SAVE) ===============');
     
     const isProduction = process.env.NODE_ENV === 'production';
-    console.log('🌍 Environment:', isProduction ? 'Production' : 'Development');
-    console.log('👤 Guest Mode:', guestMode ? 'Enabled (session cookie)' : 'Disabled (persistent cookie)');
+    const isLocalhost = req.headers.host && req.headers.host.includes('localhost');
     
-    // Get the origin from request
-    const origin = req.headers.origin || req.headers.referer;
-    console.log('🌐 Login request origin:', origin);
-    
-    // CRITICAL FIX: Use sameSite based on environment
-    // For localhost development: use 'lax' or 'strict'
-    // For production with HTTPS: use 'strict' or 'lax'
-    let sameSiteValue = 'lax'; // Default to 'lax'
-    
-    if (isProduction) {
-      sameSiteValue = 'strict'; // Production should use 'strict'
-    } else if (origin && origin.includes('localhost')) {
-      sameSiteValue = 'lax'; // Localhost works with 'lax'
-    }
-    
-    console.log(`🍪 Using sameSite: '${sameSiteValue}'`);
-
-    // Cookie options - Guest mode affects maxAge
     const cookieOptions = {
       httpOnly: true,
-      secure: isProduction, // false for localhost, true for production
-      sameSite: sameSiteValue, // 'lax' for localhost, 'strict' for production
+      secure: isProduction && !isLocalhost,
       path: '/',
+      sameSite: isProduction && !isLocalhost ? 'strict' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     };
-    
-    // Set maxAge based on guest mode
-    if (guestMode) {
-      // Session cookie (deleted when browser closes)
-      console.log('🍪 Setting session cookie (guest mode)');
-    } else {
-      // Persistent cookie (7 days)
-      cookieOptions.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-      console.log('🍪 Setting persistent cookie (7 days)');
-    }
-    
-    console.log("🍪 Cookie options:", cookieOptions);
-    
-    // Set the new cookie
-    console.log('🚀 Setting cookie...');
-    res.cookie("token", token, cookieOptions);
-    
-    // Verify the cookie was set
-    const setCookieHeader = res.getHeader('Set-Cookie');
-    console.log('📋 Set-Cookie Header in response:', setCookieHeader);
-    
-    // 8️⃣ Record session in user_session table with guest mode flag
-    console.log('\n💾 SAVING SESSION TO DATABASE ===========================');
-    await query(
-      `INSERT INTO user_session 
-       (user_id, session_token, device_name, device_type, ip_address, 
-        user_agent, token_expires, is_guest_mode)
-       VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), ?)`,
-      [
-        user.id,
-        token,
-        device_name || "Unknown",
-        device_type || "desktop",
-        ip_address,
-        user_agent || "Unknown",
-        guestMode ? 1 : 0
-      ]
-    );
-    console.log('✅ Session saved to database');
 
-    // 9️⃣ Update last login time
+    if (isProduction && !isLocalhost) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN || '.oliviuus.com';
+    }
+
+    console.log('🍪 Cookie options:', cookieOptions);
+    
+    // **SET THE COOKIE WITH THE EXACT SAME TOKEN**
+    res.cookie("token", token, cookieOptions);
+    console.log('✅ Cookie set with token (first 50 chars):', token.substring(0, 50) + '...');
+
+    // 9️⃣ **VERIFY** cookie was set
+    const setCookieHeader = res.getHeader('Set-Cookie');
+    if (setCookieHeader) {
+      console.log('✅ Set-Cookie header present in response');
+    } else {
+      console.warn('⚠️ Set-Cookie header not found in response');
+    }
+
+    // 🔟 Update user last login
     await query(
       "UPDATE users SET last_login_at = NOW(), last_active_at = NOW() WHERE id = ?",
       [user.id]
     );
 
-    // 🔟 Send success notification for new device/login
+    // 1️⃣1️⃣ Send success notification
     await handleSuccessfulLogin(user.id, identifier, ip_address, device_name, device_type, user_agent);
 
-    // FIXED: Use the redirectUrl from request body
+    // 1️⃣2️⃣ Return response with debugging info
     const finalRedirectUrl = redirectUrl || "/";
-    console.log('🔄 Redirect URL:', finalRedirectUrl);
 
-    // Return user info with guest mode indicator
     const userResponse = {
       success: true,
-      message: guestMode ? "Login successful (Guest Mode)" : "Login successful",
+      message: "Login successful",
       user: { 
         id: user.id, 
         oliviuus_id: user.oliviuus_id,
@@ -2919,19 +2894,28 @@ const loginUser = async (req, res) => {
         phone: user.phone,
         role: user.role,
         profile_avatar_url: user.profile_avatar_url,
-        global_account_tier: user.global_account_tier,
         first_name: user.first_name || '',
         last_name: user.last_name || '',
-        guestMode: guestMode // Add guest mode flag to response
+        email_verified: user.email_verified,
+        phone_verified: user.phone_verified
       },
-      token: token, // Return token in response for localStorage fallback
-      cookie_set: true,
-      cookie_type: guestMode ? "session" : "persistent",
+      session: {
+        id: sessionId,
+        saved_to_db: true,
+        cookie_set: true,
+        token_length: token.length,
+        expires_in: "7 days"
+      },
+      debug: {
+        token_in_cookie: true,
+        session_in_db: true,
+        cookie_name: 'token'
+      },
       redirectUrl: finalRedirectUrl
     };
 
     console.log('\n✅ LOGIN COMPLETE ===========================');
-    console.log('📤 Sending response with user data');
+    console.log('📤 Response sent for user:', user.username);
 
     return res.status(200).json(userResponse);
 
@@ -2942,7 +2926,8 @@ const loginUser = async (req, res) => {
     
     res.status(500).json({ 
       success: false,
-      error: "Something went wrong, please try again." 
+      error: "Something went wrong, please try again.",
+      error_code: 'SERVER_ERROR'
     });
   }
 };
@@ -2984,6 +2969,8 @@ const determineLoginIdentifier = (identifier) => {
 // Enhanced failed login handler
 const handleFailedLoginAttempt = async (userId, identifier, ip_address, device_name, device_type, reason) => {
   try {
+    console.log('⚠️ Handling failed login attempt:', { userId, reason });
+
     // Log the failed attempt
     await query(
       `INSERT INTO security_logs 
@@ -3015,26 +3002,30 @@ const handleFailedLoginAttempt = async (userId, identifier, ip_address, device_n
 
       if (recentFailures[0]?.count >= 5) {
         // Lock account for 15 minutes
+        const lockUntil = new Date(Date.now() + 15 * 60 * 1000);
         await query(
-          `UPDATE users SET is_locked = TRUE, account_lock_until = DATE_ADD(NOW(), INTERVAL 15 MINUTE)
+          `UPDATE users SET is_locked = TRUE, account_lock_until = ?
            WHERE id = ?`,
-          [userId]
+          [lockUntil, userId]
         );
 
         // Send notification to user
         await query(
           `INSERT INTO notifications 
-           (user_id, type, title, message, icon, priority, metadata)
+           (user_id, type, title, message, icon, priority, metadata, reference_type, reference_id)
            VALUES (?, 'security_alert', '🔒 Account Locked', 
-                  'Your account has been locked for 15 minutes due to too many failed login attempts.', 
-                  'shield-alert', 'high', ?)`,
+                  'Your account has been locked for 15 minutes due to too many failed login attempts. If this was not you, please reset your password.', 
+                  'shield-alert', 'high', ?, 'user', ?)`,
           [
             userId,
             JSON.stringify({
               ip_address: ip_address,
               lock_reason: 'too_many_failed_attempts',
-              lock_until: new Date(Date.now() + 15 * 60 * 1000).toISOString()
-            })
+              lock_until: lockUntil.toISOString(),
+              device_name: device_name,
+              timestamp: new Date().toISOString()
+            }),
+            userId
           ]
         );
       }
@@ -3048,6 +3039,8 @@ const handleFailedLoginAttempt = async (userId, identifier, ip_address, device_n
 // Enhanced successful login handler
 const handleSuccessfulLogin = async (userId, identifier, ip_address, device_name, device_type, user_agent) => {
   try {
+    console.log('✅ Handling successful login for user:', userId);
+
     // Check if this device has logged in before
     const existingSession = await query(
       `SELECT id FROM user_session 
@@ -3063,19 +3056,40 @@ const handleSuccessfulLogin = async (userId, identifier, ip_address, device_name
       // Send new device notification
       await query(
         `INSERT INTO notifications 
-         (user_id, type, title, message, icon, priority, metadata)
+         (user_id, type, title, message, icon, priority, metadata, reference_type, reference_id, action_url)
          VALUES (?, 'new_device_login', '📱 New Login Location', 
-                ?, 'devices', 'high', ?)`,
+                ?, 'devices', 'high', ?, 'user', ?, '/account/settings#sessions')`,
         [
           userId,
-          `Your account was just accessed from a new ${device_type || 'device'} (${device_name || 'Unknown Device'}) at ${ip_address}.`,
+          `Your account was just accessed from a new ${device_type || 'device'} (${device_name || 'Unknown Device'}) at ${ip_address}. If this wasn't you, please secure your account immediately.`,
           JSON.stringify({
             ip_address: ip_address,
             device_name: device_name || 'Unknown',
             device_type: device_type || 'desktop',
             timestamp: new Date().toISOString(),
             is_new_device: true
-          })
+          }),
+          userId
+        ]
+      );
+    } else {
+      // Send regular login notification
+      await query(
+        `INSERT INTO notifications 
+         (user_id, type, title, message, icon, priority, metadata, reference_type, reference_id)
+         VALUES (?, 'login_success', '✅ Login Successful', 
+                ?, 'check-circle', 'low', ?, 'user', ?)`,
+        [
+          userId,
+          `You've successfully logged in from your ${device_name || 'device'} (${device_type || 'desktop'}).`,
+          JSON.stringify({
+            ip_address: ip_address,
+            device_name: device_name || 'Unknown',
+            device_type: device_type || 'desktop',
+            timestamp: new Date().toISOString(),
+            is_new_device: false
+          }),
+          userId
         ]
       );
     }
@@ -3096,17 +3110,10 @@ const handleSuccessfulLogin = async (userId, identifier, ip_address, device_name
         JSON.stringify({
           identifier: identifier,
           new_device: isNewDevice,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          user_agent: user_agent?.substring(0, 200)
         })
       ]
-    );
-
-    // Clear failed attempts counter
-    await query(
-      `UPDATE users SET failed_login_attempts = 0, last_failed_login = NULL, 
-       account_lock_until = NULL, is_locked = FALSE
-       WHERE id = ?`,
-      [userId]
     );
 
   } catch (error) {

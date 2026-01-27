@@ -4219,6 +4219,10 @@ const getTopUsers = async (req, res) => {
           SELECT 
             u.id,
             u.email,
+            u.phone,
+            u.username,
+            u.first_name,
+            u.last_name,
             u.created_at,
             u.subscription_plan,
             COALESCE(SUM(
@@ -4280,7 +4284,7 @@ const getTopUsers = async (req, res) => {
           ) kp ON u.id = kp.user_id
           LEFT JOIN user_session us ON u.id = us.user_id AND ${dateFilter}
           WHERE u.is_active = TRUE
-          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          GROUP BY u.id, u.email, u.phone, u.username, u.first_name, u.last_name, u.created_at, u.subscription_plan
           ORDER BY total_watch_minutes DESC
           LIMIT ?
         `;
@@ -4292,6 +4296,10 @@ const getTopUsers = async (req, res) => {
           SELECT 
             u.id,
             u.email,
+            u.phone,
+            u.username,
+            u.first_name,
+            u.last_name,
             u.created_at,
             u.subscription_plan,
             COUNT(DISTINCT us.id) as total_sessions,
@@ -4339,7 +4347,7 @@ const getTopUsers = async (req, res) => {
             GROUP BY kp.parent_user_id
           ) kp ON u.id = kp.user_id
           WHERE u.is_active = TRUE
-          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          GROUP BY u.id, u.email, u.phone, u.username, u.first_name, u.last_name, u.created_at, u.subscription_plan
           ORDER BY total_sessions DESC
           LIMIT ?
         `;
@@ -4351,6 +4359,10 @@ const getTopUsers = async (req, res) => {
           SELECT 
             u.id,
             u.email,
+            u.phone,
+            u.username,
+            u.first_name,
+            u.last_name,
             u.created_at,
             u.subscription_plan,
             (
@@ -4404,7 +4416,7 @@ const getTopUsers = async (req, res) => {
             GROUP BY kp.parent_user_id
           ) kp ON u.id = kp.user_id
           WHERE u.is_active = TRUE
-          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          GROUP BY u.id, u.email, u.phone, u.username, u.first_name, u.last_name, u.created_at, u.subscription_plan
           ORDER BY total_subscription_value DESC
           LIMIT ?
         `;
@@ -4416,6 +4428,10 @@ const getTopUsers = async (req, res) => {
           SELECT 
             u.id,
             u.email,
+            u.phone,
+            u.username,
+            u.first_name,
+            u.last_name,
             u.created_at,
             u.subscription_plan,
             MAX(us.last_activity) as last_activity,
@@ -4459,7 +4475,7 @@ const getTopUsers = async (req, res) => {
             GROUP BY kp.parent_user_id
           ) kp ON u.id = kp.user_id
           WHERE u.is_active = TRUE
-          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          GROUP BY u.id, u.email, u.phone, u.username, u.first_name, u.last_name, u.created_at, u.subscription_plan
           ORDER BY last_activity DESC
           LIMIT ?
         `;
@@ -4471,6 +4487,10 @@ const getTopUsers = async (req, res) => {
           SELECT 
             u.id,
             u.email,
+            u.phone,
+            u.username,
+            u.first_name,
+            u.last_name,
             u.created_at,
             u.subscription_plan,
             (
@@ -4530,7 +4550,7 @@ const getTopUsers = async (req, res) => {
             GROUP BY kp.parent_user_id
           ) kp ON u.id = kp.user_id
           WHERE u.is_active = TRUE
-          GROUP BY u.id, u.email, u.created_at, u.subscription_plan
+          GROUP BY u.id, u.email, u.phone, u.username, u.first_name, u.last_name, u.created_at, u.subscription_plan
           ORDER BY total_unique_content DESC, total_viewing_sessions DESC
           LIMIT ?
         `;
@@ -4544,15 +4564,39 @@ const getTopUsers = async (req, res) => {
         });
     }
     
-    
     // FIXED: Properly call the query function
     const topUsers = await query(sqlQuery, params);
     
-    // Format the response
+    // Helper function to get user display name with null safety
+    const getUserDisplayName = (user) => {
+      if (!user) return 'User';
+      
+      // Priority: username > full name > email prefix > phone > fallback
+      if (user.username) return user.username;
+      
+      if (user.first_name) {
+        return `${user.first_name} ${user.last_name || ''}`.trim();
+      }
+      
+      if (user.email) {
+        return user.email.split('@')[0];
+      }
+      
+      if (user.phone) {
+        return `User (${user.phone.substring(user.phone.length - 4)})`;
+      }
+      
+      return 'User';
+    };
+    
+    // Format the response with null-safe user info
     const formattedUsers = topUsers.map(user => ({
       id: user.id,
       email: user.email,
-      username: user.email.split('@')[0],
+      phone: user.phone,
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
       created_at: user.created_at,
       subscription_plan: user.subscription_plan || 'none',
       total_watch_minutes: user.total_watch_minutes || 0,
@@ -4571,7 +4615,10 @@ const getTopUsers = async (req, res) => {
       last_activity: user.last_activity || user.created_at,
       latest_subscription_start: user.latest_subscription_start,
       subscription_status: user.subscription_status,
-      subscription_price: user.subscription_price
+      subscription_price: user.subscription_price,
+      // Add derived fields for frontend
+      display_name: getUserDisplayName(user),
+      primary_identifier: user.email || user.phone || user.username || 'No identifier'
     }));
     
     // Calculate overall stats
@@ -4747,6 +4794,10 @@ const getTopUsersSummary = async (req, res) => {
         SELECT 
           u.id,
           u.email,
+          u.phone,
+          u.username,
+          u.first_name,
+          u.last_name,
           COALESCE(SUM(
             CASE 
               WHEN cs.total_watch_time IS NOT NULL THEN cs.total_watch_time
@@ -4771,7 +4822,7 @@ const getTopUsersSummary = async (req, res) => {
           GROUP BY kp.parent_user_id
         ) kp ON u.id = kp.user_id
         WHERE u.is_active = TRUE
-        GROUP BY u.id, u.email
+        GROUP BY u.id, u.email, u.phone, u.username, u.first_name, u.last_name
         ORDER BY total_watch_minutes DESC
         LIMIT 5
       `),
@@ -4780,12 +4831,16 @@ const getTopUsersSummary = async (req, res) => {
         SELECT 
           u.id,
           u.email,
+          u.phone,
+          u.username,
+          u.first_name,
+          u.last_name,
           COUNT(DISTINCT us.id) as total_sessions
         FROM users u
         LEFT JOIN user_session us ON u.id = us.user_id 
           AND us.login_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         WHERE u.is_active = TRUE
-        GROUP BY u.id, u.email
+        GROUP BY u.id, u.email, u.phone, u.username, u.first_name, u.last_name
         ORDER BY total_sessions DESC
         LIMIT 5
       `),
@@ -4794,6 +4849,10 @@ const getTopUsersSummary = async (req, res) => {
         SELECT 
           u.id,
           u.email,
+          u.phone,
+          u.username,
+          u.first_name,
+          u.last_name,
           (
             SELECT COALESCE(SUM(s.price), 0)
             FROM user_subscriptions us2
@@ -4812,45 +4871,90 @@ const getTopUsersSummary = async (req, res) => {
         SELECT 
           u.id,
           u.email,
+          u.phone,
+          u.username,
+          u.first_name,
+          u.last_name,
           MAX(us.last_activity) as last_activity
         FROM users u
         LEFT JOIN user_session us ON u.id = us.user_id 
           AND us.last_activity >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
         WHERE u.is_active = TRUE
-        GROUP BY u.id, u.email
+        GROUP BY u.id, u.email, u.phone, u.username, u.first_name, u.last_name
         ORDER BY last_activity DESC
         LIMIT 5
       `)
     ]);
     
+    // Helper function to get user display name with null safety
+    const getUserDisplayName = (user) => {
+      if (!user) return 'User';
+      
+      // Priority: username > full name > email prefix > phone > fallback
+      if (user.username) return user.username;
+      
+      if (user.first_name) {
+        return `${user.first_name} ${user.last_name || ''}`.trim();
+      }
+      
+      if (user.email) {
+        return user.email.split('@')[0];
+      }
+      
+      if (user.phone) {
+        return `User (${user.phone.substring(user.phone.length - 4)})`;
+      }
+      
+      return 'User';
+    };
+    
+    // Process each category with null-safe display names
+    const processedSummary = {
+      top_by_watch_time: topByWatchTime.map(u => ({
+        id: u.id,
+        email: u.email,
+        phone: u.phone,
+        username: u.username,
+        first_name: u.first_name,
+        last_name: u.last_name,
+        display_name: getUserDisplayName(u),
+        total_watch_minutes: u.total_watch_minutes || 0
+      })),
+      top_by_sessions: topBySessions.map(u => ({
+        id: u.id,
+        email: u.email,
+        phone: u.phone,
+        username: u.username,
+        first_name: u.first_name,
+        last_name: u.last_name,
+        display_name: getUserDisplayName(u),
+        total_sessions: u.total_sessions || 0
+      })),
+      top_by_subscription: topBySubscription.map(u => ({
+        id: u.id,
+        email: u.email,
+        phone: u.phone,
+        username: u.username,
+        first_name: u.first_name,
+        last_name: u.last_name,
+        display_name: getUserDisplayName(u),
+        total_subscription_value: u.total_subscription_value || 0
+      })),
+      recent_active: recentActive.map(u => ({
+        id: u.id,
+        email: u.email,
+        phone: u.phone,
+        username: u.username,
+        first_name: u.first_name,
+        last_name: u.last_name,
+        display_name: getUserDisplayName(u),
+        last_activity: u.last_activity
+      }))
+    };
+    
     res.status(200).json({
       success: true,
-      summary: {
-        top_by_watch_time: topByWatchTime.map(u => ({
-          id: u.id,
-          email: u.email,
-          username: u.email.split('@')[0],
-          total_watch_minutes: u.total_watch_minutes || 0
-        })),
-        top_by_sessions: topBySessions.map(u => ({
-          id: u.id,
-          email: u.email,
-          username: u.email.split('@')[0],
-          total_sessions: u.total_sessions || 0
-        })),
-        top_by_subscription: topBySubscription.map(u => ({
-          id: u.id,
-          email: u.email,
-          username: u.email.split('@')[0],
-          total_subscription_value: u.total_subscription_value || 0
-        })),
-        recent_active: recentActive.map(u => ({
-          id: u.id,
-          email: u.email,
-          username: u.email.split('@')[0],
-          last_activity: u.last_activity
-        }))
-      }
+      summary: processedSummary
     });
     
   } catch (err) {
@@ -4861,7 +4965,6 @@ const getTopUsersSummary = async (req, res) => {
     });
   }
 };
-
 
 
 module.exports = {

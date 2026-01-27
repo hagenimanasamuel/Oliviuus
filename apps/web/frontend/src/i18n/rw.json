@@ -615,6 +615,39 @@
     "fullLibrary": "Uburenganzira bwo kubona ibintu byose biri kuri Oliviuus",
     "prioritySupport": "Ubufasha bwihutirwa",
     "parentalControls": "Igenzura ry'ababyeyi ku mutekano w'umuryango",
+    "freePlans": {
+      "header": "Ifatabuguzi z'Ubuntu",
+      "checking": "Turimo kugenzura Ifatabuguzi z'ubuntu...",
+      "activePlan": "Ifatabuguzi y'Ubuntu ikoreshwa",
+      "availablePlans": "Ifatabuguzi z'Ubuntu ziboneka",
+      "availablePlansCount": "Hari Ifatabuguzi z'ubuntu {{count}} ziboneka",
+      "noPlans": "Nta Ifatabuguzi z'ubuntu ziboneka",
+      "clickToView": "Kanda urebe",
+      "loading": "Turimo gutegura Ifatabuguzi z'ubuntu...",
+      "loadingError": "Habaye ikibazo mu gutegura Ifatabuguzi z'ubuntu",
+      "networkError": "Ikibazo cya murandasi",
+      "alreadyActive": "Usanzwe ufite Ifatabuguzi y'ubuntu ikoreshwa",
+      "checkBackLater": "Garuka nyuma urebe niba hari amatangazo mashya",
+      "yourActivePlan": "Ifatabuguzi yawe y'Ubuntu ikoreshwa",
+      "activate": "Yifungure",
+      "activateSuccess": "Ifatabuguzi y'ubuntu yifunguwe neza!",
+      "activationError": "Habaye ikibazo mu gufungura Ifatabuguzi y'ubuntu. Ongera ugerageze.",
+      "viewAllDetails": "Reba ibisobanuro byose n'amabwiriza",
+      "planInfo": "{{name}} • iminsi {{days}}",
+      "timeRemaining": "hasigaye {{time}}",
+      "trialBadge": "Igerageza",
+      "expires": "Irarangira",
+      "invalidDate": "Itariki itari yo",
+      "expired": "Yarangiye",
+      "timeFormats": {
+        "months": "amezi {{count}}",
+        "weeks": "ibyumweru {{count}}",
+        "days": "iminsi {{count}}",
+        "hours": "amasaha {{count}}",
+        "minutes": "iminota {{count}}",
+        "lessThanMinute": "Munsi y'umunota"
+      }
+    },
     "quality": {
       "SD": "SD (480p)",
       "HD": "HD (720p)",
@@ -1840,7 +1873,8 @@
       "close": "Funga",
       "goBack": "Subira Inyuma",
       "tryAgain": "Ongera Ugerageze",
-      "copied": "Byakoporowe!"
+      "copied": "Byakoporowe!",
+      "refresh": "Ongera Uvugurure"
     },
     "video": "Video"
   },
@@ -5868,7 +5902,69 @@
     "addNewPlan": "Ongeramo Ifatabuguzi Nshya",
     "supportDescription": "Ufite ikibazo kuri abonema yawe? Turi hano kugufasha.",
     "subscriptionSupport": "Ubufasha bwa Abonema",
-    "subscriptionSupportDescription": "Ukeneye ubufasha kuri abonema yawe? Twandikire ku bwishyu, guhindura Ifatabuguzi, cyangwa ibindi bibazo."
+    "subscriptionSupportDescription": "Ukeneye ubufasha kuri abonema yawe? Twandikire ku bwishyu, guhindura Ifatabuguzi, cyangwa ibindi bibazo.",
+    "noSubscription": {
+      "title": "Nta Fatabuguzi Rihari",
+      "description": "Tangira Ugure Ifatabuguzi kuri Oliviuus kugira ngo ubone ibirimo n'ibikorwa byihariye."
+    },
+
+    "expired": {
+      "title": "Kwiyandikisha Byarangiye",
+      "description": "Kwiyandikisha kwawe byarangiye. Ongera wiyandikishe kugira ngo ukomeze kwishimira ibiranga Premium."
+    },
+
+    "cancelled": {
+      "title": "Ifatabuguzi Ryahagaritswe",
+      "description": "Ifatabuguzi ryawe ryahagaritswe.",
+      "descriptionWithDate": "Ifatabuguzi Ryawe ryahagaritswe ku wa {{date}}.",
+      "details": "Ibisobanuro by'ifatabuguzi Byahagaritswe"
+    },
+
+    "cancelledDetails": "Ibisobanuro by'ifatabuguzi Byahagaritswe",
+    "accessUntil": "Uzakomeza Kugera Kugeza Ku wa",
+
+    "scheduled": {
+      "description": "Gahunda yawe izatangira mu minsi {{days}} ku wa {{date}}",
+      "support": "Ufite ikibazo ku ifatabuguzi Ryawe? Vugana n'itsinda ryacu rishinzwe ubufasha."
+    },
+
+    "scheduleDetails": "Ibisobanuro by'Itangira",
+    "endedOn": "Byarangiye Ku wa",
+    "lastPayment": "Kwishyura Kwa Nyuma",
+
+    "trial": {
+      "description": "Ubu uri mu igerageza ry'ubuntu. Vugurura kugira ngo ukomeze nyuma y’uko risoze.",
+      "ends": "Igerageza Rirangira"
+    },
+
+    "gracePeriod": {
+      "description": "Kwishyura kwawe kwakererewe. Nyamuneka vugurura uburyo bwo kwishyura kugira ngo wirinde guhagarikirwa serivisi."
+    },
+
+    "active": {
+      "description": "Ifatabuguzi ryawe rirakora kandi riri ku murongo."
+    },
+
+    "benefits": {
+      "title": "Ibyiza Ryo Kugura Ifatabuguzi",
+      "hdQuality": "Ubwiza bwa HD & 4K Ultra HD",
+      "multipleDevices": "Rebera ku bikoresho byinshi",
+      "offlineDownloads": "Kuramo urebere nta interineti",
+      "noAds": "Kureba nta matangazo"
+    },
+
+    "getStarted": "Tangira",
+    "renewNow": "Ongera Uyivugurure Ubu",
+    "startNewPlan": "Tangira Gahunda Nshya",
+
+    "timeRemaining": "Igihe Gisigaye",
+
+    "checkingStatus": "Turimo kugenzura uko Ifatabuguzi rihagaze...",
+
+    "includedFeatures": "Ibiranga Bikubiyemo",
+
+    "questions": "Ufite Ibibazo?",
+    "scheduledSupport": "Ufite ikibazo ku Ifatabuguzi ryawe? Vugana n'itsinda ryacu rishinzwe ubufasha."
   },
   "planChangeModal": {
     "title": "Zamura Ifatabuguzi Yawe",

@@ -615,6 +615,39 @@
     "fullLibrary": "Pata maktaba yote ya maudhui",
     "prioritySupport": "Usaidizi wa wateja wa kipaumbele",
     "parentalControls": "Udhibiti wa wazazi kwa usalama wa familia",
+    "freePlans": {
+      "header": "Mipango ya Bure",
+      "checking": "Inakagua mipango ya bure...",
+      "activePlan": "Mpango wa Bure Unaotumika",
+      "availablePlans": "Mipango ya Bure Inayopatikana",
+      "availablePlansCount": "Mipango ya bure {{count}} inapatikana",
+      "noPlans": "Hakuna mipango ya bure inayopatikana",
+      "clickToView": "Bofya kuangalia",
+      "loading": "Inapakia mipango ya bure...",
+      "loadingError": "Hitilafu katika kupakia mipango ya bure",
+      "networkError": "Hitilafu ya mtandao",
+      "alreadyActive": "Tayari una mpango wa bure unaotumika",
+      "checkBackLater": "Rudi baadaye kwa ofa mpya",
+      "yourActivePlan": "Mpango wako wa Bure Unaotumika",
+      "activate": "Washa",
+      "activateSuccess": "Mpango wa bure umewezeshwa kikamilifu!",
+      "activationError": "Hitilafu katika kuwezesha mpango wa bure. Tafadhali jaribu tena.",
+      "viewAllDetails": "Tazama maelezo yote na masharti",
+      "planInfo": "{{name}} • siku {{days}}",
+      "timeRemaining": "imebaki {{time}}",
+      "trialBadge": "Jaribio",
+      "expires": "Inaisha",
+      "invalidDate": "Tarehe si sahihi",
+      "expired": "Imeisha muda",
+      "timeFormats": {
+        "months": "mwezi {{count}}",
+        "weeks": "wiki {{count}}",
+        "days": "siku {{count}}",
+        "hours": "saa {{count}}",
+        "minutes": "dakika {{count}}",
+        "lessThanMinute": "Chini ya dakika moja"
+      }
+    },
     "quality": {
       "SD": "SD (480p)",
       "HD": "HD (720p)",
@@ -1839,7 +1872,8 @@
       "close": "Funga",
       "goBack": "Rudi Nyuma",
       "tryAgain": "Jaribu Tena",
-      "copied": "Imenakiliwa!"
+      "copied": "Imenakiliwa!",
+      "refresh": "Sasisha"
     },
     "video": "Video"
   },
@@ -5762,7 +5796,69 @@
     "addNewPlan": "Ongeza Mpango Mpya",
     "supportDescription": "Una matatizo na usajili wako? Tuko hapa kusaidia.",
     "subscriptionSupport": "Msaada wa Usajili",
-    "subscriptionSupportDescription": "Unahitaji msaada kuhusu usajili wako? Wasiliana na timu yetu kwa maswali ya malipo, kubadilisha mpango au mengineyo."
+    "subscriptionSupportDescription": "Unahitaji msaada kuhusu usajili wako? Wasiliana na timu yetu kwa maswali ya malipo, kubadilisha mpango au mengineyo.",
+    "noSubscription": {
+      "title": "Hakuna Usajili Unaotumika",
+      "description": "Anza na Oliviuus Premium ili upate maudhui na vipengele vya kipekee."
+    },
+
+    "expired": {
+      "title": "Usajili Umeisha",
+      "description": "Usajili wako umeisha. Fanya upya ili uendelee kufurahia vipengele vya Premium."
+    },
+
+    "cancelled": {
+      "title": "Usajili Umeghairiwa",
+      "description": "Usajili wako umeghairiwa.",
+      "descriptionWithDate": "Usajili wako ulighairiwa tarehe {{date}}.",
+      "details": "Maelezo ya Usajili Ulioghairiwa"
+    },
+
+    "cancelledDetails": "Maelezo ya Usajili Ulioghairiwa",
+    "accessUntil": "Upatikanaji Hadi",
+
+    "scheduled": {
+      "description": "Mpango wako utaanza baada ya siku {{days}} tarehe {{date}}",
+      "support": "Una maswali kuhusu usajili wako uliopangwa? Wasiliana na timu yetu ya msaada."
+    },
+
+    "scheduleDetails": "Maelezo ya Ratiba",
+    "endedOn": "Uliisha Tarehe",
+    "lastPayment": "Malipo ya Mwisho",
+
+    "trial": {
+      "description": "Kwa sasa uko kwenye majaribio ya bure. Boresha ili uendelee baada ya majaribio kuisha.",
+      "ends": "Majaribio Yanaisha"
+    },
+
+    "gracePeriod": {
+      "description": "Malipo yako yamechelewa. Tafadhali sasisha njia yako ya malipo ili kuepuka kukatika kwa huduma."
+    },
+
+    "active": {
+      "description": "Usajili wako unafanya kazi na uko sawa."
+    },
+
+    "benefits": {
+      "title": "Faida za Kujisajili",
+      "hdQuality": "Ubora wa HD & 4K Ultra HD",
+      "multipleDevices": "Tazama kwenye vifaa vingi",
+      "offlineDownloads": "Pakua kutazama bila intaneti",
+      "noAds": "Utiririshaji bila matangazo"
+    },
+
+    "getStarted": "Anza",
+    "renewNow": "Fanya Upya Sasa",
+    "startNewPlan": "Anza Mpango Mpya",
+
+    "timeRemaining": "Muda Uliobaki",
+
+    "checkingStatus": "Inakagua hali ya usajili...",
+
+    "includedFeatures": "Vipengele Vilivyojumuishwa",
+
+    "questions": "Una Maswali?",
+    "scheduledSupport": "Una maswali kuhusu usajili wako uliopangwa? Wasiliana na timu yetu ya msaada."
   },
   "planChangeModal": {
     "title": "Boresha Mpango Wako",

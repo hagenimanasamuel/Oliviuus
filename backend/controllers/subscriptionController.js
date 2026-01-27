@@ -1008,18 +1008,14 @@ const getSubscriptionPlans = async (req, res) => {
     let plans;
 
     try {
-      // Try to use display_order if it exists
       plans = await query(`
         SELECT * FROM subscriptions 
-        WHERE is_active = true 
-        ORDER BY display_order ASC
+        ORDER BY display_order ASC, price ASC
       `);
     } catch (orderError) {
-      // If display_order doesn't exist, fall back to id ordering
       if (orderError.code === 'ER_BAD_FIELD_ERROR') {
         plans = await query(`
           SELECT * FROM subscriptions 
-          WHERE is_active = true 
           ORDER BY id ASC
         `);
       } else {
@@ -1037,12 +1033,60 @@ const getSubscriptionPlans = async (req, res) => {
       });
     }
 
-    // Parse JSON fields
+    // Parse JSON fields and ensure all fields are included
     const parsedPlans = plans.map(plan => ({
-      ...plan,
+      id: plan.id,
+      name: plan.name,
+      type: plan.type,
+      price: plan.price,
+      original_price: plan.original_price,
+      description: plan.description,
+      tagline: plan.tagline,
+      currency: plan.currency,
+      
+      // Device and session limits
+      max_sessions: plan.max_sessions,
+      max_devices_registered: plan.max_devices_registered,
+      
+      // Content features
+      video_quality: plan.video_quality,
+      max_video_bitrate: plan.max_video_bitrate,
+      hdr_support: Boolean(plan.hdr_support),
+      offline_downloads: Boolean(plan.offline_downloads),
+      max_downloads: plan.max_downloads,
+      download_quality: plan.download_quality,
+      download_expiry_days: plan.download_expiry_days,
+      simultaneous_downloads: plan.simultaneous_downloads,
+      
+      // Premium features
+      early_access: Boolean(plan.early_access),
+      exclusive_content: Boolean(plan.exclusive_content),
+      parental_controls: Boolean(plan.parental_controls),
+      
+      // Family plan
+      is_family_plan: Boolean(plan.is_family_plan),
+      max_family_members: plan.max_family_members,
+      
+      // User limits
+      max_profiles: plan.max_profiles,
+      
+      // JSON fields with safe parsing
       devices_allowed: plan.devices_allowed ? JSON.parse(plan.devices_allowed) : [],
       supported_platforms: plan.supported_platforms ? JSON.parse(plan.supported_platforms) : [],
-      content_restrictions: plan.content_restrictions ? JSON.parse(plan.content_restrictions) : []
+      content_restrictions: plan.content_restrictions ? JSON.parse(plan.content_restrictions) : [],
+      
+      // Display settings
+      display_order: plan.display_order,
+      is_popular: Boolean(plan.is_popular),
+      is_featured: Boolean(plan.is_featured),
+      
+      // Status
+      is_active: Boolean(plan.is_active),
+      is_visible: Boolean(plan.is_visible),
+      
+      // Timestamps
+      created_at: plan.created_at,
+      updated_at: plan.updated_at
     }));
 
     res.status(200).json({
@@ -1076,12 +1120,51 @@ const getSubscriptionPlanById = async (req, res) => {
     }
 
     const plan = plans[0];
-    // Parse JSON fields
+    // Parse JSON fields with safe parsing
     const parsedPlan = {
-      ...plan,
+      id: plan.id,
+      name: plan.name,
+      type: plan.type,
+      price: plan.price,
+      original_price: plan.original_price,
+      description: plan.description,
+      tagline: plan.tagline,
+      currency: plan.currency,
+      
+      max_sessions: plan.max_sessions,
+      max_devices_registered: plan.max_devices_registered,
+      
+      video_quality: plan.video_quality,
+      max_video_bitrate: plan.max_video_bitrate,
+      hdr_support: Boolean(plan.hdr_support),
+      offline_downloads: Boolean(plan.offline_downloads),
+      max_downloads: plan.max_downloads,
+      download_quality: plan.download_quality,
+      download_expiry_days: plan.download_expiry_days,
+      simultaneous_downloads: plan.simultaneous_downloads,
+      
+      early_access: Boolean(plan.early_access),
+      exclusive_content: Boolean(plan.exclusive_content),
+      parental_controls: Boolean(plan.parental_controls),
+      
+      is_family_plan: Boolean(plan.is_family_plan),
+      max_family_members: plan.max_family_members,
+      
+      max_profiles: plan.max_profiles,
+      
       devices_allowed: plan.devices_allowed ? JSON.parse(plan.devices_allowed) : [],
       supported_platforms: plan.supported_platforms ? JSON.parse(plan.supported_platforms) : [],
-      content_restrictions: plan.content_restrictions ? JSON.parse(plan.content_restrictions) : []
+      content_restrictions: plan.content_restrictions ? JSON.parse(plan.content_restrictions) : [],
+      
+      display_order: plan.display_order,
+      is_popular: Boolean(plan.is_popular),
+      is_featured: Boolean(plan.is_featured),
+      
+      is_active: Boolean(plan.is_active),
+      is_visible: Boolean(plan.is_visible),
+      
+      created_at: plan.created_at,
+      updated_at: plan.updated_at
     };
 
     res.status(200).json({
@@ -1114,14 +1197,39 @@ const updateSubscriptionPlan = async (req, res) => {
       });
     }
 
-    // Build dynamic update query
+    // Build dynamic update query - COMPLETE list of all subscription table fields
     const allowedFields = [
-      'name', 'type', 'price', 'original_price', 'description', 'tagline', 'currency',
-      'devices_allowed', 'max_sessions', 'max_devices_registered', 'supported_platforms',
-      'video_quality', 'max_video_bitrate', 'hdr_support', 'offline_downloads', 'max_downloads',
-      'download_quality', 'download_expiry_days', 'simultaneous_downloads', 'early_access',
-      'exclusive_content', 'content_restrictions', 'max_profiles', 'parental_controls',
-      'display_order', 'is_popular', 'is_featured', 'is_active', 'is_visible'
+      // Basic information
+      'name', 'type', 'description', 'tagline',
+      
+      // Pricing
+      'price', 'original_price', 'currency',
+      
+      // Device and session limits
+      'max_sessions', 'max_devices_registered',
+      
+      // Content features
+      'video_quality', 'max_video_bitrate', 'hdr_support',
+      'offline_downloads', 'max_downloads', 'download_quality',
+      'download_expiry_days', 'simultaneous_downloads',
+      
+      // Premium features
+      'early_access', 'exclusive_content', 'parental_controls',
+      
+      // Family plan specific
+      'is_family_plan', 'max_family_members',
+      
+      // User limits
+      'max_profiles',
+      
+      // JSON fields
+      'devices_allowed', 'supported_platforms', 'content_restrictions',
+      
+      // Display settings
+      'display_order', 'is_popular', 'is_featured',
+      
+      // Status
+      'is_active', 'is_visible'
     ];
 
     const updateFields = [];
@@ -1133,9 +1241,40 @@ const updateSubscriptionPlan = async (req, res) => {
 
         // Handle JSON fields
         if (['devices_allowed', 'supported_platforms', 'content_restrictions'].includes(key)) {
-          updateValues.push(JSON.stringify(updateData[key]));
-        } else {
-          updateValues.push(updateData[key]);
+          // Ensure we store valid JSON
+          try {
+            // If it's already a string, parse and re-stringify to ensure it's valid
+            if (typeof updateData[key] === 'string') {
+              const parsed = JSON.parse(updateData[key]);
+              updateValues.push(JSON.stringify(parsed));
+            } else if (Array.isArray(updateData[key])) {
+              updateValues.push(JSON.stringify(updateData[key]));
+            } else {
+              updateValues.push(JSON.stringify([]));
+            }
+          } catch (err) {
+            console.error(`Error processing JSON field ${key}:`, err);
+            updateValues.push(JSON.stringify([]));
+          }
+        } 
+        // Handle boolean fields
+        else if (['is_active', 'is_visible', 'is_popular', 'is_featured', 'is_family_plan', 
+                  'offline_downloads', 'hdr_support', 'early_access', 'exclusive_content', 
+                  'parental_controls'].includes(key)) {
+          updateValues.push(updateData[key] ? 1 : 0);
+        }
+        // Handle number fields
+        else if (['price', 'original_price', 'max_sessions', 'max_devices_registered', 
+                  'max_video_bitrate', 'max_downloads', 'simultaneous_downloads', 
+                  'download_expiry_days', 'max_family_members', 'max_profiles', 
+                  'display_order'].includes(key)) {
+          const value = updateData[key] === null || updateData[key] === undefined ? 
+                       (key === 'original_price' ? null : 0) : Number(updateData[key]);
+          updateValues.push(value);
+        }
+        // Handle string fields
+        else {
+          updateValues.push(updateData[key] || '');
         }
       }
     });
@@ -1153,9 +1292,21 @@ const updateSubscriptionPlan = async (req, res) => {
 
     await query(sql, updateValues);
 
+    // Get the updated plan to return
+    const updatedPlan = await query('SELECT * FROM subscriptions WHERE id = ?', [planId]);
+    
+    // Parse JSON fields for response
+    const parsedPlan = {
+      ...updatedPlan[0],
+      devices_allowed: updatedPlan[0].devices_allowed ? JSON.parse(updatedPlan[0].devices_allowed) : [],
+      supported_platforms: updatedPlan[0].supported_platforms ? JSON.parse(updatedPlan[0].supported_platforms) : [],
+      content_restrictions: updatedPlan[0].content_restrictions ? JSON.parse(updatedPlan[0].content_restrictions) : []
+    };
+
     res.status(200).json({
       success: true,
-      message: 'Subscription plan updated successfully'
+      message: 'Subscription plan updated successfully',
+      data: parsedPlan
     });
 
   } catch (error) {

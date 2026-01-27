@@ -1,15 +1,23 @@
 User-agent: *
 Allow: /
-Allow: /index.html
-Allow: /*.js
-Allow: /*.css
 
-# Sitemap
-Sitemap: https://oliviuus.pages.dev/sitemap.xml
-
-# Crawl delay (optional)
-Crawl-delay: 1
-
-# Disallow admin pages (if any)
+# Block private / logged-in / internal areas
 Disallow: /admin
-Disallow: /private
+Disallow: /account
+Disallow: /library
+Disallow: /downloads
+Disallow: /history
+Disallow: /my-list
+Disallow: /tv
+Disallow: /movies
+Disallow: /new
+Disallow: /browse
+Disallow: /profile
+Disallow: /search
+Disallow: /watch
+Disallow: /subscription
+Disallow: /payment
+Disallow: /sample
+
+# Sitemap location
+Sitemap: https://oliviuus.com/sitemap.xml

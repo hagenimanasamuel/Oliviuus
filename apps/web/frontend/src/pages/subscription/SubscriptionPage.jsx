@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Helmet } from "react-helmet";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Gift, Clock, CheckCircle, XCircle, AlertCircle, RefreshCw, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 
 // Components
 import SubscriptionHeader from "../../components/subscription/SubscriptionHeader.jsx";
@@ -16,6 +17,17 @@ const SubscriptionPage = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { currentSubscription, getTimeRemaining } = useSubscription();
+  
+  // Free Plans State
+  const [availablePlans, setAvailablePlans] = useState([]);
+  const [userActivePlans, setUserActivePlans] = useState([]);
+  const [freePlansLoading, setFreePlansLoading] = useState(false);
+  const [showFreePlansExpanded, setShowFreePlansExpanded] = useState(false);
+  const [freePlansError, setFreePlansError] = useState(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const freePlansRef = useRef();
+
+  // Subscription Plans State
   const [loading, setLoading] = useState(false);
   const [plansLoading, setPlansLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,24 +41,229 @@ const SubscriptionPage = () => {
   const scrollContainerRef = useRef(null);
   const helpSupportRef = useRef(null);
 
+  // Debug logging helper
+  const logDebug = useCallback((message, data = null, type = 'info') => {
+    const timestamp = new Date().toISOString();
+    console.log(`[FREE-PLANS][${timestamp}] ${type.toUpperCase()}: ${message}`, data || '');
+  }, []);
+
   // Get current language
   const currentLang = i18n.language;
 
   // ==================== SUBSCRIPTION ACCESS CHECK ====================
-  // Check if user has active subscription and redirect
   useEffect(() => {
     if (currentSubscription && currentSubscription.real_time_status === 'active') {
-      // User has active subscription, redirect to home
       navigate("/", { replace: true });
     }
   }, [currentSubscription, navigate]);
 
-  // If user has active subscription, show redirect immediately
   if (currentSubscription && currentSubscription.real_time_status === 'active') {
     return <Navigate to="/" replace />;
   }
 
-  // ==================== REST OF YOUR ORIGINAL CODE ====================
+  // ==================== FREE PLANS FUNCTIONALITIES ====================
+  
+  // Fetch user's active free plans
+  const fetchUserActivePlans = useCallback(async () => {
+    try {
+      logDebug('Fetching user active plans...');
+      const response = await api.get('/admin/subscriptions/free-plans/user/active');
+
+      if (response.data.success) {
+        const activePlans = response.data.data || [];
+        logDebug(`User has ${activePlans.length} active free plans`);
+        setUserActivePlans(activePlans);
+      } else {
+        logDebug('No active plans found');
+        setUserActivePlans([]);
+      }
+    } catch (error) {
+      logDebug('Error fetching user active plans', error.message);
+      setUserActivePlans([]);
+    }
+  }, [logDebug]);
+
+  // Fetch eligible free plans
+  const fetchAvailableFreePlans = useCallback(async () => {
+    try {
+      setFreePlansLoading(true);
+      setFreePlansError(null);
+      
+      logDebug('Fetching available free plans...');
+      const response = await api.get('/admin/subscriptions/free-plans/eligible');
+
+      if (response.data.success) {
+        let plansData = [];
+        
+        if (response.data.available_schedules && Array.isArray(response.data.available_schedules)) {
+          plansData = response.data.available_schedules;
+        } 
+        else if (response.data.data && response.data.data.available_schedules && Array.isArray(response.data.data.available_schedules)) {
+          plansData = response.data.data.available_schedules;
+        }
+        else if (response.data.data && Array.isArray(response.data.data)) {
+          plansData = response.data.data;
+        }
+        else if (Array.isArray(response.data)) {
+          plansData = response.data;
+        }
+        
+        logDebug(`Found ${plansData.length} available free plans`);
+        setAvailablePlans(plansData);
+        setFreePlansError(null);
+        
+        // Auto-expand if there are available plans
+        if (plansData.length > 0) {
+          setShowFreePlansExpanded(true);
+        }
+      } else {
+        logDebug('No free plans available');
+        setFreePlansError(response.data.message || t('subscriptionPage.freePlans.noPlans'));
+        setAvailablePlans([]);
+      }
+    } catch (error) {
+      logDebug('Error fetching free plans', error.message);
+      setFreePlansError(error.response?.data?.message || error.message || t('subscriptionPage.freePlans.networkError'));
+      setAvailablePlans([]);
+    } finally {
+      setFreePlansLoading(false);
+    }
+  }, [logDebug, t]);
+
+  // Initial data fetch
+  useEffect(() => {
+    let isMounted = true;
+    
+    const initFreePlans = async () => {
+      if (!isMounted) return;
+      
+      logDebug('Initializing free plans...');
+      try {
+        await Promise.all([
+          fetchAvailableFreePlans(),
+          fetchUserActivePlans()
+        ]);
+      } catch (error) {
+        logDebug('Initialization error', error);
+      } finally {
+        if (isMounted) {
+          setHasInitialized(true);
+        }
+      }
+    };
+
+    initFreePlans();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchAvailableFreePlans, fetchUserActivePlans, logDebug]);
+
+  // Activate a free plan
+  const activateFreePlan = async (scheduleId, planName) => {
+    try {
+      logDebug(`Activating free plan: ${planName}`);
+      
+      const response = await api.post(`/admin/subscriptions/free-plans/${scheduleId}/activate`);
+      
+      if (response.data.success) {
+        // Show success notification
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg z-50 animate-slideIn';
+        notification.innerHTML = `
+          <div class="flex items-center gap-2">
+            <CheckCircle class="w-5 h-5" />
+            <span>${response.data.message || t('subscriptionPage.freePlans.activateSuccess')}</span>
+          </div>
+        `;
+        document.body.appendChild(notification);
+        
+        // Auto-remove notification after 2 seconds
+        setTimeout(() => {
+          notification.classList.add('animate-slideOut');
+          setTimeout(() => notification.remove(), 300);
+        }, 2000);
+        
+        // Wait for notification to show, then redirect
+        setTimeout(() => {
+          // Redirect to home page
+          navigate("/", { replace: true });
+        }, 1500);
+        
+      } else {
+        alert(response.data.message || t('subscriptionPage.freePlans.activationError'));
+      }
+    } catch (error) {
+      logDebug('Activation error', error);
+      alert(error.response?.data?.message || t('subscriptionPage.freePlans.activationError'));
+    }
+  };
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
+
+  // Format time remaining
+  const formatTimeRemaining = (endDate) => {
+    try {
+      if (!endDate) return 'N/A';
+      
+      const now = new Date();
+      const end = new Date(endDate);
+      
+      if (isNaN(end.getTime())) return t('subscriptionPage.freePlans.invalidDate');
+      
+      const diffMs = end - now;
+      
+      if (diffMs <= 0) return t('subscriptionPage.freePlans.expired');
+      
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (diffDays > 30) {
+        const months = Math.floor(diffDays / 30);
+        return t('subscriptionPage.freePlans.timeFormats.months', { count: months });
+      } else if (diffDays > 7) {
+        const weeks = Math.floor(diffDays / 7);
+        return t('subscriptionPage.freePlans.timeFormats.weeks', { count: weeks });
+      } else if (diffDays > 0) {
+        return t('subscriptionPage.freePlans.timeFormats.days', { count: diffDays });
+      } else if (diffHours > 0) {
+        return t('subscriptionPage.freePlans.timeFormats.hours', { count: diffHours });
+      } else if (diffMinutes > 0) {
+        return t('subscriptionPage.freePlans.timeFormats.minutes', { count: diffMinutes });
+      } else {
+        return t('subscriptionPage.freePlans.timeFormats.lessThanMinute');
+      }
+    } catch (error) {
+      return 'N/A';
+    }
+  };
+
+  // Check if user has active free plan
+  const hasActiveFreePlan = userActivePlans.length > 0;
+
+  // Check if we should show free plans section at all
+  const shouldShowFreePlansSection = () => {
+    if (!hasInitialized && freePlansLoading) return true; // Show loading state
+    if (freePlansError && availablePlans.length === 0) return false; // Hide on error with no plans
+    if (availablePlans.length > 0) return true; // Show if we have plans
+    if (hasActiveFreePlan) return true; // Show if user has active plan
+    return false; // Otherwise hide
+  };
+
+  // ==================== SUBSCRIPTION PLANS FUNCTIONALITIES ====================
   
   // SEO content based on language
   const seoContent = {
@@ -148,7 +365,6 @@ const SubscriptionPage = () => {
         const response = await api.get("/subscriptions/public");
 
         if (response.data.success && response.data.data && response.data.data.length > 0) {
-          // Use backend plans directly - add gradient and ensure all fields are present
           const backendPlans = response.data.data.map(backendPlan => {
             return {
               ...backendPlan,
@@ -172,11 +388,11 @@ const SubscriptionPage = () => {
           setPlans(backendPlans);
           setShowCurrency(true);
         } else {
-          setError(t('subscriptionPage.fetchError', 'No subscription plans available at the moment.'));
+          setError(t('subscriptionPage.fetchError'));
           setPlans([]);
         }
       } catch (err) {
-        setError(t('subscriptionPage.fetchError', 'Failed to load subscription plans. Please try again.'));
+        setError(t('subscriptionPage.fetchError'));
         setPlans([]);
       } finally {
         setPlansLoading(false);
@@ -257,7 +473,7 @@ const SubscriptionPage = () => {
       });
 
     } catch (err) {
-      setError(t('subscriptionPage.selectError', 'Failed to select plan. Please try again.'));
+      setError(t('subscriptionPage.selectError'));
     } finally {
       setLoading(false);
     }
@@ -285,7 +501,7 @@ const SubscriptionPage = () => {
           <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-16 border-4 border-[#BC8BBC] border-t-transparent rounded-full animate-spin"></div>
             <p className="text-white text-lg text-center">
-              {t('subscriptionPage.loading', 'Loading subscription plans...')}
+              {t('subscriptionPage.loading')}
             </p>
           </div>
         </div>
@@ -293,21 +509,51 @@ const SubscriptionPage = () => {
     );
   }
 
+  // Add CSS animations for notifications
+  const NotificationStyles = () => (
+    <style>{`
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+      
+      .animate-slideIn {
+        animation: slideIn 0.3s ease-out forwards;
+      }
+      
+      .animate-slideOut {
+        animation: slideOut 0.3s ease-in forwards;
+      }
+    `}</style>
+  );
+
   return (
     <>
       <Helmet>
-        {/* Basic Meta Tags */}
         <title>{currentSeo.title}</title>
         <meta name="description" content={currentSeo.description} />
         <meta name="keywords" content={currentSeo.keywords} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta httpEquiv="Content-Language" content={currentLang} />
-
-        {/* Allow indexing */}
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
-
-        {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://oliviuus.com/subscription" />
         <meta property="og:title" content={currentSeo.ogTitle} />
@@ -318,22 +564,14 @@ const SubscriptionPage = () => {
         <meta property="og:image:alt" content="Oliviuus Subscription Plans" />
         <meta property="og:site_name" content="Oliviuus" />
         <meta property="og:locale" content={currentLang} />
-
-        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@oliviuus_rw" />
         <meta name="twitter:creator" content="@oliviuus_rw" />
         <meta name="twitter:title" content={currentSeo.ogTitle} />
         <meta name="twitter:description" content={currentSeo.ogDescription} />
         <meta name="twitter:image" content="https://oliviuus.com/subscription-twitter-image.jpg" />
-
-        {/* Canonical URL */}
         <link rel="canonical" href="https://oliviuus.com/subscription" />
-
-        {/* Language Alternates */}
         <link rel="alternate" href="https://oliviuus.com/subscription" hreflang="x-default" />
-
-        {/* Structured Data for Subscription Page */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -347,73 +585,11 @@ const SubscriptionPage = () => {
               "name": "Oliviuus",
               "url": "https://oliviuus.com",
               "description": "Streaming platform for Rwandan and international content"
-            },
-            "breadcrumb": {
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                {
-                  "@type": "ListItem",
-                  "position": 1,
-                  "name": "Home",
-                  "item": "https://oliviuus.com"
-                },
-                {
-                  "@type": "ListItem",
-                  "position": 2,
-                  "name": currentLang === 'rw' ? 'Amagenzura' : 'Subscription',
-                  "item": "https://oliviuus.com/subscription"
-                }
-              ]
-            },
-            "about": {
-              "@type": "Service",
-              "name": "Video Streaming Service",
-              "serviceType": "Video on demand",
-              "provider": {
-                "@type": "Organization",
-                "name": "Oliviuus"
-              },
-              "areaServed": "Rwanda, East Africa",
-              "audience": {
-                "@type": "PeopleAudience",
-                "suggestedMinAge": 13
-              }
             }
           })}
         </script>
-
-        {/* Structured Data for Subscription Plans */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            "itemListElement": plans.map((plan, index) => ({
-              "@type": "ListItem",
-              "position": index + 1,
-              "item": {
-                "@type": "Product",
-                "name": plan.name,
-                "description": plan.description || `Oliviuus ${plan.name} plan`,
-                "offers": {
-                  "@type": "Offer",
-                  "price": plan.price,
-                  "priceCurrency": "RWF",
-                  "availability": "https://schema.org/InStock",
-                  "validFrom": "2024-01-01T00:00:00+00:00"
-                },
-                "brand": {
-                  "@type": "Brand",
-                  "name": "Oliviuus"
-                },
-                "audience": {
-                  "@type": "PeopleAudience",
-                  "suggestedMinAge": 13
-                }
-              }
-            }))
-          })}
-        </script>
       </Helmet>
+      <NotificationStyles />
 
       <div className="min-h-screen bg-gray-900 flex flex-col">
         <SubscriptionHeader
@@ -423,7 +599,7 @@ const SubscriptionPage = () => {
         />
 
         <main className="flex-1 flex flex-col items-center py-4 sm:py-6 lg:py-8 px-3 sm:px-4 lg:px-6">
-          {/* Pending Subscription Banner - Only shows if there's a future plan */}
+          {/* Pending Subscription Banner */}
           {hasPendingSubscription && pendingInfo && (
             <div className="w-full max-w-4xl mb-6 sm:mb-8 px-2">
               <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-4 sm:p-6 text-center">
@@ -450,21 +626,184 @@ const SubscriptionPage = () => {
             </div>
           )}
 
+          {/* ==================== FREE PLANS SECTION (Compact Header) ==================== */}
+          {shouldShowFreePlansSection() && (
+            <div className="w-full max-w-4xl mb-4 sm:mb-6 px-2" ref={freePlansRef}>
+              {/* Compact Header - Always Visible */}
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setShowFreePlansExpanded(!showFreePlansExpanded)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                    showFreePlansExpanded 
+                      ? 'bg-gradient-to-r from-purple-900/30 to-[#BC8BBC]/20 border border-purple-700/50' 
+                      : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {freePlansLoading ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-purple-500"></div>
+                    ) : hasActiveFreePlan ? (
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                    ) : availablePlans.length > 0 ? (
+                      <Sparkles className="w-4 h-4 text-yellow-400" />
+                    ) : (
+                      <Gift className="w-4 h-4 text-purple-400" />
+                    )}
+                    <span className="text-sm font-medium text-white">
+                      {freePlansLoading 
+                        ? t('subscriptionPage.freePlans.checking')
+                        : hasActiveFreePlan 
+                          ? t('subscriptionPage.freePlans.activePlan')
+                          : availablePlans.length > 0 
+                            ? t('subscriptionPage.freePlans.availablePlansCount', { 
+                                count: availablePlans.length,
+                                s: availablePlans.length !== 1 ? 's' : ''
+                              })
+                            : t('subscriptionPage.freePlans.header')}
+                    </span>
+                  </div>
+                  <div className="text-gray-400">
+                    {showFreePlansExpanded ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </div>
+                </button>
+
+                {!freePlansLoading && availablePlans.length > 0 && !showFreePlansExpanded && (
+                  <div className="flex items-center gap-2">
+                    <div className="text-xs text-gray-400">
+                      {t('subscriptionPage.freePlans.clickToView')}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Expanded Content - Only shown when expanded */}
+              {showFreePlansExpanded && (
+                <div className="mt-3 bg-gradient-to-r from-purple-900/10 to-[#BC8BBC]/5 border border-purple-700/30 rounded-xl p-4 sm:p-5 transition-all duration-200">
+                  {freePlansLoading ? (
+                    <div className="py-4 flex flex-col items-center justify-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-purple-500 mb-2"></div>
+                      <p className="text-gray-400 text-sm">{t('subscriptionPage.freePlans.loading')}</p>
+                    </div>
+                  ) : freePlansError ? (
+                    <div className="py-4 text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <AlertCircle className="w-5 h-5 text-red-400" />
+                        <p className="text-gray-400 text-sm">
+                          {freePlansError}
+                        </p>
+                      </div>
+                    </div>
+                  ) : availablePlans.length === 0 ? (
+                    <div className="py-4 text-center">
+                      <Gift className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+                      <p className="text-gray-400 text-sm">
+                        {hasActiveFreePlan 
+                          ? t('subscriptionPage.freePlans.alreadyActive')
+                          : t('subscriptionPage.freePlans.noPlans')}
+                      </p>
+                      {hasActiveFreePlan && (
+                        <div className="mt-3 pt-3 border-t border-gray-700/50">
+                          <p className="text-gray-500 text-xs">
+                            {t('subscriptionPage.freePlans.checkBackLater')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      {/* User's Active Free Plans */}
+                      {hasActiveFreePlan && (
+                        <div className="mb-4 pb-4 border-b border-gray-700/50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <CheckCircle className="w-4 h-4 text-green-400" />
+                            <h4 className="text-green-300 font-medium text-sm">
+                              {t('subscriptionPage.freePlans.yourActivePlan')}
+                            </h4>
+                          </div>
+                          {userActivePlans.map((plan, index) => (
+                            <div key={index} className="ml-6 text-xs text-gray-400">
+                              {t('subscriptionPage.freePlans.planInfo', {
+                                name: plan.plan_name || 'Free Plan',
+                                days: formatTimeRemaining(plan.expires_at)
+                              })}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Available Free Plans */}
+                      <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                        {availablePlans.map((plan) => (
+                          <div
+                            key={plan.id || plan.schedule_id}
+                            className="bg-gray-800/40 border border-gray-700/50 rounded-lg p-3 hover:bg-gray-800/60 transition-colors"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start gap-2 mb-2">
+                                  <h4 className="text-white font-medium text-sm truncate">
+                                    {plan.schedule_name || plan.name || 'Free Plan'}
+                                  </h4>
+                                  {plan.is_trial && (
+                                    <span className="flex-shrink-0 bg-blue-900/30 text-blue-300 text-xs px-2 py-0.5 rounded-full">
+                                      {t('subscriptionPage.freePlans.trialBadge')}
+                                    </span>
+                                  )}
+                                </div>
+                                
+                                <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+                                  <span>{plan.plan_name || 'Premium Plan'}</span>
+                                  <span className="text-gray-600">•</span>
+                                  <span>{plan.duration_days || plan.plan_duration_days || 7} {t('subscriptionPage.freePlans.timeFormats.days', { count: plan.duration_days || plan.plan_duration_days || 7 })}</span>
+                                </div>
+                                
+                                {(plan.ends_at || plan.end_date) && (
+                                  <div className="flex items-center text-xs text-gray-500">
+                                    <Clock className="w-3 h-3 mr-1" />
+                                    {t('subscriptionPage.freePlans.timeRemaining', { time: formatTimeRemaining(plan.ends_at || plan.end_date) })}
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <button
+                                onClick={() => activateFreePlan(plan.id, plan.schedule_name || plan.name)}
+                                disabled={freePlansLoading}
+                                className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {t('subscriptionPage.freePlans.activate')}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ==================== SUBSCRIPTION PLANS SECTION ==================== */}
           <div className="text-center mb-8 sm:mb-10 lg:mb-12 w-full max-w-4xl px-2">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-3 sm:mb-4 leading-tight">
-              {t('subscriptionPage.title', 'Choose Your Plan')}
+              {t('subscriptionPage.title')}
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-gray-300 mb-6 sm:mb-8 leading-relaxed px-2">
-              {t('subscriptionPage.subtitle', 'Unlimited streaming. No commitments. Cancel anytime.')}
+              {t('subscriptionPage.subtitle')}
             </p>
 
             {showCurrency && plans.length > 0 && (
               <div className="bg-gray-800/80 rounded-lg sm:rounded-xl p-3 sm:p-4 inline-block border border-gray-700 max-w-full">
                 <p className="text-gray-300 text-xs sm:text-sm text-center">
-                  {t('subscriptionPage.pricesIn', 'Prices in')} <span className="text-[#BC8BBC] font-semibold">{currencySymbols[currency]}</span>
+                  {t('subscriptionPage.pricesIn')} <span className="text-[#BC8BBC] font-semibold">{currencySymbols[currency]}</span>
                   {currency !== "RWF" && (
                     <span className="text-gray-400 text-xs ml-1 sm:ml-2 block sm:inline mt-1 sm:mt-0">
-                      ({t('subscriptionPage.convertedFromRWF', 'converted from RWF')})
+                      ({t('subscriptionPage.convertedFromRWF')})
                     </span>
                   )}
                 </p>
@@ -487,20 +826,20 @@ const SubscriptionPage = () => {
           <div className="w-full max-w-4xl mb-6 px-2">
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 text-center">
               <p className="text-gray-300 text-sm mb-3">
-                {t('subscriptionPage.helpSection.title', 'Having issues with your subscription?')}
+                {t('subscriptionPage.helpSection.title')}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={() => navigate('/account/settings#subscription')}
                   className="bg-[#BC8BBC] hover:bg-[#a56ba5] text-white py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200"
                 >
-                  {t('subscriptionPage.helpSection.checkStatus', 'Check Your Subscription Status')}
+                  {t('subscriptionPage.helpSection.checkStatus')}
                 </button>
                 <button
                   onClick={scrollToHelp}
                   className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200"
                 >
-                  {t('subscriptionPage.helpSection.contactSupport', 'Contact Support Team')}
+                  {t('subscriptionPage.helpSection.contactSupport')}
                 </button>
               </div>
             </div>
@@ -557,13 +896,6 @@ const SubscriptionPage = () => {
                     </svg>
                   </button>
                 )}
-
-                {/* Scroll indicator dots */}
-                <div className="flex justify-center space-x-2 mt-4 lg:hidden">
-                  {plans.map((_, index) => (
-                    <div key={index} className="w-2 h-2 bg-gray-600 rounded-full transition-all duration-200"></div>
-                  ))}
-                </div>
               </div>
 
               {/* Tablet and Desktop: Grid layout */}
@@ -594,10 +926,10 @@ const SubscriptionPage = () => {
                 </svg>
               </div>
               <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-2">
-                {t('subscriptionPage.noPlans', 'No Plans Available')}
+                {t('subscriptionPage.noPlans')}
               </h3>
               <p className="text-gray-400 text-sm sm:text-base max-w-md mx-auto">
-                {t('subscriptionPage.checkBackLater', 'Please check back later for available subscription plans.')}
+                {t('subscriptionPage.checkBackLater')}
               </p>
             </div>
           )}

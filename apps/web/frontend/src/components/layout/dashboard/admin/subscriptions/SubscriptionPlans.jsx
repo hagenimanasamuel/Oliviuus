@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Edit3, ToggleLeft, ToggleRight, Eye, EyeOff, Star, 
   X, CheckCircle, AlertCircle, Plus, Search, Filter,
-  Monitor, Download, Users, Crown, Zap, CreditCard
+  Monitor, Download, Users, Crown, Zap, CreditCard,
+  ChevronDown, ChevronUp
 } from "lucide-react";
 import clsx from "clsx";
 import api from "../../../../../api/axios";
 
-// Lazy-loaded modal components
 const PlanDetailsModal = React.lazy(() => import("./PlanDetailsModal"));
 
 export default function SubscriptionPlans() {
@@ -18,6 +18,7 @@ export default function SubscriptionPlans() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expandedPlanId, setExpandedPlanId] = useState(null);
 
   useEffect(() => {
     fetchPlans();
@@ -118,10 +119,15 @@ export default function SubscriptionPlans() {
     handleCloseModal();
   };
 
+  const toggleExpandPlan = (planId) => {
+    setExpandedPlanId(expandedPlanId === planId ? null : planId);
+  };
+
   // Filter plans based on search and filter criteria
   const filteredPlans = plans.filter(plan => {
     const matchesSearch = plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         plan.tagline.toLowerCase().includes(searchTerm.toLowerCase());
+                         (plan.tagline && plan.tagline.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                         (plan.description && plan.description.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesFilter = filterStatus === "all" ||
                          (filterStatus === "active" && plan.is_active) ||
@@ -139,6 +145,7 @@ export default function SubscriptionPlans() {
     if (name.includes('premium') || name.includes('pro')) return Zap;
     if (name.includes('family')) return Users;
     if (name.includes('ultimate') || name.includes('enterprise')) return Crown;
+    if (name.includes('free')) return CreditCard;
     return CreditCard;
   };
 
@@ -149,6 +156,7 @@ export default function SubscriptionPlans() {
     if (name.includes('premium') || name.includes('pro')) return 'from-purple-500 to-pink-500';
     if (name.includes('family')) return 'from-orange-500 to-red-500';
     if (name.includes('ultimate')) return 'from-yellow-500 to-orange-500';
+    if (name.includes('free')) return 'from-gray-400 to-gray-600';
     return 'from-gray-500 to-gray-700';
   };
 
@@ -170,21 +178,18 @@ export default function SubscriptionPlans() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Subscription Plans</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Manage and configure your subscription plans
+            Manage and configure all subscription plans from the database
           </p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-[#BC8BBC] text-white rounded-lg hover:bg-[#9b69b2] transition-colors font-medium">
-          <Plus size={18} />
-          Create New Plan
-        </button>
       </div>
 
       {/* Search and Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search plans..."
+            placeholder="Search plans by name, tagline, or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#BC8BBC] focus:border-transparent"
@@ -203,10 +208,6 @@ export default function SubscriptionPlans() {
             <option value="visible">Visible</option>
             <option value="hidden">Hidden</option>
           </select>
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-            <Filter size={18} />
-            Filters
-          </button>
         </div>
       </div>
 
@@ -234,7 +235,7 @@ export default function SubscriptionPlans() {
             <div
               key={plan.id}
               className={clsx(
-                "bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]",
+                "bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl",
                 plan.is_popular 
                   ? 'border-[#BC8BBC] ring-2 ring-[#BC8BBC]/20' 
                   : 'border-gray-200 dark:border-gray-700',
@@ -242,10 +243,13 @@ export default function SubscriptionPlans() {
               )}
             >
               {/* Plan Header with Gradient */}
-              <div className={clsx(
-                "p-6 rounded-t-xl text-white relative overflow-hidden",
-                plan.is_popular ? 'bg-gradient-to-r from-[#BC8BBC] to-purple-600' : `bg-gradient-to-r ${planColor}`
-              )}>
+              <div 
+                className={clsx(
+                  "p-6 rounded-t-xl text-white relative overflow-hidden cursor-pointer",
+                  plan.is_popular ? 'bg-gradient-to-r from-[#BC8BBC] to-purple-600' : `bg-gradient-to-r ${planColor}`
+                )}
+                onClick={() => toggleExpandPlan(plan.id)}
+              >
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
@@ -257,17 +261,27 @@ export default function SubscriptionPlans() {
                         <p className="text-white/80 text-sm">{plan.tagline}</p>
                       </div>
                     </div>
-                    {plan.is_popular && (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-white/20 rounded-full text-xs font-medium backdrop-blur-sm">
-                        <Star size={12} />
-                        Popular
-                      </span>
-                    )}
+                    <div className="flex gap-1">
+                      {plan.is_popular && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-white/20 rounded-full text-xs font-medium backdrop-blur-sm">
+                          <Star size={12} />
+                          Popular
+                        </span>
+                      )}
+                      <button className="text-white/80 hover:text-white">
+                        {expandedPlanId === plan.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="flex items-baseline">
-                    <span className="text-3xl font-bold">FRw {plan.price.toLocaleString()}</span>
-                    <span className="ml-2 text-white/80">/month</span>
+                    <span className="text-3xl font-bold">
+                      {plan.price === 0 ? 'Free' : `FRw ${plan.price.toLocaleString()}`}
+                    </span>
+                    {plan.price > 0 && <span className="ml-2 text-white/80">/month</span>}
+                  </div>
+                  <div className="mt-2 text-sm text-white/80">
+                    Type: <span className="font-semibold capitalize">{plan.type}</span>
                   </div>
                 </div>
                 
@@ -275,52 +289,50 @@ export default function SubscriptionPlans() {
                 <div className="absolute inset-0 bg-black/10"></div>
               </div>
 
-              {/* Plan Features */}
-              <div className="p-6 space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <Monitor size={16} />
-                      Devices
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {plan.max_sessions} simultaneous
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <Zap size={16} />
-                      Quality
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-white capitalize">
-                      {plan.video_quality}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <Download size={16} />
-                      Downloads
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {plan.max_downloads === -1 ? 'Unlimited' : plan.max_downloads}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <Users size={16} />
-                      Profiles
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {plan.max_profiles}
-                    </span>
+              {/* Expanded Details */}
+              {expandedPlanId === plan.id && (
+                <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Max Sessions:</span>
+                      <span className="font-semibold">{plan.max_sessions}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Max Profiles:</span>
+                      <span className="font-semibold">{plan.max_profiles}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Max Downloads:</span>
+                      <span className="font-semibold">
+                        {plan.max_downloads === -1 ? 'Unlimited' : plan.max_downloads}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Video Quality:</span>
+                      <span className="font-semibold capitalize">{plan.video_quality}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Simultaneous Downloads:</span>
+                      <span className="font-semibold">{plan.simultaneous_downloads}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Offline Downloads:</span>
+                      <span className="font-semibold">{plan.offline_downloads ? 'Yes' : 'No'}</span>
+                    </div>
+                    {plan.devices_allowed && Array.isArray(plan.devices_allowed) && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Devices:</span>
+                        <span className="font-semibold">{plan.devices_allowed.join(', ')}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
+              )}
 
+              {/* Plan Features & Actions */}
+              <div className="p-6 space-y-4">
                 {/* Status Badges */}
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-wrap gap-2">
                   <span className={clsx(
                     "inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
                     plan.is_active 
@@ -340,6 +352,20 @@ export default function SubscriptionPlans() {
                     {plan.is_visible ? <Eye size={12} /> : <EyeOff size={12} />}
                     {plan.is_visible ? 'Visible' : 'Hidden'}
                   </span>
+                  
+                  {plan.is_family_plan && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full text-xs font-medium">
+                      <Users size={12} />
+                      Family Plan
+                    </span>
+                  )}
+                  
+                  {plan.is_featured && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full text-xs font-medium">
+                      <Star size={12} />
+                      Featured
+                    </span>
+                  )}
                 </div>
 
                 {/* Action Buttons */}
@@ -351,7 +377,7 @@ export default function SubscriptionPlans() {
                       "w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
                       plan.is_popular
                         ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     )}
                   >
                     <Star size={16} />
@@ -369,7 +395,7 @@ export default function SubscriptionPlans() {
                       )}
                     >
                       {plan.is_visible ? <Eye size={16} /> : <EyeOff size={16} />}
-                      <span className="hidden sm:inline">{plan.is_visible ? 'Hide' : 'Show'}</span>
+                      {plan.is_visible ? 'Hide' : 'Show'}
                     </button>
 
                     <button
@@ -382,16 +408,16 @@ export default function SubscriptionPlans() {
                       )}
                     >
                       {plan.is_active ? <ToggleLeft size={16} /> : <ToggleRight size={16} />}
-                      <span className="hidden sm:inline">{plan.is_active ? 'Deactivate' : 'Activate'}</span>
+                      {plan.is_active ? 'Deactivate' : 'Activate'}
                     </button>
                   </div>
 
                   <button 
                     onClick={() => handleEditPlan(plan)}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#BC8BBC] text-white rounded-lg text-sm font-medium hover:bg-[#9b69b2] transition-all hover:scale-105"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#BC8BBC] text-white rounded-lg text-sm font-medium hover:bg-[#9b69b2] transition-all"
                   >
                     <Edit3 size={16} />
-                    Edit Plan
+                    Edit Plan Details
                   </button>
                 </div>
               </div>

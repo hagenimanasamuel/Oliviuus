@@ -661,6 +661,39 @@
     "fullLibrary": "Access to entire content library",
     "prioritySupport": "Priority customer support",
     "parentalControls": "Parental controls for family safety",
+    "freePlans": {
+      "header": "Free Plans",
+      "checking": "Checking for free plans...",
+      "activePlan": "Active Free Plan",
+      "availablePlans": "Free Plans Available",
+      "availablePlansCount": "{{count}} Free Plan{{s}} Available",
+      "noPlans": "No free plans available",
+      "clickToView": "Click to view",
+      "loading": "Loading free plans...",
+      "loadingError": "Error loading free plans",
+      "networkError": "Network error",
+      "alreadyActive": "You already have an active free plan",
+      "checkBackLater": "Check back later for new offers",
+      "yourActivePlan": "Your Active Free Plan",
+      "activate": "Activate",
+      "activateSuccess": "Free plan activated successfully!",
+      "activationError": "Error activating free plan. Please try again.",
+      "viewAllDetails": "View all details & terms",
+      "planInfo": "{{name}} • {{days}} day{{s}}",
+      "timeRemaining": "{{time}} left",
+      "trialBadge": "Trial",
+      "expires": "Expires",
+      "invalidDate": "Invalid date",
+      "expired": "Expired",
+      "timeFormats": {
+        "months": "{{count}} month{{s}}",
+        "weeks": "{{count}} week{{s}}",
+        "days": "{{count}} day{{s}}",
+        "hours": "{{count}} hour{{s}}",
+        "minutes": "{{count}} minute{{s}}",
+        "lessThanMinute": "Less than a minute"
+      }
+    },
     "quality": {
       "SD": "SD (480p)",
       "HD": "HD (720p)",
@@ -1901,7 +1934,8 @@
       "close": "Close",
       "goBack": "Go Back",
       "tryAgain": "Try Again",
-      "copied": "Copied!"
+      "copied": "Copied!",
+      "refresh": "Refresh"
     },
     "video": "Video"
   },
@@ -5731,7 +5765,55 @@
     "addNewPlan": "Add New Plan",
     "supportDescription": "Having issues with your subscription? Our support team is here to help.",
     "subscriptionSupport": "Subscription Support",
-    "subscriptionSupportDescription": "Need help with your subscription? Contact our support team for assistance with billing, plan changes, or any other questions."
+    "subscriptionSupportDescription": "Need help with your subscription? Contact our support team for assistance with billing, plan changes, or any other questions.",
+    "noSubscription": {
+      "title": "No Active Subscription",
+      "description": "Get started with Oliviuus Premium to access exclusive content and features."
+    },
+    "expired": {
+      "title": "Subscription Expired",
+      "description": "Your subscription has ended. Renew to continue enjoying premium features."
+    },
+    "cancelled": {
+      "title": "Subscription Cancelled",
+      "description": "Your subscription has been cancelled.",
+      "descriptionWithDate": "Your subscription was cancelled on {{date}}.",
+      "details": "Cancelled Subscription Details"
+    },
+    "cancelledDetails": "Cancelled Subscription Details",
+    "accessUntil": "Access Until",
+    "scheduled": {
+      "description": "Your plan will start in {{days}} days on {{date}}",
+      "support": "Questions about your scheduled subscription? Contact our support team."
+    },
+    "scheduleDetails": "Schedule Details",
+    "endedOn": "Ended On",
+    "lastPayment": "Last Payment",
+    "trial": {
+      "description": "You're currently on a free trial. Upgrade to continue after trial ends.",
+      "ends": "Trial Ends"
+    },
+    "gracePeriod": {
+      "description": "Your payment is overdue. Please update your payment method to avoid service interruption."
+    },
+    "active": {
+      "description": "Your subscription is active and in good standing."
+    },
+    "benefits": {
+      "title": "Benefits of Subscribing",
+      "hdQuality": "HD & 4K Ultra HD quality",
+      "multipleDevices": "Watch on multiple devices",
+      "offlineDownloads": "Download for offline viewing",
+      "noAds": "Ad-free streaming experience"
+    },
+    "getStarted": "Get Started",
+    "renewNow": "Renew Now",
+    "startNewPlan": "Start New Plan",
+    "timeRemaining": "Time Remaining",
+    "checkingStatus": "Checking subscription status...",
+    "includedFeatures": "Included Features",
+    "questions": "Have Questions?",
+    "scheduledSupport": "Questions about your scheduled subscription? Contact our support team."
   },
   "history": {
     "title": "History",

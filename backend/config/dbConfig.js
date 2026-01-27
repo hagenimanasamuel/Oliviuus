@@ -218,7 +218,7 @@ const sql = `
   CREATE TABLE IF NOT EXISTS user_session (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    session_token VARCHAR(255) NOT NULL,
+    session_token VARCHAR(1024) NOT NULL,
     device_name VARCHAR(100),
     device_type ENUM('mobile','desktop','tablet') DEFAULT 'desktop',
     ip_address VARCHAR(45),
@@ -3194,6 +3194,138 @@ const createLiveEventsTable = async () => {
   }
 };
 
+const createFreePlanSchedulesTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS free_plan_schedules (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      
+      -- Schedule Configuration
+      schedule_name VARCHAR(255) NOT NULL,
+      description TEXT,
+      schedule_type ENUM('one_time', 'recurring', 'manual', 'event_based', 'public_offer') NOT NULL DEFAULT 'public_offer',
+      
+      -- Target Configuration
+      target_plan_id INT NOT NULL,
+      target_user_type ENUM('all_new_users', 'existing_users', 'specific_users', 'user_segment', 'all_users', 'eligible_users') DEFAULT 'eligible_users',
+      target_user_ids JSON DEFAULT NULL, -- For specific users [1, 2, 3]
+      user_segment_criteria JSON DEFAULT NULL, -- {age_range: [18-25], last_login_days: 30}
+      
+      -- Timing Configuration
+      start_date DATETIME NOT NULL,
+      end_date DATETIME DEFAULT NULL,
+      recurrence_pattern ENUM('daily', 'weekly', 'monthly', 'yearly', 'on_specific_date') DEFAULT NULL,
+      recurrence_value JSON DEFAULT NULL, -- For custom recurrence {days_of_week: [1, 3, 5], months: [12]}
+      
+      -- Plan Configuration
+      plan_duration_days INT NOT NULL DEFAULT 7,
+      is_trial BOOLEAN DEFAULT TRUE,
+      auto_upgrade_to_paid BOOLEAN DEFAULT FALSE,
+      upgrade_plan_id INT DEFAULT NULL,
+      
+      -- Status & Control
+      status ENUM('scheduled', 'active', 'paused', 'completed', 'cancelled') DEFAULT 'active',
+      is_active BOOLEAN DEFAULT TRUE,
+      max_activations INT DEFAULT NULL, -- NULL = unlimited
+      current_activations INT DEFAULT 0,
+      
+      -- Execution Tracking
+      last_executed_at DATETIME DEFAULT NULL,
+      next_execution_at DATETIME DEFAULT NULL,
+      execution_count INT DEFAULT 0,
+      
+      -- Access Restrictions
+      allowed_devices JSON DEFAULT NULL,
+      allowed_regions JSON DEFAULT NULL,
+      blocked_countries JSON DEFAULT NULL,
+      
+      -- Terms and Instructions (NEW COLUMNS)
+      terms_and_conditions TEXT DEFAULT NULL,
+      redemption_instructions TEXT DEFAULT NULL,
+      
+      -- Metadata
+      created_by INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      activated_at DATETIME DEFAULT NULL,
+      completed_at DATETIME DEFAULT NULL,
+      
+      -- Foreign keys
+      FOREIGN KEY (target_plan_id) REFERENCES subscriptions(id) ON DELETE CASCADE,
+      FOREIGN KEY (upgrade_plan_id) REFERENCES subscriptions(id) ON DELETE SET NULL,
+      FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+      
+      -- Indexes
+      INDEX idx_schedule_status (status),
+      INDEX idx_schedule_type (schedule_type),
+      INDEX idx_schedule_dates (start_date, end_date),
+      INDEX idx_schedule_next_execution (next_execution_at),
+      INDEX idx_schedule_created_by (created_by),
+      INDEX idx_schedule_target_plan (target_plan_id),
+      INDEX idx_schedule_is_active (is_active),
+      INDEX idx_schedule_created_at (created_at)
+    );
+  `;
+
+  try {
+    await query(sql);
+    console.log("✅ free_plan_schedules table created/updated");
+    
+    // Also create a table for tracking individual activations
+    const sqlActivations = `
+      CREATE TABLE IF NOT EXISTS free_plan_activations (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        schedule_id INT NULL,
+        user_id INT NOT NULL,
+        subscription_id INT DEFAULT NULL, -- Reference to created user_subscription
+        plan_id INT NOT NULL,
+        
+        -- Activation details
+        activation_type ENUM('scheduled', 'manual', 'referral', 'promotion', 'event', 'user_activated') NOT NULL,
+        activated_at DATETIME NOT NULL,
+        expires_at DATETIME NOT NULL,
+        is_active BOOLEAN DEFAULT TRUE,
+        
+        -- Tracking
+        activated_by INT DEFAULT NULL, -- Admin who manually activated
+        deactivated_at DATETIME DEFAULT NULL,
+        deactivation_reason VARCHAR(255) DEFAULT NULL,
+        
+        -- Usage tracking
+        devices_used JSON DEFAULT NULL,
+        platforms_used JSON DEFAULT NULL,
+        watch_time_minutes INT DEFAULT 0,
+        
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        
+        -- Foreign keys
+        FOREIGN KEY (schedule_id) REFERENCES free_plan_schedules(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (plan_id) REFERENCES subscriptions(id) ON DELETE CASCADE,
+        FOREIGN KEY (subscription_id) REFERENCES user_subscriptions(id) ON DELETE SET NULL,
+        FOREIGN KEY (activated_by) REFERENCES users(id) ON DELETE SET NULL,
+        
+        -- Indexes
+        INDEX idx_activations_user (user_id),
+        INDEX idx_activations_schedule (schedule_id),
+        INDEX idx_activations_plan (plan_id),
+        INDEX idx_activations_dates (activated_at, expires_at),
+        INDEX idx_activations_active (is_active),
+        INDEX idx_activations_type (activation_type),
+        INDEX idx_activations_expires (expires_at),
+        INDEX idx_activations_created (created_at),
+        UNIQUE KEY unique_user_active_schedule (user_id, schedule_id, is_active)
+      );
+    `;
+    
+    await query(sqlActivations);
+    console.log("✅ free_plan_activations table created/updated");
+    
+  } catch (err) {
+    console.error("❌ Error creating free plan tables:", err);
+  }
+};
+
 
 const initializeDatabase = async () => {
   try {
@@ -3265,6 +3397,7 @@ const initializeDatabase = async () => {
     // ====================
     console.log("🎮 Phase 9: Creating game tables...");
     await createGameTables(); // References users and kids_profiles
+    await createFreePlanSchedulesTable();
     
     // ====================
     // PHASE 10: ROLE FEATURES
