@@ -30,7 +30,7 @@ import { useAuth } from '../context/AuthContext';
 import { useIsanzureAuth } from '../context/IsanzureAuthContext';
 
 export default function HomeRoutes() {
-  // Each component handles its own loading state
+  // Each component handles its own loading state with skeleton
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
