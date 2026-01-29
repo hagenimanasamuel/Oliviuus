@@ -5,44 +5,53 @@ import { Check, Info, AlertCircle, Clock, Calendar, DollarSign, Users, Home, Key
 export default function Step5Rules({ formData, setFormData, errors, setErrors }) {
   const [expandedPolicy, setExpandedPolicy] = useState(null);
 
-  const cancellationPolicies = [
-    { 
-      value: 'flexible', 
-      label: 'Flexible', 
-      description: 'Full refund 1 day before arrival',
-      details: {
-        shortDesc: 'Tenant-friendly policy',
-        landlordProtection: 'Low',
-        tenantFlexibility: 'High',
-        refundTimeline: '1 day before check-in',
-        platformFeeNote: 'Note: 10% platform fee is non-refundable. Tenant receives 90% of payment back.'
-      }
-    },
-    { 
-      value: 'moderate', 
-      label: 'Moderate', 
-      description: 'Full refund 5 days before arrival',
-      details: {
-        shortDesc: 'Balanced approach',
-        landlordProtection: 'Medium',
-        tenantFlexibility: 'Medium',
-        refundTimeline: '5 days before check-in',
-        platformFeeNote: 'Note: 10% platform fee is non-refundable. Tenant receives 90% of payment back.'
-      }
-    },
-    { 
-      value: 'strict', 
-      label: 'Strict', 
-      description: '50% refund up to 1 week before arrival',
-      details: {
-        shortDesc: 'Landlord-protective policy',
-        landlordProtection: 'High',
-        tenantFlexibility: 'Low',
-        refundTimeline: '7 days before check-in for 50% refund',
-        platformFeeNote: 'Note: 10% platform fee is deducted first. For 50% refund, calculation is: (Payment × 50%) - 10% fee.'
-      }
-    },
-  ];
+const cancellationPolicies = [
+  {
+    value: 'flexible',
+    label: 'Flexible',
+    description: 'Best for tenants – short notice friendly',
+    details: {
+      shortDesc: 'Tenant-friendly for quick bookings',
+      landlordProtection: 'Low',
+      tenantFlexibility: 'Very High',
+      refundTimeline:
+        'Full refund if cancelled at least 24 hours before check-in',
+      platformFeeNote:
+        'Guest service fee is non-refundable. Accommodation amount follows this policy.'
+    }
+  },
+
+  {
+    value: 'moderate',
+    label: 'Moderate',
+    description: 'Balanced for both landlord and tenant',
+    details: {
+      shortDesc: 'Recommended for most local rentals',
+      landlordProtection: 'Medium',
+      tenantFlexibility: 'Medium',
+      refundTimeline:
+        'Full refund 48+ hours before check-in, 50% refund within 24–48 hours, no refund within 24 hours',
+      platformFeeNote:
+        'Guest service fee is non-refundable. Refund applies only to accommodation amount.'
+    }
+  },
+
+  {
+    value: 'strict',
+    label: 'Strict',
+    description: 'Best for landlords – protects daily income',
+    details: {
+      shortDesc: 'Landlord-protective for short stays',
+      landlordProtection: 'High',
+      tenantFlexibility: 'Low',
+      refundTimeline:
+        '50% refund if cancelled 48+ hours before check-in, no refund within 48 hours',
+      platformFeeNote:
+        'Guest service fee is non-refundable. Late cancellations protect landlord earnings.'
+    }
+  }
+];
+
 
   // Boolean rules
   const booleanRules = [
@@ -123,38 +132,48 @@ export default function Step5Rules({ formData, setFormData, errors, setErrors })
     }));
   };
 
-  const calculateRefundExample = (policy) => {
-    const monthlyPrice = 50000; // Example price for calculation
-    const platformFee = monthlyPrice * 0.10; // 10% platform fee
-    
-    switch(policy) {
-      case 'flexible':
-        return {
-          tenantCancels: '1+ days before check-in',
-          tenantReceives: `${(monthlyPrice - platformFee).toLocaleString()} RWF`,
-          landlordReceives: '0 RWF',
-          platformKeeps: `${platformFee.toLocaleString()} RWF`
-        };
-      case 'moderate':
-        return {
-          tenantCancels: '5+ days before check-in',
-          tenantReceives: `${(monthlyPrice - platformFee).toLocaleString()} RWF`,
-          landlordReceives: '0 RWF',
-          platformKeeps: `${platformFee.toLocaleString()} RWF`
-        };
-      case 'strict':
-        const fiftyPercent = monthlyPrice * 0.50;
-        const tenantRefund = fiftyPercent - platformFee;
-        return {
-          tenantCancels: '7+ days before check-in',
-          tenantReceives: `${Math.max(0, tenantRefund).toLocaleString()} RWF`,
-          landlordReceives: `${(monthlyPrice - fiftyPercent).toLocaleString()} RWF`,
-          platformKeeps: `${platformFee.toLocaleString()} RWF`
-        };
-      default:
-        return {};
-    }
-  };
+const calculateRefundExample = (policy) => {
+  // For Rwanda short-stay, show a nightly example (more realistic than monthly)
+  const totalPayment = 50000; // Example total booking amount (e.g. 1–2 nights)
+  const serviceFeeRate = 0.10; // 10% guest service fee (non-refundable)
+  const serviceFee = totalPayment * serviceFeeRate;
+
+  // "Accommodation amount" is what can be refunded to guest (depends on policy)
+  const accommodationAmount = totalPayment - serviceFee;
+
+  const money = (n) => `${Math.max(0, Math.round(n)).toLocaleString()} RWF`;
+
+  switch (policy) {
+    case 'flexible':
+      return {
+        tenantCancels: '24+ hours before check-in',
+        tenantReceives: money(accommodationAmount),
+        landlordReceives: money(0),
+        platformKeeps: money(serviceFee)
+      };
+
+    case 'moderate':
+      return {
+        // Show the “middle case” (most confusing) so landlords understand it
+        tenantCancels: '24–48 hours before check-in',
+        tenantReceives: money(accommodationAmount * 0.50),
+        landlordReceives: money(accommodationAmount * 0.50),
+        platformKeeps: money(serviceFee)
+      };
+
+    case 'strict':
+      return {
+        tenantCancels: '48+ hours before check-in',
+        tenantReceives: money(accommodationAmount * 0.50),
+        landlordReceives: money(accommodationAmount * 0.50),
+        platformKeeps: money(serviceFee)
+      };
+
+    default:
+      return {};
+  }
+};
+
 
   return (
     <div className="p-6">

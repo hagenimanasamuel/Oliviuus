@@ -1,13 +1,11 @@
 // src/pages/Booking/BookingProcess.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { Coffee, Car, Clock, Bell, Wifi } from 'lucide-react';
 import api from '../../api/axios';
 import MainHeader from '../../components/LandingPage/Header/Header';
 import BottomNav from '../../components/LandingPage/BottomNav/BottomNav';
 import Footer from '../../components/ui/Footer';
 
-// Import booking components - Make sure these paths are correct!
 import ProgressBar from '../../components/Booking/ProgressBar';
 import BookingDetailsStep from '../../components/Booking/BookingDetailsStep';
 import PaymentMethodStep from '../../components/Booking/PaymentMethodStep';
@@ -20,7 +18,7 @@ const BookingProcess = () => {
   const { propertyUid } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [step, setStep] = useState(1); // 1: Details, 2: Payment, 3: Confirm
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [property, setProperty] = useState(null);
   const [bookingData, setBookingData] = useState({
@@ -34,7 +32,6 @@ const BookingProcess = () => {
   });
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
-  // Map period names for display
   const periodDisplay = {
     monthly: { label: 'Monthly', unit: 'months' },
     weekly: { label: 'Weekly', unit: 'weeks' },
@@ -44,7 +41,6 @@ const BookingProcess = () => {
 
   useEffect(() => {
     fetchPropertyDetails();
-    // Auto-set start date to tomorrow
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     setBookingData(prev => ({
@@ -52,6 +48,11 @@ const BookingProcess = () => {
       startDate: tomorrow.toISOString().split('T')[0]
     }));
   }, [propertyUid]);
+
+  useEffect(() => {
+    // Scroll to top when step changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
 
   const fetchPropertyDetails = async () => {
     try {
@@ -89,13 +90,7 @@ const BookingProcess = () => {
 
   const calculateTotal = () => {
     const basePrice = getPriceForPeriod();
-    const periodMultiplier = {
-      monthly: bookingData.duration,
-      weekly: bookingData.duration,
-      daily: bookingData.duration,
-      nightly: bookingData.duration
-    }[bookingData.period] || 1;
-    
+    const periodMultiplier = bookingData.duration;
     return basePrice * periodMultiplier;
   };
 
@@ -113,20 +108,266 @@ const BookingProcess = () => {
     const options = [];
     const propertyType = getPropertyType();
     
-    if (propertyType === 'guest_house' || propertyType === 'hotel') {
+    if (propertyType === 'guest_house' || propertyType === 'hotel' || propertyType === 'hostel') {
       options.push(
-        { id: 'breakfast', label: 'Breakfast Included', icon: <Coffee className="h-4 w-4" />, price: 5000 },
-        { id: 'airport_transfer', label: 'Airport Transfer', icon: <Car className="h-4 w-4" />, price: 15000 },
-        { id: 'late_checkout', label: 'Late Checkout (2PM)', icon: <Clock className="h-4 w-4" />, price: 10000 }
+        { id: 'breakfast', label: 'Breakfast Included', price: 5000 },
+        { id: 'airport_transfer', label: 'Airport Transfer', price: 15000 },
+        { id: 'late_checkout', label: 'Late Checkout (2PM)', price: 10000 }
       );
     }
     
     options.push(
-      { id: 'cleaning', label: 'Extra Cleaning Service', icon: <Bell className="h-4 w-4" />, price: 8000 },
-      { id: 'wifi_boost', label: 'Premium WiFi Speed', icon: <Wifi className="h-4 w-4" />, price: 3000 }
+      { id: 'cleaning', label: 'Extra Cleaning Service', price: 8000 },
+      { id: 'wifi_boost', label: 'Premium WiFi Speed', price: 3000 }
     );
     
     return options;
+  };
+
+  const getCustomizationTotal = () => {
+    const options = getCustomizationOptions();
+    return bookingData.customizations.reduce((total, id) => {
+      const option = options.find(opt => opt.id === id);
+      return total + (option?.price || 0);
+    }, 0);
+  };
+
+  const getPaymentSchedule = () => {
+    if (!property) return [];
+    
+    const period = bookingData.period;
+    const duration = bookingData.duration;
+    const basePrice = getPriceForPeriod();
+    
+    if (basePrice === 0) return [];
+    
+    const schedule = [];
+    
+    const maxAdvance = property.max_advance_months || 3;
+    const maxSingle = property.max_single_payment_months || 6;
+    
+    if (period === 'monthly') {
+      if (duration <= maxSingle) {
+        schedule.push({
+          type: 'full',
+          amount: basePrice * duration,
+          dueDate: 'Upon Booking',
+          description: `Full ${duration} month${duration > 1 ? 's' : ''} upfront`
+        });
+      } else {
+        const firstPaymentMonths = Math.min(maxAdvance, duration);
+        const firstPayment = basePrice * firstPaymentMonths;
+        
+        schedule.push({
+          type: 'first',
+          amount: firstPayment,
+          dueDate: 'Upon Booking',
+          description: `First ${firstPaymentMonths} month${firstPaymentMonths > 1 ? 's' : ''} upfront`
+        });
+        
+        const remainingMonths = duration - firstPaymentMonths;
+        if (remainingMonths > 0) {
+          schedule.push({
+            type: 'monthly',
+            amount: basePrice,
+            dueDate: 'Monthly',
+            description: `Then ${remainingMonths} month${remainingMonths > 1 ? 's' : ''} paid monthly`,
+            isMonthly: true
+          });
+        }
+      }
+    } else {
+      schedule.push({
+        type: 'full',
+        amount: basePrice * duration,
+        dueDate: 'Upon Booking',
+        description: `Full payment for ${duration} ${periodDisplay[period]?.unit}`
+      });
+    }
+    
+    return schedule;
+  };
+
+  const getUtilitiesInfo = () => {
+    if (!property) return null;
+    
+    const utilitiesMin = property.utilities_min || 0;
+    const utilitiesMax = property.utilities_max || 0;
+    const utilitiesIncluded = property.utilities_included === 1;
+    
+    // Only show for monthly bookings
+    if (bookingData.period !== 'monthly') {
+      return null;
+    }
+    
+    if (utilitiesIncluded) {
+      return {
+        included: true,
+        message: 'All utilities (electricity, water, internet) are included in the rent price.'
+      };
+    } else if (utilitiesMin > 0 && utilitiesMax > 0) {
+      return {
+        included: false,
+        min: parseFloat(utilitiesMin),
+        max: parseFloat(utilitiesMax),
+        message: 'Utilities (electricity, water) are paid separately based on actual usage.'
+      };
+    } else {
+      return {
+        included: false,
+        min: 0,
+        max: 0,
+        message: 'Contact host for utilities information.'
+      };
+    }
+  };
+
+  const getPaymentLimitsInfo = () => {
+    if (bookingData.period !== 'monthly' || !property) return null;
+    
+    const maxAdvance = property.max_advance_months || 3;
+    const maxSingle = property.max_single_payment_months || 6;
+    const duration = bookingData.duration;
+    
+    return {
+      maxAdvance,
+      maxSingle,
+      message: `Select between ${maxAdvance} and ${maxSingle} months`
+    };
+  };
+
+  const getCancellationInfo = () => {
+    if (!property) return null;
+    
+    const rules = property;
+    const platformCommission = property.platform_commission_rate || 10;
+    const policy = rules.cancellation_policy || 'flexible';
+    
+    // Calculate days until check-in
+    const startDate = new Date(bookingData.startDate);
+    const now = new Date();
+    const daysUntilCheckIn = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
+    const isWithinTwoDays = daysUntilCheckIn <= 2;
+    
+    // Determine refund percentage
+    let refundPercentage = 0;
+    let showTwoDayProtection = false;
+    
+    if (isWithinTwoDays && bookingData.period === 'monthly') {
+      // Within 2 days for monthly: Full refund (90% after commission)
+      refundPercentage = 100;
+      showTwoDayProtection = true;
+    } else {
+      // Use landlord's policy
+      switch (policy) {
+        case 'flexible':
+          refundPercentage = 100;
+          break;
+        case 'moderate':
+          refundPercentage = 50;
+          break;
+        case 'strict':
+          refundPercentage = 0;
+          break;
+        default:
+          refundPercentage = 100;
+      }
+    }
+    
+    const refundAfterCommission = refundPercentage > 0 
+      ? Math.round(refundPercentage - (refundPercentage * (platformCommission / 100)))
+      : 0;
+    
+    // Get policy description based on type
+    let policyDescription = '';
+    switch (policy) {
+      case 'flexible':
+        policyDescription = `Full refund (${refundAfterCommission}% after ${platformCommission}% platform fee) if canceled 24 hours before check-in`;
+        break;
+      case 'moderate':
+        policyDescription = `Partial refund (${refundAfterCommission}% after ${platformCommission}% platform fee) if canceled 7 days before check-in`;
+        break;
+      case 'strict':
+        policyDescription = `No refund for cancellations`;
+        break;
+      default:
+        policyDescription = `Contact host for cancellation details`;
+    }
+    
+    return {
+      policy,
+      refundPercentage,
+      refundAfterCommission,
+      platformCommission,
+      isWithinTwoDays,
+      daysUntilCheckIn,
+      showTwoDayProtection,
+      policyDescription,
+      monthlyExample: getMonthlyCancellationExample(policy, platformCommission, refundAfterCommission)
+    };
+  };
+
+  const getMonthlyCancellationExample = (policy, commission, refundAfter) => {
+    const monthlyRent = property.monthly_price || 50000;
+    const accommodationAmount = monthlyRent - (monthlyRent * (commission / 100));
+    
+    switch (policy) {
+      case 'flexible':
+        return `Example: For ${formatPrice(monthlyRent)} monthly rent, you'd get ${formatPrice(accommodationAmount)} back if you cancel 24+ hours before check-in.`;
+      case 'moderate':
+        return `Example: For ${formatPrice(monthlyRent)} monthly rent, you'd get ${formatPrice(accommodationAmount * 0.5)} back if you cancel 7+ days before check-in.`;
+      case 'strict':
+        return `Example: For ${formatPrice(monthlyRent)} monthly rent, no refund is provided for cancellations.`;
+      default:
+        return '';
+    }
+  };
+
+  const getHouseRulesList = () => {
+    if (!property) return [];
+    
+    const rulesList = [];
+    const rules = property;
+    
+    if (rules.check_in_time) {
+      rulesList.push(`Check-in: ${rules.check_in_time}`);
+    }
+    
+    if (rules.check_out_time) {
+      rulesList.push(`Check-out: ${rules.check_out_time}`);
+    }
+    
+    if (rules.smoking_allowed === 0) {
+      rulesList.push('No smoking allowed');
+    } else if (rules.smoking_allowed === 1) {
+      rulesList.push('Smoking allowed in designated areas');
+    }
+    
+    if (rules.pets_allowed === 0) {
+      rulesList.push('No pets allowed');
+    } else if (rules.pets_allowed === 1) {
+      rulesList.push('Pets allowed with approval');
+    }
+    
+    if (rules.events_allowed === 0) {
+      rulesList.push('No parties or events');
+    }
+    
+    if (rules.guests_allowed === 0) {
+      rulesList.push('No overnight guests without approval');
+    }
+    
+    if (rules.house_rules) {
+      const additionalRules = rules.house_rules.split('\n').filter(rule => rule.trim());
+      rulesList.push(...additionalRules);
+    }
+    
+    return rulesList;
+  };
+
+  const calculateFirstPayment = () => {
+    const schedule = getPaymentSchedule();
+    return schedule.length > 0 ? schedule[0].amount : 0;
   };
 
   const handleCustomizationToggle = (optionId) => {
@@ -162,7 +403,7 @@ const BookingProcess = () => {
     try {
       setPaymentProcessing(true);
       await new Promise(resolve => setTimeout(resolve, 2000));
-      navigate(`/booking/success/${propertyUid}?period=${bookingData.period}&amount=${calculateTotal()}`);
+      navigate(`/booking/success/${propertyUid}?period=${bookingData.period}&amount=${calculateTotal() + getCustomizationTotal()}`);
     } catch (error) {
       console.error('Payment error:', error);
       alert('Payment failed. Please try again.');
@@ -171,20 +412,10 @@ const BookingProcess = () => {
     }
   };
 
-  const getCustomizationTotal = () => {
-    const options = getCustomizationOptions();
-    return bookingData.customizations.reduce((total, id) => {
-      const option = options.find(opt => opt.id === id);
-      return total + (option?.price || 0);
-    }, 0);
-  };
-
-  // Loading state
   if (loading) {
     return <LoadingState />;
   }
 
-  // Error state
   if (!property) {
     return <ErrorState onBrowseProperties={() => navigate('/')} />;
   }
@@ -193,13 +424,26 @@ const BookingProcess = () => {
   const basePrice = getPriceForPeriod();
   const customizationTotal = getCustomizationTotal();
   const totalAmount = calculateTotal() + customizationTotal;
+  const paymentSchedule = getPaymentSchedule();
+  const firstPayment = calculateFirstPayment();
+  const utilitiesInfo = getUtilitiesInfo();
+  const paymentLimitsInfo = getPaymentLimitsInfo();
+  const cancellationInfo = getCancellationInfo();
+  const houseRules = getHouseRulesList();
 
-  // Step content based on current step
   const renderStepContent = () => {
     const commonProps = {
       property,
       bookingData,
       periodInfo,
+      basePrice,
+      totalAmount,
+      firstPayment,
+      utilitiesInfo,
+      paymentLimitsInfo,
+      cancellationInfo,
+      houseRules,
+      paymentSchedule,
       onUpdateBookingData: setBookingData,
       onNextStep: handleNextStep,
       onBackStep: handleBackStep,
@@ -210,9 +454,6 @@ const BookingProcess = () => {
       getGuestOptions,
       getPropertyType,
       calculateTotal,
-      basePrice,
-      customizationTotal,
-      totalAmount,
       paymentProcessing
     };
 
@@ -240,7 +481,6 @@ const BookingProcess = () => {
       <MainHeader />
 
       <main className="container mx-auto px-4 py-6 pb-24 md:pb-6">
-        {/* Progress Bar */}
         <ProgressBar
           step={step}
           onBackStep={handleBackStep}
@@ -248,12 +488,10 @@ const BookingProcess = () => {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Booking Form */}
           <div className="lg:col-span-2 space-y-6">
             {renderStepContent()}
           </div>
 
-          {/* Right Column - Summary Card */}
           <div className="lg:col-span-1">
             <SummaryCard
               property={property}
@@ -263,6 +501,12 @@ const BookingProcess = () => {
               calculateTotal={calculateTotal}
               getCustomizationTotal={getCustomizationTotal}
               totalAmount={totalAmount}
+              getPaymentSchedule={getPaymentSchedule}
+              getUtilitiesInfo={getUtilitiesInfo}
+              paymentSchedule={paymentSchedule}
+              firstPayment={firstPayment}
+              utilitiesInfo={utilitiesInfo}
+              cancellationInfo={cancellationInfo}
             />
           </div>
         </div>

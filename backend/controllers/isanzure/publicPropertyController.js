@@ -648,53 +648,56 @@ exports.getPropertyByUid = async (req, res) => {
   try {
     // Get property with basic landlord info
     const query = `
-      SELECT 
-        -- Property details
-        p.*,
-        
-        -- Pricing details
-        COALESCE(pp.monthly_price, 0) as monthly_price,
-        COALESCE(pp.weekly_price, 0) as weekly_price,
-        COALESCE(pp.daily_price, 0) as daily_price,
-        COALESCE(pp.nightly_price, 0) as nightly_price,
-        pp.accept_nightly,
-        pp.accept_daily,
-        pp.accept_weekly,
-        pp.accept_monthly,
-        pp.utilities_min,
-        pp.utilities_max,
-        pp.utilities_included,
-        
-        -- Rules
-        pr.check_in_time,
-        pr.check_out_time,
-        pr.cancellation_policy,
-        pr.smoking_allowed,
-        pr.pets_allowed,
-        pr.events_allowed,
-        pr.guests_allowed,
-        pr.house_rules,
-        
-        -- Landlord basic info
-        u.id as landlord_id,
-        u.user_uid as landlord_uid,
-        u.user_type as landlord_type,
-        u.id_verified,
-        u.verification_status,
-        u.public_phone,
-        u.public_email,
-        u.oliviuus_user_id,
-        u.preferred_contact_methods
-        
-      FROM properties p
-      
-      LEFT JOIN property_pricing pp ON p.id = pp.property_id
-      LEFT JOIN property_rules pr ON p.id = pr.property_id
-      LEFT JOIN users u ON p.landlord_id = u.id
-      
-      WHERE p.property_uid = ?
-        AND p.status = 'active'
-    `;
+  SELECT 
+    -- Property details
+    p.*,
+    
+    -- Pricing details
+    COALESCE(pp.monthly_price, 0) as monthly_price,
+    COALESCE(pp.weekly_price, 0) as weekly_price,
+    COALESCE(pp.daily_price, 0) as daily_price,
+    COALESCE(pp.nightly_price, 0) as nightly_price,
+    pp.accept_nightly,
+    pp.accept_daily,
+    pp.accept_weekly,
+    pp.accept_monthly,
+    pp.utilities_min,
+    pp.utilities_max,
+    pp.utilities_included,
+    pp.max_advance_months,           -- ADD THIS LINE
+    pp.max_single_payment_months,    -- ADD THIS LINE
+    pp.platform_commission_rate,     -- ADD THIS LINE
+    
+    -- Rules
+    pr.check_in_time,
+    pr.check_out_time,
+    pr.cancellation_policy,
+    pr.smoking_allowed,
+    pr.pets_allowed,
+    pr.events_allowed,
+    pr.guests_allowed,
+    pr.house_rules,
+    
+    -- Landlord basic info
+    u.id as landlord_id,
+    u.user_uid as landlord_uid,
+    u.user_type as landlord_type,
+    u.id_verified,
+    u.verification_status,
+    u.public_phone,
+    u.public_email,
+    u.oliviuus_user_id,
+    u.preferred_contact_methods
+    
+  FROM properties p
+  
+  LEFT JOIN property_pricing pp ON p.id = pp.property_id
+  LEFT JOIN property_rules pr ON p.id = pr.property_id
+  LEFT JOIN users u ON p.landlord_id = u.id
+  
+  WHERE p.property_uid = ?
+    AND p.status = 'active'
+`;
 
     debugLog('Executing property query:', { query, params: [propertyUid] });
     const properties = await isanzureQuery(query, [propertyUid]);
