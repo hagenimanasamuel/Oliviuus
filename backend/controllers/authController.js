@@ -920,7 +920,7 @@ const completeRegistration = async (req, res) => {
       `INSERT INTO users 
        (oliviuus_id, username, email, password, first_name, last_name,
         profile_avatar_url, email_verified, is_active, role, global_account_tier, created_by, registration_source)
-       VALUES (?, ?, ?, ?, ?, ?, ?, true, true, 'user', 'free', 'self', 'email_registration')`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, true, true, 'viewer', 'free', 'self', 'email_registration')`,
       [
         oliviuusId,
         username,
@@ -1149,7 +1149,7 @@ const completePhoneRegistration = async (req, res) => {
       (oliviuus_id, username, phone, password, first_name, last_name, 
        profile_avatar_url, phone_verified, is_active, 
        role, global_account_tier, created_by, registration_source)
-      VALUES (?, ?, ?, ?, ?, ?, ?, true, true, 'user', 'free', 'self', 'phone_registration')`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, true, true, 'viewer', 'free', 'self', 'phone_registration')`,
       [
         oliviuusId,
         autoUsername,
@@ -1850,7 +1850,7 @@ const createCustomAccountEnhanced = async (req, res) => {
       (oliviuus_id, username, first_name, last_name, password, profile_avatar_url, 
        date_of_birth, gender, role, global_account_tier, username_verified, 
        is_active, created_by, registration_source)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'user', 'free', true, true, 'self', 'custom_registration')`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'viewer', 'free', true, true, 'self', 'custom_registration')`,
       [oliviuusId, username, firstName, lastName, hashedPassword, avatarUrl,
         dateOfBirth, gender, calculateUsernameStrength(username)]
     );
@@ -2088,7 +2088,7 @@ const createCustomAccount = async (req, res) => {
       (oliviuus_id, username, first_name, last_name, password, profile_avatar_url, 
        date_of_birth, gender, role, global_account_tier, username_verified, 
        is_active, created_by, registration_source)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'user', 'free', true, true, 'self', 'custom_registration')`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'viewer', 'free', true, true, 'self', 'custom_registration')`,
       [oliviuusId, cleanUsername, firstName, lastName, hashedPassword, avatarUrl,
         dateOfBirth, gender]
     );
@@ -3250,7 +3250,7 @@ const googleAuth = async (req, res) => {
         `INSERT INTO users 
         (oliviuus_id, email, password, email_verified, is_active, role, 
          global_account_tier, profile_avatar_url, created_by, registration_source)
-        VALUES (?, ?, 'google_oauth', ?, true, 'user', 'free', ?, 'google', 'google_oauth')`,
+        VALUES (?, ?, 'google_oauth', ?, true, 'viewer', 'free', ?, 'google', 'google_oauth')`,
         [oliviuusId, email, email_verified || false, avatarUrl]
       );
 

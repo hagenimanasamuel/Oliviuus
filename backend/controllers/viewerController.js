@@ -61,22 +61,22 @@ setInterval(() => {
 // Kid content configuration - defines what is considered kid-friendly
 const KID_CONTENT_CONFIG = {
   // Age ratings allowed for kids (in order of strictness)
-  allowedAgeRatings: ['G', 'PG', '7+', '13+'],
+  allowedAgeRatings: ['G', 'PG', '1+','2+','3+','4+','5+','6+','7+', '8+', '9+', '10+', '11+', '12+', '13+', '14+'],
 
   // Categories considered kid-friendly
-  kidFriendlyCategories: ['Family', 'Animation', 'Cartoons', 'Educational'],
+  kidFriendlyCategories: ['Family', 'Animation', 'Cartoons', 'Educational', 'music', 'song', 'indirimbo', 'children'],
 
   // Genres considered kid-friendly
-  kidFriendlyGenres: ['Family', 'Animation', 'Children'],
+  kidFriendlyGenres: ['Family', 'Animation', 'Children', 'Educational', 'Musical', 'Music', 'Songs', 'Kids', 'Indirimbo'],
 
   // Categories that are ALWAYS restricted for kids
-  restrictedCategories: ['Horror', 'Thriller', 'Crime', 'War', 'Adult'],
+  restrictedCategories: ['Horror', 'Thriller', 'Crime', 'War', 'Adult', 'sex', 'romance'],
 
   // Genres that are ALWAYS restricted for kids
-  restrictedGenres: ['Horror', 'Thriller', 'Crime', 'War', 'Adult'],
+  restrictedGenres: ['Horror', 'Thriller', 'Crime', 'War', 'Adult', 'sex'],
 
   // Age ratings that are NEVER allowed for kids
-  restrictedAgeRatings: ['R', 'NC-17', '18+', 'A'],
+  restrictedAgeRatings: ['R', 'NC-17', '18+', '19+', '20+', '21+', '22+', '23+', '24+', '25+', 'A'],
 
   // Content types that may be restricted
   restrictedContentTypes: ['documentary'] // Some documentaries may have mature content
@@ -2955,7 +2955,7 @@ const getKidFriendlyContent = async (req, res) => {
       WHERE c.status = 'published' 
         AND c.visibility = 'public'
         AND (
-          c.age_rating IN ('G', 'PG', '7+', '13+')
+          c.age_rating IN ('G', 'PG', '1+','2+','3+','4+','5+','6+','7+', '8+', '9+', '10+', '11+', '12+', '13+', '14+')
           OR
           EXISTS (
             SELECT 1 FROM content_categories cc
@@ -3035,7 +3035,7 @@ const getKidFriendlyContent = async (req, res) => {
       WHERE status = 'published' 
         AND visibility = 'public'
         AND (
-          age_rating IN ('G', 'PG', '7+', '13+')
+          age_rating IN ('G', 'PG', '1+','2+','3+','4+','5+','6+','7+', '8+', '9+', '10+', '11+', '12+', '13+', '14+')
           OR EXISTS (
             SELECT 1 FROM content_categories cc
             INNER JOIN categories cat ON cc.category_id = cat.id

@@ -70,7 +70,7 @@ const KID_ALLOWED_AGE_RATINGS = [
   'TV-Y7',      // Older Children (7+)
   'TV-G',       // General Audience
   'PG',         // Parental Guidance (for older kids)
-  '7+', '8+', '9+', '10+', '11+', '12+' // Custom age ratings
+  '1+','2+','3+','4+','5+','6+','7+', '8+', '9+', '10+', '11+', '12+', '13+', '14+' // Custom age ratings
 ];
 
 // Blocked age ratings for kids (never show these)
@@ -1574,9 +1574,9 @@ const getKidFilters = async (req, res) => {
 
     // Simple function to get age ratings
     const getKidAgeRatings = (maxAgeRating) => {
-      if (!maxAgeRating) return ['all', '3+', '4+', '5+', '6+', '7+'];
+      if (!maxAgeRating) return ['all', '3+', '4+', '5+', '6+', '7+', '8+', '9+', '10+', '11+', '12+', '13+', '14+'];
       if (maxAgeRating.toLowerCase() === 'all') {
-        return ['all', '3+', '4+', '5+', '6+', '7+', '8+', '9+', '10+', '11+', '12+'];
+        return ['all', '3+', '4+', '5+', '6+', '7+', '8+', '9+', '10+', '11+', '12+', '13+', '14+'];
       }
       const age = parseInt(maxAgeRating.replace('+', ''));
       const allowedRatings = ['all'];
