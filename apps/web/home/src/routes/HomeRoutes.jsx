@@ -6,6 +6,9 @@ import HostProfilePage from '../pages/Landing/HostProfilePage.jsx';
 import PropertyDetailsPage from '../pages/Landing/property/PropertyDetailsPage.jsx';
 import BookingSuccessPage from '../pages/Booking/SuccessPage.jsx';
 import BookingProcess from '../pages/Booking/BookingProcess.jsx';
+import BookingResultPage from '../pages/Booking/ResultPage.jsx';
+
+import AccountLayout from '../components/Account/AccountLayout';
 
 // Lazy load components
 const BookingsPage = lazy(() => import('../pages/Account/BookingsPage.jsx'));
@@ -13,6 +16,8 @@ const WishlistPage = lazy(() => import('../pages/Account/WishlistPage.jsx'));
 const BecomeLandlordPage = lazy(() => import('../pages/Account/BecomeLandlordPage.jsx'));
 const BecomeAgentPage = lazy(() => import('../pages/Account/BecomeAgentPage.jsx'));
 const LandlordDashboard = lazy(() => import('../pages/Dashboard/Landlord/LandlordDashboard.jsx'));
+
+const AccountRoutes = lazy(() => import('./AccountRoutes.jsx'));
 
 
 // Loading fallback component
@@ -44,10 +49,14 @@ export default function HomeRoutes() {
          {/* Booking Routes */}
         <Route path="/book/:propertyUid" element={<BookingProcess />} />
         <Route path="/booking/success/:propertyUid" element={<BookingSuccessPage />} />
+        <Route path="/booking/result" element={<BookingResultPage />} />
+
+                {/* Account Routes with Layout */}
+        <Route path="/account" element={<AccountLayout />}>
+          <Route path="*" element={<AccountRoutes />} />
+        </Route>
 
         {/* Account Routes */}
-        <Route path="/bookings" element={<BookingsPage />} />
-        <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/become-landlord" element={<BecomeLandlordPage />} />
         <Route path="/become-agent" element={<BecomeAgentPage />} />
 

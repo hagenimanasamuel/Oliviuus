@@ -17,7 +17,8 @@ import {
   Verified,
   Users,
   HelpCircle,
-  X
+  X,
+  Send
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,17 +26,15 @@ export default function ContactSection({ property, landlord }) {
   const navigate = useNavigate();
   const [showPhone, setShowPhone] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
-  const [showSupportSection, setShowSupportSection] = useState(false); // Hidden by default
-  const [showHostInfo, setShowHostInfo] = useState(false); // Hidden by default
+  const [showSupportSection, setShowSupportSection] = useState(false);
+  const [showHostInfo, setShowHostInfo] = useState(false);
   const [isCopied, setIsCopied] = useState({ phone: false, email: false });
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Format phone number
   const formatPhoneNumber = (phone) => {
     if (!phone) return null;
-    // Remove all non-numeric characters
     const cleaned = phone.replace(/\D/g, '');
-    // Format: +250 XXX XXX XXX
     if (cleaned.length === 9) {
       return `+250 ${cleaned.substring(0, 3)} ${cleaned.substring(3, 6)} ${cleaned.substring(6)}`;
     } else if (cleaned.length === 12 && cleaned.startsWith('250')) {
@@ -47,19 +46,14 @@ export default function ContactSection({ property, landlord }) {
   // Get contact info from landlord or property
   const getContactInfo = () => {
     const contact = {
-      // Priority: public phone > SSO phone > property owner phone
       phone: landlord?.public_phone || 
              landlord?.sso_profile?.phone || 
              property?.owner_phone || 
              '+250 788 880 266',
-      
-      // Priority: public email > SSO email > property owner email
       email: landlord?.public_email || 
              landlord?.sso_profile?.email || 
              property?.owner_email || 
              'contact@oliviuus.com',
-      
-      // Support contacts (platform level)
       supportPhone: '+250 788 880 266',
       supportEmail: 'support@isanzure.com'
     };
@@ -72,11 +66,38 @@ export default function ContactSection({ property, landlord }) {
 
   const contactInfo = getContactInfo();
 
+  // ========== NAVIGATE TO MESSAGES WITH AUTO DRAFT ==========
+const navigateToMessages = () => {
+  if (!property?.property_uid) return;
+
+  // Use landlord UUID, not numeric ID
+  const landlordUid = landlord?.user_uid || '';
+  const propertyUid = property.property_uid;
+  const defaultMessage = `Can I get more info on this @${propertyUid}?`;
+  
+  const encodedMessage = encodeURIComponent(defaultMessage);
+  
+  // Professional URL with UUIDs
+  navigate(`/account/messages?landlord=${landlordUid}&property=${propertyUid}&draft=${encodedMessage}`);
+};
+
+  // Navigate to messages with specific property mention
+  const navigateToMessagesWithMention = () => {
+    if (!property?.property_uid) return;
+
+    const propertyMention = `@${property.property_uid}`;
+    const defaultMessage = `Can I get more info on this ${propertyMention}?`;
+    
+    const encodedMessage = encodeURIComponent(defaultMessage);
+    const encodedPropertyUid = encodeURIComponent(property.property_uid);
+    
+    navigate(`/account/messages?landlordId=${landlord?.id || ''}&propertyId=${property.id}&propertyUid=${encodedPropertyUid}&message=${encodedMessage}`);
+  };
+
   // Get landlord name with fallbacks
   const getLandlordName = () => {
     if (!landlord) return 'Property Host';
     
-    // Try SSO profile first
     if (landlord.sso_profile?.full_name) {
       return landlord.sso_profile.full_name;
     }
@@ -93,7 +114,6 @@ export default function ContactSection({ property, landlord }) {
       return landlord.sso_profile.username;
     }
     
-    // Fallback to basic landlord info
     if (landlord.first_name && landlord.last_name) {
       return `${landlord.first_name} ${landlord.last_name}`;
     }
@@ -143,9 +163,9 @@ export default function ContactSection({ property, landlord }) {
            landlord?.verification_status === 'approved';
   };
 
-  // Get preferred contact methods - ALWAYS include In-App Messaging
+  // Get preferred contact methods
   const getPreferredContactMethods = () => {
-    const baseMethods = ['in_app_messaging']; // Always include In-App Messaging
+    const baseMethods = ['in_app_messaging'];
     
     if (!landlord?.preferred_contact_methods) {
       return [...baseMethods, 'whatsapp', 'phone', 'email'];
@@ -156,7 +176,6 @@ export default function ContactSection({ property, landlord }) {
         ? landlord.preferred_contact_methods 
         : JSON.parse(landlord.preferred_contact_methods);
       
-      // Add in-app messaging if not already present
       if (!methods.includes('in_app_messaging')) {
         methods.unshift('in_app_messaging');
       }
@@ -185,16 +204,6 @@ export default function ContactSection({ property, landlord }) {
       navigate(`/host/${landlord.user_uid}`);
     } else if (landlord?.id) {
       navigate(`/host/${landlord.id}`);
-    }
-  };
-
-  // Navigate to messages
-  const navigateToMessages = () => {
-    // Navigate to chat with this landlord
-    if (landlord?.id) {
-      navigate(`/tenant/messages?landlordId=${landlord.id}&propertyId=${property?.id}`);
-    } else {
-      navigate('/tenant/messages');
     }
   };
 
@@ -231,24 +240,47 @@ export default function ContactSection({ property, landlord }) {
           <>
             {/* Contact Methods */}
             <div className="space-y-4 mb-8">
-              {/* Primary Chat Button */}
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] p-px">
+              {/* Primary Chat Button - WITH AUTO MESSAGE DRAFT */}
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] p-px group">
                 <button 
-                  onClick={navigateToMessages}
-                  className="w-full bg-white py-4 rounded-xl font-semibold text-gray-900 hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 relative group"
+                  onClick={navigateToMessagesWithMention}
+                  className="w-full bg-white py-4 rounded-xl font-semibold text-gray-900 hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 relative"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-[#BC8BBC]/5 to-[#8A5A8A]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <MessageCircle className="h-5 w-5 text-[#BC8BBC]" />
                   <span>💬 Message Host</span>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <Send className="h-3 w-3 text-[#BC8BBC]" />
                     <div className="px-2 py-1 bg-[#BC8BBC]/10 text-[#BC8BBC] text-xs font-medium rounded-full">
-                      Recommended
+                      Auto-draft ready
                     </div>
                   </div>
                 </button>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
               </div>
 
-              {/* Host's Preferred Contact Methods - Always includes In-App Messaging */}
+              {/* Quick Message Preview */}
+              {property?.property_uid && (
+                <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="flex items-start gap-2">
+                    <div className="p-1.5 bg-purple-100 rounded-lg mt-0.5">
+                      <MessageCircle className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-purple-900 mb-1">Quick message preview:</p>
+                      <p className="text-sm text-purple-700 bg-white p-2 rounded-lg border border-purple-200">
+                        "Can I get more info on this <span className="font-bold text-purple-900">@{property.property_uid}</span>?"
+                      </p>
+                      <p className="text-xs text-purple-600 mt-1 flex items-center gap-1">
+                        <Info className="h-3 w-3" />
+                        This will be auto-filled when you click Message Host
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Host's Preferred Contact Methods */}
               <div className="p-3 bg-gradient-to-r from-[#BC8BBC]/5 to-[#8A5A8A]/5 rounded-lg border border-[#BC8BBC]/10">
                 <div className="text-sm font-medium text-gray-700 mb-2">Host's Preferred Contact Methods</div>
                 <div className="flex flex-wrap gap-2">
@@ -384,7 +416,7 @@ export default function ContactSection({ property, landlord }) {
               </div>
             </div>
 
-            {/* Host Information - Hidden by default, shown only if user expands */}
+            {/* Host Information */}
             {showHostInfo && landlord && (
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
@@ -442,6 +474,15 @@ export default function ContactSection({ property, landlord }) {
                       Active on iSanzure
                     </span>
                   </div>
+
+                  {/* Quick Message Button */}
+                  <button
+                    onClick={navigateToMessagesWithMention}
+                    className="w-full mt-4 py-2 bg-purple-50 text-purple-700 rounded-lg font-medium hover:bg-purple-100 transition-colors flex items-center justify-center gap-2 border border-purple-200"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Message {getLandlordName().split(' ')[0]}
+                  </button>
                 </div>
 
                 {/* View Profile Button */}
@@ -455,7 +496,7 @@ export default function ContactSection({ property, landlord }) {
               </div>
             )}
 
-            {/* Support Section - Hidden by default, shown only if user expands */}
+            {/* Support Section */}
             {showSupportSection && (
               <div className="border-t border-gray-200 pt-6">
                 <div className="flex items-center justify-between mb-4">
@@ -522,7 +563,7 @@ export default function ContactSection({ property, landlord }) {
               </div>
             )}
 
-            {/* Section Toggle Buttons - ALWAYS visible to allow expansion */}
+            {/* Section Toggle Buttons */}
             <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-gray-200">
               {landlord && !showHostInfo && (
                 <button
@@ -556,10 +597,12 @@ export default function ContactSection({ property, landlord }) {
             </p>
             <div className="flex items-center justify-center gap-4">
               <button
-                onClick={navigateToMessages}
-                className="px-6 py-2.5 bg-[#BC8BBC] text-white rounded-lg font-medium hover:bg-[#9A6A9A] transition-colors"
+                onClick={navigateToMessagesWithMention}
+                className="px-6 py-2.5 bg-[#BC8BBC] text-white rounded-lg font-medium hover:bg-[#9A6A9A] transition-colors flex items-center gap-2"
               >
+                <MessageCircle className="h-4 w-4" />
                 Message Host
+                <Send className="h-3 w-3" />
               </button>
               <button
                 onClick={() => setIsExpanded(true)}
@@ -568,6 +611,11 @@ export default function ContactSection({ property, landlord }) {
                 View All Options
               </button>
             </div>
+            {property?.property_uid && (
+              <p className="text-xs text-gray-400 mt-3">
+                Message will include: @{property.property_uid}
+              </p>
+            )}
           </div>
         )}
 

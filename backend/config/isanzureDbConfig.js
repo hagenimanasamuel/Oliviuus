@@ -812,6 +812,426 @@ const seedDefaultAmenities = async () => {
   }
 };
 
+const createMessagesTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS messages (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      message_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      sender_id INT NOT NULL,
+      receiver_id INT NOT NULL,
+      booking_id INT NULL,  -- Keep column, remove FK constraint
+      message_type ENUM('chat', 'booking_update', 'payment_notice', 'system_alert') DEFAULT 'chat',
+      content TEXT NOT NULL,
+      is_read BOOLEAN DEFAULT FALSE,
+      read_at TIMESTAMP NULL,
+      metadata JSON NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      INDEX idx_message_uid (message_uid),
+      INDEX idx_sender_id (sender_id),
+      INDEX idx_receiver_id (receiver_id),
+      INDEX idx_booking_id (booking_id),
+      INDEX idx_created_at (created_at),
+      INDEX idx_message_type (message_type),
+      INDEX idx_is_read (is_read),
+      
+      FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+      -- REMOVED: FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ messages table is ready");
+  } catch (err) {
+    console.error("❌ Error creating messages table:", err);
+  }
+};
+const createUserBalancesTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS user_balances (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL UNIQUE,
+      balance_amount DECIMAL(12,2) DEFAULT 0.00,
+      pending_amount DECIMAL(12,2) DEFAULT 0.00,
+      on_hold_amount DECIMAL(12,2) DEFAULT 0.00,
+      currency_code VARCHAR(3) DEFAULT 'RWF',
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      
+      INDEX idx_user_id (user_id),
+      INDEX idx_balance_amount (balance_amount),
+      INDEX idx_updated_at (updated_at),
+      
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ user_balances table is ready");
+  } catch (err) {
+    console.error("❌ Error creating user_balances table:", err);
+  }
+};
+const createTransactionsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS transactions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      transaction_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      from_user_id INT NULL,
+      to_user_id INT NULL,
+      booking_id INT NULL,
+      payment_id INT NULL,  -- Keep column, remove FK constraint
+      amount DECIMAL(12,2) NOT NULL,
+      currency_code VARCHAR(3) DEFAULT 'RWF',
+      transaction_type ENUM('rent_payment', 'extension', 'deposit', 'withdrawal', 'refund', 'commission') NOT NULL,
+      status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
+      payment_method ENUM('mobile_money', 'card', 'balance', 'loan') NOT NULL,
+      gateway_data JSON NULL,
+      notes TEXT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      completed_at TIMESTAMP NULL,
+      
+      INDEX idx_transaction_uid (transaction_uid),
+      INDEX idx_from_user_id (from_user_id),
+      INDEX idx_to_user_id (to_user_id),
+      INDEX idx_booking_id (booking_id),
+      INDEX idx_payment_id (payment_id),
+      INDEX idx_status (status),
+      INDEX idx_created_at (created_at),
+      INDEX idx_transaction_type (transaction_type),
+      INDEX idx_payment_method (payment_method),
+      
+      FOREIGN KEY (from_user_id) REFERENCES users(id) ON DELETE SET NULL,
+      FOREIGN KEY (to_user_id) REFERENCES users(id) ON DELETE SET NULL,
+      FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
+      -- REMOVED: FOREIGN KEY (payment_id) REFERENCES booking_payments(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ transactions table is ready");
+  } catch (err) {
+    console.error("❌ Error creating transactions table:", err);
+  }
+};
+
+const createBookingsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS bookings (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      booking_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      payment_reference VARCHAR(255) NULL,  -- ✅ ADD THIS RIGHT HERE
+      property_id INT NOT NULL,
+      landlord_id INT NOT NULL,
+      tenant_id INT NOT NULL,
+      booking_period ENUM('monthly', 'weekly', 'daily', 'nightly') NOT NULL,
+      start_date DATE NOT NULL,
+      duration INT NOT NULL,
+      end_date DATE NOT NULL,
+      total_amount DECIMAL(12,2) NOT NULL,
+      optional_services JSON NULL,
+      special_requests TEXT NULL,
+      status ENUM('pending', 'confirmed', 'active', 'completed', 'cancelled') DEFAULT 'pending',
+      cancellation_policy ENUM('flexible', 'moderate', 'strict') DEFAULT 'flexible',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      confirmed_at TIMESTAMP NULL,
+      check_in_at TIMESTAMP NULL,
+      check_out_at TIMESTAMP NULL,
+      cancelled_at TIMESTAMP NULL,
+      
+      INDEX idx_booking_uid (booking_uid),
+      INDEX idx_payment_reference (payment_reference), -- ✅ ADD INDEX
+      INDEX idx_property_id (property_id),
+      INDEX idx_landlord_id (landlord_id),
+      INDEX idx_tenant_id (tenant_id),
+      INDEX idx_status (status),
+      INDEX idx_start_date (start_date),
+      INDEX idx_end_date (end_date),
+      INDEX idx_created_at (created_at),
+      INDEX idx_booking_period (booking_period),
+      
+      FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
+      FOREIGN KEY (landlord_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (tenant_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ Bookings table is ready");
+  } catch (err) {
+    console.error("❌ Error creating bookings table:", err);
+  }
+};
+
+const createBookingPaymentsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS booking_payments (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      payment_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      booking_id INT NOT NULL,
+      payment_type ENUM('first_payment', 'rent_installment', 'full_payment', 'extension') NOT NULL,
+      period_covered JSON NOT NULL,
+      due_date DATE NOT NULL,
+      amount DECIMAL(12,2) NOT NULL,
+      status ENUM('pending', 'paid', 'overdue', 'cancelled') DEFAULT 'pending',
+      paid_at TIMESTAMP NULL,
+      transaction_id INT NULL,  -- Keep column, remove FK constraint
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      INDEX idx_payment_uid (payment_uid),
+      INDEX idx_booking_id (booking_id),
+      INDEX idx_due_date (due_date),
+      INDEX idx_status (status),
+      INDEX idx_payment_type (payment_type),
+      INDEX idx_created_at (created_at),
+      
+      FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE
+      -- REMOVED: FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ booking_payments table is ready");
+  } catch (err) {
+    console.error("❌ Error creating booking_payments table:", err);
+  }
+};
+
+const createBookingExtensionsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS booking_extensions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      extension_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      original_booking_id INT NOT NULL,
+      requested_by_user_id INT NOT NULL,
+      additional_periods INT NOT NULL,
+      new_end_date DATE NOT NULL,
+      additional_amount DECIMAL(12,2) NOT NULL,
+      status ENUM('requested', 'approved', 'rejected') DEFAULT 'requested',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      responded_at TIMESTAMP NULL,
+      
+      INDEX idx_extension_uid (extension_uid),
+      INDEX idx_original_booking_id (original_booking_id),
+      INDEX idx_requested_by_user_id (requested_by_user_id),
+      INDEX idx_status (status),
+      INDEX idx_created_at (created_at),
+      
+      FOREIGN KEY (original_booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
+      FOREIGN KEY (requested_by_user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ booking_extensions table is ready");
+  } catch (err) {
+    console.error("❌ Error creating booking_extensions table:", err);
+  }
+};
+
+const createBookingCancellationsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS booking_cancellations (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      cancellation_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      booking_id INT NOT NULL UNIQUE,
+      initiated_by_user_id INT NOT NULL,
+      reason TEXT NULL,
+      refund_amount DECIMAL(12,2) DEFAULT 0.00,
+      platform_fee_kept DECIMAL(12,2) DEFAULT 0.00,
+      cancellation_policy_applied ENUM('flexible', 'moderate', 'strict') NOT NULL,
+      status ENUM('pending', 'processed') DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      processed_at TIMESTAMP NULL,
+      
+      INDEX idx_cancellation_uid (cancellation_uid),
+      INDEX idx_booking_id (booking_id),
+      INDEX idx_initiated_by_user_id (initiated_by_user_id),
+      INDEX idx_status (status),
+      INDEX idx_created_at (created_at),
+      
+      FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
+      FOREIGN KEY (initiated_by_user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ booking_cancellations table is ready");
+  } catch (err) {
+    console.error("❌ Error creating booking_cancellations table:", err);
+  }
+};
+
+
+const createCommissionsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS commissions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      commission_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      booking_id INT NOT NULL,
+      transaction_id INT NULL,  -- Keep column, remove FK constraint
+      commission_amount DECIMAL(12,2) NOT NULL,
+      commission_rate DECIMAL(5,2) NOT NULL,
+      status ENUM('pending', 'collected') DEFAULT 'pending',
+      collected_at TIMESTAMP NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      INDEX idx_commission_uid (commission_uid),
+      INDEX idx_booking_id (booking_id),
+      INDEX idx_transaction_id (transaction_id),
+      INDEX idx_status (status),
+      INDEX idx_created_at (created_at),
+      
+      FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE
+      -- REMOVED: FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ commissions table is ready");
+  } catch (err) {
+    console.error("❌ Error creating commissions table:", err);
+  }
+};
+
+const createWithdrawalsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS withdrawals (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      withdrawal_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      user_id INT NOT NULL,
+      amount DECIMAL(12,2) NOT NULL,
+      withdrawal_method ENUM('bk', 'equity', 'mtn', 'airtel') NOT NULL,
+      account_details JSON NOT NULL,
+      status ENUM('pending', 'processing', 'completed', 'failed', 'rejected') DEFAULT 'pending',
+      processed_by_admin_id INT NULL,
+      notes TEXT NULL,
+      requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      processed_at TIMESTAMP NULL,
+      
+      INDEX idx_withdrawal_uid (withdrawal_uid),
+      INDEX idx_user_id (user_id),
+      INDEX idx_status (status),
+      INDEX idx_withdrawal_method (withdrawal_method),
+      INDEX idx_requested_at (requested_at),
+      
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (processed_by_admin_id) REFERENCES users(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ withdrawals table is ready");
+  } catch (err) {
+    console.error("❌ Error creating withdrawals table:", err);
+  }
+};
+
+const addMissingForeignKeys = async () => {
+  console.log("🔗 Adding missing foreign keys...");
+  
+  // Try to drop existing constraints first (ignore errors if they don't exist)
+  try {
+    await isanzureQuery(`ALTER TABLE transactions DROP FOREIGN KEY fk_transactions_payment_id`);
+  } catch (e) {}
+  try {
+    await isanzureQuery(`ALTER TABLE booking_payments DROP FOREIGN KEY fk_booking_payments_transaction_id`);
+  } catch (e) {}
+  try {
+    await isanzureQuery(`ALTER TABLE commissions DROP FOREIGN KEY fk_commissions_transaction_id`);
+  } catch (e) {}
+  try {
+    await isanzureQuery(`ALTER TABLE messages DROP FOREIGN KEY fk_messages_booking_id`);
+  } catch (e) {}
+  
+  // Now add fresh constraints
+  try {
+    await isanzureQuery(`
+      ALTER TABLE transactions 
+      ADD CONSTRAINT fk_transactions_payment_id
+      FOREIGN KEY (payment_id) REFERENCES booking_payments(id) ON DELETE SET NULL;
+    `);
+    console.log("✅ Added payment_id foreign key to transactions");
+  } catch (err) {
+    console.log("⚠️ Could not add payment_id FK to transactions:", err.message);
+  }
+
+  try {
+    await isanzureQuery(`
+      ALTER TABLE booking_payments 
+      ADD CONSTRAINT fk_booking_payments_transaction_id
+      FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE SET NULL;
+    `);
+    console.log("✅ Added transaction_id foreign key to booking_payments");
+  } catch (err) {
+    console.log("⚠️ Could not add transaction_id FK to booking_payments:", err.message);
+  }
+
+  try {
+    await isanzureQuery(`
+      ALTER TABLE commissions 
+      ADD CONSTRAINT fk_commissions_transaction_id
+      FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE SET NULL;
+    `);
+    console.log("✅ Added transaction_id foreign key to commissions");
+  } catch (err) {
+    console.log("⚠️ Could not add transaction_id FK to commissions:", err.message);
+  }
+
+  try {
+    await isanzureQuery(`
+      ALTER TABLE messages 
+      ADD CONSTRAINT fk_messages_booking_id
+      FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL;
+    `);
+    console.log("✅ Added booking_id foreign key to messages");
+  } catch (err) {
+    console.log("⚠️ Could not add booking_id FK to messages:", err.message);
+  }
+  
+  console.log("🔗 Foreign key addition complete");
+};
+
+const createPropertyUnavailableDatesTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS property_unavailable_dates (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      unavailable_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      property_id INT NOT NULL,
+      date DATE NOT NULL,
+      status ENUM('maintenance', 'blocked', 'owner_stay', 'holiday') NOT NULL DEFAULT 'blocked',
+      reason TEXT NULL,
+      created_by INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      
+      INDEX idx_property_id (property_id),
+      INDEX idx_date (date),
+      INDEX idx_status (status),
+      UNIQUE KEY unique_property_date (property_id, date),
+      
+      FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
+      FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ Property unavailable dates table is ready");
+  } catch (err) {
+    console.error("❌ Error creating property unavailable dates table:", err);
+  }
+};
+
 // Initialize iSanzure database 
 const initializeIsanzureDatabase = async () => {
   try {
@@ -834,6 +1254,32 @@ const initializeIsanzureDatabase = async () => {
     await createPropertyPricingTable();
     await createPropertyRulesTable();
     await createPropertyNearbyAttractionsTable();
+
+    // 2. TABLES WITH NO DEPENDENCIES OR ONLY USERS/PROPERTIES
+    await createUserBalancesTable();      
+    await createWithdrawalsTable(); 
+    await createBookingsTable(); 
+    
+    // 3. TABLES THAT REFERENCE ONLY BOOKINGS
+    await createBookingExtensionsTable(); 
+    await createBookingCancellationsTable();
+    
+    // 4. TRANSACTIONS - NO payment_id FK
+    await createTransactionsTable();
+    
+    // 5. BOOKING PAYMENTS - NO transaction_id FK
+    await createBookingPaymentsTable();
+    
+    // 6. COMMISSIONS - NO transaction_id FK
+    await createCommissionsTable();
+    
+    // 7. MESSAGES - NO booking_id FK
+    await createMessagesTable();
+
+    // 8. ADD ALL MISSING FOREIGN KEYS
+    await addMissingForeignKeys();
+
+    await createPropertyUnavailableDatesTable();
 
     console.log("✅ iSanzure database initialization complete");
     return true;

@@ -44,14 +44,14 @@ export default function AccountMenu({ onClose, user }) {
     bookings: { 
       label: 'Bookings', 
       icon: <BookOpen size={16} />, 
-      path: '/bookings',
+      path: '/account/bookings',
       requiresAuth: true,
       authMessage: 'Sign in to view your bookings'
     },
     wishlist: { 
       label: 'Wishlist', 
       icon: <Heart size={16} />, 
-      path: '/wishlist',
+      path: '/account/wishlist',
       requiresAuth: true,
       authMessage: 'Sign in to save properties to your wishlist'
     },

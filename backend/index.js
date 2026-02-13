@@ -63,6 +63,10 @@ const isanzureRoutes = require('./routes/isanzure/isanzureRoutes');
 const propertyRoutes = require('./routes/isanzure/propertyRoutes');
 const publicPropertyRoutes = require('./routes/isanzure/publicPropertyRoutes');
 const isanzureSearchRoutes = require('./routes/isanzure/searchRoutes');
+const bookingRoutes = require('./routes/isanzure/bookingRoutes');
+const landlordBookingRoutes = require('./routes/isanzure/landlordBookingRoutes');
+const isanzureNotificationRoutes = require('./routes/isanzure/notificationRoutes');
+const messageRoutes = require('./routes/isanzure/messageRoutes');
 
 const cookieParser = require("cookie-parser");
 
@@ -461,6 +465,10 @@ app.use('/api/isanzure', isanzureRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/public/properties', publicPropertyRoutes);
 app.use('/api/isanzure/search', isanzureSearchRoutes);
+app.use('/api/booking', bookingRoutes);
+app.use('/api/landlord/bookings', landlordBookingRoutes);
+app.use('/api/notifications', isanzureNotificationRoutes);
+app.use('/api/user/messages', messageRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -509,7 +517,7 @@ const startServer = async () => {
     initializeSubscriptionMonitor();
     
     // Step 5: Start the server with Socket.IO
-    const PORT = process.env.PORT || 3122;
+    const PORT = process.env.PORT || 3123;
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT} with Socket.IO support`);
       console.log("✅ Database initialized successfully!");

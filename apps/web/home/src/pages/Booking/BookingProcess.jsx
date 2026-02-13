@@ -14,10 +14,19 @@ import SummaryCard from '../../components/Booking/SummaryCard';
 import LoadingState from '../../components/Booking/LoadingState';
 import ErrorState from '../../components/Booking/ErrorState';
 
+// ✅ ADD THIS IMPORT
+import { useAuth } from '../../context/AuthContext';
+import { useIsanzureAuth } from '../../context/IsanzureAuthContext';
+
 const BookingProcess = () => {
   const { propertyUid } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  
+  // ✅ ADD THESE
+  const { user } = useAuth();
+  const { refreshIsanzureUser } = useIsanzureAuth();
+  
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [property, setProperty] = useState(null);
@@ -31,6 +40,22 @@ const BookingProcess = () => {
     duration: 1
   });
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+  // ✅ ADD THIS - AUTO-CREATE iSanzure user if authenticated but not in iSanzure
+  useEffect(() => {
+    const ensureIsanzureUser = async () => {
+      if (user && !user?.isanzure_user_id) {
+        try {
+          console.log('🔄 Ensuring iSanzure user exists...');
+          await refreshIsanzureUser();
+        } catch (error) {
+          console.error('Error ensuring iSanzure user:', error);
+        }
+      }
+    };
+    
+    ensureIsanzureUser();
+  }, [user]);
 
   const periodDisplay = {
     monthly: { label: 'Monthly', unit: 'months' },
@@ -50,7 +75,6 @@ const BookingProcess = () => {
   }, [propertyUid]);
 
   useEffect(() => {
-    // Scroll to top when step changes
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [step]);
 
@@ -195,7 +219,6 @@ const BookingProcess = () => {
     const utilitiesMax = property.utilities_max || 0;
     const utilitiesIncluded = property.utilities_included === 1;
     
-    // Only show for monthly bookings
     if (bookingData.period !== 'monthly') {
       return null;
     }
@@ -243,42 +266,31 @@ const BookingProcess = () => {
     const platformCommission = property.platform_commission_rate || 10;
     const policy = rules.cancellation_policy || 'flexible';
     
-    // Calculate days until check-in
     const startDate = new Date(bookingData.startDate);
     const now = new Date();
     const daysUntilCheckIn = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
     const isWithinTwoDays = daysUntilCheckIn <= 2;
     
-    // Determine refund percentage
     let refundPercentage = 0;
-    let showTwoDayProtection = false;
     
-    if (isWithinTwoDays && bookingData.period === 'monthly') {
-      // Within 2 days for monthly: Full refund (90% after commission)
-      refundPercentage = 100;
-      showTwoDayProtection = true;
-    } else {
-      // Use landlord's policy
-      switch (policy) {
-        case 'flexible':
-          refundPercentage = 100;
-          break;
-        case 'moderate':
-          refundPercentage = 50;
-          break;
-        case 'strict':
-          refundPercentage = 0;
-          break;
-        default:
-          refundPercentage = 100;
-      }
+    switch (policy) {
+      case 'flexible':
+        refundPercentage = 100;
+        break;
+      case 'moderate':
+        refundPercentage = 50;
+        break;
+      case 'strict':
+        refundPercentage = 0;
+        break;
+      default:
+        refundPercentage = 100;
     }
     
     const refundAfterCommission = refundPercentage > 0 
       ? Math.round(refundPercentage - (refundPercentage * (platformCommission / 100)))
       : 0;
     
-    // Get policy description based on type
     let policyDescription = '';
     switch (policy) {
       case 'flexible':
@@ -301,7 +313,7 @@ const BookingProcess = () => {
       platformCommission,
       isWithinTwoDays,
       daysUntilCheckIn,
-      showTwoDayProtection,
+      showTwoDayProtection: isWithinTwoDays && bookingData.period === 'monthly',
       policyDescription,
       monthlyExample: getMonthlyCancellationExample(policy, platformCommission, refundAfterCommission)
     };
@@ -395,7 +407,7 @@ const BookingProcess = () => {
     if (step > 1) {
       setStep(step - 1);
     } else {
-      navigate(`/property/${propertyUid}`);
+      navigate(-1);
     }
   };
 
@@ -470,7 +482,12 @@ const BookingProcess = () => {
       case 2:
         return <PaymentMethodStep {...commonProps} />;
       case 3:
-        return <ConfirmPaymentStep {...commonProps} />;
+        return (
+          <ConfirmPaymentStep
+            {...commonProps}
+            propertyUid={propertyUid} // ✅ ONLY THIS LINE ADDED
+          />
+        );
       default:
         return null;
     }

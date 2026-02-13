@@ -664,9 +664,9 @@ exports.getPropertyByUid = async (req, res) => {
     pp.utilities_min,
     pp.utilities_max,
     pp.utilities_included,
-    pp.max_advance_months,           -- ADD THIS LINE
-    pp.max_single_payment_months,    -- ADD THIS LINE
-    pp.platform_commission_rate,     -- ADD THIS LINE
+    pp.max_advance_months,          
+    pp.max_single_payment_months,   
+    pp.platform_commission_rate,    
     
     -- Rules
     pr.check_in_time,
