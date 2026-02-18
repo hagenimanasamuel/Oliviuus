@@ -1,7 +1,7 @@
 // src/routes/AccountRoutes.jsx
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
-import AuthForm from '../pages/Auth/AuthForm.jsx';
+import AuthForm from '../pages/auth/AuthForm.jsx';
 import { useAuth } from '../context/AuthContext'; 
 
 // Lazy load components
