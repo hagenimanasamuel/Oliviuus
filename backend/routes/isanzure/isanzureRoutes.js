@@ -186,4 +186,103 @@ router.get('/is-landlord', authMiddleware, async (req, res) => {
   }
 });
 
+// auto create tenant user if not exists - this is called from the frontend when we detect a logged in user without an iSanzure account, to ensure they have one for tenant features
+router.post('/auto-create-tenant', authMiddleware, async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const user_type = 'tenant';
+
+    console.log('📝 Auto-creating tenant for Oliviuus ID:', user_id);
+
+    // First check if user exists
+    const checkSql = 'SELECT id, user_type FROM users WHERE oliviuus_user_id = ?';
+    const existingUser = await isanzureQuery(checkSql, [user_id]);
+
+    if (existingUser.length > 0) {
+      // User already exists
+      console.log('✅ User already exists in iSanzure as:', existingUser[0].user_type);
+      return res.status(200).json({
+        success: true,
+        exists: true,
+        message: 'User already exists in iSanzure',
+        isanzure_user: {
+          id: existingUser[0].id,
+          user_type: existingUser[0].user_type,
+          oliviuus_user_id: user_id
+        }
+      });
+    }
+
+    // User doesn't exist, create new one
+    const insertSql = `
+      INSERT INTO users (
+        oliviuus_user_id, 
+        user_type, 
+        registration_source,
+        created_at,
+        updated_at
+      ) VALUES (?, ?, 'oliviuus_sso', NOW(), NOW())
+    `;
+
+    const result = await isanzureQuery(insertSql, [user_id, user_type]);
+    
+    console.log('✅ New tenant created with ID:', result.insertId);
+
+    // Fetch the created user
+    const fetchSql = `
+      SELECT 
+        id as isanzure_user_id,
+        oliviuus_user_id,
+        user_type,
+        registration_source,
+        created_at
+      FROM users 
+      WHERE id = ?
+    `;
+    
+    const newUser = await isanzureQuery(fetchSql, [result.insertId]);
+
+    res.status(201).json({
+      success: true,
+      exists: false,
+      message: 'Tenant account created successfully',
+      isanzure_user: newUser[0] || {
+        id: result.insertId,
+        oliviuus_user_id: user_id,
+        user_type: user_type
+      }
+    });
+
+  } catch (error) {
+    // Handle duplicate entry error gracefully
+    if (error.code === 'ER_DUP_ENTRY') {
+      console.log('⚠️ Duplicate entry caught, user was created in another request');
+      
+      // Fetch the existing user
+      try {
+        const fetchSql = 'SELECT id, user_type FROM users WHERE oliviuus_user_id = ?';
+        const existingUser = await isanzureQuery(fetchSql, [req.user.id]);
+        
+        if (existingUser.length > 0) {
+          return res.status(200).json({
+            success: true,
+            exists: true,
+            message: 'User already exists in iSanzure',
+            isanzure_user: existingUser[0]
+          });
+        }
+      } catch (fetchError) {
+        console.error('Error fetching after duplicate:', fetchError);
+      }
+    }
+    
+    console.error('❌ Error in auto-create-tenant:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error',
+      error: error.message 
+    });
+  }
+});
+
 module.exports = router;

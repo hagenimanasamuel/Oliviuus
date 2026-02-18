@@ -67,6 +67,10 @@ const bookingRoutes = require('./routes/isanzure/bookingRoutes');
 const landlordBookingRoutes = require('./routes/isanzure/landlordBookingRoutes');
 const isanzureNotificationRoutes = require('./routes/isanzure/notificationRoutes');
 const messageRoutes = require('./routes/isanzure/messageRoutes');
+const wishlistRoutes = require('./routes/isanzure/wishlistRoutes');
+const userBookingRoutes = require('./routes/isanzure/userBookingRoutes');
+const balanceRoutes = require('./routes/isanzure/balanceRoutes');
+const landlordTenantRoutes = require('./routes/isanzure/landlordTenantRoutes');
 
 const cookieParser = require("cookie-parser");
 
@@ -469,6 +473,10 @@ app.use('/api/booking', bookingRoutes);
 app.use('/api/landlord/bookings', landlordBookingRoutes);
 app.use('/api/notifications', isanzureNotificationRoutes);
 app.use('/api/user/messages', messageRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/isanzure/user/bookings', userBookingRoutes);
+app.use('/api/isanzure/balance', balanceRoutes);
+app.use('/api/landlord/tenants', landlordTenantRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

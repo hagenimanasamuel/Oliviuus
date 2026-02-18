@@ -1,12 +1,12 @@
 // src/components/Booking/PaymentModal.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  X, 
-  Phone, 
-  Loader, 
-  Check, 
-  CreditCard, 
-  Wallet, 
+import {
+  X,
+  Phone,
+  Loader,
+  Check,
+  CreditCard,
+  Wallet,
   TrendingUp,
   Info,
   Shield,
@@ -113,33 +113,33 @@ const PaymentModal = ({
     setTrackingAttempts(0);
     setCardRedirected(false);
     setTrackingStarted(true);
-    
+
     // Wait 5 seconds before first check (user needs time to see phone prompt)
     setTimeout(() => {
       let attempts = 0;
       const maxAttempts = 24; // 24 attempts = 72 seconds (3s interval) for card payments
-      
+
       const interval = setInterval(async () => {
         attempts++;
         setTrackingAttempts(attempts);
-        
+
         try {
           const response = await api.get(`/booking/status/${referenceId}`);
           const data = response.data.data;
-          
+
           console.log(`📊 Tracking attempt ${attempts}:`, data.status);
-          
+
           if (data.status === 'completed') {
             console.log('🎉 Payment successful!');
             clearInterval(interval);
             setPaymentStatus('success');
             setPaymentStep(3);
-            
+
             setTimeout(() => {
               onClose();
               onSuccess();
             }, 2000);
-            
+
           } else if (data.status === 'failed') {
             console.log('❌ Payment failed');
             clearInterval(interval);
@@ -149,11 +149,11 @@ const PaymentModal = ({
             setProcessingPayment(false);
             setTrackingStarted(false);
           }
-          
+
         } catch (error) {
           console.error('Tracking error:', error);
         }
-        
+
         // Stop after max attempts
         if (attempts >= maxAttempts) {
           console.log(`⏹️ Stopped tracking after ${maxAttempts} attempts`);
@@ -162,23 +162,23 @@ const PaymentModal = ({
           setShowInstructions(true);
           setProcessingPayment(false);
         }
-        
+
       }, 3000); // Check every 3 seconds
-      
+
       setTrackingInterval(interval);
-      
+
     }, 5000); // 5 second delay before starting
   };
 
   // ========== MOMO PAYMENT ==========
   const handleMoMoPayment = async () => {
     if (!validatePhoneNumber()) return;
-    
+
     setProcessingPayment(true);
     setValidationError('');
     setShowInstructions(false);
     setTrackingStarted(false);
-    
+
     try {
       const payload = {
         propertyUid,
@@ -191,18 +191,18 @@ const PaymentModal = ({
         specialRequests: bookingData.specialRequests || '',
         optionalServices: bookingData.customizations?.length > 0 ? bookingData.customizations : null
       };
-      
+
       const response = await api.post('/booking/initiate', payload);
-      
+
       if (response.data.success) {
         setPaymentReference(response.data.reference_id);
         setInstructions(response.data.instructions || []);
         setPaymentStep(2);
-        
-        // Start smart tracking (5s delay, 12 attempts, 3s interval)
+
+        // Start smart tracking
         startSmartTracking(response.data.reference_id);
       }
-      
+
     } catch (error) {
       console.error('❌ MoMo payment error:', error);
       setValidationError(error.response?.data?.message || 'Payment failed');
@@ -211,15 +211,13 @@ const PaymentModal = ({
     }
   };
 
-  // ========== CARD PAYMENT - FIXED ==========
+  // ========== CARD PAYMENT ==========
   const handleCardPayment = async () => {
     if (!validateCardDetails()) return;
-    
+
     setProcessingPayment(true);
     setValidationError('');
-    setCardRedirected(false);
-    setTrackingStarted(false);
-    
+
     try {
       const payload = {
         propertyUid,
@@ -236,41 +234,20 @@ const PaymentModal = ({
         optionalServices: bookingData.customizations?.length > 0 ? bookingData.customizations : null,
         cancel_url: window.location.href
       };
-      
+
       const response = await api.post('/booking/initiate', payload);
-      
-      if (response.data.success && response.data.mode === 'card') {
+
+      if (response.data.success && response.data.redirect_url) {
         setPaymentReference(response.data.reference_id);
-        setCardRedirected(true);
         setPaymentStep(2);
-        
-        // Create and submit form to iframe URL
-        const { card_url, ...postData } = response.data.postData;
-        
-        const form = document.createElement('form');
-        form.action = card_url;
-        form.method = 'POST';
-        form.style.display = 'none';
-        form.target = '_blank';
-        
-        Object.keys(postData).forEach(key => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = postData[key];
-          form.appendChild(input);
-        });
-        
-        document.body.appendChild(form);
-        form.submit();
-        
-        // Clean up
-        setTimeout(() => form.remove(), 1000);
-        
-        // ✅ FIX: Start tracking the payment status (DO NOT show success yet!)
+
+        // ✅ Redirect to Pesapal iframe
+        window.location.href = response.data.redirect_url;
+
+        // Start tracking the payment status
         startSmartTracking(response.data.reference_id);
       }
-      
+
     } catch (error) {
       console.error('❌ Card payment error:', error);
       setValidationError(error.response?.data?.message || 'Payment failed');
@@ -282,7 +259,7 @@ const PaymentModal = ({
   // ========== BALANCE PAYMENT ==========
   const handleBalancePayment = async () => {
     setProcessingPayment(true);
-    
+
     try {
       const payload = {
         propertyUid,
@@ -294,9 +271,9 @@ const PaymentModal = ({
         specialRequests: bookingData.specialRequests || '',
         optionalServices: bookingData.customizations?.length > 0 ? bookingData.customizations : null
       };
-      
+
       const response = await api.post('/booking/initiate', payload);
-      
+
       if (response.data.success) {
         setPaymentReference(response.data.reference_id);
         setPaymentStep(2);
@@ -309,7 +286,7 @@ const PaymentModal = ({
           }, 2000);
         }, 1500);
       }
-      
+
     } catch (error) {
       console.error('❌ Balance payment error:', error);
       setValidationError('Payment failed');
@@ -321,7 +298,7 @@ const PaymentModal = ({
   // ========== LOAN PAYMENT ==========
   const handleLoanPayment = async () => {
     setProcessingPayment(true);
-    
+
     try {
       const payload = {
         propertyUid,
@@ -333,9 +310,9 @@ const PaymentModal = ({
         specialRequests: bookingData.specialRequests || '',
         optionalServices: bookingData.customizations?.length > 0 ? bookingData.customizations : null
       };
-      
+
       const response = await api.post('/booking/initiate', payload);
-      
+
       if (response.data.success) {
         setPaymentReference(response.data.reference_id);
         setPaymentStep(2);
@@ -348,7 +325,7 @@ const PaymentModal = ({
           }, 2000);
         }, 1500);
       }
-      
+
     } catch (error) {
       console.error('❌ Loan payment error:', error);
       setValidationError('Payment failed');
@@ -391,13 +368,13 @@ const PaymentModal = ({
       setValidationError('Phone number is required');
       return false;
     }
-    
+
     const cleaned = paymentDetails.phoneNumber.replace(/\D/g, '');
     if (cleaned.length < 9) {
       setValidationError('Please enter a valid phone number (at least 9 digits)');
       return false;
     }
-    
+
     setValidationError('');
     return true;
   };
@@ -420,7 +397,7 @@ const PaymentModal = ({
       setValidationError('Please enter a valid email address');
       return false;
     }
-    
+
     setValidationError('');
     return true;
   };
@@ -438,15 +415,15 @@ const PaymentModal = ({
 
   const isPaymentButtonEnabled = () => {
     if (paymentStep !== 1) return false;
-    
+
     switch (bookingData.paymentMethod) {
       case 'mobile_money':
         return paymentDetails.phoneNumber.replace(/\D/g, '').length >= 9;
       case 'card':
-        return paymentDetails.firstName && 
-               paymentDetails.lastName && 
-               paymentDetails.email && 
-               paymentDetails.email.includes('@');
+        return paymentDetails.firstName &&
+          paymentDetails.lastName &&
+          paymentDetails.email &&
+          paymentDetails.email.includes('@');
       case 'balance':
         return userBalance >= totalAmount;
       case 'loan':
@@ -469,7 +446,7 @@ const PaymentModal = ({
                 <h3 className="font-bold text-gray-900 text-lg">Mobile Money Payment</h3>
                 <p className="text-sm text-gray-600">Enter your phone number to receive payment prompt</p>
               </div>
-              
+
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -481,13 +458,12 @@ const PaymentModal = ({
                     type="tel"
                     value={paymentDetails.phoneNumber}
                     onChange={(e) => {
-                      setPaymentDetails({...paymentDetails, phoneNumber: e.target.value});
+                      setPaymentDetails({ ...paymentDetails, phoneNumber: e.target.value });
                       setValidationError('');
                     }}
                     placeholder="0788 XXX XXX"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#BC8BBC]/20 outline-none transition-all ${
-                      validationError ? 'border-red-300 bg-red-50' : 'border-gray-300 focus:border-[#BC8BBC]'
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#BC8BBC]/20 outline-none transition-all ${validationError ? 'border-red-300 bg-red-50' : 'border-gray-300 focus:border-[#BC8BBC]'
+                      }`}
                   />
                   {validationError && (
                     <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
@@ -496,7 +472,7 @@ const PaymentModal = ({
                     </p>
                   )}
                 </div>
-                
+
                 <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-sm">
                   <div className="font-medium text-blue-800 mb-1 flex items-center gap-1">
                     <Info className="h-4 w-4" />
@@ -509,7 +485,7 @@ const PaymentModal = ({
                     <li>Enter your PIN to confirm</li>
                   </ol>
                 </div>
-                
+
                 <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600">
                   <div className="font-medium mb-1 flex items-center gap-1">
                     <Shield className="h-3 w-3" />
@@ -531,7 +507,7 @@ const PaymentModal = ({
                 <h3 className="font-bold text-gray-900 text-lg">Card Payment</h3>
                 <p className="text-sm text-gray-600">Enter your details for secure payment</p>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -543,7 +519,7 @@ const PaymentModal = ({
                       type="text"
                       value={paymentDetails.firstName}
                       onChange={(e) => {
-                        setPaymentDetails({...paymentDetails, firstName: e.target.value});
+                        setPaymentDetails({ ...paymentDetails, firstName: e.target.value });
                         setValidationError('');
                       }}
                       placeholder="John"
@@ -558,7 +534,7 @@ const PaymentModal = ({
                       type="text"
                       value={paymentDetails.lastName}
                       onChange={(e) => {
-                        setPaymentDetails({...paymentDetails, lastName: e.target.value});
+                        setPaymentDetails({ ...paymentDetails, lastName: e.target.value });
                         setValidationError('');
                       }}
                       placeholder="Doe"
@@ -566,7 +542,7 @@ const PaymentModal = ({
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Email Address
@@ -575,14 +551,14 @@ const PaymentModal = ({
                     type="email"
                     value={paymentDetails.email}
                     onChange={(e) => {
-                      setPaymentDetails({...paymentDetails, email: e.target.value});
+                      setPaymentDetails({ ...paymentDetails, email: e.target.value });
                       setValidationError('');
                     }}
                     placeholder="your@email.com"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#BC8BBC]/20 focus:border-[#BC8BBC] outline-none transition-all"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Phone Number (Optional)
@@ -590,19 +566,19 @@ const PaymentModal = ({
                   <input
                     type="tel"
                     value={paymentDetails.phoneNumber}
-                    onChange={(e) => setPaymentDetails({...paymentDetails, phoneNumber: e.target.value})}
+                    onChange={(e) => setPaymentDetails({ ...paymentDetails, phoneNumber: e.target.value })}
                     placeholder="0788 XXX XXX"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#BC8BBC]/20 focus:border-[#BC8BBC] outline-none transition-all"
                   />
                 </div>
-                
+
                 {validationError && (
                   <p className="text-xs text-red-600 flex items-center gap-1 mt-1">
                     <AlertCircle className="h-3 w-3" />
                     {validationError}
                   </p>
                 )}
-                
+
                 <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-sm">
                   <div className="font-medium text-blue-800 mb-1 flex items-center gap-1">
                     <Shield className="h-4 w-4" />
@@ -629,7 +605,7 @@ const PaymentModal = ({
                 <h3 className="font-bold text-gray-900 text-lg">iSanzure Balance</h3>
                 <p className="text-sm text-gray-600">Pay using your wallet balance</p>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="p-3 bg-white rounded-lg border border-gray-200">
                   <div className="flex justify-between items-center mb-2">
@@ -642,7 +618,7 @@ const PaymentModal = ({
                       <div className="text-xl font-bold text-gray-900">{formatPrice(totalAmount)}</div>
                     </div>
                   </div>
-                  
+
                   {userBalance >= totalAmount ? (
                     <div className="p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
                       <div className="flex items-center gap-2">
@@ -673,7 +649,7 @@ const PaymentModal = ({
                 <h3 className="font-bold text-gray-900 text-lg">iSanzure Loan</h3>
                 <p className="text-sm text-gray-600">Pay using your loan limit</p>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="p-3 bg-white rounded-lg border border-gray-200">
                   <div className="flex justify-between items-center mb-2">
@@ -686,7 +662,7 @@ const PaymentModal = ({
                       <div className="text-xl font-bold text-gray-900">{formatPrice(totalAmount)}</div>
                     </div>
                   </div>
-                  
+
                   {userLoanLimit >= totalAmount ? (
                     <div className="p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
                       <div className="flex items-center gap-2">
@@ -703,7 +679,7 @@ const PaymentModal = ({
                     </div>
                   )}
                 </div>
-                
+
                 <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600">
                   <div className="font-medium mb-1">Loan Terms</div>
                   <p>This amount will be added to your iSanzure loan balance.</p>
@@ -720,11 +696,11 @@ const PaymentModal = ({
         <div className="py-8 text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#BC8BBC] mx-auto mb-4"></div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">
-            {bookingData.paymentMethod === 'card' && cardRedirected 
-              ? 'Waiting for Payment Confirmation' 
+            {bookingData.paymentMethod === 'card' && cardRedirected
+              ? 'Waiting for Payment Confirmation'
               : 'Processing Payment'}
           </h3>
-          
+
           {bookingData.paymentMethod === 'card' && cardRedirected && (
             <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
               <p className="text-amber-800 text-sm font-medium mb-2 flex items-center gap-2">
@@ -737,7 +713,7 @@ const PaymentModal = ({
               </p>
             </div>
           )}
-          
+
           <p className="text-gray-600 text-sm">
             {bookingData.paymentMethod === 'mobile_money' && 'Please check your phone for the payment prompt...'}
             {bookingData.paymentMethod === 'card' && 'Waiting for payment confirmation from the secure page...'}
@@ -762,7 +738,7 @@ const PaymentModal = ({
           {trackingStarted && (
             <div className="mt-4">
               <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-                <div 
+                <div
                   className="bg-[#BC8BBC] h-1.5 rounded-full transition-all duration-300"
                   style={{ width: `${(trackingAttempts / 24) * 100}%` }}
                 ></div>
@@ -813,28 +789,26 @@ const PaymentModal = ({
           <button
             onClick={handleCloseModal}
             disabled={processingPayment}
-            className={`p-2 rounded-full transition-colors ${
-              processingPayment ? 'text-gray-400 cursor-not-allowed' : 'hover:bg-gray-100 text-gray-500'
-            }`}
+            className={`p-2 rounded-full transition-colors ${processingPayment ? 'text-gray-400 cursor-not-allowed' : 'hover:bg-gray-100 text-gray-500'
+              }`}
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-        
+
         <div className="p-6 min-h-[320px] max-h-[60vh] overflow-y-auto">
           {renderPaymentContent()}
         </div>
-        
+
         {paymentStep === 1 && (
           <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-2xl">
             <button
               onClick={handleProcessPayment}
               disabled={!isPaymentButtonEnabled() || processingPayment}
-              className={`w-full py-3 rounded-lg font-medium transition-all ${
-                isPaymentButtonEnabled() && !processingPayment
+              className={`w-full py-3 rounded-lg font-medium transition-all ${isPaymentButtonEnabled() && !processingPayment
                   ? 'bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] text-white hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]'
                   : 'bg-gray-200 cursor-not-allowed text-gray-500'
-              }`}
+                }`}
             >
               {processingPayment ? (
                 <div className="flex items-center justify-center gap-2">
@@ -845,7 +819,7 @@ const PaymentModal = ({
                 getButtonText()
               )}
             </button>
-            
+
             <button
               onClick={handleCloseModal}
               className="w-full py-3 mt-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
@@ -854,7 +828,7 @@ const PaymentModal = ({
             </button>
           </div>
         )}
-        
+
         {paymentStep === 2 && bookingData.paymentMethod === 'card' && cardRedirected && (
           <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-2xl">
             <button

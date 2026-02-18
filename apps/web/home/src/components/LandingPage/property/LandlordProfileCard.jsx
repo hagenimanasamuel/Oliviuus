@@ -61,11 +61,61 @@ const LandlordProfileCard = ({ landlord, propertyUid }) => {
     }
   };
 
+  // ========== NAVIGATE TO IN-APP MESSAGING ==========
+  const handleInAppMessage = (e) => {
+    e.stopPropagation();
+    
+    if (!landlord?.user_uid) {
+      console.error('Landlord UUID is missing');
+      return;
+    }
+
+    // Create a professional message
+    let defaultMessage = `Hi ${getLandlordName()}, I'm interested in `;
+    
+    // Add property reference if available
+    if (propertyUid) {
+      defaultMessage += `property @${propertyUid}`;
+    } else {
+      defaultMessage += `your properties`;
+    }
+    
+    defaultMessage += `. Can you provide more information?`;
+    
+    const encodedMessage = encodeURIComponent(defaultMessage);
+    
+    // Navigate to messages with landlord UUID and draft
+    navigate(`/account/messages?landlord=${landlord.user_uid}&draft=${encodedMessage}`);
+  };
+
   // Format phone number for WhatsApp
   const formatPhoneForWhatsApp = (phone) => {
     if (!phone) return null;
     // Remove spaces and special characters, keep only digits
     return phone.replace(/\D/g, '');
+  };
+
+  // Handle WhatsApp message
+  const handleWhatsApp = (e) => {
+    e.stopPropagation();
+    
+    const phone = landlord.public_phone || landlord.sso_profile?.phone;
+    if (!phone) return;
+    
+    const whatsappNumber = formatPhoneForWhatsApp(phone);
+    if (!whatsappNumber) return;
+    
+    let message = `Hi ${getLandlordName()}, I'm interested in `;
+    
+    if (propertyUid) {
+      message += `property @${propertyUid}`;
+    } else {
+      message += `your properties`;
+    }
+    
+    message += `. Can you provide more information?`;
+    
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   // Get available contact options
@@ -74,21 +124,31 @@ const LandlordProfileCard = ({ landlord, propertyUid }) => {
     
     const options = [];
     
-    // WhatsApp
+    // In-App Messaging (Always show)
+    options.push({
+      type: 'inapp',
+      icon: '💬',
+      label: 'Message',
+      color: 'bg-gradient-to-r from-[#BC8BBC]/20 to-[#8A5A8A]/20 border border-[#BC8BBC]/30 text-[#8A5A8A] hover:from-[#BC8BBC]/30 hover:to-[#8A5A8A]/30',
+      action: handleInAppMessage
+    });
+    
+    // WhatsApp (Icon only)
     const phone = landlord.public_phone || landlord.sso_profile?.phone;
     if (phone) {
       const whatsappNumber = formatPhoneForWhatsApp(phone);
       if (whatsappNumber) {
         options.push({
           type: 'whatsapp',
-          icon: '💬',
-          label: 'Message',
-          color: 'bg-green-50 border border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300',
-          action: (e) => {
-            e.stopPropagation();
-            const message = `Hello ${getLandlordName()}, I'm interested in this property!`;
-            window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-          }
+          icon: (
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.554 4.118 1.523 5.87L.044 23.91l6.068-1.521C7.812 23.194 9.856 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.848 0-3.593-.504-5.097-1.382l-.365-.212-3.604.904.96-3.541-.23-.388C2.584 15.74 2 13.918 2 12 2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/>
+            </svg>
+          ),
+          label: '',
+          color: 'bg-green-50 border border-green-200 text-green-600 hover:bg-green-100 hover:border-green-300',
+          action: handleWhatsApp
         });
       }
     }
@@ -98,8 +158,8 @@ const LandlordProfileCard = ({ landlord, propertyUid }) => {
       options.push({
         type: 'phone',
         icon: '📞',
-        label: 'Call',
-        color: 'bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300',
+        label: '',
+        color: 'bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 hover:border-blue-300',
         action: (e) => {
           e.stopPropagation();
           window.location.href = `tel:${phone}`;
@@ -113,12 +173,19 @@ const LandlordProfileCard = ({ landlord, propertyUid }) => {
       options.push({
         type: 'email',
         icon: '📧',
-        label: 'Email',
-        color: 'bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100 hover:border-purple-300',
+        label: '',
+        color: 'bg-purple-50 border border-purple-200 text-purple-600 hover:bg-purple-100 hover:border-purple-300',
         action: (e) => {
           e.stopPropagation();
           const subject = `Inquiry about your property`;
-          const body = `Hello ${getLandlordName()},\n\nI would like to know more about your property.`;
+          let body = `Hi ${getLandlordName()},\n\n`;
+          
+          if (propertyUid) {
+            body += `I would like to know more about property @${propertyUid}.`;
+          } else {
+            body += `I would like to know more about your properties.`;
+          }
+          
           window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
       });
@@ -208,18 +275,28 @@ const LandlordProfileCard = ({ landlord, propertyUid }) => {
         </div>
       </div>
 
-      {/* Contact Buttons - Only show if available */}
+      {/* Contact Buttons - In-App Messaging always first, WhatsApp icon only */}
       {contactOptions.length > 0 && (
         <div className="mb-3 pt-3 border-t border-gray-100">
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {contactOptions.map((option, index) => (
               <button
                 key={index}
                 onClick={option.action}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg ${option.color} transition-all duration-200 text-xs font-medium`}
+                className={`
+                  flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg 
+                  ${option.color} transition-all duration-200 text-sm font-medium
+                  ${option.type === 'inapp' ? 'flex-1' : ''}
+                  ${option.type === 'whatsapp' ? 'px-3' : ''}
+                `}
+                title={option.type === 'whatsapp' ? 'WhatsApp' : option.type === 'phone' ? 'Call' : option.type === 'email' ? 'Email' : ''}
               >
-                <span className="text-sm">{option.icon}</span>
-                <span>{option.label}</span>
+                {typeof option.icon === 'string' ? (
+                  <span className="text-base">{option.icon}</span>
+                ) : (
+                  option.icon
+                )}
+                {option.label && <span>{option.label}</span>}
               </button>
             ))}
           </div>

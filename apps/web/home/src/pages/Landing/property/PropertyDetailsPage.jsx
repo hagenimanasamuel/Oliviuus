@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+// src/pages/property/PropertyDetailsPage.jsx
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../api/axios';
+import toast from 'react-hot-toast';
 
 // Import layout components
 import MainHeader from '../../../components/LandingPage/Header/Header';
@@ -44,6 +46,13 @@ export default function PropertyDetailsPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showShareModal, setShowShareModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showFloatingButton, setShowFloatingButton] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState('monthly');
+  const [showPeriodSelector, setShowPeriodSelector] = useState(false);
+  
+  const bookingSectionRef = useRef(null);
+  const floatingButtonRef = useRef(null);
+  const periodSelectorRef = useRef(null);
 
   const fetchPropertyDetails = useCallback(async () => {
     try {
@@ -54,16 +63,16 @@ export default function PropertyDetailsPage() {
 
       if (propertyResponse.data.success && propertyResponse.data.data) {
         const responseData = propertyResponse.data.data;
-        
+
         // Set property data
         setProperty(responseData.property);
         setImages(responseData.images || []);
         setAmenities(responseData.amenities || []);
-        
+
         // Set landlord data (already includes SSO profile from backend)
         if (responseData.landlord) {
           setLandlord(responseData.landlord);
-          
+
           // Optionally fetch additional landlord info if needed
           if (responseData.landlord.id) {
             try {
@@ -99,17 +108,156 @@ export default function PropertyDetailsPage() {
     fetchPropertyDetails();
   }, [fetchPropertyDetails]);
 
+  // Handle scroll to show/hide floating button on mobile
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerWidth < 1024) { // Mobile only
+        if (bookingSectionRef.current) {
+          const rect = bookingSectionRef.current.getBoundingClientRect();
+          // Show floating button when booking section is out of view
+          const isBookingSectionVisible = rect.top < window.innerHeight && rect.bottom > 0;
+          setShowFloatingButton(!isBookingSectionVisible);
+        }
+      } else {
+        setShowFloatingButton(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    // Initial check
+    handleScroll();
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close period selector when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (periodSelectorRef.current && !periodSelectorRef.current.contains(event.target) &&
+          floatingButtonRef.current && !floatingButtonRef.current.contains(event.target)) {
+        setShowPeriodSelector(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleBookNow = () => {
     console.log('Booking property:', propertyUid);
-    // Navigate to booking or show booking modal
-    // navigate(`/book/${propertyUid}`);
+    // Navigate to booking with selected period
+    navigate(`/book/${propertyUid}?period=${selectedPeriod}`);
   };
 
-  const handleFavorite = () => {
-    setIsFavorite(!isFavorite);
-    // Add to favorites API call here
-    // api.post(`/user/favorites/${propertyUid}`, { isFavorite: !isFavorite });
+  const handleFavorite = async () => {
+    if (!propertyUid) return;
+
+    try {
+      if (isFavorite) {
+        // Remove from wishlist
+        const response = await api.delete(`/wishlist/remove/${propertyUid}`);
+
+        if (response.data.success) {
+          setIsFavorite(false);
+          toast.success('Removed from wishlist', {
+            icon: '💔',
+            style: {
+              borderRadius: '10px',
+              background: '#333',
+              color: '#fff',
+            }
+          });
+        }
+      } else {
+        // Add to wishlist
+        const response = await api.post(`/wishlist/add/${propertyUid}`);
+
+        if (response.data.success) {
+          setIsFavorite(true);
+          toast.success('Added to wishlist!', {
+            icon: '❤️',
+            style: {
+              borderRadius: '10px',
+              background: '#BC8BBC',
+              color: '#fff',
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        toast.error('Please login to save properties', {
+          icon: '🔒',
+          duration: 4000
+        });
+      } else if (error.response?.data?.code === 'ALREADY_IN_WISHLIST') {
+        // Property already in wishlist - just update UI
+        setIsFavorite(true);
+        toast('Already in your wishlist', {
+          icon: '❤️',
+        });
+      } else if (error.response?.data?.code === 'NOT_IN_WISHLIST') {
+        // Property not in wishlist - just update UI
+        setIsFavorite(false);
+      } else if (error.response?.data?.code === 'PROPERTY_INACTIVE') {
+        toast.error('This property is currently unavailable', {
+          icon: '🏠',
+        });
+      } else {
+        toast.error('Something went wrong. Please try again.', {
+          icon: '❌',
+        });
+      }
+    }
   };
+
+  // Add this new callback function to sync with header
+  const handleFavoriteChange = (newFavoriteState) => {
+    setIsFavorite(newFavoriteState);
+  };
+
+  // Handle period selection from BookingSummary
+  const handlePeriodChange = (period) => {
+    setSelectedPeriod(period);
+  };
+
+  // Handle period selection from floating button
+  const handleFloatingPeriodSelect = (period) => {
+    setSelectedPeriod(period);
+    setShowPeriodSelector(false);
+  };
+
+  // Get all available periods for the floating selector
+  const getAvailablePeriods = () => {
+    if (!property) return [];
+    
+    const periods = [];
+    if (property.accept_monthly && property.monthly_price > 0) {
+      periods.push({ id: 'monthly', label: 'Monthly', price: property.monthly_price, period: 'month' });
+    }
+    if (property.accept_weekly && property.weekly_price > 0) {
+      periods.push({ id: 'weekly', label: 'Weekly', price: property.weekly_price, period: 'week' });
+    }
+    if (property.accept_daily && property.daily_price > 0) {
+      periods.push({ id: 'daily', label: 'Daily', price: property.daily_price, period: 'day' });
+    }
+    if (property.accept_nightly && property.nightly_price > 0) {
+      periods.push({ id: 'nightly', label: 'Nightly', price: property.nightly_price, period: 'night' });
+    }
+    return periods;
+  };
+
+  // Get selected period data for floating button
+  const getSelectedPeriodData = () => {
+    const periods = getAvailablePeriods();
+    return periods.find(p => p.id === selectedPeriod) || periods[0];
+  };
+
+  const availablePeriods = getAvailablePeriods();
+  const selectedPeriodData = getSelectedPeriodData();
 
   // Loading state
   if (loading) {
@@ -206,6 +354,8 @@ export default function PropertyDetailsPage() {
         showShareModal={() => setShowShareModal(true)}
         isFavorite={isFavorite}
         handleFavorite={handleFavorite}
+        propertyUid={propertyUid}
+        onFavoriteChange={handleFavoriteChange}
       />
 
       {/* Main Content */}
@@ -221,8 +371,8 @@ export default function PropertyDetailsPage() {
           <div className="lg:col-span-2 space-y-3 sm:space-y-4 md:space-y-6">
             {/* Image Gallery with Title, Location, Price and Badges integrated */}
             <div className="rounded-xl sm:rounded-2xl overflow-hidden">
-              <ImageGallery 
-                images={images} 
+              <ImageGallery
+                images={images}
                 propertyTitle={property.title}
                 property={property}
               />
@@ -238,10 +388,19 @@ export default function PropertyDetailsPage() {
             </div>
           </div>
 
-          {/* Right Column - Contact & Booking */}
-          <div className="space-y-3 sm:space-y-4 md:space-y-6">
+          {/* Right Column - Booking & Contact */}
+          <div className="space-y-3 sm:space-y-4 md:space-y-6 lg:relative">
+            {/* Booking Summary - With ref for scroll detection and sticky positioning */}
+            <div ref={bookingSectionRef} className="lg:sticky lg:top-24 lg:z-20">
+              <BookingSummary 
+                property={property} 
+                onPeriodChange={handlePeriodChange}
+                selectedPeriod={selectedPeriod}
+              />
+            </div>
+            
+            {/* Contact Section - For additional contact info */}
             <ContactSection property={property} landlord={landlord} />
-            <BookingSummary property={property} />
           </div>
         </div>
 
@@ -257,7 +416,7 @@ export default function PropertyDetailsPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => console.log('Report property:', propertyUid)}
-                    className="flex flex-col items-center justify-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex flex-col items-center justify-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     <div className="text-2xl text-gray-600">🚨</div>
                     <span className="text-sm font-medium text-gray-900">Report</span>
@@ -266,20 +425,32 @@ export default function PropertyDetailsPage() {
 
                   <button
                     onClick={handleFavorite}
-                    className="flex flex-col items-center justify-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    className={`flex flex-col items-center justify-center gap-2 p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
+                      isFavorite
+                        ? 'border-[#BC8BBC] bg-[#BC8BBC]/5'
+                        : 'border-gray-200 hover:border-[#BC8BBC]/40 hover:bg-[#BC8BBC]/5'
+                    }`}
                   >
-                    <div className={`text-2xl ${isFavorite ? 'text-red-500' : 'text-gray-600'}`}>
+                    <div className={`text-2xl transition-colors duration-200 ${
+                      isFavorite ? 'text-[#BC8BBC]' : 'text-gray-600'
+                    }`}>
                       {isFavorite ? '❤️' : '🤍'}
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className={`text-sm font-medium transition-colors duration-200 ${
+                      isFavorite ? 'text-[#BC8BBC]' : 'text-gray-900'
+                    }`}>
                       {isFavorite ? 'Saved' : 'Save'}
                     </span>
-                    <span className="text-xs text-gray-500">To wishlist</span>
+                    <span className={`text-xs transition-colors duration-200 ${
+                      isFavorite ? 'text-[#BC8BBC]/70' : 'text-gray-500'
+                    }`}>
+                      To wishlist
+                    </span>
                   </button>
 
                   <button
                     onClick={() => setShowShareModal(true)}
-                    className="flex flex-col items-center justify-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex flex-col items-center justify-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     <div className="text-2xl text-gray-600">📤</div>
                     <span className="text-sm font-medium text-gray-900">Share</span>
@@ -288,8 +459,8 @@ export default function PropertyDetailsPage() {
 
                   {/* Landlord Profile Card */}
                   <div className="col-span-2 md:col-span-1">
-                    <LandlordProfileCard 
-                      landlord={landlord} 
+                    <LandlordProfileCard
+                      landlord={landlord}
                       propertyUid={propertyUid}
                     />
                   </div>
@@ -353,6 +524,134 @@ export default function PropertyDetailsPage() {
         </div>
       </main>
 
+      {/* Floating Action Button for Mobile - Shows only when booking section is scrolled out of view */}
+      {showFloatingButton && property.status !== 'rented' && selectedPeriodData && (
+        <div 
+          ref={floatingButtonRef}
+          className="fixed bottom-20 left-4 right-4 z-40 md:hidden"
+        >
+          <div className="relative">
+            {/* Main Floating Button */}
+            <div
+              onClick={handleBookNow}
+              className="w-full bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between px-4 cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                {/* Dynamic action text based on period */}
+                <span className="text-sm">
+                  {selectedPeriodData.id === 'monthly' ? 'Proceed to Rent' :
+                   selectedPeriodData.id === 'weekly' ? 'Reserve Week' :
+                   selectedPeriodData.id === 'daily' ? 'Reserve Day' :
+                   selectedPeriodData.id === 'nightly' ? 'Book Night' : 'Book Now'}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                {/* Period Badge - Completely separate click handler */}
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setShowPeriodSelector(!showPeriodSelector);
+                  }}
+                  className="flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors"
+                >
+                  <span className="text-xs font-medium">{selectedPeriodData.label}</span>
+                  <svg 
+                    className={`w-3.5 h-3.5 transition-transform duration-300 ${showPeriodSelector ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                
+                {/* Price */}
+                <span className="text-sm font-bold">
+                  {formatPrice(selectedPeriodData.price).replace('RWF', 'RF')}
+                </span>
+              </div>
+            </div>
+
+            {/* Period Selector Dropdown */}
+            {showPeriodSelector && (
+              <div 
+                ref={periodSelectorRef}
+                className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden animate-slide-up"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="p-2">
+                  <div className="text-xs font-medium text-gray-500 px-3 py-2 flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Select Rental Period</span>
+                  </div>
+                  
+                  {availablePeriods.map((period) => (
+                    <button
+                      key={period.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        handleFloatingPeriodSelect(period.id);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all cursor-pointer ${
+                        selectedPeriod === period.id
+                          ? 'bg-gradient-to-r from-[#BC8BBC]/10 to-[#8A5A8A]/10 border border-[#BC8BBC]/30'
+                          : 'hover:bg-gray-50 border border-transparent'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Period icon */}
+                        <span className="text-lg">
+                          {period.id === 'monthly' ? '📅' :
+                           period.id === 'weekly' ? '📆' :
+                           period.id === 'daily' ? '☀️' : '🌙'}
+                        </span>
+                        <div className="text-left">
+                          <div className="text-sm font-medium text-gray-900">{period.label}</div>
+                          <div className="text-xs text-gray-500">
+                            {period.id === 'monthly' ? 'Long-term commitment' :
+                             period.id === 'weekly' ? 'Perfect for stays' :
+                             period.id === 'daily' ? 'Flexible booking' : 'Overnight stay'}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-gray-900">
+                            {formatPrice(period.price).replace('RWF', 'RF')}
+                          </div>
+                          <div className="text-xs text-gray-500">per {period.period}</div>
+                        </div>
+                        {selectedPeriod === period.id && (
+                          <svg className="w-5 h-5 text-[#BC8BBC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                
+                {/* Quick action hint */}
+                <div className="px-3 py-2 bg-gray-50 border-t border-gray-100">
+                  <p className="text-[10px] text-gray-500 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Tap to select different period
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Bottom Navigation - Always visible on mobile */}
       <BottomNav />
 
@@ -365,6 +664,23 @@ export default function PropertyDetailsPage() {
         onClose={() => setShowShareModal(false)}
         property={property}
       />
+
+      {/* Add animation styles */}
+      <style jsx>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-up {
+          animation: slideUp 0.2s ease-out;
+        }
+      `}</style>
     </div>
   );
 }

@@ -5,20 +5,14 @@ import {
   Mail, 
   MessageCircle, 
   Shield, 
-  Star, 
   User,
   ChevronDown,
   ChevronUp,
-  Globe,
-  CheckCircle,
-  Info,
-  ExternalLink,
-  Copy,
-  Verified,
-  Users,
   HelpCircle,
   X,
-  Send
+  Send,
+  Building,
+  Copy
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -28,8 +22,9 @@ export default function ContactSection({ property, landlord }) {
   const [showEmail, setShowEmail] = useState(false);
   const [showSupportSection, setShowSupportSection] = useState(false);
   const [showHostInfo, setShowHostInfo] = useState(false);
+  const [showDirectContact, setShowDirectContact] = useState(false);
   const [isCopied, setIsCopied] = useState({ phone: false, email: false });
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   // Format phone number
   const formatPhoneNumber = (phone) => {
@@ -66,32 +61,34 @@ export default function ContactSection({ property, landlord }) {
 
   const contactInfo = getContactInfo();
 
-  // ========== NAVIGATE TO MESSAGES WITH AUTO DRAFT ==========
-const navigateToMessages = () => {
-  if (!property?.property_uid) return;
+  // ========== PROFESSIONAL NAVIGATE TO MESSAGES WITH UUIDs ONLY ==========
+  const navigateToMessages = () => {
+    if (!property?.property_uid) {
+      console.error('Property UUID is missing');
+      return;
+    }
 
-  // Use landlord UUID, not numeric ID
-  const landlordUid = landlord?.user_uid || '';
-  const propertyUid = property.property_uid;
-  const defaultMessage = `Can I get more info on this @${propertyUid}?`;
-  
-  const encodedMessage = encodeURIComponent(defaultMessage);
-  
-  // Professional URL with UUIDs
-  navigate(`/account/messages?landlord=${landlordUid}&property=${propertyUid}&draft=${encodedMessage}`);
-};
-
-  // Navigate to messages with specific property mention
-  const navigateToMessagesWithMention = () => {
-    if (!property?.property_uid) return;
-
-    const propertyMention = `@${property.property_uid}`;
-    const defaultMessage = `Can I get more info on this ${propertyMention}?`;
+    // Use landlord UUID, NOT numeric ID
+    const landlordUid = landlord?.user_uid || '';
+    const propertyUid = property.property_uid;
+    
+    // Professional message with @mention using UUID
+    const defaultMessage = `Hi, I'm interested in @${propertyUid}. Can you provide more information?`;
     
     const encodedMessage = encodeURIComponent(defaultMessage);
-    const encodedPropertyUid = encodeURIComponent(property.property_uid);
     
-    navigate(`/account/messages?landlordId=${landlord?.id || ''}&propertyId=${property.id}&propertyUid=${encodedPropertyUid}&message=${encodedMessage}`);
+    // Professional URL with UUIDs ONLY - no numeric IDs
+    navigate(`/account/messages?landlord=${landlordUid}&property=${propertyUid}&draft=${encodedMessage}`);
+  };
+
+  // Navigate to host profile using UUID
+  const navigateToHostProfile = () => {
+    if (landlord?.user_uid) {
+      navigate(`/host/${landlord.user_uid}`);
+    } else if (landlord?.id) {
+      // Fallback to numeric ID only if UUID is missing (should not happen)
+      navigate(`/host/${landlord.id}`);
+    }
   };
 
   // Get landlord name with fallbacks
@@ -163,31 +160,6 @@ const navigateToMessages = () => {
            landlord?.verification_status === 'approved';
   };
 
-  // Get preferred contact methods
-  const getPreferredContactMethods = () => {
-    const baseMethods = ['in_app_messaging'];
-    
-    if (!landlord?.preferred_contact_methods) {
-      return [...baseMethods, 'whatsapp', 'phone', 'email'];
-    }
-    
-    try {
-      const methods = Array.isArray(landlord.preferred_contact_methods) 
-        ? landlord.preferred_contact_methods 
-        : JSON.parse(landlord.preferred_contact_methods);
-      
-      if (!methods.includes('in_app_messaging')) {
-        methods.unshift('in_app_messaging');
-      }
-      
-      return methods;
-    } catch (e) {
-      return [...baseMethods, 'whatsapp', 'phone', 'email'];
-    }
-  };
-
-  const preferredMethods = getPreferredContactMethods();
-
   const copyToClipboard = async (text, type) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -195,15 +167,6 @@ const navigateToMessages = () => {
       setTimeout(() => setIsCopied({ ...isCopied, [type]: false }), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
-    }
-  };
-
-  // Navigate to host profile
-  const navigateToHostProfile = () => {
-    if (landlord?.user_uid) {
-      navigate(`/host/${landlord.user_uid}`);
-    } else if (landlord?.id) {
-      navigate(`/host/${landlord.id}`);
     }
   };
 
@@ -240,180 +203,151 @@ const navigateToMessages = () => {
           <>
             {/* Contact Methods */}
             <div className="space-y-4 mb-8">
-              {/* Primary Chat Button - WITH AUTO MESSAGE DRAFT */}
+              {/* Primary Chat Button */}
               <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] p-px group">
                 <button 
-                  onClick={navigateToMessagesWithMention}
+                  onClick={navigateToMessages}
                   className="w-full bg-white py-4 rounded-xl font-semibold text-gray-900 hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 relative"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-[#BC8BBC]/5 to-[#8A5A8A]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <MessageCircle className="h-5 w-5 text-[#BC8BBC]" />
                   <span>💬 Message Host</span>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                    <Send className="h-3 w-3 text-[#BC8BBC]" />
-                    <div className="px-2 py-1 bg-[#BC8BBC]/10 text-[#BC8BBC] text-xs font-medium rounded-full">
-                      Auto-draft ready
-                    </div>
-                  </div>
+                  <Send className="h-3 w-3 text-[#BC8BBC]" />
                 </button>
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
               </div>
 
-              {/* Quick Message Preview */}
-              {property?.property_uid && (
-                <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                  <div className="flex items-start gap-2">
-                    <div className="p-1.5 bg-purple-100 rounded-lg mt-0.5">
-                      <MessageCircle className="h-4 w-4 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-purple-900 mb-1">Quick message preview:</p>
-                      <p className="text-sm text-purple-700 bg-white p-2 rounded-lg border border-purple-200">
-                        "Can I get more info on this <span className="font-bold text-purple-900">@{property.property_uid}</span>?"
-                      </p>
-                      <p className="text-xs text-purple-600 mt-1 flex items-center gap-1">
-                        <Info className="h-3 w-3" />
-                        This will be auto-filled when you click Message Host
-                      </p>
+              {/* Direct Contact Toggle Button */}
+              <button
+                onClick={() => setShowDirectContact(!showDirectContact)}
+                className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+              >
+                <span className="text-sm font-medium text-gray-700">📞 Direct Contact Options</span>
+                {showDirectContact ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
+              </button>
+
+              {/* Direct Contact Section - Collapsed by default */}
+              {showDirectContact && (
+                <div className="space-y-3 pl-2 animate-fadeIn">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {contactInfo.phone && contactInfo.phone !== '+250 788 880 266' && (
+                      <button 
+                        onClick={() => setShowPhone(!showPhone)}
+                        className={`relative p-4 rounded-xl border transition-all duration-300 ${
+                          showPhone 
+                            ? 'border-[#BC8BBC] bg-[#BC8BBC]/5 shadow-sm' 
+                            : 'border-gray-200 hover:border-[#BC8BBC]/50 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${
+                              showPhone ? 'bg-[#BC8BBC] text-white' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              <Phone className="h-4 w-4" />
+                            </div>
+                            <div className="text-left">
+                              <div className="font-medium text-gray-900">Phone Number</div>
+                              {showPhone ? (
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-sm font-mono text-gray-700">{contactInfo.formattedPhone || contactInfo.phone}</span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      copyToClipboard(contactInfo.phone, 'phone');
+                                    }}
+                                    className="text-gray-400 hover:text-[#BC8BBC] transition-colors p-1"
+                                    title="Copy phone number"
+                                  >
+                                    <Copy className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="text-xs text-gray-500 mt-1">Click to reveal</div>
+                              )}
+                            </div>
+                          </div>
+                          {showPhone && (
+                            <div className="text-[#BC8BBC]">
+                              <Copy className="h-5 w-5" />
+                            </div>
+                          )}
+                        </div>
+                        {isCopied.phone && (
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-[#BC8BBC] text-white text-xs px-2 py-1 rounded-full">
+                            Copied!
+                          </div>
+                        )}
+                      </button>
+                    )}
+
+                    {contactInfo.email && contactInfo.email !== 'contact@oliviuus.com' && (
+                      <button 
+                        onClick={() => setShowEmail(!showEmail)}
+                        className={`relative p-4 rounded-xl border transition-all duration-300 ${
+                          showEmail 
+                            ? 'border-[#BC8BBC] bg-[#BC8BBC]/5 shadow-sm' 
+                            : 'border-gray-200 hover:border-[#BC8BBC]/50 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${
+                              showEmail ? 'bg-[#BC8BBC] text-white' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              <Mail className="h-4 w-4" />
+                            </div>
+                            <div className="text-left">
+                              <div className="font-medium text-gray-900">Email Address</div>
+                              {showEmail ? (
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-sm text-gray-700 truncate max-w-[120px]">{contactInfo.email}</span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      copyToClipboard(contactInfo.email, 'email');
+                                    }}
+                                    className="text-gray-400 hover:text-[#BC8BBC] transition-colors p-1"
+                                    title="Copy email"
+                                  >
+                                    <Copy className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="text-xs text-gray-500 mt-1">Click to reveal</div>
+                              )}
+                            </div>
+                          </div>
+                          {showEmail && (
+                            <div className="text-[#BC8BBC]">
+                              <Copy className="h-5 w-5" />
+                            </div>
+                          )}
+                        </div>
+                        {isCopied.email && (
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-[#BC8BBC] text-white text-xs px-2 py-1 rounded-full">
+                            Copied!
+                          </div>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Security Note - Now inside direct contact section */}
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                    <div className="flex items-start gap-3">
+                      <Shield className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-medium text-blue-900 mb-1">Secure Communication</h4>
+                        <p className="text-sm text-blue-700">
+                          For your safety and privacy, we recommend using our messaging system. 
+                          All conversations are encrypted and monitored for quality assurance.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
-
-              {/* Host's Preferred Contact Methods */}
-              <div className="p-3 bg-gradient-to-r from-[#BC8BBC]/5 to-[#8A5A8A]/5 rounded-lg border border-[#BC8BBC]/10">
-                <div className="text-sm font-medium text-gray-700 mb-2">Host's Preferred Contact Methods</div>
-                <div className="flex flex-wrap gap-2">
-                  {preferredMethods.map((method, index) => (
-                    <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm shadow-sm">
-                      {method === 'in_app_messaging' && '💬 In-App Messaging'}
-                      {method === 'whatsapp' && '💬 WhatsApp'}
-                      {method === 'phone' && '📞 Phone Call'}
-                      {method === 'email' && '📧 Email'}
-                      {method === 'sms' && '📱 SMS'}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Direct Contact Toggles */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {contactInfo.phone && contactInfo.phone !== '+250 788 880 266' && (
-                  <button 
-                    onClick={() => setShowPhone(!showPhone)}
-                    className={`relative p-4 rounded-xl border transition-all duration-300 ${
-                      showPhone 
-                        ? 'border-[#BC8BBC] bg-[#BC8BBC]/5 shadow-sm' 
-                        : 'border-gray-200 hover:border-[#BC8BBC]/50 hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${
-                          showPhone ? 'bg-[#BC8BBC] text-white' : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          <Phone className="h-4 w-4" />
-                        </div>
-                        <div className="text-left">
-                          <div className="font-medium text-gray-900">Phone Number</div>
-                          {showPhone ? (
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-sm font-mono text-gray-700">{contactInfo.formattedPhone || contactInfo.phone}</span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(contactInfo.phone, 'phone');
-                                }}
-                                className="text-gray-400 hover:text-[#BC8BBC] transition-colors p-1"
-                                title="Copy phone number"
-                              >
-                                <Copy className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="text-xs text-gray-500 mt-1">Click to reveal</div>
-                          )}
-                        </div>
-                      </div>
-                      {showPhone && (
-                        <div className="text-[#BC8BBC]">
-                          <CheckCircle className="h-5 w-5" />
-                        </div>
-                      )}
-                    </div>
-                    {isCopied.phone && (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-[#BC8BBC] text-white text-xs px-2 py-1 rounded-full">
-                        Copied!
-                      </div>
-                    )}
-                  </button>
-                )}
-
-                {contactInfo.email && contactInfo.email !== 'contact@oliviuus.com' && (
-                  <button 
-                    onClick={() => setShowEmail(!showEmail)}
-                    className={`relative p-4 rounded-xl border transition-all duration-300 ${
-                      showEmail 
-                        ? 'border-[#BC8BBC] bg-[#BC8BBC]/5 shadow-sm' 
-                        : 'border-gray-200 hover:border-[#BC8BBC]/50 hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${
-                          showEmail ? 'bg-[#BC8BBC] text-white' : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          <Mail className="h-4 w-4" />
-                        </div>
-                        <div className="text-left">
-                          <div className="font-medium text-gray-900">Email Address</div>
-                          {showEmail ? (
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-sm text-gray-700 truncate max-w-[120px]">{contactInfo.email}</span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(contactInfo.email, 'email');
-                                }}
-                                className="text-gray-400 hover:text-[#BC8BBC] transition-colors p-1"
-                                title="Copy email"
-                              >
-                                <Copy className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="text-xs text-gray-500 mt-1">Click to reveal</div>
-                          )}
-                        </div>
-                      </div>
-                      {showEmail && (
-                        <div className="text-[#BC8BBC]">
-                          <CheckCircle className="h-5 w-5" />
-                        </div>
-                      )}
-                    </div>
-                    {isCopied.email && (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-[#BC8BBC] text-white text-xs px-2 py-1 rounded-full">
-                        Copied!
-                      </div>
-                    )}
-                  </button>
-                )}
-              </div>
-
-              {/* Call to Action */}
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                <div className="flex items-start gap-3">
-                  <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-medium text-blue-900 mb-1">Secure Communication</h4>
-                    <p className="text-sm text-blue-700">
-                      For your safety and privacy, we recommend using our messaging system. 
-                      All conversations are encrypted and monitored for quality assurance.
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Host Information */}
@@ -442,7 +376,7 @@ const navigateToMessages = () => {
                       {getLandlordAvatar()}
                       {isLandlordVerified() && (
                         <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-md">
-                          <Verified className="h-4 w-4 text-green-600" />
+                          <Shield className="h-4 w-4 text-green-600" />
                         </div>
                       )}
                     </div>
@@ -455,29 +389,22 @@ const navigateToMessages = () => {
                       </div>
                       
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Globe className="h-3 w-3" />
+                        <Building className="h-3 w-3" />
                         <span>iSanzure Verified Host</span>
                       </div>
+                      
+                      {/* Show Host UUID for reference (optional) */}
+                      {landlord.user_uid && (
+                        <p className="text-xs text-gray-400 mt-1 font-mono">
+                          ID: {landlord.user_uid.slice(0, 8)}...
+                        </p>
+                      )}
                     </div>
-                  </div>
-
-                  {/* Host Tags */}
-                  <div className="flex flex-wrap gap-2">
-                    {isLandlordVerified() && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-200">
-                        <Shield className="h-3 w-3" />
-                        Verified
-                      </span>
-                    )}
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">
-                      <MessageCircle className="h-3 w-3" />
-                      Active on iSanzure
-                    </span>
                   </div>
 
                   {/* Quick Message Button */}
                   <button
-                    onClick={navigateToMessagesWithMention}
+                    onClick={navigateToMessages}
                     className="w-full mt-4 py-2 bg-purple-50 text-purple-700 rounded-lg font-medium hover:bg-purple-100 transition-colors flex items-center justify-center gap-2 border border-purple-200"
                   >
                     <MessageCircle className="h-4 w-4" />
@@ -485,12 +412,12 @@ const navigateToMessages = () => {
                   </button>
                 </div>
 
-                {/* View Profile Button */}
+                {/* View Profile Button - Uses UUID */}
                 <button 
                   onClick={navigateToHostProfile}
                   className="w-full mt-4 py-3 border border-[#BC8BBC] text-[#BC8BBC] rounded-xl font-medium hover:bg-[#BC8BBC]/5 transition-colors flex items-center justify-center gap-2"
                 >
-                  <ExternalLink className="h-4 w-4" />
+                  <User className="h-4 w-4" />
                   View Full Host Profile
                 </button>
               </div>
@@ -518,7 +445,7 @@ const navigateToMessages = () => {
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-5">
                   <div className="flex items-start gap-4">
                     <div className="p-3 bg-white rounded-lg border border-blue-200 shadow-sm">
-                      <Users className="h-6 w-6 text-blue-600" />
+                      <User className="h-6 w-6 text-blue-600" />
                     </div>
                     <div className="flex-1">
                       <h5 className="font-bold text-gray-900 mb-2">iSanzure Support Team</h5>
@@ -586,7 +513,7 @@ const navigateToMessages = () => {
             </div>
           </>
         ) : (
-          // Collapsed View
+          // Collapsed View - Shows quick actions
           <div className="text-center py-6">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#BC8BBC]/10 to-[#8A5A8A]/10 flex items-center justify-center mx-auto mb-4">
               <MessageCircle className="h-8 w-8 text-[#BC8BBC]" />
@@ -597,7 +524,7 @@ const navigateToMessages = () => {
             </p>
             <div className="flex items-center justify-center gap-4">
               <button
-                onClick={navigateToMessagesWithMention}
+                onClick={navigateToMessages}
                 className="px-6 py-2.5 bg-[#BC8BBC] text-white rounded-lg font-medium hover:bg-[#9A6A9A] transition-colors flex items-center gap-2"
               >
                 <MessageCircle className="h-4 w-4" />
@@ -613,22 +540,29 @@ const navigateToMessages = () => {
             </div>
             {property?.property_uid && (
               <p className="text-xs text-gray-400 mt-3">
-                Message will include: @{property.property_uid}
+                Message will include: <span className="font-mono">@{property.property_uid}</span>
               </p>
             )}
           </div>
         )}
-
-        {/* Security Badge */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-            <Shield className="h-4 w-4 text-green-600" />
-            <span>Secure & Encrypted Communication</span>
-            <span className="text-gray-300">•</span>
-            <span>Privacy Protected</span>
-          </div>
-        </div>
       </div>
+
+      {/* Add animation styles */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }

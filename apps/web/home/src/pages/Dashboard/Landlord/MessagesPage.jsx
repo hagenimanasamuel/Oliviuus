@@ -3,8 +3,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Search,
   Send,
-  Phone,
-  Mail,
   User,
   Home,
   Calendar,
@@ -32,14 +30,15 @@ import {
   CheckCircle,
   Bed,
   Maximize2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Loader
 } from 'lucide-react';
-import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../api/axios';
 
 export default function MessagesPage() {
   const navigate = useNavigate();
+  
   const [loading, setLoading] = useState(true);
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -68,6 +67,7 @@ export default function MessagesPage() {
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
   const [showUid, setShowUid] = useState(false);
   const [newMessageReceived, setNewMessageReceived] = useState(false);
+  const [fetchingSuggestions, setFetchingSuggestions] = useState(false);
   
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -75,11 +75,95 @@ export default function MessagesPage() {
   const hoverTimeoutRef = useRef(null);
   const pollingIntervalRef = useRef(null);
   const copyTimeoutRef = useRef(null);
+  const suggestionFetchTimeoutRef = useRef(null);
   
   const colors = {
     primary: '#BC8BBC',
     primaryDark: '#8A5A8A',
     primaryLight: '#E6D3E6'
+  };
+
+  // ========== SKELETON LOADING COMPONENTS ==========
+  const ConversationSkeleton = () => (
+    <div className="p-4 border-b border-gray-200 animate-pulse">
+      <div className="flex gap-3">
+        <div className="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-2">
+            <div className="h-4 bg-gray-200 rounded w-32"></div>
+            <div className="h-3 bg-gray-200 rounded w-12"></div>
+          </div>
+          <div className="h-3 bg-gray-200 rounded w-48 mb-2"></div>
+          <div className="h-3 bg-gray-200 rounded w-24"></div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const MessageSkeleton = ({ isCurrentUser = false }) => (
+    <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4 animate-pulse`}>
+      <div className={`flex gap-2 max-w-[70%] ${isCurrentUser ? 'flex-row-reverse' : ''}`}>
+        {!isCurrentUser && (
+          <div className="w-8 h-8 bg-gray-200 rounded-full flex-shrink-0"></div>
+        )}
+        <div>
+          <div className={`p-3 rounded-2xl ${isCurrentUser ? 'bg-gray-300' : 'bg-gray-200'} w-64 h-16`}></div>
+          <div className="flex items-center gap-2 mt-1 justify-end">
+            <div className="h-3 bg-gray-200 rounded w-16"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ========== SHOW REAL TIME FROM DATABASE ==========
+  const formatMessageTime = (timestamp) => {
+    if (!timestamp) return '';
+    
+    const date = new Date(timestamp);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) return '';
+    
+    // Format: HH:MM AM/PM (e.g., "11:45 AM" or "2:30 PM")
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
+  // For conversation list - shows time for today, date for older
+  const formatConversationTime = (timestamp) => {
+    if (!timestamp) return '';
+    
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return '';
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // If today - show time
+    if (date >= today) {
+      return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+    }
+    // If yesterday - show "Yesterday"
+    else if (date >= yesterday) {
+      return 'Yesterday';
+    }
+    // Otherwise show date
+    else {
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
   };
 
   // ========== FETCH DATA ==========
@@ -97,6 +181,9 @@ export default function MessagesPage() {
       }
       if (copyTimeoutRef.current) {
         clearTimeout(copyTimeoutRef.current);
+      }
+      if (suggestionFetchTimeoutRef.current) {
+        clearTimeout(suggestionFetchTimeoutRef.current);
       }
     };
   }, []);
@@ -150,9 +237,11 @@ export default function MessagesPage() {
     }
   };
 
-  // ========== PROPERTY MENTIONS - FIXED ==========
+  // ========== PROPERTY MENTIONS ==========
   const fetchPropertySuggestions = useCallback(async (query, conversationId) => {
     try {
+      setFetchingSuggestions(true);
+      
       const params = new URLSearchParams({
         query: query || '',
         ...(conversationId && { conversation_id: conversationId })
@@ -168,11 +257,15 @@ export default function MessagesPage() {
       }
     } catch (error) {
       console.error('Error fetching property suggestions:', error);
+    } finally {
+      setFetchingSuggestions(false);
     }
   }, []);
 
   const fetchTagSuggestions = useCallback(async (query) => {
     try {
+      setFetchingSuggestions(true);
+      
       const response = await api.get(`/user/messages/suggestions/tags?query=${encodeURIComponent(query || '')}`);
       if (response.data.success) {
         setSuggestions(response.data.data.suggestions);
@@ -182,6 +275,8 @@ export default function MessagesPage() {
       }
     } catch (error) {
       console.error('Error fetching tag suggestions:', error);
+    } finally {
+      setFetchingSuggestions(false);
     }
   }, []);
 
@@ -234,19 +329,27 @@ export default function MessagesPage() {
     setNewMessage(value);
     setCursorPosition(position);
 
+    if (suggestionFetchTimeoutRef.current) {
+      clearTimeout(suggestionFetchTimeoutRef.current);
+    }
+
     const textBeforeCursor = value.slice(0, position);
     const atMatch = textBeforeCursor.match(/@([a-zA-Z0-9-]*)$/);
     
     if (atMatch) {
       const query = atMatch[1];
       setSuggestionQuery(query);
-      fetchPropertySuggestions(query, selectedConversation?.id);
+      suggestionFetchTimeoutRef.current = setTimeout(() => {
+        fetchPropertySuggestions(query, selectedConversation?.id);
+      }, 300);
     } else {
       const hashMatch = textBeforeCursor.match(/#([a-zA-Z0-9-]*)$/);
       if (hashMatch) {
         const query = hashMatch[1];
         setSuggestionQuery(query);
-        fetchTagSuggestions(query);
+        suggestionFetchTimeoutRef.current = setTimeout(() => {
+          fetchTagSuggestions(query);
+        }, 300);
       } else {
         setShowSuggestions(false);
       }
@@ -420,7 +523,7 @@ export default function MessagesPage() {
                 >
                   {/* Property Mention Button */}
                   <button
-                    onClick={() => part.property?.property_uid && navigate(`/property/${part.property.property_uid}`)}
+                    onClick={() => part.property?.property_uid && navigate(`/properties/${part.property.property_uid}`)}
                     onMouseEnter={(e) => part.property && handlePropertyMouseEnter(part.property, e)}
                     onMouseLeave={handlePropertyMouseLeave}
                     className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-all ${
@@ -454,7 +557,7 @@ export default function MessagesPage() {
                   {/* Copy UUID Button - Appears on Hover */}
                   <button
                     onClick={(e) => copyPropertyUid(part.uid, e)}
-                    className={`absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded-md text-xs font-medium shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
+                    className={`absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded-md text-xs font-medium shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 ${
                       isCurrentUser
                         ? 'bg-gray-800 text-white'
                         : 'bg-gray-800 text-white'
@@ -524,7 +627,7 @@ export default function MessagesPage() {
                 }`}
               >
                 <button
-                  onClick={() => navigate(`/property/${property.property_uid}`)}
+                  onClick={() => navigate(`/properties/${property.property_uid}`)}
                   onMouseEnter={(e) => handlePropertyMouseEnter(property, e)}
                   onMouseLeave={handlePropertyMouseLeave}
                   className="flex items-center gap-3 p-2 w-full text-left"
@@ -614,24 +717,6 @@ export default function MessagesPage() {
   };
 
   // ========== UTILITIES ==========
-  const formatMessageTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMinutes = Math.floor((now - date) / (1000 * 60));
-    
-    if (diffMinutes < 1) return 'Just now';
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
-    
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    
-    const diffDays = Math.floor(diffHours / 24);
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return format(date, 'EEEE');
-    
-    return format(date, 'MMM d');
-  };
-
   const getInitials = (name) => {
     if (!name) return '?';
     return name
@@ -745,6 +830,58 @@ export default function MessagesPage() {
   const handleManualRefresh = async () => {
     await checkForNewMessages();
   };
+
+  // Loading state with Skeletons
+  if (loading) {
+    return (
+      <div className="h-[calc(100vh-8rem)] bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
+        {/* Header Skeleton */}
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-white">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div>
+              <div className="h-6 bg-gray-200 rounded w-32 mb-2 animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+          </div>
+        </div>
+
+        <div className="flex flex-1 overflow-hidden">
+          {/* Conversations List Skeleton */}
+          <div className="w-80 border-r border-gray-200 bg-gray-50">
+            <div className="p-3 border-b border-gray-200 bg-white">
+              <div className="h-9 bg-gray-200 rounded-lg mb-3 animate-pulse"></div>
+              <div className="flex gap-2">
+                <div className="h-6 bg-gray-200 rounded-full w-16 animate-pulse"></div>
+                <div className="h-6 bg-gray-200 rounded-full w-20 animate-pulse"></div>
+                <div className="h-6 bg-gray-200 rounded-full w-20 animate-pulse"></div>
+              </div>
+            </div>
+            <div className="overflow-y-auto">
+              <ConversationSkeleton />
+              <ConversationSkeleton />
+              <ConversationSkeleton />
+              <ConversationSkeleton />
+              <ConversationSkeleton />
+            </div>
+          </div>
+
+          {/* Messages Area Skeleton */}
+          <div className="flex-1 flex flex-col bg-white p-4">
+            <MessageSkeleton />
+            <MessageSkeleton isCurrentUser={true} />
+            <MessageSkeleton />
+            <MessageSkeleton isCurrentUser={true} />
+            <MessageSkeleton />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[calc(100vh-8rem)] bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col relative">
@@ -863,11 +1000,7 @@ export default function MessagesPage() {
           </div>
           
           <div className="flex-1 overflow-y-auto">
-            {loading ? (
-              <div className="flex items-center justify-center h-32">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: colors.primary }}></div>
-              </div>
-            ) : conversations.length === 0 ? (
+            {conversations.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 text-center p-6">
                 <MessageSquare className="h-12 w-12 text-gray-300 mb-3" />
                 <h3 className="text-lg font-medium text-gray-900 mb-1">No messages yet</h3>
@@ -902,7 +1035,7 @@ export default function MessagesPage() {
                           </h3>
                           {conv.last_message && (
                             <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                              {formatMessageTime(conv.last_message.created_at)}
+                              {formatConversationTime(conv.last_message.created_at)}
                             </span>
                           )}
                         </div>
@@ -990,12 +1123,6 @@ export default function MessagesPage() {
                 
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Phone className="h-4 w-4 text-gray-600" />
-                  </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Mail className="h-4 w-4 text-gray-600" />
-                  </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                     <MoreVertical className="h-4 w-4 text-gray-600" />
                   </button>
                 </div>
@@ -1078,13 +1205,11 @@ export default function MessagesPage() {
                               {message.metadata?.has_mentions && (
                                 <span className="flex items-center gap-1 text-purple-600">
                                   <AtSign className="h-3 w-3" />
-                                  <span className="hidden sm:inline">Property</span>
                                 </span>
                               )}
                               {message.metadata?.has_tags && (
                                 <span className="flex items-center gap-1 text-blue-600">
                                   <Hash className="h-3 w-3" />
-                                  <span className="hidden sm:inline">Tag</span>
                                 </span>
                               )}
                             </div>
@@ -1099,7 +1224,7 @@ export default function MessagesPage() {
               
               {/* Message Input */}
               <div className="p-4 border-t border-gray-200 bg-white relative">
-                {showSuggestions && suggestions.length > 0 && (
+                {showSuggestions && (
                   <div 
                     ref={suggestionsRef}
                     className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-xl shadow-2xl border border-gray-200 max-h-80 overflow-y-auto z-50"
@@ -1109,78 +1234,124 @@ export default function MessagesPage() {
                         {suggestionType === 'property' ? (
                           <>
                             <AtSign className="h-3 w-3" />
-                            Property suggestions
+                            Mention a property
+                            {fetchingSuggestions && (
+                              <Loader className="h-3 w-3 animate-spin ml-2" />
+                            )}
                           </>
                         ) : (
                           <>
                             <Hash className="h-3 w-3" />
-                            Tag suggestions
+                            Add a topic tag
+                            {fetchingSuggestions && (
+                              <Loader className="h-3 w-3 animate-spin ml-2" />
+                            )}
                           </>
                         )}
                       </p>
                     </div>
                     
-                    {suggestions.map((suggestion, index) => (
-                      <button
-                        key={suggestionType === 'property' ? suggestion.id : suggestion.tag}
-                        onClick={() => insertSuggestion(suggestion)}
-                        className={`w-full p-3 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                          index === selectedSuggestionIndex ? 'bg-gray-50' : ''
-                        }`}
-                      >
+                    {suggestions.length === 0 && fetchingSuggestions ? (
+                      <div className="p-8 text-center">
+                        <Loader className="h-6 w-6 animate-spin mx-auto mb-2 text-purple-600" />
+                        <p className="text-sm text-gray-600">Finding properties...</p>
+                      </div>
+                    ) : suggestions.length === 0 ? (
+                      <div className="p-8 text-center">
                         {suggestionType === 'property' ? (
                           <>
-                            {suggestion.image ? (
-                              <img 
-                                src={suggestion.image} 
-                                alt={suggestion.name}
-                                className="w-12 h-12 rounded-md object-cover flex-shrink-0"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                <Home className="h-6 w-6 text-gray-400" />
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0 text-left">
-                              <p className="text-sm font-medium text-gray-900 truncate">
-                                {suggestion.name}
-                              </p>
-                              <p className="text-xs text-gray-500 truncate flex items-center gap-1">
-                                <MapPin className="h-3 w-3 flex-shrink-0" />
-                                {suggestion.subtitle}
-                              </p>
-                              {suggestion.displayPrice > 0 && (
-                                <p className="text-xs font-semibold text-purple-700 mt-1">
-                                  {new Intl.NumberFormat('en-RW', {
-                                    style: 'currency',
-                                    currency: 'RWF',
-                                    minimumFractionDigits: 0
-                                  }).format(suggestion.displayPrice)}
-                                  <span className="text-[10px] font-normal text-gray-500 ml-1">/month</span>
-                                </p>
-                              )}
+                            <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                              <Home className="h-8 w-8 text-purple-300" />
                             </div>
-                            {suggestion.verified && (
-                              <Shield className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            )}
+                            <p className="text-sm font-medium text-gray-900 mb-1">
+                              {searchTerm ? `No properties matching "${searchTerm}"` : 'Start typing to search'}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Try typing a property name or location
+                            </p>
                           </>
                         ) : (
                           <>
-                            <div className="w-10 h-10 rounded-md bg-blue-100 flex items-center justify-center flex-shrink-0">
-                              <Hash className="h-5 w-5 text-blue-600" />
+                            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                              <Hash className="h-8 w-8 text-blue-300" />
                             </div>
-                            <div className="flex-1 min-w-0 text-left">
-                              <p className="text-sm font-medium text-gray-900">
-                                #{suggestion.tag}
-                              </p>
-                              <p className="text-xs text-gray-500 truncate">
-                                {suggestion.description}
-                              </p>
-                            </div>
+                            <p className="text-sm font-medium text-gray-900 mb-1">
+                              {searchTerm ? `No tags matching "${searchTerm}"` : 'Start typing to find tags'}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Common tags: #checkin, #payment, #wifi
+                            </p>
                           </>
                         )}
-                      </button>
-                    ))}
+                      </div>
+                    ) : (
+                      suggestions.map((suggestion, index) => (
+                        <button
+                          key={suggestionType === 'property' ? suggestion.id : suggestion.tag}
+                          onClick={() => insertSuggestion(suggestion)}
+                          className={`w-full p-3 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                            index === selectedSuggestionIndex ? 'bg-gray-50' : ''
+                          }`}
+                        >
+                          {suggestionType === 'property' ? (
+                            <>
+                              {suggestion.image ? (
+                                <img 
+                                  src={suggestion.image} 
+                                  alt={suggestion.name}
+                                  className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                  <Home className="h-6 w-6 text-gray-400" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0 text-left">
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  {suggestion.name}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+                                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                                  {suggestion.subtitle}
+                                </p>
+                                {suggestion.displayPrice > 0 && (
+                                  <p className="text-xs font-semibold text-purple-700 mt-1">
+                                    {new Intl.NumberFormat('en-RW', {
+                                      style: 'currency',
+                                      currency: 'RWF',
+                                      minimumFractionDigits: 0
+                                    }).format(suggestion.displayPrice)}
+                                    <span className="text-[10px] font-normal text-gray-500 ml-1">/month</span>
+                                  </p>
+                                )}
+                                {suggestion.sourceDescription && (
+                                  <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded-full mt-1 inline-block">
+                                    {suggestion.sourceDescription}
+                                  </span>
+                                )}
+                              </div>
+                              {suggestion.verified && (
+                                <Shield className="h-4 w-4 text-green-500 flex-shrink-0" />
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-10 h-10 rounded-md bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                <Hash className="h-5 w-5 text-blue-600" />
+                              </div>
+                              <div className="flex-1 min-w-0 text-left">
+                                <p className="text-sm font-medium text-gray-900">
+                                  #{suggestion.tag}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {suggestion.description}
+                                </p>
+                              </div>
+                            </>
+                          )}
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
                 
@@ -1390,7 +1561,7 @@ export default function MessagesPage() {
               <div className="flex items-center gap-2 mt-3">
                 <button
                   onClick={() => {
-                    navigate(`/property/${hoveredProperty.id}`);
+                    navigate(`/properties/${hoveredProperty.id}`);
                     setHoveredProperty(null);
                   }}
                   className="flex-1 px-3 py-1.5 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-1"
@@ -1440,6 +1611,19 @@ export default function MessagesPage() {
         }
         .animate-fadeIn {
           animation: fadeIn 0.2s ease-out;
+        }
+
+        /* Pulse animation for skeletons */
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
+        }
+        .animate-pulse {
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
       `}</style>
     </div>

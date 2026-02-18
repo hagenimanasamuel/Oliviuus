@@ -259,81 +259,115 @@ const BookingProcess = () => {
     };
   };
 
-  const getCancellationInfo = () => {
-    if (!property) return null;
-    
-    const rules = property;
-    const platformCommission = property.platform_commission_rate || 10;
-    const policy = rules.cancellation_policy || 'flexible';
-    
-    const startDate = new Date(bookingData.startDate);
-    const now = new Date();
-    const daysUntilCheckIn = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
-    const isWithinTwoDays = daysUntilCheckIn <= 2;
-    
-    let refundPercentage = 0;
-    
-    switch (policy) {
-      case 'flexible':
-        refundPercentage = 100;
-        break;
-      case 'moderate':
-        refundPercentage = 50;
-        break;
-      case 'strict':
-        refundPercentage = 0;
-        break;
-      default:
-        refundPercentage = 100;
-    }
-    
-    const refundAfterCommission = refundPercentage > 0 
-      ? Math.round(refundPercentage - (refundPercentage * (platformCommission / 100)))
-      : 0;
-    
-    let policyDescription = '';
-    switch (policy) {
-      case 'flexible':
-        policyDescription = `Full refund (${refundAfterCommission}% after ${platformCommission}% platform fee) if canceled 24 hours before check-in`;
-        break;
-      case 'moderate':
-        policyDescription = `Partial refund (${refundAfterCommission}% after ${platformCommission}% platform fee) if canceled 7 days before check-in`;
-        break;
-      case 'strict':
-        policyDescription = `No refund for cancellations`;
-        break;
-      default:
-        policyDescription = `Contact host for cancellation details`;
-    }
-    
-    return {
-      policy,
-      refundPercentage,
-      refundAfterCommission,
-      platformCommission,
-      isWithinTwoDays,
-      daysUntilCheckIn,
-      showTwoDayProtection: isWithinTwoDays && bookingData.period === 'monthly',
-      policyDescription,
-      monthlyExample: getMonthlyCancellationExample(policy, platformCommission, refundAfterCommission)
-    };
+const getCancellationInfo = () => {
+  if (!property) return null;
+  
+  const policy = property.cancellation_policy || 'moderate';
+  
+  const startDate = new Date(bookingData.startDate);
+  const now = new Date();
+  const hoursUntilCheckIn = Math.max(0, Math.floor((startDate - now) / (1000 * 60 * 60)));
+  
+  // Policy display names
+  const policyNames = {
+    'flexible': 'Flexible Cancellation',
+    'moderate': 'Moderate Cancellation',
+    'strict': 'Strict Cancellation'
   };
+  
+  // Policy descriptions
+  const policyDescriptions = {
+    'flexible': 'Tenant-friendly – full refund if cancelled at least 24 hours before check-in',
+    'moderate': 'Balanced – full refund 48+ hours, 50% refund 24–48 hours, no refund within 24 hours',
+    'strict': 'Landlord-protective – 50% refund 48+ hours, no refund within 48 hours'
+  };
+  
+  // Refund percentages based on EXACT policies
+  let refund48Plus = 0;
+  let refund24to48 = 0;
+  let refundLessThan24 = 0;
+  
+  switch (policy) {
+    case 'flexible':
+      refund48Plus = 100;      // 48+ hours = 100% (same as 24+ in practice)
+      refund24to48 = 100;      // 24-48 hours = 100% (since flexible only has 24+ cutoff)
+      refundLessThan24 = 0;     // <24 hours = 0%
+      break;
+      
+    case 'moderate':
+      refund48Plus = 100;       // 48+ hours = 100%
+      refund24to48 = 50;        // 24-48 hours = 50%
+      refundLessThan24 = 0;      // <24 hours = 0%
+      break;
+      
+    case 'strict':
+      refund48Plus = 50;        // 48+ hours = 50%
+      refund24to48 = 0;         // 24-48 hours = 0% (strict uses 48 cutoff)
+      refundLessThan24 = 0;      // <24 hours = 0%
+      break;
+      
+    default:
+      refund48Plus = 100;
+      refund24to48 = 50;
+      refundLessThan24 = 0;
+  }
+  
+  // Determine current refund percentage
+  let currentRefundPercentage = 0;
+  if (hoursUntilCheckIn >= 48) {
+    currentRefundPercentage = refund48Plus;
+  } else if (hoursUntilCheckIn >= 24) {
+    currentRefundPercentage = refund24to48;
+  } else {
+    currentRefundPercentage = refundLessThan24;
+  }
+  
+  // Special case for flexible - if between 24-48 hours, still 100%
+  if (policy === 'flexible' && hoursUntilCheckIn >= 24) {
+    currentRefundPercentage = 100;
+  }
+  
+  return {
+    policy,
+    policyName: policyNames[policy] || 'Cancellation Policy',
+    policyDescription: policyDescriptions[policy] || 'Standard cancellation policy applies',
+    refundPercentage: currentRefundPercentage,
+    refund48Plus,
+    refund24to48,
+    refundLessThan24,
+    hoursUntilCheckIn
+  };
+};
 
-  const getMonthlyCancellationExample = (policy, commission, refundAfter) => {
-    const monthlyRent = property.monthly_price || 50000;
-    const accommodationAmount = monthlyRent - (monthlyRent * (commission / 100));
-    
-    switch (policy) {
-      case 'flexible':
-        return `Example: For ${formatPrice(monthlyRent)} monthly rent, you'd get ${formatPrice(accommodationAmount)} back if you cancel 24+ hours before check-in.`;
-      case 'moderate':
-        return `Example: For ${formatPrice(monthlyRent)} monthly rent, you'd get ${formatPrice(accommodationAmount * 0.5)} back if you cancel 7+ days before check-in.`;
-      case 'strict':
-        return `Example: For ${formatPrice(monthlyRent)} monthly rent, no refund is provided for cancellations.`;
-      default:
-        return '';
-    }
-  };
+const getMonthlyCancellationExample = (policy) => {
+  const monthlyRent = property.monthly_price || 60000;
+  
+  switch (policy) {
+    case 'flexible':
+      return {
+        '48+': `48+ hours before: 100% refund (RF ${formatPrice(monthlyRent)} back)`,
+        '24-48': `24-48 hours before: 50% refund (RF ${formatPrice(monthlyRent * 0.5)} back)`,
+        '<24': `Less than 24 hours: No refund`
+      };
+    case 'moderate':
+      return {
+        '48+': `48+ hours before: 100% refund (RF ${formatPrice(monthlyRent)} back)`,
+        '24-48': `24-48 hours before: 50% refund (RF ${formatPrice(monthlyRent * 0.5)} back)`,
+        '<24': `Less than 24 hours: No refund`
+      };
+    case 'strict':
+      return {
+        '48+': `48+ hours before: 50% refund (RF ${formatPrice(monthlyRent * 0.5)} back)`,
+        '<48': `Less than 48 hours: No refund`
+      };
+    default:
+      return {
+        '48+': `48+ hours before: 100% refund`,
+        '24-48': `24-48 hours before: 50% refund`,
+        '<24': `Less than 24 hours: No refund`
+      };
+  }
+};
 
   const getHouseRulesList = () => {
     if (!property) return [];

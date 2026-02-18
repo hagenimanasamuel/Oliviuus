@@ -6,7 +6,9 @@ import HostProfilePage from '../pages/Landing/HostProfilePage.jsx';
 import PropertyDetailsPage from '../pages/Landing/property/PropertyDetailsPage.jsx';
 import BookingSuccessPage from '../pages/Booking/SuccessPage.jsx';
 import BookingProcess from '../pages/Booking/BookingProcess.jsx';
+import BookingProcessingPage from '../components/Booking/ProcessingPage.jsx';
 import BookingResultPage from '../pages/Booking/ResultPage.jsx';
+
 
 import AccountLayout from '../components/Account/AccountLayout';
 
@@ -50,6 +52,7 @@ export default function HomeRoutes() {
         <Route path="/book/:propertyUid" element={<BookingProcess />} />
         <Route path="/booking/success/:propertyUid" element={<BookingSuccessPage />} />
         <Route path="/booking/result" element={<BookingResultPage />} />
+        <Route path="/booking/processing" element={<BookingProcessingPage />} />
 
                 {/* Account Routes with Layout */}
         <Route path="/account" element={<AccountLayout />}>

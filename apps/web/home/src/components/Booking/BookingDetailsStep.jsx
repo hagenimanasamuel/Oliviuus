@@ -1,13 +1,12 @@
-// src/components/Booking/BookingDetailsStep.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Calendar, 
-  Users, 
-  Check, 
-  Shield, 
-  FileText, 
-  Info, 
-  Clock, 
+import {
+  Calendar,
+  Users,
+  Check,
+  Shield,
+  FileText,
+  Info,
+  Clock,
   DollarSign,
   Power,
   AlertCircle,
@@ -73,15 +72,15 @@ const BookingDetailsStep = ({
   const [showDetails, setShowDetails] = useState(false);
   const [errors, setErrors] = useState({});
   const [durationValidation, setDurationValidation] = useState({ isValid: true, message: '' });
-  
+
   // ============================================
-  // ✅ NEW STATE FOR AVAILABILITY CHECK
+  // STATE FOR AVAILABILITY CHECK
   // ============================================
   const [checkingAvailability, setCheckingAvailability] = useState(false);
   const [availabilityStatus, setAvailabilityStatus] = useState(null);
   const [availabilityError, setAvailabilityError] = useState('');
   const [debounceTimer, setDebounceTimer] = useState(null);
-  
+
   // Refs for scrolling to errors
   const startDateRef = useRef(null);
   const durationRef = useRef(null);
@@ -124,21 +123,18 @@ const BookingDetailsStep = ({
   ].filter(period => period.price > 0);
 
   // ============================================
-  // ✅ REAL-TIME AVAILABILITY CHECK
+  // REAL-TIME AVAILABILITY CHECK
   // ============================================
   useEffect(() => {
-    // Don't check if no start date or duration
     if (!bookingData.startDate || !bookingData.duration) {
       setAvailabilityStatus(null);
       return;
     }
 
-    // Clear previous timer
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }
 
-    // Debounce to avoid too many API calls
     const timer = setTimeout(() => {
       checkAvailability();
     }, 800);
@@ -152,7 +148,6 @@ const BookingDetailsStep = ({
     };
   }, [bookingData.startDate, bookingData.duration, bookingData.period]);
 
-  // ✅ CHECK AVAILABILITY API CALL
   const checkAvailability = async () => {
     if (!bookingData.startDate || !bookingData.duration) return;
 
@@ -161,7 +156,6 @@ const BookingDetailsStep = ({
     setAvailabilityStatus(null);
 
     try {
-      // Calculate end date based on period and duration
       const endDate = new Date(bookingData.startDate);
       switch (bookingData.period) {
         case 'monthly':
@@ -193,10 +187,10 @@ const BookingDetailsStep = ({
       }
     } catch (error) {
       console.error('Availability check error:', error);
-      
+
       if (error.response?.status === 409) {
         const errorData = error.response.data;
-        
+
         if (errorData.code === 'DUPLICATE_BOOKING') {
           setAvailabilityStatus({
             available: false,
@@ -218,7 +212,6 @@ const BookingDetailsStep = ({
     }
   };
 
-  // ✅ MANUAL CHECK AVAILABILITY
   const handleCheckAvailability = () => {
     checkAvailability();
   };
@@ -231,8 +224,7 @@ const BookingDetailsStep = ({
         onUpdateBookingData({ ...bookingData, duration: maxAdvance });
       }
       validateDuration(maxAdvance);
-      
-      // Trigger availability check after setting duration
+
       setTimeout(() => checkAvailability(), 100);
     }
   }, [property]);
@@ -266,23 +258,23 @@ const BookingDetailsStep = ({
   // Validate all booking details
   const validateBooking = () => {
     const newErrors = {};
-    
+
     if (!bookingData.startDate) {
       newErrors.startDate = 'Please select a start date';
     } else {
       const startDate = new Date(bookingData.startDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (startDate < today) {
         newErrors.startDate = 'Start date cannot be in the past';
       }
     }
-    
+
     if (basePrice === 0 || basePrice === null) {
       newErrors.price = 'This property requires you to contact the host for pricing';
     }
-    
+
     // Validate duration for monthly bookings
     if (bookingData.period === 'monthly') {
       const durationValidation = validateDuration(bookingData.duration);
@@ -295,9 +287,9 @@ const BookingDetailsStep = ({
     if (!availabilityStatus?.available) {
       newErrors.availability = 'Please check availability and confirm dates are available';
     }
-    
+
     setErrors(newErrors);
-    
+
     // Scroll to first error if any
     if (Object.keys(newErrors).length > 0) {
       setTimeout(() => {
@@ -311,65 +303,62 @@ const BookingDetailsStep = ({
         }
       }, 100);
     }
-    
+
     return Object.keys(newErrors).length === 0;
   };
 
   // Handle duration change with validation
   const handleDurationChange = (newDuration) => {
     if (newDuration < 1) return;
-    
+
     if (bookingData.period === 'monthly') {
       const maxAdvance = property.max_advance_months || 3;
       const maxSingle = property.max_single_payment_months || 6;
-      
+
       if (newDuration < maxAdvance) {
         newDuration = maxAdvance;
       }
-      
+
       if (newDuration > maxSingle) {
         newDuration = maxSingle;
       }
     }
-    
+
     const validation = validateDuration(newDuration);
     setDurationValidation(validation);
-    
+
     onUpdateBookingData({ ...bookingData, duration: newDuration });
-    
-    // Clear availability status when duration changes
+
     setAvailabilityStatus(null);
   };
 
   // Handle period change
   const handlePeriodChange = (periodId) => {
     const newPeriodData = { period: periodId };
-    
+
     if (periodId === 'monthly') {
       const maxAdvance = property.max_advance_months || 3;
       newPeriodData.duration = maxAdvance;
-      
+
       const validation = validateDuration(maxAdvance);
       setDurationValidation(validation);
     } else {
       newPeriodData.duration = 1;
       setDurationValidation({ isValid: true, message: '' });
     }
-    
+
     onUpdateBookingData({ ...bookingData, ...newPeriodData });
     setShowPeriodSelector(false);
-    
-    // Clear availability status when period changes
+
     setAvailabilityStatus(null);
   };
 
   // Handle start date change
   const handleStartDateChange = (e) => {
-    onUpdateBookingData({...bookingData, startDate: e.target.value});
+    onUpdateBookingData({ ...bookingData, startDate: e.target.value });
     if (errors.startDate) {
       setErrors(prev => ({ ...prev, startDate: '' }));
     }
-    // Clear availability status when date changes
     setAvailabilityStatus(null);
   };
 
@@ -425,7 +414,7 @@ const BookingDetailsStep = ({
           </div>
         </div>
       </div>
-      
+
       <div className="space-y-6">
         {/* Rental Period and Start Date in one row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -434,8 +423,8 @@ const BookingDetailsStep = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Rental Period
             </label>
-            
-            <div 
+
+            <div
               onClick={() => setShowPeriodSelector(true)}
               className="bg-gray-50 p-3 rounded-lg border border-gray-200 cursor-pointer hover:border-gray-300 transition-colors"
             >
@@ -470,16 +459,13 @@ const BookingDetailsStep = ({
               value={bookingData.startDate}
               onChange={handleStartDateChange}
               min={new Date().toISOString().split('T')[0]}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#BC8BBC]/20 outline-none transition-all ${
-                errors.startDate 
-                  ? 'border-red-300 bg-red-50 focus:border-red-500' 
-                  : 'border-gray-300 focus:border-[#BC8BBC]'
-              }`}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#BC8BBC]/20 outline-none transition-all ${errors.startDate
+                ? 'border-red-300 bg-red-50 focus:border-red-500'
+                : 'border-gray-300 focus:border-[#BC8BBC]'
+                }`}
             />
-            
-            {/* ============================================ */}
-            {/* ✅ AVAILABILITY STATUS - BELOW DATE FIELD */}
-            {/* ============================================ */}
+
+            {/* Availability Status */}
             {bookingData.startDate && bookingData.duration && (
               <div className="mt-1.5 text-xs">
                 {checkingAvailability ? (
@@ -497,7 +483,7 @@ const BookingDetailsStep = ({
                     <AlertCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
                     <div>
                       <span>You already have a booking for these dates.</span>
-                      <button 
+                      <button
                         onClick={() => navigate('/bookings')}
                         className="ml-1 text-[#BC8BBC] hover:text-[#9A6A9A] font-medium underline"
                       >
@@ -519,7 +505,7 @@ const BookingDetailsStep = ({
                   <div className="flex items-center gap-1 text-yellow-600">
                     <AlertCircle className="h-3 w-3" />
                     <span>Unable to check availability. </span>
-                    <button 
+                    <button
                       onClick={handleCheckAvailability}
                       className="text-[#BC8BBC] hover:text-[#9A6A9A] font-medium underline"
                     >
@@ -558,16 +544,15 @@ const BookingDetailsStep = ({
                 </div>
               )}
             </div>
-            
+
             <div className="flex items-center gap-3 mb-2">
               <button
                 onClick={() => handleDurationChange(bookingData.duration - 1)}
                 disabled={bookingData.duration <= (property.max_advance_months || 3)}
-                className={`w-10 h-10 flex items-center justify-center border rounded-lg transition-colors ${
-                  bookingData.duration <= (property.max_advance_months || 3)
-                    ? 'border-gray-200 text-gray-300 cursor-not-allowed'
-                    : 'border-gray-300 hover:border-[#BC8BBC] hover:text-[#BC8BBC]'
-                }`}
+                className={`w-10 h-10 flex items-center justify-center border rounded-lg transition-colors ${bookingData.duration <= (property.max_advance_months || 3)
+                  ? 'border-gray-200 text-gray-300 cursor-not-allowed'
+                  : 'border-gray-300 hover:border-[#BC8BBC] hover:text-[#BC8BBC]'
+                  }`}
               >
                 -
               </button>
@@ -580,16 +565,15 @@ const BookingDetailsStep = ({
               <button
                 onClick={() => handleDurationChange(bookingData.duration + 1)}
                 disabled={bookingData.period === 'monthly' && bookingData.duration >= (property.max_single_payment_months || 6)}
-                className={`w-10 h-10 flex items-center justify-center border rounded-lg transition-colors ${
-                  bookingData.period === 'monthly' && bookingData.duration >= (property.max_single_payment_months || 6)
-                    ? 'border-gray-200 text-gray-300 cursor-not-allowed'
-                    : 'border-gray-300 hover:border-[#BC8BBC] hover:text-[#BC8BBC]'
-                }`}
+                className={`w-10 h-10 flex items-center justify-center border rounded-lg transition-colors ${bookingData.period === 'monthly' && bookingData.duration >= (property.max_single_payment_months || 6)
+                  ? 'border-gray-200 text-gray-300 cursor-not-allowed'
+                  : 'border-gray-300 hover:border-[#BC8BBC] hover:text-[#BC8BBC]'
+                  }`}
               >
                 +
               </button>
             </div>
-            
+
             {errors.duration && (
               <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700 animate-pulse">
                 <div className="flex items-center gap-2">
@@ -598,7 +582,7 @@ const BookingDetailsStep = ({
                 </div>
               </div>
             )}
-            
+
             {!durationValidation.isValid && !errors.duration && (
               <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-sm text-amber-700">
                 <div className="flex items-center gap-2">
@@ -607,7 +591,7 @@ const BookingDetailsStep = ({
                 </div>
               </div>
             )}
-            
+
             {errors.price && (
               <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700">
                 <div className="flex items-center gap-2">
@@ -616,7 +600,7 @@ const BookingDetailsStep = ({
                 </div>
               </div>
             )}
-            
+
             {errors.startDate && (
               <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700 animate-pulse">
                 <div className="flex items-center gap-2">
@@ -625,7 +609,7 @@ const BookingDetailsStep = ({
                 </div>
               </div>
             )}
-            
+
             {/* Payment limits info - Only for monthly */}
             {bookingData.period === 'monthly' && paymentLimitsInfo && showPaymentRules && showDetails && (
               <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200 text-sm">
@@ -671,14 +655,14 @@ const BookingDetailsStep = ({
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Total Amount:</span>
                   <span className="font-bold text-gray-900">
                     {formatPrice(totalAmount)}
                   </span>
                 </div>
-                
+
                 {customizationTotal > 0 && (
                   <div className="flex items-center justify-between text-xs mt-1">
                     <span className="text-gray-500">+ Services:</span>
@@ -724,16 +708,15 @@ const BookingDetailsStep = ({
                     {showUtilitiesDetails ? 'Less' : 'Details'}
                   </button>
                 </div>
-                
-                <div className={`p-4 border rounded-lg transition-all ${
-                  utilitiesInfo.included
-                    ? 'border-green-200 bg-green-50' 
-                    : 'border-gray-200 bg-gray-50'
-                }`}>
+
+                <div className={`p-4 border rounded-lg transition-all ${utilitiesInfo.included
+                  ? 'border-green-200 bg-green-50'
+                  : 'border-gray-200 bg-gray-50'
+                  }`}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="font-medium text-gray-900 mb-1">
-                        {utilitiesInfo.included 
+                        {utilitiesInfo.included
                           ? '✅ Utilities Included'
                           : '⚠️ Utilities Not Included'
                         }
@@ -741,7 +724,7 @@ const BookingDetailsStep = ({
                       <div className="text-sm text-gray-600">
                         {utilitiesInfo.message}
                       </div>
-                      
+
                       {showUtilitiesDetails && !utilitiesInfo.included && utilitiesInfo.min > 0 && (
                         <div className="mt-3 pt-3 border-t border-gray-200">
                           <div className="text-sm font-medium text-gray-900 mb-2">Estimated Monthly Range:</div>
@@ -761,7 +744,7 @@ const BookingDetailsStep = ({
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="text-right ml-4">
                       {utilitiesInfo.included ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -776,7 +759,9 @@ const BookingDetailsStep = ({
               </div>
             )}
 
-            {/* Cancellation Policy - ALWAYS shows landlord's policy */}
+            {/* ============================================ */}
+            {/* ✅ UPDATED: Cancellation Policy - NO FEES */}
+            {/* ============================================ */}
             {cancellationInfo && (
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -791,50 +776,158 @@ const BookingDetailsStep = ({
                     {showCancellationDetails ? 'Hide Details' : 'View Details'}
                   </button>
                 </div>
-                
+
                 <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
                   <div className="space-y-3">
+                    {/* Policy Summary */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="font-medium text-gray-900">
-                          {cancellationInfo.refundPercentage}% Refund
+                        <div className="font-medium text-gray-900 mb-1">
+                          {cancellationInfo.policyName}
                         </div>
                         <div className="text-sm text-gray-600">
                           {cancellationInfo.policyDescription}
                         </div>
                       </div>
-                      <div className={`text-sm font-bold ${
-                        cancellationInfo.refundPercentage > 0 
-                          ? 'text-green-600' 
-                          : 'text-red-600'
-                      }`}>
-                        {cancellationInfo.refundPercentage > 0 
-                          ? `${cancellationInfo.refundAfterCommission}%` 
-                          : '0%'}
+                      <div className={`text-sm font-bold px-3 py-1 rounded-full ${cancellationInfo.refundPercentage === 100 ? 'bg-green-100 text-green-700' :
+                          cancellationInfo.refundPercentage === 50 ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-red-100 text-red-700'
+                        }`}>
+                        {cancellationInfo.refundPercentage}% refund
                       </div>
                     </div>
-                    
-                    {/* Monthly Example - Only for monthly bookings */}
-                    {bookingData.period === 'monthly' && cancellationInfo.monthlyExample && (
-                      <div className="p-2 bg-blue-50 rounded border border-blue-100 text-xs text-blue-700">
-                        {cancellationInfo.monthlyExample}
+
+                    {/* Timing breakdown based on exact policies */}
+                    <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                      {/* 48+ hours column */}
+                      <div className={`p-2 rounded-lg border ${cancellationInfo.hoursUntilCheckIn >= 48
+                          ? 'border-green-200 bg-green-50'
+                          : 'border-gray-200 bg-gray-50'
+                        }`}>
+                        <div className="font-medium mb-1">48+ hours</div>
+                        <div className="text-gray-600">
+                          {cancellationInfo.refund48Plus}% refund
+                        </div>
+                        {cancellationInfo.policy === 'flexible' && cancellationInfo.refund48Plus === 100 && (
+                          <div className="mt-1 text-[10px] text-gray-500">(Same as 24+ hours)</div>
+                        )}
+                      </div>
+
+                      {/* 24-48 hours column */}
+                      <div className={`p-2 rounded-lg border ${cancellationInfo.hoursUntilCheckIn >= 24 && cancellationInfo.hoursUntilCheckIn < 48
+                          ? 'border-yellow-200 bg-yellow-50'
+                          : 'border-gray-200 bg-gray-50'
+                        }`}>
+                        <div className="font-medium mb-1">24-48 hours</div>
+                        <div className="text-gray-600">
+                          {cancellationInfo.policy === 'flexible' ? '100%' :
+                            cancellationInfo.policy === 'moderate' ? '50%' :
+                              '0%'} refund
+                        </div>
+                        {cancellationInfo.policy === 'strict' && (
+                          <div className="mt-1 text-[10px] text-gray-500">No refund</div>
+                        )}
+                      </div>
+
+                      {/* <24 hours column */}
+                      <div className={`p-2 rounded-lg border ${cancellationInfo.hoursUntilCheckIn < 24
+                          ? 'border-red-200 bg-red-50'
+                          : 'border-gray-200 bg-gray-50'
+                        }`}>
+                        <div className="font-medium mb-1">{'<24 hours'}</div>
+                        <div className="text-gray-600">0% refund</div>
+                      </div>
+                    </div>
+
+                    {/* Current timing indicator */}
+                    {bookingData.startDate && (
+                      <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-blue-800">Current:</span>
+                          <span className="font-medium text-blue-900">
+                            {cancellationInfo.hoursUntilCheckIn} hours until check-in
+                          </span>
+                        </div>
                       </div>
                     )}
-                    
+
+                    {/* Examples based on policy */}
                     {showCancellationDetails && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <div className="space-y-3">
-                          <div className="p-2 bg-amber-50 border border-amber-200 rounded text-xs text-gray-700">
-                            <div className="flex items-start gap-1">
-                              <Info className="h-3 w-3 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div className="mt-3 pt-3 border-t border-gray-200 space-y-3">
+                        {/* Flexible Policy Examples */}
+                        {cancellationInfo.policy === 'flexible' && (
+                          <div className="space-y-2">
+                            <div className="p-3 bg-gray-100 rounded-lg text-xs text-gray-700">
+                              <div className="font-medium mb-2">📋 Examples (based on 60,000 RWF):</div>
+                              <ul className="space-y-2">
+                                <li className="flex items-start gap-2">
+                                  <span className="text-green-600 font-bold">•</span>
+                                  <span><span className="font-medium">24+ hours before check-in:</span> 100% refund (60,000 RWF back)</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-red-600 font-bold">•</span>
+                                  <span><span className="font-medium">Less than 24 hours before check-in:</span> No refund (0 RWF)</span>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Moderate Policy Examples */}
+                        {cancellationInfo.policy === 'moderate' && (
+                          <div className="space-y-2">
+                            <div className="p-3 bg-gray-100 rounded-lg text-xs text-gray-700">
+                              <div className="font-medium mb-2">📋 Examples (based on 60,000 RWF):</div>
+                              <ul className="space-y-2">
+                                <li className="flex items-start gap-2">
+                                  <span className="text-green-600 font-bold">•</span>
+                                  <span><span className="font-medium">48+ hours before check-in:</span> 100% refund (60,000 RWF back)</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-yellow-600 font-bold">•</span>
+                                  <span><span className="font-medium">24-48 hours before check-in:</span> 50% refund (30,000 RWF back)</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-red-600 font-bold">•</span>
+                                  <span><span className="font-medium">Less than 24 hours before check-in:</span> No refund (0 RWF)</span>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Strict Policy Examples */}
+                        {cancellationInfo.policy === 'strict' && (
+                          <div className="space-y-2">
+                            <div className="p-3 bg-gray-100 rounded-lg text-xs text-gray-700">
+                              <div className="font-medium mb-2">📋 Examples (based on 60,000 RWF):</div>
+                              <ul className="space-y-2">
+                                <li className="flex items-start gap-2">
+                                  <span className="text-green-600 font-bold">•</span>
+                                  <span><span className="font-medium">48+ hours before check-in:</span> 50% refund (30,000 RWF back)</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <span className="text-red-600 font-bold">•</span>
+                                  <span><span className="font-medium">Less than 48 hours before check-in:</span> No refund (0 RWF)</span>
+                                </li>
+                              </ul>
+                              <div className="mt-2 text-gray-500 italic">
+                                Note: For strict policy, the 24-48 hour window does not apply.
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Important Notes */}
+                        <div className="p-2 bg-amber-50 border border-amber-200 rounded text-xs text-gray-700">
+                          <div className="flex items-start gap-1">
+                            <Info className="h-3 w-3 text-amber-600 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <div className="font-medium mb-1">Important Notes:</div>
                               <div>
-                                <div className="font-medium mb-1">Important Notes:</div>
-                                <div>
-                                  • Platform service fee ({cancellationInfo.platformCommission}%) is non-refundable<br/>
-                                  • Refund amount is calculated on rent amount only<br/>
-                                  • All times are based on Rwanda local time<br/>
-                                  • Refunds processed within 5-7 business days
-                                </div>
+                                • All times are based on Rwanda local time (CAT)<br />
+                                • Refunds are processed within 5-7 business days<br />
+                                • Cancellation applies to the entire booking
                               </div>
                             </div>
                           </div>
@@ -843,25 +936,6 @@ const BookingDetailsStep = ({
                     )}
                   </div>
                 </div>
-
-                {/* 2-Day Protection Notice - ONLY for monthly bookings AND check-in within 2 days */}
-                {cancellationInfo?.showTwoDayProtection && bookingData.period === 'monthly' && (
-                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-sm">
-                    <div className="flex items-start gap-2">
-                      <Shield className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <div className="font-medium text-green-800 mb-1">2-Day Protection Active</div>
-                        <p className="text-green-700">
-                          Your check-in is within 2 days. Full refund (90% after 10% platform fee) if you cancel within 2 days. 
-                          <span className="font-medium"> This gives you time to check the house before committing.</span>
-                        </p>
-                        <div className="mt-2 text-xs text-green-600">
-                          Note: After 2 days, the landlord's cancellation policy above applies.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
@@ -881,7 +955,7 @@ const BookingDetailsStep = ({
                     {showHouseRules ? 'Hide' : `View ${houseRules.length} Rules`}
                   </button>
                 </div>
-                
+
                 {showHouseRules ? (
                   <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
                     <div className="space-y-4">
@@ -896,7 +970,7 @@ const BookingDetailsStep = ({
                         } else if (rule.includes('pets')) {
                           explanation = 'This rule tells you if you can bring animals like dogs or cats.';
                         }
-                        
+
                         return (
                           <div key={index} className="flex items-start gap-2">
                             <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -928,7 +1002,7 @@ const BookingDetailsStep = ({
               </label>
               <textarea
                 value={bookingData.specialRequests}
-                onChange={(e) => onUpdateBookingData({...bookingData, specialRequests: e.target.value})}
+                onChange={(e) => onUpdateBookingData({ ...bookingData, specialRequests: e.target.value })}
                 placeholder="Any special requirements or requests for the host..."
                 rows={3}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-[#BC8BBC] focus:ring-2 focus:ring-[#BC8BBC]/20 outline-none transition-all resize-none"
@@ -955,32 +1029,31 @@ const BookingDetailsStep = ({
       {/* Error summary ref */}
       <div ref={errorsRef}></div>
 
-      {/* Action Button - ALWAYS shows Continue to Payment */}
+      {/* Action Button */}
       <div className="mt-6">
         <button
           onClick={handleNext}
           disabled={
-            Object.keys(errors).length > 0 || 
-            basePrice === 0 || 
+            Object.keys(errors).length > 0 ||
+            basePrice === 0 ||
             !durationValidation.isValid ||
             !availabilityStatus?.available ||
             checkingAvailability ||
             !bookingData.startDate
           }
-          className={`w-full py-4 rounded-lg font-medium transition-all ${
-            Object.keys(errors).length === 0 && 
-            basePrice > 0 && 
+          className={`w-full py-4 rounded-lg font-medium transition-all ${Object.keys(errors).length === 0 &&
+            basePrice > 0 &&
             durationValidation.isValid &&
             availabilityStatus?.available &&
             !checkingAvailability &&
             bookingData.startDate
-              ? 'bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] text-white hover:shadow-lg hover:scale-[1.02] active:scale-[0.99]'
-              : 'bg-gray-200 cursor-not-allowed text-gray-500'
-          }`}
+            ? 'bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] text-white hover:shadow-lg hover:scale-[1.02] active:scale-[0.99]'
+            : 'bg-gray-200 cursor-not-allowed text-gray-500'
+            }`}
         >
           Continue to Payment - {formatPrice(firstPayment)} Now
         </button>
-        
+
         {/* Small helper text when disabled */}
         {!availabilityStatus?.available && bookingData.startDate && !checkingAvailability && availabilityStatus && (
           <p className="text-xs text-red-500 text-center mt-2">
@@ -1012,25 +1085,23 @@ const BookingDetailsStep = ({
                 <X className="h-5 w-5 text-gray-500" />
               </button>
             </div>
-            
+
             <div className="p-4 space-y-3">
               {availablePeriods.map((period) => (
                 <div
                   key={period.id}
                   onClick={() => handlePeriodChange(period.id)}
-                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                    bookingData.period === period.id
-                      ? 'bg-gradient-to-r from-[#BC8BBC]/10 to-[#8A5A8A]/10 border-[#BC8BBC]'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
+                  className={`p-4 border rounded-lg cursor-pointer transition-all ${bookingData.period === period.id
+                    ? 'bg-gradient-to-r from-[#BC8BBC]/10 to-[#8A5A8A]/10 border-[#BC8BBC]'
+                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        bookingData.period === period.id
-                          ? 'bg-[#BC8BBC] text-white'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${bookingData.period === period.id
+                        ? 'bg-[#BC8BBC] text-white'
+                        : 'bg-gray-100 text-gray-600'
+                        }`}>
                         <CalendarDays className="h-5 w-5" />
                       </div>
                       <div>
@@ -1045,7 +1116,7 @@ const BookingDetailsStep = ({
                       <div className="text-xs text-gray-500">per {period.unit}</div>
                     </div>
                   </div>
-                  
+
                   {bookingData.period === period.id && (
                     <div className="mt-3 pt-3 border-t border-gray-200">
                       <div className="flex items-center gap-2 text-sm text-green-600">
@@ -1056,7 +1127,7 @@ const BookingDetailsStep = ({
                   )}
                 </div>
               ))}
-              
+
               {availablePeriods.length === 0 && (
                 <div className="text-center py-8">
                   <div className="text-3xl mb-3 text-gray-300">📅</div>
@@ -1067,7 +1138,7 @@ const BookingDetailsStep = ({
                 </div>
               )}
             </div>
-            
+
             <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
               <button
                 onClick={() => setShowPeriodSelector(false)}

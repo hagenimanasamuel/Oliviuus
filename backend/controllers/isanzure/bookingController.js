@@ -215,7 +215,7 @@ exports.checkBookingAvailability = async (req, res) => {
 };
 
 // ============================================
-// 2. CREATE BOOKING AFTER PAYMENT
+// 2. CREATE BOOKING AFTER PAYMENT - FIXED (NO EXTRA LOGIC)
 // ============================================
 const createBookingAfterPayment = async (referenceId) => {
   try {
@@ -229,7 +229,7 @@ const createBookingAfterPayment = async (referenceId) => {
       return false;
     }
 
-    // Check if booking already exists for this transaction
+    // ✅ Check if booking already exists (only these two checks - NO extra logic)
     const existingBookingCheck = await isanzureQuery(`
       SELECT b.id, b.booking_uid, b.status 
       FROM bookings b
@@ -240,8 +240,7 @@ const createBookingAfterPayment = async (referenceId) => {
     if (existingBookingCheck.length > 0) {
       debugLog('✅ Booking already exists for transaction:', {
         transactionId: payment.transaction_id,
-        bookingUid: existingBookingCheck[0].booking_uid,
-        status: existingBookingCheck[0].status
+        bookingUid: existingBookingCheck[0].booking_uid
       });
       return { 
         bookingId: existingBookingCheck[0].id, 
@@ -259,8 +258,7 @@ const createBookingAfterPayment = async (referenceId) => {
     if (existingByRef.length > 0) {
       debugLog('✅ Booking already exists for reference:', {
         referenceId,
-        bookingUid: existingByRef[0].booking_uid,
-        status: existingByRef[0].status
+        bookingUid: existingByRef[0].booking_uid
       });
       return { 
         bookingId: existingByRef[0].id, 
@@ -289,11 +287,6 @@ const createBookingAfterPayment = async (referenceId) => {
 
     const property = properties[0];
     const cancellationPolicy = property.cancellation_policy || 'flexible';
-
-    debugLog('📋 Using cancellation policy:', {
-      propertyId: property.id,
-      policy: cancellationPolicy
-    });
 
     // Create booking
     const insertBookingSql = `
@@ -623,62 +616,64 @@ exports.initiateBookingPayment = async (req, res) => {
       }
     }
 
-    // 💳 CARD PAYMENT
-else if (paymentMethod === 'card') {
-  const cardFirstName = firstName || user.first_name || 'iSanzure';
-  const cardLastName = lastName || user.last_name || 'User';
-  const cardEmail = email || user.public_email || `${user.user_uid}@isanzure.rw`;
+    // 💳 CARD PAYMENT - FIXED (NO EXTRA LOGIC)
+    else if (paymentMethod === 'card') {
+      const cardFirstName = firstName || user.first_name || 'iSanzure';
+      const cardLastName = lastName || user.last_name || 'User';
+      const cardEmail = email || user.public_email || `${user.user_uid}@isanzure.rw`;
 
-  paymentResult = await paymentService.createCardPayment({
-    userId: user.id,
-    email: cardEmail,
-    firstName: cardFirstName,
-    lastName: cardLastName,
-    phoneNumber: customerPhone || user.public_phone || '',
-    amount: totalAmount,
-    description: `Booking: ${property.title}`,
-    propertyUid,
-    bookingPeriod,
-    startDate,
-    duration,
-    specialRequests,
-    optionalServices,
-    cancelUrl
-  });
+      paymentResult = await paymentService.createCardPayment({
+        userId: user.id,
+        email: cardEmail,
+        firstName: cardFirstName,
+        lastName: cardLastName,
+        phoneNumber: customerPhone || user.public_phone || '',
+        amount: totalAmount,
+        description: `Booking: ${property.title}`,
+        propertyUid,
+        bookingPeriod,
+        startDate,
+        duration,
+        specialRequests,
+        optionalServices,
+        cancelUrl
+      });
 
-  if (paymentResult.status === 'success') {
-    // ✅ FIX: Save payment as 'pending', NOT 'success'
-    await paymentService.createBookingPaymentRecord({
-      userId: user.id,
-      propertyId: property.id,
-      amount: totalAmount,
-      referenceId: paymentResult.referenceId,
-      status: 'pending',  // ← CRITICAL: Must be 'pending', not 'success'
-      bookingPeriod,
-      duration,
-      startDate,
-      endDate: endDateFormatted,
-      specialRequests,
-      optionalServices,
-      cancellationPolicy: property.cancellation_policy,
-      paymentMethod
-    });
+      if (paymentResult.status === 'success') {
+        // Save payment record as 'pending'
+        await paymentService.createBookingPaymentRecord({
+          userId: user.id,
+          propertyId: property.id,
+          amount: totalAmount,
+          referenceId: paymentResult.referenceId,
+          status: 'pending',
+          bookingPeriod,
+          duration,
+          startDate,
+          endDate: endDateFormatted,
+          specialRequests,
+          optionalServices,
+          cancellationPolicy: property.cancellation_policy,
+          paymentMethod
+        });
 
-    // ✅ FIX: Start tracking card payments too!
-    paymentService.startBackgroundStatusCheck(
-      paymentResult.referenceId,
-      createBookingAfterPayment
-    ).catch(error => debugLog('Background check error:', error.message));
+        // Start background tracking
+        paymentService.startBackgroundStatusCheck(
+          paymentResult.referenceId,
+          createBookingAfterPayment
+        ).catch(error => debugLog('Background check error:', error.message));
 
-    return res.json({
-      success: true,
-      mode: 'card',
-      message: 'Card payment initiated. Please complete payment in the opened window.',
-      reference_id: paymentResult.referenceId,
-      postData: paymentResult.postData
-    });
-  }
-}
+        // ✅ Return redirect_url to frontend
+        return res.json({
+          success: true,
+          mode: 'card',
+          message: 'Card payment initiated. Redirecting to payment page...',
+          reference_id: paymentResult.referenceId,
+          redirect_url: paymentResult.redirect_url,
+          paymentMethod: 'card'
+        });
+      }
+    }
 
     // ❌ PAYMENT FAILED
     if (paymentResult?.status === 'fail') {
@@ -835,64 +830,153 @@ exports.handleBookingPaymentCallback = async (req, res) => {
 };
 
 // ============================================
-// 📞 PAYMENT WEBHOOK - Server-to-server ONLY
+// 📞 UNIVERSAL WEBHOOK - Handles ALL callback formats!
 // ============================================
 exports.handlePaymentWebhook = async (req, res) => {
   try {
-    // ✅ Handle BOTH POST and GET!
-    let reference_id, transaction_id, status;
+    let reference_id, transaction_id, status, amount, payment_method;
     
-    if (req.method === 'POST') {
-      // Proper webhook - JSON body
-      reference_id = req.body.reference_id;
-      transaction_id = req.body.transaction_id;
-      status = req.body.status;
-    } else {
-      // Browser redirect - GET with query params
+    debugLog('📨 Webhook received:', {
+      method: req.method,
+      contentType: req.headers['content-type'],
+      body: req.body,
+      query: req.query
+    });
+
+    // ============================================
+    // ✅ CASE 1: Mobile Money (JSON POST)
+    // ============================================
+    if (req.headers['content-type']?.includes('application/json')) {
+      const data = req.body;
+      reference_id = data.reference_id;
+      transaction_id = data.transaction_id;
+      status = data.status;
+      amount = data.amount;
+      payment_method = data.payment_method;
+      
+      debugLog('💳 Mobile Money callback (JSON):', { reference_id, transaction_id, status });
+    }
+    
+    // ============================================
+    // ✅ CASE 2: Card Payment (Form POST from Pesapal)
+    // ============================================
+    else if (req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
+      // Pesapal sends form data with these fields
+      reference_id = req.body.pesapal_merchant_reference;
+      transaction_id = req.body.pesapal_transaction_tracking_id;
+      const response = req.body.pesapal_response_data;
+      
+      // Map Pesapal response to our status
+      status = response === 'COMPLETED' ? 'success' : 'failed';
+      payment_method = 'card';
+      
+      debugLog('💳 Card callback (Form):', { 
+        reference_id, 
+        transaction_id, 
+        response,
+        status 
+      });
+    }
+    
+    // ============================================
+    // ✅ CASE 3: Legacy GET (just in case)
+    // ============================================
+    else if (req.method === 'GET') {
       reference_id = req.query.reference_id || req.query.reference;
       transaction_id = req.query.transaction_id;
       status = req.query.status;
+      amount = req.query.amount;
+      payment_method = req.query.payment_method;
+      
+      debugLog('⚠️ Legacy GET callback:', { reference_id, transaction_id, status });
+      
+      // If GET, redirect to frontend with ngrok header
+      if (reference_id) {
+        res.setHeader('ngrok-skip-browser-warning', 'true');
+        return res.redirect(`${process.env.FRONTEND_URL}/booking/result?reference_id=${reference_id}&status=${status}`);
+      }
     }
 
-    debugLog('📨 Webhook received:', { 
-      method: req.method,
-      reference_id, 
-      transaction_id, 
-      status 
-    });
-
+    // ============================================
+    // ✅ Validate required data
+    // ============================================
     if (!reference_id || !status) {
-      return res.status(400).json({ success: false, message: 'Invalid webhook' });
+      debugLog('❌ Invalid callback data:', { reference_id, transaction_id, status });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Missing required fields' 
+      });
     }
 
-    // Update payment status
+    // ============================================
+    // ✅ Map status to our system
+    // ============================================
     const mappedStatus = mapPaymentStatus(status);
-    await paymentService.updateBookingPaymentStatus(reference_id, mappedStatus, transaction_id);
     
+    debugLog(`🔄 Updating payment: ${reference_id} -> ${mappedStatus}`);
+
+    // ============================================
+    // ✅ Check if already processed (idempotent)
+    // ============================================
+    const existingPayment = await paymentService.getBookingPaymentByReference(reference_id);
+    
+    if (existingPayment && existingPayment.status !== 'pending') {
+      debugLog(`⚠️ Payment already processed: ${reference_id} (${existingPayment.status})`);
+      
+      // For GET requests, redirect to frontend
+      if (req.method === 'GET') {
+        res.setHeader('ngrok-skip-browser-warning', 'true');
+        return res.redirect(`${process.env.FRONTEND_URL}/booking/result?reference_id=${reference_id}&status=${existingPayment.status}`);
+      }
+      
+      return res.status(200).json({ success: true, message: 'Already processed' });
+    }
+
+    // ============================================
+    // ✅ Update payment status
+    // ============================================
+    await paymentService.updateBookingPaymentStatus(reference_id, mappedStatus, transaction_id);
+
+    // ============================================
+    // ✅ If completed, create booking
+    // ============================================
     if (mappedStatus === 'completed') {
       await createBookingAfterPayment(reference_id);
     }
 
-    // ✅ If GET request (browser), redirect to frontend
+    // ============================================
+    // ✅ For GET requests, redirect to frontend
+    // ============================================
     if (req.method === 'GET') {
-      // Set ngrok-skip-browser-warning header
       res.setHeader('ngrok-skip-browser-warning', 'true');
-      
-      // Redirect to your frontend result page
-      return res.redirect(`${process.env.FRONTEND_URL}/booking/result?reference_id=${reference_id}&status=${status}`);
+      return res.redirect(`${process.env.FRONTEND_URL}/booking/result?reference_id=${reference_id}&status=${mappedStatus}`);
     }
 
-    // ✅ If POST request, return JSON
-    res.status(200).json({ success: true });
+    // ============================================
+    // ✅ For POST requests, return JSON
+    // ============================================
+    debugLog(`✅ Callback processed successfully: ${reference_id}`);
+    res.status(200).json({ 
+      success: true, 
+      message: 'Callback processed',
+      data: { reference_id, status: mappedStatus }
+    });
 
   } catch (error) {
     debugLog('❌ Webhook error:', error.message);
     
+    // For GET requests, redirect to frontend error page
     if (req.method === 'GET') {
-      res.redirect(`${process.env.FRONTEND_URL}/booking/error`);
-    } else {
-      res.status(200).json({ success: false, message: error.message });
+      res.setHeader('ngrok-skip-browser-warning', 'true');
+      return res.redirect(`${process.env.FRONTEND_URL}/booking/error`);
     }
+    
+    // For POST, return 200 with error (always acknowledge)
+    res.status(200).json({ 
+      success: false, 
+      message: 'Error processing callback',
+      error: error.message
+    });
   }
 };
 

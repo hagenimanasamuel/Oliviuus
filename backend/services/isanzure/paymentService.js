@@ -152,65 +152,47 @@ async createCardPayment(paymentData) {
   } = paymentData;
 
   const referenceId = this.generateReferenceId('CARD');
-
-  // ✅ WEBHOOK - Server-to-server (POST, JSON)
-  const webhookUrl = `${process.env.BASE_URL}/api/booking/webhook`;
   
-  // ✅ REDIRECT - Browser goes here after payment (GET, URL params)
-  const returnUrl = `${process.env.FRONTEND_URL}/booking/result`;
-  const cancelUrlFinal = cancelUrl || `${process.env.FRONTEND_URL}/booking/result`;
+  const webhookUrl = `${process.env.BASE_URL}/api/booking/webhook`;
+  const redirectUrl = `${process.env.FRONTEND_URL}/booking/processing`;
 
   console.log(`💳 Card Payment:`);
   console.log(`   Reference: ${referenceId}`);
   console.log(`   Amount: ${amount} RWF`);
-  console.log(`   Webhook URL: ${webhookUrl} (server-to-server)`);
-  console.log(`   Return URL: ${returnUrl} (browser redirect)`);
+  console.log(`   Webhook URL: ${webhookUrl}`);
+  console.log(`   Redirect URL: ${redirectUrl}`);
 
   try {
     const payload = {
       email,
       name: `${firstName} ${lastName}`.trim(),
-      phone_number: phoneNumber || '',
-      first_name: firstName,
-      last_name: lastName,
-      
-      payment_method: "Card",
-      card_url: this.cardCheckoutUrl,
-      
-      api_key: this.appKey,
-      secrate_key: this.secretKey,
-      
+      payment_method: "card",
       amount: String(amount),
-      currency: "RWF",
-      
-      reference_id: referenceId,
       service_paid: this.servicePaid,
-      
-      narration: description || "iSanzure Booking Payment",
-      account_number: `ISANZURE-${userId || 'USER'}`,
-      
-      // ✅ CRITICAL - BOTH URLs!
-      callback_url: webhookUrl,  // 👈 Webhook (server-to-server)
-      return_url: returnUrl,     // 👈 Redirect (browser)
-      cancel_url: cancelUrlFinal, // 👈 Redirect (browser)
-      
-      country_code: "RW",
-      action: "pay",
-      created_at: new Date().toISOString()
+      reference_id: referenceId,
+      callback_url: webhookUrl,
+      card_redirect_url: redirectUrl,
+      action: "pay"
     };
 
+    console.log('📤 Sending card payment request:');
+    console.log(JSON.stringify(payload, null, 2));
+
     const result = await this.makeRequest("POST", payload);
+
+    console.log('📥 LMBTech response:', JSON.stringify(result, null, 2));
+
+    // ✅ FIX: Always use the correct Pesapal URL
+    const pesapalUrl = `https://pay.lmbtech.rw/pay/pesapal/iframe.php?reference_id=${referenceId}`;
+    
+    console.log(`✅ Redirecting to Pesapal: ${pesapalUrl}`);
 
     return {
       status: 'success',
       message: 'Card payment initiated',
       referenceId,
       paymentMethod: 'card',
-      mode: 'card',
-      postData: {
-        card_url: this.cardCheckoutUrl,
-        ...payload
-      },
+      redirect_url: pesapalUrl, // 👈 FORCE correct URL
       response: result
     };
 
@@ -299,13 +281,57 @@ async createCardPayment(paymentData) {
   // 💾 DATABASE OPERATIONS
   // ============================================
 
-  async createBookingPaymentRecord(data) {
-    const {
-      userId,
-      propertyId,
-      amount,
+async createBookingPaymentRecord(data) {
+  const {
+    userId,
+    propertyId,
+    amount,
+    referenceId,
+    status,
+    bookingPeriod,
+    duration,
+    startDate,
+    endDate,
+    specialRequests,
+    optionalServices,
+    cancellationPolicy,
+    paymentMethod
+  } = data;
+
+  try {
+    const transactionSql = `
+      INSERT INTO transactions (
+        transaction_uid,
+        from_user_id,
+        to_user_id,
+        amount,
+        currency_code,
+        transaction_type,
+        status,
+        payment_method,
+        gateway_data,
+        notes,
+        created_at,
+        completed_at
+      ) VALUES (
+        UUID(),
+        ?,
+        NULL,
+        ?,
+        'RWF',
+        'rent_payment',
+        ?,
+        ?,
+        ?,
+        ?,
+        UTC_TIMESTAMP(),
+        CASE WHEN ? = 'completed' THEN UTC_TIMESTAMP() ELSE NULL END
+      )
+    `;
+
+    const gatewayData = JSON.stringify({
       referenceId,
-      status,
+      propertyId,
       bookingPeriod,
       duration,
       startDate,
@@ -314,81 +340,26 @@ async createCardPayment(paymentData) {
       optionalServices,
       cancellationPolicy,
       paymentMethod
-    } = data;
+    });
 
-    try {
-      const transactionSql = `
-        INSERT INTO transactions (
-          transaction_uid,
-          from_user_id,
-          to_user_id,
-          amount,
-          currency_code,
-          transaction_type,
-          status,
-          payment_method,
-          gateway_data,
-          notes,
-          created_at,
-          completed_at
-        ) VALUES (
-          UUID(),
-          ?,
-          NULL,
-          ?,
-          'RWF',
-          'rent_payment',
-          ?,
-          ?,
-          ?,
-          ?,
-          UTC_TIMESTAMP(),
-          CASE WHEN ? = 'completed' THEN UTC_TIMESTAMP() ELSE NULL END
-        )
-      `;
+    const result = await isanzureQuery(transactionSql, [
+      userId,
+      amount,
+      status,
+      paymentMethod,
+      gatewayData,
+      `Booking payment - ${bookingPeriod} (${paymentMethod})`,
+      status
+    ]);
 
-      const gatewayData = JSON.stringify({
-        referenceId,
-        propertyId,
-        bookingPeriod,
-        duration,
-        startDate,
-        endDate,
-        specialRequests,
-        optionalServices,
-        cancellationPolicy,
-        paymentMethod
-      });
-
-      const result = await isanzureQuery(transactionSql, [
-        userId,
-        amount,
-        status,
-        paymentMethod,
-        gatewayData,
-        `Booking payment - ${bookingPeriod} (${paymentMethod})`,
-        status
-      ]);
-
-      const transactionId = result.insertId;
-
-      if (status !== 'failed') {
-        await isanzureQuery(`
-          INSERT INTO user_balances (user_id, pending_amount, balance_amount, currency_code, updated_at)
-          VALUES (?, ?, 0, 'RWF', UTC_TIMESTAMP())
-          ON DUPLICATE KEY UPDATE
-            pending_amount = pending_amount + ?,
-            updated_at = UTC_TIMESTAMP()
-        `, [userId, amount, amount]);
-      }
-
-      console.log(`✅ Payment record created: ${referenceId} - ${status} (${paymentMethod})`);
-      return transactionId;
-    } catch (error) {
-      console.error('❌ Error creating payment record:', error);
-      throw error;
-    }
+    console.log(`✅ Payment record created: ${referenceId} - ${status} (${paymentMethod})`);
+    return result.insertId;
+    
+  } catch (error) {
+    console.error('❌ Error creating payment record:', error);
+    throw error;
   }
+}
 
   async getBookingPaymentByReference(referenceId) {
     try {

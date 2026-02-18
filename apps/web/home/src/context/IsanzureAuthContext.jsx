@@ -1,4 +1,3 @@
-// src/context/iSanzureAuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import api from "../api/axios";
@@ -32,6 +31,8 @@ export const IsanzureAuthProvider = ({ children }) => {
           setIsanzureUser(response.data.user);
           setUserType(response.data.user.user_type);
         } else {
+          // This should rarely happen now due to auto-creation
+          console.log('⚠️ User not in iSanzure yet - auto-creation should handle this');
           setIsanzureUser(null);
           setUserType('tenant');
         }
@@ -99,7 +100,6 @@ export const IsanzureAuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook
 export const useIsanzureAuth = () => { 
   const context = useContext(IsanzureAuthContext);
   if (!context) {

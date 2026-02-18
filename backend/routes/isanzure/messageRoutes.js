@@ -8,7 +8,7 @@ const authMiddleware = require('../../middlewares/authMiddleware');
 router.use(authMiddleware);
 
 // ============================================
-// 📋 CONVERSATIONS - FOR USERS
+// 📋 CONVERSATIONS - FOR ALL USERS
 // ============================================
 router.get('/conversations', messageController.getConversations);
 router.get('/conversations/:conversationId', messageController.getConversation);
@@ -19,6 +19,7 @@ router.put('/conversations/:conversationId/read', messageController.markAsRead);
 // 💬 MESSAGES
 // ============================================
 router.post('/send', messageController.sendMessage);
+router.post('/send/first', messageController.sendFirstMessage);
 router.delete('/:messageId', messageController.deleteMessage);
 
 // ============================================
@@ -28,6 +29,11 @@ router.get('/search', messageController.searchMessages);
 router.get('/suggestions/properties', messageController.getPropertySuggestions);
 router.get('/suggestions/tags', messageController.getTagSuggestions);
 router.post('/parse', messageController.parseMessageContent);
+
+// ============================================
+// 👤 USER LOOKUP
+// ============================================
+router.get('/user/:userUid', messageController.getUserByUid);
 
 // ============================================
 // 📊 STATS & COUNTS

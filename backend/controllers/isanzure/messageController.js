@@ -1022,43 +1022,127 @@ exports.getPropertySuggestions = async (req, res) => {
     }
 
     const { query, conversation_id } = req.query;
-    const searchTerm = query || '';
+    const searchTerm = query ? query.trim() : '';
+    
+    debugLog('🎯 Smart property suggestions for user:', { 
+      userId: user.id, 
+      userType: user.user_type,
+      searchTerm,
+      conversationId: conversation_id 
+    });
 
     let properties = [];
+    let seenProperties = new Map(); // Deduplicate properties
 
+    // ========== STRATEGY 1: Properties from current conversation ==========
+    if (conversation_id) {
+      try {
+        // Parse conversation ID to get the other user
+        let otherUserId = conversation_id;
+        if (conversation_id.startsWith('conv_')) {
+          const parts = conversation_id.split('_');
+          otherUserId = parts[2] === String(user.id) ? parts[1] : parts[2];
+        }
+
+        debugLog('📞 Getting properties from conversation partner:', otherUserId);
+
+        // Get properties owned by the other user (if they're a landlord)
+        const conversationProperties = await isanzureQuery(`
+          SELECT 
+            p.id,
+            p.property_uid,
+            p.title,
+            p.description,
+            p.property_type,
+            p.province,
+            p.district,
+            p.sector,
+            p.address,
+            p.max_guests,
+            p.area,
+            p.is_verified,
+            COALESCE(pp.monthly_price, 0) as monthly_price,
+            COALESCE(pp.weekly_price, 0) as weekly_price,
+            COALESCE(pp.daily_price, 0) as daily_price,
+            (SELECT pi.image_url FROM property_images pi WHERE pi.property_id = p.id AND pi.is_cover = 1 LIMIT 1) as cover_image,
+            (SELECT COUNT(*) FROM property_images pi2 WHERE pi2.property_id = p.id) as image_count,
+            'conversation' as source,
+            100 as priority,
+            u.user_type as owner_type,
+            CONCAT(COALESCE(sso.first_name, 'User'), ' ', COALESCE(sso.last_name, '')) as owner_name
+          FROM properties p
+          INNER JOIN users u ON p.landlord_id = u.id
+          LEFT JOIN oliviuus_db.users sso ON u.oliviuus_user_id = sso.id
+          LEFT JOIN property_pricing pp ON p.id = pp.property_id
+          WHERE p.landlord_id = ? 
+            AND p.status = 'active'
+            AND (p.title LIKE ? OR p.property_uid LIKE ? OR p.address LIKE ? OR p.description LIKE ?)
+          LIMIT 5
+        `, [otherUserId, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]).catch(() => []);
+
+        conversationProperties.forEach(p => {
+          if (!seenProperties.has(p.id)) {
+            seenProperties.set(p.id, true);
+            properties.push(p);
+          }
+        });
+
+        debugLog(`✅ Found ${conversationProperties.length} properties from conversation partner`);
+      } catch (error) {
+        debugLog('Error getting conversation properties:', error.message);
+      }
+    }
+
+    // ========== STRATEGY 2: User's own properties (for landlords) ==========
     if (user.user_type === 'landlord' || user.user_type === 'property_manager' || user.user_type === 'agent') {
-      // Landlord: suggest their own properties
-      properties = await isanzureQuery(`
-        SELECT 
-          p.id,
-          p.property_uid,
-          p.title,
-          p.description,
-          p.property_type,
-          p.province,
-          p.district,
-          p.sector,
-          p.address,
-          p.max_guests,
-          p.area,
-          p.is_verified,
-          p.is_featured,
-          COALESCE(pp.monthly_price, 0) as monthly_price,
-          COALESCE(pp.weekly_price, 0) as weekly_price,
-          COALESCE(pp.daily_price, 0) as daily_price,
-          (SELECT pi.image_url FROM property_images pi WHERE pi.property_id = p.id AND pi.is_cover = 1 LIMIT 1) as cover_image,
-          (SELECT COUNT(*) FROM property_images pi2 WHERE pi2.property_id = p.id) as image_count
-        FROM properties p
-        LEFT JOIN property_pricing pp ON p.id = pp.property_id
-        WHERE p.landlord_id = ?
-          AND p.status = 'active'
-          AND (p.title LIKE ? OR p.property_uid LIKE ? OR p.address LIKE ? OR p.description LIKE ?)
-        LIMIT 10
-      `, [user.id, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]);
-    } else {
-      // Tenant: suggest properties they've booked
-      properties = await isanzureQuery(`
-        SELECT 
+      try {
+        const ownProperties = await isanzureQuery(`
+          SELECT 
+            p.id,
+            p.property_uid,
+            p.title,
+            p.description,
+            p.property_type,
+            p.province,
+            p.district,
+            p.sector,
+            p.address,
+            p.max_guests,
+            p.area,
+            p.is_verified,
+            COALESCE(pp.monthly_price, 0) as monthly_price,
+            COALESCE(pp.weekly_price, 0) as weekly_price,
+            COALESCE(pp.daily_price, 0) as daily_price,
+            (SELECT pi.image_url FROM property_images pi WHERE pi.property_id = p.id AND pi.is_cover = 1 LIMIT 1) as cover_image,
+            (SELECT COUNT(*) FROM property_images pi2 WHERE pi2.property_id = p.id) as image_count,
+            'my_property' as source,
+            95 as priority,
+            'Your Property' as owner_name
+          FROM properties p
+          LEFT JOIN property_pricing pp ON p.id = pp.property_id
+          WHERE p.landlord_id = ?
+            AND p.status = 'active'
+            AND (p.title LIKE ? OR p.property_uid LIKE ? OR p.address LIKE ? OR p.description LIKE ?)
+          LIMIT 5
+        `, [user.id, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]).catch(() => []);
+
+        ownProperties.forEach(p => {
+          if (!seenProperties.has(p.id)) {
+            seenProperties.set(p.id, true);
+            properties.push(p);
+          }
+        });
+
+        debugLog(`✅ Found ${ownProperties.length} own properties`);
+      } catch (error) {
+        debugLog('Error getting own properties:', error.message);
+      }
+    }
+
+    // ========== STRATEGY 3: Properties user has BOOKED ==========
+    try {
+      const bookedProperties = await isanzureQuery(`
+        SELECT DISTINCT
           p.id,
           p.property_uid,
           p.title,
@@ -1076,53 +1160,301 @@ exports.getPropertySuggestions = async (req, res) => {
           COALESCE(pp.daily_price, 0) as daily_price,
           (SELECT pi.image_url FROM property_images pi WHERE pi.property_id = p.id AND pi.is_cover = 1 LIMIT 1) as cover_image,
           (SELECT COUNT(*) FROM property_images pi2 WHERE pi2.property_id = p.id) as image_count,
-          'booked' as relationship
+          'booked' as source,
+          90 as priority,
+          b.status as booking_status,
+          CONCAT(COALESCE(landlord_sso.first_name, 'Landlord'), ' ', COALESCE(landlord_sso.last_name, '')) as owner_name
         FROM bookings b
         INNER JOIN properties p ON b.property_id = p.id
+        INNER JOIN users landlord ON p.landlord_id = landlord.id
+        LEFT JOIN oliviuus_db.users landlord_sso ON landlord.oliviuus_user_id = landlord_sso.id
         LEFT JOIN property_pricing pp ON p.id = pp.property_id
         WHERE b.tenant_id = ?
-          AND b.status IN ('confirmed', 'active', 'completed')
-        ORDER BY b.created_at DESC
-        LIMIT 10
-      `, [user.id]);
+          AND b.status IN ('confirmed', 'active', 'completed', 'pending')
+          AND (p.title LIKE ? OR p.property_uid LIKE ? OR p.address LIKE ? OR p.description LIKE ?)
+        ORDER BY 
+          CASE b.status 
+            WHEN 'active' THEN 1
+            WHEN 'confirmed' THEN 2
+            WHEN 'completed' THEN 3
+            WHEN 'pending' THEN 4
+            ELSE 5
+          END,
+          b.created_at DESC
+        LIMIT 5
+      `, [user.id, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]).catch(() => []);
+
+      bookedProperties.forEach(p => {
+        if (!seenProperties.has(p.id)) {
+          seenProperties.set(p.id, true);
+          properties.push(p);
+        }
+      });
+
+      debugLog(`✅ Found ${bookedProperties.length} booked properties`);
+    } catch (error) {
+      debugLog('Error getting booked properties:', error.message);
     }
 
-    // Format with FULL details
-    const formattedProperties = properties.map(p => ({
-      id: p.property_uid,
-      uid: p.property_uid,
-      name: p.title,
-      description: p.description,
-      subtitle: `${p.district || ''} ${p.sector ? `- ${p.sector}` : ''}`.trim() || p.province || 'Location not specified',
-      location: {
-        address: p.address,
-        province: p.province,
-        district: p.district,
-        sector: p.sector
-      },
-      image: p.cover_image || null,
-      images: {
-        cover: p.cover_image,
-        count: p.image_count || 0
-      },
-      price: {
-        monthly: p.monthly_price || 0,
-        weekly: p.weekly_price || 0,
-        daily: p.daily_price || 0
-      },
-      displayPrice: p.monthly_price || p.weekly_price || p.daily_price || 0,
-      specs: {
-        type: p.property_type,
-        guests: p.max_guests,
-        area: p.area
-      },
-      verified: p.is_verified === 1,
-      relationship: p.relationship || 'available',
-      meta: {
-        property_uid: p.property_uid,
-        property_type: p.property_type
+    // ========== STRATEGY 4: Properties in WISHLIST ==========
+    try {
+      // Check if wishlist table exists
+      const tableCheck = await isanzureQuery(`
+        SELECT COUNT(*) as count
+        FROM information_schema.tables 
+        WHERE table_schema = DATABASE() 
+          AND table_name = 'wishlist'
+      `).catch(() => [{ count: 0 }]);
+
+      if (tableCheck[0].count > 0) {
+        const wishlistProperties = await isanzureQuery(`
+          SELECT 
+            p.id,
+            p.property_uid,
+            p.title,
+            p.description,
+            p.property_type,
+            p.province,
+            p.district,
+            p.sector,
+            p.address,
+            p.max_guests,
+            p.area,
+            p.is_verified,
+            COALESCE(pp.monthly_price, 0) as monthly_price,
+            COALESCE(pp.weekly_price, 0) as weekly_price,
+            COALESCE(pp.daily_price, 0) as daily_price,
+            (SELECT pi.image_url FROM property_images pi WHERE pi.property_id = p.id AND pi.is_cover = 1 LIMIT 1) as cover_image,
+            (SELECT COUNT(*) FROM property_images pi2 WHERE pi2.property_id = p.id) as image_count,
+            'wishlist' as source,
+            85 as priority,
+            w.created_at as saved_at,
+            CONCAT(COALESCE(landlord_sso.first_name, 'Landlord'), ' ', COALESCE(landlord_sso.last_name, '')) as owner_name
+          FROM wishlist w
+          INNER JOIN properties p ON w.property_id = p.id
+          INNER JOIN users landlord ON p.landlord_id = landlord.id
+          LEFT JOIN oliviuus_db.users landlord_sso ON landlord.oliviuus_user_id = landlord_sso.id
+          LEFT JOIN property_pricing pp ON p.id = pp.property_id
+          WHERE w.user_id = ?
+            AND (p.title LIKE ? OR p.property_uid LIKE ? OR p.address LIKE ? OR p.description LIKE ?)
+          ORDER BY w.created_at DESC
+          LIMIT 5
+        `, [user.id, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`]).catch(() => []);
+
+        wishlistProperties.forEach(p => {
+          if (!seenProperties.has(p.id)) {
+            seenProperties.set(p.id, true);
+            properties.push(p);
+          }
+        });
+
+        debugLog(`✅ Found ${wishlistProperties.length} wishlist properties`);
       }
-    }));
+    } catch (error) {
+      debugLog('Error getting wishlist properties:', error.message);
+    }
+
+    // ========== STRATEGY 5: Properties from SAME LOCATION (if search term is location) ==========
+    if (properties.length < 5 && searchTerm) {
+      try {
+        // Try to match location terms
+        const locationProperties = await isanzureQuery(`
+          SELECT 
+            p.id,
+            p.property_uid,
+            p.title,
+            p.description,
+            p.property_type,
+            p.province,
+            p.district,
+            p.sector,
+            p.address,
+            p.max_guests,
+            p.area,
+            p.is_verified,
+            COALESCE(pp.monthly_price, 0) as monthly_price,
+            COALESCE(pp.weekly_price, 0) as weekly_price,
+            COALESCE(pp.daily_price, 0) as daily_price,
+            (SELECT pi.image_url FROM property_images pi WHERE pi.property_id = p.id AND pi.is_cover = 1 LIMIT 1) as cover_image,
+            (SELECT COUNT(*) FROM property_images pi2 WHERE pi2.property_id = p.id) as image_count,
+            'nearby' as source,
+            80 as priority,
+            CONCAT(COALESCE(landlord_sso.first_name, 'Landlord'), ' ', COALESCE(landlord_sso.last_name, '')) as owner_name
+          FROM properties p
+          INNER JOIN users landlord ON p.landlord_id = landlord.id
+          LEFT JOIN oliviuus_db.users landlord_sso ON landlord.oliviuus_user_id = landlord_sso.id
+          LEFT JOIN property_pricing pp ON p.id = pp.property_id
+          WHERE p.status = 'active'
+            AND (p.province LIKE ? OR p.district LIKE ? OR p.sector LIKE ?)
+            AND p.landlord_id != ?
+          LIMIT 3
+        `, [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, user.id]).catch(() => []);
+
+        locationProperties.forEach(p => {
+          if (!seenProperties.has(p.id)) {
+            seenProperties.set(p.id, true);
+            properties.push(p);
+          }
+        });
+
+        debugLog(`✅ Found ${locationProperties.length} nearby properties`);
+      } catch (error) {
+        debugLog('Error getting location properties:', error.message);
+      }
+    }
+
+    // ========== STRATEGY 6: Popular/Featured properties ==========
+    if (properties.length < 3) {
+      try {
+        const popularProperties = await isanzureQuery(`
+          SELECT 
+            p.id,
+            p.property_uid,
+            p.title,
+            p.description,
+            p.property_type,
+            p.province,
+            p.district,
+            p.sector,
+            p.address,
+            p.max_guests,
+            p.area,
+            p.is_verified,
+            COALESCE(pp.monthly_price, 0) as monthly_price,
+            COALESCE(pp.weekly_price, 0) as weekly_price,
+            COALESCE(pp.daily_price, 0) as daily_price,
+            (SELECT pi.image_url FROM property_images pi WHERE pi.property_id = p.id AND pi.is_cover = 1 LIMIT 1) as cover_image,
+            (SELECT COUNT(*) FROM property_images pi2 WHERE pi2.property_id = p.id) as image_count,
+            'featured' as source,
+            70 as priority,
+            CONCAT(COALESCE(landlord_sso.first_name, 'Landlord'), ' ', COALESCE(landlord_sso.last_name, '')) as owner_name
+          FROM properties p
+          INNER JOIN users landlord ON p.landlord_id = landlord.id
+          LEFT JOIN oliviuus_db.users landlord_sso ON landlord.oliviuus_user_id = landlord_sso.id
+          LEFT JOIN property_pricing pp ON p.id = pp.property_id
+          WHERE p.status = 'active'
+            AND (p.is_featured = 1 OR p.is_verified = 1)
+            AND p.landlord_id != ?
+          ORDER BY p.is_featured DESC, p.created_at DESC
+          LIMIT 3
+        `, [user.id]).catch(() => []);
+
+        popularProperties.forEach(p => {
+          if (!seenProperties.has(p.id)) {
+            seenProperties.set(p.id, true);
+            properties.push(p);
+          }
+        });
+
+        debugLog(`✅ Found ${popularProperties.length} featured properties`);
+      } catch (error) {
+        debugLog('Error getting featured properties:', error.message);
+      }
+    }
+
+    // ========== DEDUPLICATE AND SORT BY PRIORITY ==========
+    // Remove any remaining duplicates
+    const uniqueProperties = [];
+    const finalSeen = new Map();
+    
+    properties.forEach(p => {
+      if (!finalSeen.has(p.id)) {
+        finalSeen.set(p.id, true);
+        uniqueProperties.push(p);
+      }
+    });
+
+    // Sort by priority (higher first)
+    uniqueProperties.sort((a, b) => b.priority - a.priority);
+
+    // Limit to 8 suggestions max
+    const limitedProperties = uniqueProperties.slice(0, 8);
+
+    // Format with user-friendly messages
+    const formattedProperties = limitedProperties.map(p => {
+      // Create source description
+      let sourceDescription = '';
+      switch(p.source) {
+        case 'conversation':
+          sourceDescription = `🏠 ${p.owner_name || 'Landlord'}'s property`;
+          break;
+        case 'my_property':
+          sourceDescription = '✨ Your property';
+          break;
+        case 'booked':
+          sourceDescription = p.booking_status === 'active' 
+            ? '🔑 Currently staying here' 
+            : p.booking_status === 'confirmed'
+            ? '📅 Upcoming stay'
+            : p.booking_status === 'completed'
+            ? '⭐ Previously stayed'
+            : '📋 Booked property';
+          break;
+        case 'wishlist':
+          sourceDescription = '❤️ In your wishlist';
+          break;
+        case 'nearby':
+          sourceDescription = `📍 In ${p.district || p.sector || p.province}`;
+          break;
+        case 'featured':
+          sourceDescription = '🌟 Featured property';
+          break;
+        default:
+          sourceDescription = '🏡 Property';
+      }
+
+      return {
+        id: p.property_uid,
+        uid: p.property_uid,
+        name: p.title,
+        description: p.description,
+        subtitle: `${p.district || ''} ${p.sector ? `- ${p.sector}` : ''}`.trim() || p.province || 'Rwanda',
+        location: {
+          address: p.address,
+          province: p.province,
+          district: p.district,
+          sector: p.sector
+        },
+        image: p.cover_image || null,
+        images: {
+          cover: p.cover_image,
+          count: p.image_count || 0
+        },
+        price: {
+          monthly: p.monthly_price || 0,
+          weekly: p.weekly_price || 0,
+          daily: p.daily_price || 0
+        },
+        displayPrice: p.monthly_price || p.weekly_price || p.daily_price || 0,
+        specs: {
+          type: p.property_type,
+          guests: p.max_guests,
+          area: p.area
+        },
+        verified: p.is_verified === 1,
+        source: p.source,
+        sourceDescription: sourceDescription,
+        priority: p.priority,
+        meta: {
+          property_uid: p.property_uid,
+          property_type: p.property_type
+        }
+      };
+    });
+
+    // Prepare friendly message based on results
+    let message = '';
+    if (formattedProperties.length === 0) {
+      if (searchTerm) {
+        message = `No properties match "${searchTerm}"`;
+      } else {
+        message = 'Start typing to search for properties';
+      }
+    } else {
+      message = `Found ${formattedProperties.length} properties`;
+    }
+
+    debugLog(`🎯 Returning ${formattedProperties.length} smart suggestions`);
 
     res.status(200).json({
       success: true,
@@ -1130,7 +1462,9 @@ exports.getPropertySuggestions = async (req, res) => {
         suggestions: formattedProperties,
         type: 'property',
         query: searchTerm,
-        total: formattedProperties.length
+        total: formattedProperties.length,
+        message: message,
+        hasResults: formattedProperties.length > 0
       }
     });
 
@@ -1142,7 +1476,9 @@ exports.getPropertySuggestions = async (req, res) => {
         suggestions: [],
         type: 'property',
         query: req.query.query || '',
-        total: 0
+        total: 0,
+        message: 'Start typing to search for properties',
+        hasResults: false
       }
     });
   }
@@ -1345,5 +1681,538 @@ exports.parseMessageContent = async (req, res) => {
     });
   }
 };
+
+// ============================================
+// 13. GET USER BY UUID - FOR STARTING CONVERSATIONS
+// ============================================
+exports.getUserByUid = async (req, res) => {
+  try {
+    const currentUser = await getAuthenticatedUser(req);
+    
+    if (!currentUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required',
+        code: 'AUTH_REQUIRED'
+      });
+    }
+
+    const { userUid } = req.params;
+
+    if (!userUid) {
+      return res.status(400).json({
+        success: false,
+        message: 'User UID is required',
+        code: 'MISSING_USER_UID'
+      });
+    }
+
+    debugLog('Fetching user by UID:', userUid);
+
+    // Get user by user_uid (UUID)
+    const users = await isanzureQuery(`
+      SELECT 
+        u.id,
+        u.user_uid,
+        u.oliviuus_user_id,
+        u.user_type,
+        u.public_phone,
+        u.public_email,
+        u.is_active,
+        COALESCE(sso.first_name, 'User') as first_name,
+        COALESCE(sso.last_name, '') as last_name,
+        COALESCE(sso.username, CONCAT('user-', u.id)) as username,
+        CONCAT(
+          COALESCE(sso.first_name, 'User'),
+          ' ',
+          COALESCE(sso.last_name, '')
+        ) as full_name,
+        sso.profile_avatar_url as avatar
+      FROM users u
+      LEFT JOIN oliviuus_db.users sso ON u.oliviuus_user_id = sso.id
+      WHERE u.user_uid = ?
+        AND u.is_active = 1
+      LIMIT 1
+    `, [userUid]);
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        code: 'USER_NOT_FOUND'
+      });
+    }
+
+    const user = users[0];
+
+    // Don't allow messaging yourself
+    if (user.id === currentUser.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot message yourself',
+        code: 'SELF_MESSAGE_NOT_ALLOWED'
+      });
+    }
+
+    // Get user stats (total properties, etc.)
+    let stats = {};
+    if (user.user_type === 'landlord') {
+      const propertyCount = await isanzureQuery(`
+        SELECT COUNT(*) as count
+        FROM properties
+        WHERE landlord_id = ? AND status = 'active'
+      `, [user.id]);
+      stats.total_properties = propertyCount[0]?.count || 0;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        ...user,
+        stats
+      }
+    });
+
+  } catch (error) {
+    debugLog('Error fetching user by UID:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch user',
+      code: 'FETCH_USER_FAILED',
+      error: error.message
+    });
+  }
+};
+
+// ============================================
+// 14. SEND FIRST MESSAGE - CREATE NEW CONVERSATION
+// ============================================
+exports.sendFirstMessage = async (req, res) => {
+  try {
+    const currentUser = await getAuthenticatedUser(req);
+    
+    if (!currentUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required',
+        code: 'AUTH_REQUIRED'
+      });
+    }
+
+    const { recipient_uid, message, property_uid } = req.body;
+
+    if (!recipient_uid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Recipient UID is required',
+        code: 'MISSING_RECIPIENT'
+      });
+    }
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Message content is required',
+        code: 'MISSING_MESSAGE'
+      });
+    }
+
+    debugLog('Sending first message from:', currentUser.id, 'to:', recipient_uid);
+
+    // Get recipient by UUID
+    const recipients = await isanzureQuery(`
+      SELECT id, user_uid, user_type
+      FROM users
+      WHERE user_uid = ? AND is_active = 1
+      LIMIT 1
+    `, [recipient_uid]);
+
+    if (recipients.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Recipient not found',
+        code: 'RECIPIENT_NOT_FOUND'
+      });
+    }
+
+    const recipient = recipients[0];
+
+    // Don't allow messaging yourself
+    if (recipient.id === currentUser.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot message yourself',
+        code: 'SELF_MESSAGE_NOT_ALLOWED'
+      });
+    }
+
+    // Check if conversation already exists
+    const existingMessages = await isanzureQuery(`
+      SELECT id FROM messages
+      WHERE (sender_id = ? AND receiver_id = ?)
+         OR (sender_id = ? AND receiver_id = ?)
+      LIMIT 1
+    `, [currentUser.id, recipient.id, recipient.id, currentUser.id]);
+
+    if (existingMessages.length > 0) {
+      // Conversation exists, just add new message
+      return await sendMessageInternal(
+        currentUser.id, 
+        recipient.id, 
+        message, 
+        property_uid ? { mentioned_property: property_uid } : null,
+        res
+      );
+    }
+
+    // Parse @mentions in message
+    const mentionRegex = /@([a-zA-Z0-9-]+)/g;
+    const mentions = [];
+    let mentionMatch;
+    
+    while ((mentionMatch = mentionRegex.exec(message)) !== null) {
+      mentions.push(mentionMatch[1]);
+    }
+
+    // Get property details for mentions
+    let mentionedProperties = [];
+    if (mentions.length > 0) {
+      const propertyUids = [...new Set(mentions)];
+      const placeholders = propertyUids.map(() => '?').join(',');
+      
+      mentionedProperties = await isanzureQuery(`
+        SELECT 
+          p.property_uid,
+          p.id,
+          p.title,
+          p.description,
+          p.address,
+          p.province,
+          p.district,
+          p.sector,
+          p.property_type,
+          p.max_guests,
+          p.area,
+          p.is_verified,
+          COALESCE(pp.monthly_price, 0) as monthly_price,
+          COALESCE(pp.weekly_price, 0) as weekly_price,
+          COALESCE(pp.daily_price, 0) as daily_price,
+          (SELECT pi.image_url FROM property_images pi WHERE pi.property_id = p.id AND pi.is_cover = 1 LIMIT 1) as cover_image
+        FROM properties p
+        LEFT JOIN property_pricing pp ON p.id = pp.property_id
+        WHERE p.property_uid IN (${placeholders})
+      `, propertyUids).catch(() => []);
+    }
+
+    // Parse #tags
+    const tagRegex = /#([a-zA-Z0-9-]+)/g;
+    const tags = [];
+    let tagMatch;
+    
+    while ((tagMatch = tagRegex.exec(message)) !== null) {
+      tags.push(tagMatch[1]);
+    }
+
+    // Create metadata
+    const metadata = {
+      mentions: mentionedProperties.map(p => ({
+        property_uid: p.property_uid,
+        id: p.id,
+        title: p.title,
+        description: p.description ? p.description.substring(0, 100) : null,
+        location: {
+          address: p.address,
+          province: p.province,
+          district: p.district,
+          sector: p.sector
+        },
+        price: {
+          monthly: p.monthly_price,
+          weekly: p.weekly_price,
+          daily: p.daily_price
+        },
+        images: {
+          cover: p.cover_image
+        },
+        specs: {
+          type: p.property_type,
+          guests: p.max_guests,
+          area: p.area
+        },
+        verified: p.is_verified === 1,
+        mentioned_at: new Date().toISOString()
+      })),
+      tags: tags.map(t => ({ tag: t })),
+      has_mentions: mentions.length > 0,
+      has_tags: tags.length > 0,
+      is_first_message: true,
+      parsed_at: new Date().toISOString()
+    };
+
+    // Insert the first message
+    const insertQuery = `
+      INSERT INTO messages (
+        message_uid,
+        sender_id,
+        receiver_id,
+        booking_id,
+        message_type,
+        content,
+        metadata,
+        created_at,
+        is_read
+      ) VALUES (UUID(), ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), 0)
+    `;
+
+    const result = await isanzureQuery(insertQuery, [
+      currentUser.id,
+      recipient.id,
+      null, // booking_id
+      'chat',
+      message.trim(),
+      JSON.stringify(metadata)
+    ]);
+
+    const messageId = result.insertId;
+
+    // Get the inserted message
+    const newMessage = await isanzureQuery(`
+      SELECT 
+        m.id,
+        m.message_uid,
+        m.content,
+        m.metadata,
+        m.is_read,
+        m.read_at,
+        m.created_at,
+        m.sender_id,
+        m.receiver_id,
+        u_sender.user_uid as sender_uid,
+        CONCAT(
+          COALESCE(sso_sender.first_name, 'User'),
+          ' ',
+          COALESCE(sso_sender.last_name, '')
+        ) as sender_name,
+        sso_sender.profile_avatar_url as sender_avatar,
+        u_receiver.user_uid as receiver_uid,
+        CONCAT(
+          COALESCE(sso_receiver.first_name, 'User'),
+          ' ',
+          COALESCE(sso_receiver.last_name, '')
+        ) as receiver_name,
+        sso_receiver.profile_avatar_url as receiver_avatar
+      FROM messages m
+      LEFT JOIN users u_sender ON m.sender_id = u_sender.id
+      LEFT JOIN oliviuus_db.users sso_sender ON u_sender.oliviuus_user_id = sso_sender.id
+      LEFT JOIN users u_receiver ON m.receiver_id = u_receiver.id
+      LEFT JOIN oliviuus_db.users sso_receiver ON u_receiver.oliviuus_user_id = sso_receiver.id
+      WHERE m.id = ?
+    `, [messageId]);
+
+    // Parse metadata
+    if (newMessage[0].metadata) {
+      newMessage[0].metadata = JSON.parse(newMessage[0].metadata);
+    }
+
+    // Create conversation ID
+    const conversationId = `conv_${currentUser.id}_${recipient.id}`;
+
+    debugLog('First message sent successfully');
+
+    res.status(201).json({
+      success: true,
+      message: 'Message sent successfully',
+      data: {
+        message: newMessage[0],
+        conversation_id: conversationId,
+        is_new_conversation: true
+      }
+    });
+
+  } catch (error) {
+    debugLog('Error sending first message:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send message',
+      code: 'SEND_MESSAGE_FAILED',
+      error: error.message
+    });
+  }
+};
+
+// Helper function to send message in existing conversation
+async function sendMessageInternal(senderId, receiverId, message, additionalMetadata, res) {
+  try {
+    // Parse @mentions
+    const mentionRegex = /@([a-zA-Z0-9-]+)/g;
+    const mentions = [];
+    let mentionMatch;
+    
+    while ((mentionMatch = mentionRegex.exec(message)) !== null) {
+      mentions.push(mentionMatch[1]);
+    }
+
+    // Get property details for mentions
+    let mentionedProperties = [];
+    if (mentions.length > 0) {
+      const propertyUids = [...new Set(mentions)];
+      const placeholders = propertyUids.map(() => '?').join(',');
+      
+      mentionedProperties = await isanzureQuery(`
+        SELECT 
+          p.property_uid,
+          p.id,
+          p.title,
+          p.description,
+          p.address,
+          p.province,
+          p.district,
+          p.sector,
+          p.property_type,
+          p.max_guests,
+          p.area,
+          p.is_verified,
+          COALESCE(pp.monthly_price, 0) as monthly_price,
+          COALESCE(pp.weekly_price, 0) as weekly_price,
+          COALESCE(pp.daily_price, 0) as daily_price,
+          (SELECT pi.image_url FROM property_images pi WHERE pi.property_id = p.id AND pi.is_cover = 1 LIMIT 1) as cover_image
+        FROM properties p
+        LEFT JOIN property_pricing pp ON p.id = pp.property_id
+        WHERE p.property_uid IN (${placeholders})
+      `, propertyUids).catch(() => []);
+    }
+
+    // Parse #tags
+    const tagRegex = /#([a-zA-Z0-9-]+)/g;
+    const tags = [];
+    let tagMatch;
+    
+    while ((tagMatch = tagRegex.exec(message)) !== null) {
+      tags.push(tagMatch[1]);
+    }
+
+    // Create metadata
+    const metadata = {
+      mentions: mentionedProperties.map(p => ({
+        property_uid: p.property_uid,
+        id: p.id,
+        title: p.title,
+        description: p.description ? p.description.substring(0, 100) : null,
+        location: {
+          address: p.address,
+          province: p.province,
+          district: p.district,
+          sector: p.sector
+        },
+        price: {
+          monthly: p.monthly_price,
+          weekly: p.weekly_price,
+          daily: p.daily_price
+        },
+        images: {
+          cover: p.cover_image
+        },
+        specs: {
+          type: p.property_type,
+          guests: p.max_guests,
+          area: p.area
+        },
+        verified: p.is_verified === 1,
+        mentioned_at: new Date().toISOString()
+      })),
+      tags: tags.map(t => ({ tag: t })),
+      has_mentions: mentions.length > 0,
+      has_tags: tags.length > 0,
+      ...additionalMetadata
+    };
+
+    // Insert the message
+    const insertQuery = `
+      INSERT INTO messages (
+        message_uid,
+        sender_id,
+        receiver_id,
+        booking_id,
+        message_type,
+        content,
+        metadata,
+        created_at,
+        is_read
+      ) VALUES (UUID(), ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), 0)
+    `;
+
+    const result = await isanzureQuery(insertQuery, [
+      senderId,
+      receiverId,
+      null,
+      'chat',
+      message.trim(),
+      JSON.stringify(metadata)
+    ]);
+
+    const messageId = result.insertId;
+
+    // Get the inserted message
+    const newMessage = await isanzureQuery(`
+      SELECT 
+        m.id,
+        m.message_uid,
+        m.content,
+        m.metadata,
+        m.is_read,
+        m.read_at,
+        m.created_at,
+        m.sender_id,
+        m.receiver_id,
+        u_sender.user_uid as sender_uid,
+        CONCAT(
+          COALESCE(sso_sender.first_name, 'User'),
+          ' ',
+          COALESCE(sso_sender.last_name, '')
+        ) as sender_name,
+        sso_sender.profile_avatar_url as sender_avatar,
+        u_receiver.user_uid as receiver_uid,
+        CONCAT(
+          COALESCE(sso_receiver.first_name, 'User'),
+          ' ',
+          COALESCE(sso_receiver.last_name, '')
+        ) as receiver_name,
+        sso_receiver.profile_avatar_url as receiver_avatar
+      FROM messages m
+      LEFT JOIN users u_sender ON m.sender_id = u_sender.id
+      LEFT JOIN oliviuus_db.users sso_sender ON u_sender.oliviuus_user_id = sso_sender.id
+      LEFT JOIN users u_receiver ON m.receiver_id = u_receiver.id
+      LEFT JOIN oliviuus_db.users sso_receiver ON u_receiver.oliviuus_user_id = sso_receiver.id
+      WHERE m.id = ?
+    `, [messageId]);
+
+    // Parse metadata
+    if (newMessage[0].metadata) {
+      newMessage[0].metadata = JSON.parse(newMessage[0].metadata);
+    }
+
+    const conversationId = `conv_${senderId}_${receiverId}`;
+
+    if (res) {
+      res.status(201).json({
+        success: true,
+        message: 'Message sent successfully',
+        data: {
+          message: newMessage[0],
+          conversation_id: conversationId,
+          is_new_conversation: false
+        }
+      });
+    }
+
+    return newMessage[0];
+  } catch (error) {
+    debugLog('Error in sendMessageInternal:', error.message);
+    if (res) {
+      throw error;
+    }
+    return null;
+  }
+}
 
 module.exports = exports;

@@ -95,6 +95,24 @@ const HostProfilePage = () => {
     }
   };
 
+  // ========== NAVIGATE TO MESSAGES WITH DRAFT ==========
+  const navigateToMessages = () => {
+    if (!host?.user_uid) {
+      console.error('Host UUID is missing');
+      // Fallback to generic messages page if no UUID
+      navigate('/account/messages');
+      return;
+    }
+
+    // Create a professional message introducing the user to the host
+    const defaultMessage = `Hi, I'm interested in your properties. Can you tell me more about what you have available?`;
+    
+    const encodedMessage = encodeURIComponent(defaultMessage);
+    
+    // Navigate to messages with host UUID and draft
+    navigate(`/account/messages?landlord=${host.user_uid}&draft=${encodedMessage}`);
+  };
+
   // Format price
   const formatPrice = (price) => {
     if (!price || price === 0 || price === '0') return 'Contact';
@@ -434,9 +452,9 @@ const HostProfilePage = () => {
                   </div>
                 </div>
                 
-                {/* Message/Chat Button - Updated to use isanzure's internal chat */}
+                {/* Message/Chat Button - Updated to use navigateToMessages with draft */}
                 <button
-                  onClick={() => navigate('/tenant/messages')}
+                  onClick={navigateToMessages}
                   className="bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] text-white px-5 py-2.5 rounded-lg font-medium hover:opacity-90 transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -490,7 +508,7 @@ const HostProfilePage = () => {
                   <div>
                     <div className="text-xs text-gray-500">Messaging</div>
                     <button
-                      onClick={() => navigate('/tenant/messages')}
+                      onClick={navigateToMessages}
                       className="text-sm font-medium text-gray-900 hover:text-[#BC8BBC] transition-colors"
                     >
                       In-App Chat
@@ -750,7 +768,7 @@ const HostProfilePage = () => {
                           {contactPhone}
                         </a>
                         <button
-                          onClick={() => navigate('/tenant/messages')}
+                          onClick={navigateToMessages}
                           className="text-xs px-3 py-1.5 bg-gradient-to-r from-[#BC8BBC] to-[#8A5A8A] text-white rounded hover:opacity-90 transition-colors"
                         >
                           Message
@@ -866,7 +884,7 @@ const HostProfilePage = () => {
         {/* Back to Properties Button */}
         <div className="text-center">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate(-1)}
             className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-medium hover:border-[#BC8BBC] hover:text-[#BC8BBC] transition-colors shadow-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

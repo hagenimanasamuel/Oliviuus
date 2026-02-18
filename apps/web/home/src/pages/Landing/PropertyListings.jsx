@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Heart, MapPin, Home, Check, Moon, Calendar, MoreHorizontal, Star, MapPin as MapPinIcon } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
+import toast from 'react-hot-toast';
 
 // Import Rwanda geo data
 import rwandaLocationData from '../../data/rwandaGeoData.json';
@@ -589,6 +590,7 @@ export default function PropertyListings() {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchFilters, setSearchFilters] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [favoriteStates, setFavoriteStates] = useState({});
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -868,6 +870,94 @@ export default function PropertyListings() {
     }
   };
 
+  // Handle favorite toggle
+  const handleFavorite = async (propertyUid, event) => {
+    event.stopPropagation();
+    
+    if (!propertyUid) return;
+    
+    const isCurrentlyFavorite = favoriteStates[propertyUid] || false;
+    
+    try {
+      if (isCurrentlyFavorite) {
+        // Remove from wishlist
+        const response = await api.delete(`/wishlist/remove/${propertyUid}`);
+        
+        if (response.data.success) {
+          setFavoriteStates(prev => ({ ...prev, [propertyUid]: false }));
+          toast.success('Removed from wishlist', {
+            icon: '💔',
+            style: {
+              borderRadius: '10px',
+              background: '#333',
+              color: '#fff',
+            }
+          });
+        }
+      } else {
+        // Add to wishlist
+        const response = await api.post(`/wishlist/add/${propertyUid}`);
+        
+        if (response.data.success) {
+          setFavoriteStates(prev => ({ ...prev, [propertyUid]: true }));
+          toast.success('Added to wishlist!', {
+            icon: '❤️',
+            style: {
+              borderRadius: '10px',
+              background: '#BC8BBC',
+              color: '#fff',
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+      
+      if (error.response?.status === 401) {
+        toast.error('Please login to save properties', {
+          icon: '🔒',
+          duration: 4000
+        });
+      } else if (error.response?.data?.code === 'ALREADY_IN_WISHLIST') {
+        setFavoriteStates(prev => ({ ...prev, [propertyUid]: true }));
+        toast('Already in your wishlist', { icon: '❤️' });
+      } else if (error.response?.data?.code === 'NOT_IN_WISHLIST') {
+        setFavoriteStates(prev => ({ ...prev, [propertyUid]: false }));
+      } else if (error.response?.data?.code === 'PROPERTY_INACTIVE') {
+        toast.error('This property is currently unavailable', { icon: '🏠' });
+      } else {
+        toast.error('Something went wrong. Please try again.', { icon: '❌' });
+      }
+    }
+  };
+
+  // Check wishlist status for all properties
+  const checkWishlistStatus = async (propertyUid) => {
+    try {
+      const response = await api.get(`/wishlist/check/${propertyUid}`);
+      if (response.data.success) {
+        setFavoriteStates(prev => ({ 
+          ...prev, 
+          [propertyUid]: response.data.data.in_wishlist 
+        }));
+      }
+    } catch (error) {
+      // Silently fail - user might not be authenticated
+      console.log('Not authenticated or error checking wishlist');
+    }
+  };
+
+  // Check wishlist status for all properties when they load
+  useEffect(() => {
+    if (properties.length > 0) {
+      properties.forEach(property => {
+        if (property.property_uid) {
+          checkWishlistStatus(property.property_uid);
+        }
+      });
+    }
+  }, [properties]);
+
   // Infinite scroll observer
   const lastPropertyRef = useCallback(node => {
     if (loadingMore) return;
@@ -1061,6 +1151,7 @@ export default function PropertyListings() {
                 const inExactDistrict = isInExactDistrict(property);
                 const matchScore = calculateMatchScore(property);
                 const isHighMatch = matchScore >= 3;
+                const isFavorite = favoriteStates[property.property_uid] || false;
                 
                 return (
                   <div 
@@ -1099,10 +1190,19 @@ export default function PropertyListings() {
                         
                         {/* Favorite Button */}
                         <button 
-                          className="absolute top-3 right-3 p-2 bg-white/95 backdrop-blur-sm rounded-full hover:bg-white hover:scale-110 transition-all duration-200"
-                          onClick={(e) => e.stopPropagation()}
+                          className={`absolute top-3 right-3 p-2 backdrop-blur-sm rounded-full transition-all duration-200 ${
+                            isFavorite 
+                              ? 'bg-[#BC8BBC] hover:bg-[#8A5A8A]' 
+                              : 'bg-white/95 hover:bg-white hover:scale-110'
+                          }`}
+                          onClick={(e) => handleFavorite(property.property_uid, e)}
                         >
-                          <Heart size={16} className="text-gray-700" />
+                          <Heart 
+                            size={16} 
+                            className={`transition-colors duration-200 ${
+                              isFavorite ? 'text-white fill-white' : 'text-gray-700'
+                            }`} 
+                          />
                         </button>
                         
                         {/* Location Badges */}

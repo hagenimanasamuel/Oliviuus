@@ -854,7 +854,6 @@ const createUserBalancesTable = async () => {
       id INT AUTO_INCREMENT PRIMARY KEY,
       user_id INT NOT NULL UNIQUE,
       balance_amount DECIMAL(12,2) DEFAULT 0.00,
-      pending_amount DECIMAL(12,2) DEFAULT 0.00,
       on_hold_amount DECIMAL(12,2) DEFAULT 0.00,
       currency_code VARCHAR(3) DEFAULT 'RWF',
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -1109,6 +1108,9 @@ const createWithdrawalsTable = async () => {
       withdrawal_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
       user_id INT NOT NULL,
       amount DECIMAL(12,2) NOT NULL,
+      fee_percentage DECIMAL(5,2) NOT NULL,
+      fee_amount DECIMAL(12,2) NOT NULL,
+      net_amount DECIMAL(12,2) NOT NULL,
       withdrawal_method ENUM('bk', 'equity', 'mtn', 'airtel') NOT NULL,
       account_details JSON NOT NULL,
       status ENUM('pending', 'processing', 'completed', 'failed', 'rejected') DEFAULT 'pending',
@@ -1232,6 +1234,268 @@ const createPropertyUnavailableDatesTable = async () => {
   }
 };
 
+const createWishlistTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS wishlist (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      wishlist_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      
+      -- Who saved it
+      user_id INT NOT NULL,
+      
+      -- What they saved
+      property_id INT NOT NULL,
+      
+      -- When they saved it
+      saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      -- Priority/order (for custom sorting)
+      display_order INT DEFAULT 0,
+      
+      -- Timestamps
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      
+      -- Indexes
+      INDEX idx_wishlist_uid (wishlist_uid),
+      INDEX idx_user_id (user_id),
+      INDEX idx_property_id (property_id),
+      INDEX idx_saved_at (saved_at),
+      INDEX idx_display_order (display_order),
+      
+      -- Composite indexes for common queries
+      INDEX idx_user_property (user_id, property_id),
+      INDEX idx_user_saved (user_id, saved_at),
+      
+      -- Foreign keys
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
+      
+      -- Prevent duplicate saves
+      UNIQUE KEY unique_user_property (user_id, property_id)
+      
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ Wishlist table is ready");
+  } catch (err) {
+    console.error("❌ Error creating wishlist table:", err);
+  }
+};
+
+const createBalanceHistoryTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS balance_history (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      history_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      user_id INT NOT NULL,
+      transaction_id INT NULL,
+      previous_balance DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+      new_balance DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+      change_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+      change_type ENUM('credit', 'debit', 'hold', 'release', 'pending_add', 'pending_remove') NOT NULL,
+      reason VARCHAR(255) NOT NULL,
+      metadata JSON NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      INDEX idx_history_uid (history_uid),
+      INDEX idx_user_id (user_id),
+      INDEX idx_transaction_id (transaction_id),
+      INDEX idx_created_at (created_at),
+      INDEX idx_change_type (change_type),
+      INDEX idx_user_created (user_id, created_at),
+      
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ Balance history table is ready");
+  } catch (err) {
+    console.error("❌ Error creating balance history table:", err);
+  }
+};
+
+// ============================================
+// BALANCE ALERTS TABLE (Notifications)
+// ============================================
+const createBalanceAlertsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS balance_alerts (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      alert_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      user_id INT NOT NULL,
+      threshold_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+      current_balance DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+      alert_type ENUM('low_balance', 'large_deposit', 'withdrawal_initiated', 'payment_due') NOT NULL,
+      status ENUM('triggered', 'sent', 'resolved') DEFAULT 'triggered',
+      sent_at TIMESTAMP NULL,
+      resolved_at TIMESTAMP NULL,
+      metadata JSON NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      
+      INDEX idx_alert_uid (alert_uid),
+      INDEX idx_user_id (user_id),
+      INDEX idx_status (status),
+      INDEX idx_alert_type (alert_type),
+      INDEX idx_created_at (created_at),
+      INDEX idx_user_status (user_id, status),
+      
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ Balance alerts table is ready");
+  } catch (err) {
+    console.error("❌ Error creating balance alerts table:", err);
+  }
+};
+
+// ============================================
+// BALANCE FREEZE LOG TABLE (Security/Disputes)
+// ============================================
+const createBalanceFreezeLogTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS balance_freeze_log (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      freeze_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      user_id INT NOT NULL,
+      frozen_by_admin_id INT NOT NULL,
+      frozen_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+      reason TEXT NOT NULL,
+      status ENUM('frozen', 'unfrozen') DEFAULT 'frozen',
+      frozen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      unfrozen_at TIMESTAMP NULL,
+      unfrozen_by_admin_id INT NULL,
+      unfreeze_reason TEXT NULL,
+      
+      INDEX idx_freeze_uid (freeze_uid),
+      INDEX idx_user_id (user_id),
+      INDEX idx_status (status),
+      INDEX idx_frozen_at (frozen_at),
+      INDEX idx_frozen_by (frozen_by_admin_id),
+      INDEX idx_user_status (user_id, status),
+      
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (frozen_by_admin_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (unfrozen_by_admin_id) REFERENCES users(id) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ Balance freeze log table is ready");
+  } catch (err) {
+    console.error("❌ Error creating balance freeze log table:", err);
+  }
+};
+
+const createPendingBalancesTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS pending_balances (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      pending_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      
+      -- Who this pending balance belongs to
+      user_id INT NOT NULL,
+      
+      -- SOURCE: Where this pending amount came from
+      source_type ENUM(
+        'booking',
+        'extension',
+        'cancellation',
+        'withdrawal',
+        'refund',
+        'adjustment'
+      ) NOT NULL,
+      
+      -- Reference to the source (the booking, extension, etc.)
+      source_reference_type ENUM(
+        'booking',
+        'extension',
+        'cancellation',
+        'withdrawal'
+      ) NOT NULL,
+      
+      source_reference_id INT NOT NULL,
+      source_reference_uid VARCHAR(36) NOT NULL,
+      
+      -- Amount details
+      amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+      currency_code VARCHAR(3) DEFAULT 'RWF',
+      
+      -- What this pending amount is for
+      pending_type ENUM(
+        'booking_payment',
+        'extension_payment',
+        'refund',
+        'withdrawal',
+        'security_deposit',
+        'damage_charge',
+        'late_fee',
+        'commission'
+      ) NOT NULL,
+      
+      -- Status tracking
+      status ENUM(
+        'pending',
+        'processing',
+        'completed',
+        'failed',
+        'cancelled',
+        'refunded'
+      ) DEFAULT 'pending',
+      
+      -- Timelines
+      pending_since TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      completed_at TIMESTAMP NULL,
+      
+      -- Notes
+      description TEXT NULL,
+      reason TEXT NULL,
+      
+      -- Audit
+      last_status_change TIMESTAMP NULL,
+      last_status_change_reason TEXT NULL,
+      
+      -- Timestamps
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      
+      -- Indexes
+      INDEX idx_pending_uid (pending_uid),
+      INDEX idx_user_id (user_id),
+      INDEX idx_status (status),
+      INDEX idx_source_reference (source_reference_type, source_reference_id),
+      INDEX idx_user_pending (user_id, status),
+      INDEX idx_pending_since (pending_since),
+      INDEX idx_completed_at (completed_at),
+      INDEX idx_pending_type (pending_type),
+      
+      -- Composite indexes for common queries
+      INDEX idx_user_status_type (user_id, status, pending_type),
+      INDEX idx_source_lookup (source_reference_type, source_reference_id, status),
+      
+      -- Foreign keys
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ Pending balances table is ready");
+  } catch (err) {
+    console.error("❌ Error creating pending balances table:", err);
+  }
+};
+
 // Initialize iSanzure database 
 const initializeIsanzureDatabase = async () => {
   try {
@@ -1259,6 +1523,7 @@ const initializeIsanzureDatabase = async () => {
     await createUserBalancesTable();      
     await createWithdrawalsTable(); 
     await createBookingsTable(); 
+    await createWishlistTable();
     
     // 3. TABLES THAT REFERENCE ONLY BOOKINGS
     await createBookingExtensionsTable(); 
@@ -1275,7 +1540,11 @@ const initializeIsanzureDatabase = async () => {
     
     // 7. MESSAGES - NO booking_id FK
     await createMessagesTable();
-
+    await createBalanceHistoryTable();
+    await createBalanceAlertsTable();
+    await createBalanceFreezeLogTable();
+    await createPendingBalancesTable();
+    
     // 8. ADD ALL MISSING FOREIGN KEYS
     await addMissingForeignKeys();
 

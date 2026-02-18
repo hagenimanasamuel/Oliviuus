@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "../api/axios";
 
@@ -20,9 +19,48 @@ export const AuthProvider = ({ children }) => {
       return `${userData.first_name} ${userData.last_name || ''}`.trim();
     }
     if (userData.email) return userData.email.split('@')[0];
-    if (userData.phone) return `User (${userData.phone.substring(-4)})`;
-    if (userData.oliviuus_id) return `User ${userData.oliviuus_id.substring(-4)}`;
+    if (userData.phone) return `User (${userData.phone.slice(-4)})`;
+    if (userData.oliviuus_id) return `User ${userData.oliviuus_id.slice(-4)}`;
     return 'User';
+  };
+
+  // Auto-create iSanzure user
+  const ensureIsanzureUserExists = async (userId) => {
+    // Prevent multiple calls for same user
+    if (window._isCreatingIsanzureUser?.[userId]) {
+      return;
+    }
+
+    if (!window._isCreatingIsanzureUser) {
+      window._isCreatingIsanzureUser = {};
+    }
+
+    window._isCreatingIsanzureUser[userId] = true;
+
+    try {
+      console.log('🔍 Ensuring iSanzure user exists for ID:', userId);
+      
+      const response = await axios.post("/isanzure/auto-create-tenant", {}, {
+        withCredentials: true
+      });
+      
+      if (response.data.success) {
+        if (response.data.exists) {
+          console.log('✅ User already exists in iSanzure');
+        } else {
+          console.log('✅ New iSanzure tenant created');
+        }
+      }
+    } catch (error) {
+      // If it's a duplicate error, ignore it (user was created)
+      if (error.response?.status === 409 || error.response?.data?.exists) {
+        console.log('ℹ️ User already exists in iSanzure');
+      } else {
+        console.error('❌ Error creating iSanzure user:', error);
+      }
+    } finally {
+      delete window._isCreatingIsanzureUser[userId];
+    }
   };
 
   // Fetch user data from /auth/me endpoint
@@ -48,6 +86,12 @@ export const AuthProvider = ({ children }) => {
         };
 
         setUser(enhancedUserData);
+        
+        // Auto-create iSanzure user in the background
+        setTimeout(() => {
+          ensureIsanzureUserExists(userData.id);
+        }, 500);
+        
         return enhancedUserData;
       } else {
         console.log('❌ No valid user data in response');
@@ -111,6 +155,11 @@ export const AuthProvider = ({ children }) => {
     };
     
     setUser(enhancedUserData);
+    
+    // Auto-create iSanzure user on login
+    setTimeout(() => {
+      ensureIsanzureUserExists(userData.id);
+    }, 500);
   };
 
   const logoutUser = async () => {
@@ -158,7 +207,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Make sure this is exported
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

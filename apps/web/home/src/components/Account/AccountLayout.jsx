@@ -10,9 +10,7 @@ import {
   ChevronRight,
   LayoutGrid,
   Compass,
-  Bell,
-  Eye,
-  EyeOff
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useIsanzureAuth } from '../../context/IsanzureAuthContext';
@@ -44,7 +42,6 @@ export default function AccountLayout() {
   });
 
   const [loading, setLoading] = useState(true);
-  const [showUid, setShowUid] = useState(false);
 
   // ========== FETCH USER NOTIFICATION COUNTS ==========
   const fetchNotificationCounts = async () => {
@@ -285,11 +282,6 @@ export default function AccountLayout() {
 
   const dashboardLinks = getDashboardLinks();
 
-  // Toggle UUID visibility (for debugging)
-  const toggleUidVisibility = () => {
-    setShowUid(!showUid);
-  };
-
   // Desktop - Full layout with fixed sidebar
   if (!isMobile) {
     return (
@@ -324,18 +316,6 @@ export default function AccountLayout() {
                   </span>
                 )}
               </div>
-              
-              {/* Total Notifications Badge - Only when not collapsed */}
-              {!isSidebarCollapsed && notifications.summary.totalUnread + notifications.summary.totalPending > 0 && (
-                <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
-                  <Bell className="h-3 w-3" />
-                  <span>
-                    {notifications.summary.totalUnread > 0 && `${notifications.summary.totalUnread} unread`}
-                    {notifications.summary.totalUnread > 0 && notifications.summary.totalPending > 0 && ' • '}
-                    {notifications.summary.totalPending > 0 && `${notifications.summary.totalPending} pending`}
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Navigation Area - Scrollable if needed */}
@@ -448,19 +428,6 @@ export default function AccountLayout() {
 
             {/* Sidebar Footer - Fixed at bottom, never moves */}
             <div className="flex-shrink-0 p-4 border-t border-gray-100 bg-gray-50/50">
-              {/* Toggle UUID Button - Only for debugging */}
-              <button
-                onClick={toggleUidVisibility}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-200/80 transition-colors text-gray-500 group mb-2"
-              >
-                {showUid ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                {!isSidebarCollapsed && (
-                  <span className="text-xs font-medium group-hover:text-gray-700">
-                    {showUid ? 'Hide' : 'Show'} IDs
-                  </span>
-                )}
-              </button>
-              
               {/* Collapse Button */}
               <button
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -490,7 +457,6 @@ export default function AccountLayout() {
             ${isSidebarCollapsed ? 'ml-24' : 'ml-72'}
           `}>
             <div className="max-w-7xl mx-auto p-6 lg:p-8">
-              {/* NO PAGE TITLE OR DESCRIPTION HERE - They're already in the page components */}
               <Outlet />
             </div>
           </main>
@@ -539,8 +505,6 @@ export default function AccountLayout() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 w-full">
       {/* Shared Header */}
       <Header />
-      
-      {/* NO PAGE TITLE OR DESCRIPTION HERE - They're already in the page components */}
       
       {/* Main Content */}
       <main className="w-full pb-20">

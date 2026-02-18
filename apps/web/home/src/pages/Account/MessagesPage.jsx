@@ -1,4 +1,4 @@
-// src/pages/Account/MessagesPage.jsx
+// src/pages/Account/pages/MessagesPage.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Search,
@@ -33,43 +33,47 @@ import {
   Bed,
   Maximize2,
   Image as ImageIcon,
-  Info,
-  Loader
+  Users,
+  Star,
+  Briefcase,
+  Loader,
+  Sparkles
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import { useIsanzureAuth } from '../../context/IsanzureAuthContext';
 
 export default function MessagesPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user } = useAuth();
-  const { userType } = useIsanzureAuth();
+  const [searchParams] = useSearchParams();
+  const { user: authUser } = useAuth();
+  const { userType, isLandlord, isAgent, isTenant } = useIsanzureAuth();
+  
+  // ========== URL PARAMETERS ==========
+  const landlordUid = searchParams.get('landlord');
+  const propertyUid = searchParams.get('property');
+  const draftMessage = searchParams.get('draft');
   
   const [loading, setLoading] = useState(true);
+  const [initializing, setInitializing] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState(draftMessage || '');
   const [sending, setSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showMobileList, setShowMobileList] = useState(true);
   const [filter, setFilter] = useState('all');
   const [copiedUid, setCopiedUid] = useState(null);
+  const [targetLandlord, setTargetLandlord] = useState(null);
+  const [targetProperty, setTargetProperty] = useState(null);
+  const [showComposeView, setShowComposeView] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     unread: 0,
     booking_related: 0,
     today_new: 0
-  });
-
-  // ========== PROFESSIONAL URL PARAMETERS WITH UUID ==========
-  const [urlParams, setUrlParams] = useState({
-    landlordUid: null,      // Using UUID, not numeric ID
-    propertyUid: null,       // Property UUID
-    draftMessage: null
   });
 
   // ========== @MENTION & #TAG STATES ==========
@@ -83,8 +87,7 @@ export default function MessagesPage() {
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
   const [showUid, setShowUid] = useState(false);
   const [newMessageReceived, setNewMessageReceived] = useState(false);
-  const [autoSelectAttempted, setAutoSelectAttempted] = useState(false);
-  const [hasAutoFocused, setHasAutoFocused] = useState(false);
+  const [fetchingSuggestions, setFetchingSuggestions] = useState(false);
   
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -92,6 +95,7 @@ export default function MessagesPage() {
   const hoverTimeoutRef = useRef(null);
   const pollingIntervalRef = useRef(null);
   const copyTimeoutRef = useRef(null);
+  const suggestionFetchTimeoutRef = useRef(null);
   
   const colors = {
     primary: '#BC8BBC',
@@ -99,41 +103,215 @@ export default function MessagesPage() {
     primaryLight: '#E6D3E6'
   };
 
-  // ========== PROFESSIONAL URL PARSING ==========
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const landlordUid = params.get('landlord');
-    const propertyUid = params.get('property');
-    const draftMessage = params.get('draft');
+  // ========== SKELETON LOADING COMPONENTS ==========
+  const ConversationSkeleton = () => (
+    <div className="p-4 border-b border-gray-200 animate-pulse">
+      <div className="flex gap-3">
+        <div className="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-2">
+            <div className="h-4 bg-gray-200 rounded w-32"></div>
+            <div className="h-3 bg-gray-200 rounded w-12"></div>
+          </div>
+          <div className="h-3 bg-gray-200 rounded w-48 mb-2"></div>
+          <div className="h-3 bg-gray-200 rounded w-24"></div>
+        </div>
+      </div>
+    </div>
+  );
 
-    setUrlParams({
-      landlordUid: landlordUid || null,
-      propertyUid: propertyUid || null,
-      draftMessage: draftMessage ? decodeURIComponent(draftMessage) : null
+  const MessageSkeleton = ({ isCurrentUser = false }) => (
+    <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4 animate-pulse`}>
+      <div className={`flex gap-2 max-w-[70%] ${isCurrentUser ? 'flex-row-reverse' : ''}`}>
+        {!isCurrentUser && (
+          <div className="w-8 h-8 bg-gray-200 rounded-full flex-shrink-0"></div>
+        )}
+        <div>
+          <div className={`p-3 rounded-2xl ${isCurrentUser ? 'bg-gray-300' : 'bg-gray-200'} w-64 h-16`}></div>
+          <div className="flex items-center gap-2 mt-1 justify-end">
+            <div className="h-3 bg-gray-200 rounded w-16"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const MessagesAreaSkeleton = () => (
+    <div className="flex-1 p-4 space-y-4">
+      <MessageSkeleton />
+      <MessageSkeleton isCurrentUser={true} />
+      <MessageSkeleton />
+      <MessageSkeleton isCurrentUser={true} />
+      <MessageSkeleton />
+    </div>
+  );
+
+  // ========== SHOW REAL TIME FROM DATABASE ==========
+  const formatMessageTime = (timestamp) => {
+    if (!timestamp) return '';
+    
+    const date = new Date(timestamp);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) return '';
+    
+    // Format: HH:MM AM/PM (e.g., "11:45 AM" or "2:30 PM")
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
     });
+  };
 
-    // Set draft message if present
-    if (draftMessage) {
-      setNewMessage(decodeURIComponent(draftMessage));
+  // For conversation list - shows time for today, date for older
+  const formatConversationTime = (timestamp) => {
+    if (!timestamp) return '';
+    
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return '';
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // If today - show time
+    if (date >= today) {
+      return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
     }
-  }, [location.search]);
+    // If yesterday - show "Yesterday"
+    else if (date >= yesterday) {
+      return 'Yesterday';
+    }
+    // Otherwise show date
+    else {
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
+  };
 
-  // ========== PROFESSIONAL AUTO-FOCUS ==========
+  // ========== INITIALIZE FROM URL PARAMETERS ==========
   useEffect(() => {
-    if (urlParams.draftMessage && textareaRef.current && !hasAutoFocused && !selectedConversation) {
-      // Small delay to ensure DOM is ready
-      const timer = setTimeout(() => {
-        textareaRef.current?.focus();
-        const len = newMessage.length;
-        textareaRef.current?.setSelectionRange(len, len);
-        setHasAutoFocused(true);
-      }, 300);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [urlParams.draftMessage, newMessage.length, hasAutoFocused, selectedConversation]);
+    const initializeFromUrl = async () => {
+      if (!landlordUid && !propertyUid && !draftMessage) {
+        setLoading(false);
+        return;
+      }
 
-  // ========== FETCH USER CONVERSATIONS ==========
+      setInitializing(true);
+      
+      try {
+        // Step 1: Fetch landlord details if provided
+        if (landlordUid) {
+          const landlordRes = await api.get(`/user/messages/user/${landlordUid}`);
+          if (landlordRes.data.success) {
+            setTargetLandlord(landlordRes.data.data);
+          }
+        }
+
+        // Step 2: Fetch property details if provided
+        if (propertyUid) {
+          const propertyRes = await api.get(`/public/properties/${propertyUid}`);
+          if (propertyRes.data.success) {
+            setTargetProperty(propertyRes.data.data.property);
+          }
+        }
+
+        // Step 3: Check if conversation already exists
+        if (landlordUid && landlordUid !== authUser?.id) {
+          await findExistingConversation(landlordUid);
+        }
+
+      } catch (error) {
+        console.error('Error initializing from URL:', error);
+      } finally {
+        setInitializing(false);
+        setLoading(false);
+      }
+    };
+
+    if (authUser) {
+      initializeFromUrl();
+    }
+  }, [landlordUid, propertyUid, draftMessage, authUser]);
+
+  // ========== FIND EXISTING CONVERSATION ==========
+  const findExistingConversation = async (otherUserUid) => {
+    try {
+      // First, get the user's ID from UID
+      const userRes = await api.get(`/user/messages/user/${otherUserUid}`);
+      if (!userRes.data.success) return;
+
+      const otherUserId = userRes.data.data.id;
+      
+      // Look for existing conversation
+      const convRes = await api.get('/user/messages/conversations');
+      if (convRes.data.success) {
+        const existingConv = convRes.data.data.conversations.find(
+          conv => conv.other_user?.id === otherUserId
+        );
+        
+        if (existingConv) {
+          // Conversation exists - select it
+          setSelectedConversation(existingConv);
+          setShowComposeView(false);
+          await fetchMessages(existingConv.id);
+        } else {
+          // No conversation - show compose view
+          setShowComposeView(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error finding conversation:', error);
+      setShowComposeView(true);
+    }
+  };
+
+  // ========== START NEW CONVERSATION ==========
+  const startNewConversation = async () => {
+    if (!targetLandlord) return;
+
+    try {
+      setSending(true);
+      
+      const response = await api.post('/user/messages/send/first', {
+        recipient_uid: targetLandlord.user_uid,
+        message: newMessage,
+        property_uid: propertyUid
+      });
+      
+      if (response.data.success) {
+        // Clear URL parameters
+        navigate('/account/messages', { replace: true });
+        
+        // Select the new conversation
+        const convId = response.data.data.conversation_id;
+        await fetchConversations();
+        
+        // Find and select the new conversation
+        setTimeout(() => {
+          const newConv = conversations.find(c => c.id === convId);
+          if (newConv) {
+            setSelectedConversation(newConv);
+            setShowComposeView(false);
+            fetchMessages(newConv.id);
+          }
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // ========== FETCH DATA ==========
   useEffect(() => {
     fetchConversations();
     fetchStats();
@@ -149,23 +327,11 @@ export default function MessagesPage() {
       if (copyTimeoutRef.current) {
         clearTimeout(copyTimeoutRef.current);
       }
+      if (suggestionFetchTimeoutRef.current) {
+        clearTimeout(suggestionFetchTimeoutRef.current);
+      }
     };
   }, []);
-
-  // ========== PROFESSIONAL AUTO-SELECT CONVERSATION USING UUID ==========
-  useEffect(() => {
-    if (!loading && conversations.length > 0 && urlParams.landlordUid && !selectedConversation && !autoSelectAttempted) {
-      // Find conversation by landlord UUID
-      const conversation = conversations.find(c => 
-        c.other_user?.user_uid === urlParams.landlordUid
-      );
-      
-      if (conversation) {
-        handleSelectConversation(conversation);
-      }
-      setAutoSelectAttempted(true);
-    }
-  }, [conversations, loading, urlParams.landlordUid, selectedConversation, autoSelectAttempted]);
 
   useEffect(() => {
     scrollToBottom();
@@ -181,34 +347,26 @@ export default function MessagesPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // ========== SILENT POLLING WITH ERROR HANDLING ==========
+  // ========== SILENT POLLING ==========
   const checkForNewMessages = async () => {
     try {
       const statsRes = await api.get('/user/messages/stats');
-      if (statsRes.data?.success) {
+      if (statsRes.data.success) {
         setStats(statsRes.data.data);
       }
-    } catch (error) {
-      // Silent fail - no console errors
-    }
-    
-    try {
+      
       const params = new URLSearchParams();
       if (filter !== 'all') params.append('filter', filter);
       if (searchTerm) params.append('search', searchTerm);
       
       const convRes = await api.get(`/user/messages/conversations?${params}`);
-      if (convRes.data?.success) {
+      if (convRes.data.success) {
         setConversations(convRes.data.data.conversations || []);
       }
-    } catch (error) {
-      // Silent fail
-    }
-    
-    if (selectedConversation) {
-      try {
+      
+      if (selectedConversation) {
         const msgRes = await api.get(`/user/messages/conversations/${selectedConversation.id}`);
-        if (msgRes.data?.success) {
+        if (msgRes.data.success) {
           const newMessages = msgRes.data.data.messages || [];
           if (newMessages.length > messages.length) {
             setMessages(newMessages);
@@ -218,17 +376,20 @@ export default function MessagesPage() {
             setTimeout(() => setNewMessageReceived(false), 3000);
           }
         }
-      } catch (error) {
-        // Silent fail
       }
+    } catch (error) {
+      // Silent fail
     }
   };
 
   // ========== PROPERTY SUGGESTIONS ==========
-  const fetchPropertySuggestions = useCallback(async (query) => {
+  const fetchPropertySuggestions = useCallback(async (query, conversationId) => {
     try {
+      setFetchingSuggestions(true);
+      
       const params = new URLSearchParams({
-        query: query || ''
+        query: query || '',
+        ...(conversationId && { conversation_id: conversationId })
       });
       
       const response = await api.get(`/user/messages/suggestions/properties?${params}`);
@@ -241,11 +402,15 @@ export default function MessagesPage() {
       }
     } catch (error) {
       console.error('Error fetching property suggestions:', error);
+    } finally {
+      setFetchingSuggestions(false);
     }
   }, []);
 
   const fetchTagSuggestions = useCallback(async (query) => {
     try {
+      setFetchingSuggestions(true);
+      
       const response = await api.get(`/user/messages/suggestions/tags?query=${encodeURIComponent(query || '')}`);
       if (response.data.success) {
         setSuggestions(response.data.data.suggestions);
@@ -255,6 +420,8 @@ export default function MessagesPage() {
       }
     } catch (error) {
       console.error('Error fetching tag suggestions:', error);
+    } finally {
+      setFetchingSuggestions(false);
     }
   }, []);
 
@@ -297,7 +464,11 @@ export default function MessagesPage() {
 
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      if (showComposeView) {
+        startNewConversation();
+      } else {
+        handleSendMessage();
+      }
     }
   };
 
@@ -307,19 +478,27 @@ export default function MessagesPage() {
     setNewMessage(value);
     setCursorPosition(position);
 
+    if (suggestionFetchTimeoutRef.current) {
+      clearTimeout(suggestionFetchTimeoutRef.current);
+    }
+
     const textBeforeCursor = value.slice(0, position);
-    const atMatch = textBeforeCursor.match(/@([a-zA-Z0-9-]+)$/);
+    const atMatch = textBeforeCursor.match(/@([a-zA-Z0-9-]*)$/);
     
     if (atMatch) {
       const query = atMatch[1];
       setSuggestionQuery(query);
-      fetchPropertySuggestions(query);
+      suggestionFetchTimeoutRef.current = setTimeout(() => {
+        fetchPropertySuggestions(query, selectedConversation?.id);
+      }, 300);
     } else {
-      const hashMatch = textBeforeCursor.match(/#([a-zA-Z0-9-]+)$/);
+      const hashMatch = textBeforeCursor.match(/#([a-zA-Z0-9-]*)$/);
       if (hashMatch) {
         const query = hashMatch[1];
         setSuggestionQuery(query);
-        fetchTagSuggestions(query);
+        suggestionFetchTimeoutRef.current = setTimeout(() => {
+          fetchTagSuggestions(query);
+        }, 300);
       } else {
         setShowSuggestions(false);
       }
@@ -359,7 +538,6 @@ export default function MessagesPage() {
     }, 10);
   };
 
-  // ========== PROFESSIONAL SEND MESSAGE ==========
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation || sending) return;
     
@@ -375,12 +553,6 @@ export default function MessagesPage() {
         setMessages(prev => [...prev, response.data.data.message]);
         setNewMessage('');
         setShowSuggestions(false);
-        
-        // Clear URL params after successful send
-        if (urlParams.landlordUid || urlParams.draftMessage) {
-          navigate('/account/messages', { replace: true });
-        }
-        
         checkForNewMessages();
         setTimeout(scrollToBottom, 100);
       }
@@ -389,76 +561,6 @@ export default function MessagesPage() {
     } finally {
       setSending(false);
     }
-  };
-
-  // ========== FETCH CONVERSATIONS ==========
-  const fetchConversations = async (silent = false) => {
-    try {
-      if (!silent) setLoading(true);
-      
-      const params = new URLSearchParams();
-      if (filter !== 'all') params.append('filter', filter);
-      if (searchTerm) params.append('search', searchTerm);
-      
-      const response = await api.get(`/user/messages/conversations?${params}`);
-      
-      if (response.data.success) {
-        setConversations(response.data.data.conversations || []);
-      }
-    } catch (error) {
-      console.error('Error fetching conversations:', error);
-    } finally {
-      if (!silent) setLoading(false);
-    }
-  };
-
-  const fetchMessages = async (conversationId, markAsRead = true) => {
-    try {
-      const response = await api.get(`/user/messages/conversations/${conversationId}`);
-      
-      if (response.data.success) {
-        setMessages(response.data.data.messages || []);
-        
-        if (markAsRead) {
-          await api.put(`/user/messages/conversations/${conversationId}/read`);
-          fetchConversations(true);
-          fetchStats();
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    }
-  };
-
-  const fetchStats = async () => {
-    try {
-      const response = await api.get('/user/messages/stats');
-      if (response.data.success) {
-        setStats(response.data.data);
-      }
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  };
-
-  // ========== CONVERSATION HANDLERS ==========
-  const handleSelectConversation = (conversation) => {
-    setSelectedConversation(conversation);
-    setMessages([]);
-    fetchMessages(conversation.id);
-    setShowMobileList(false);
-    setShowSuggestions(false);
-    setNewMessageReceived(false);
-  };
-
-  const handleBackToList = () => {
-    setShowMobileList(true);
-    setSelectedConversation(null);
-    setShowSuggestions(false);
-  };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   // ========== PROPERTY HOVER ==========
@@ -481,69 +583,38 @@ export default function MessagesPage() {
     }, 300);
   };
 
-  const toggleUidVisibility = () => {
-    setShowUid(!showUid);
-  };
-
-  const handleManualRefresh = async () => {
-    await checkForNewMessages();
-  };
-
-  // ========== UTILITIES ==========
-  const formatMessageTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMinutes = Math.floor((now - date) / (1000 * 60));
-    
-    if (diffMinutes < 1) return 'Just now';
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
-    
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    
-    const diffDays = Math.floor(diffHours / 24);
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return format(date, 'EEEE');
-    
-    return format(date, 'MMM d');
-  };
-
-  const getInitials = (name) => {
-    if (!name) return '?';
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const getConversationAvatar = (conversation) => {
-    const user = conversation.other_user;
-    
-    if (user?.avatar) {
-      return (
-        <img 
-          src={user.avatar} 
-          alt={user.full_name}
-          className="w-10 h-10 rounded-full object-cover"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.style.display = 'none';
-            e.target.parentElement.innerHTML = `<div class="w-10 h-10 rounded-full bg-[#BC8BBC] flex items-center justify-center text-white font-medium">${getInitials(user.full_name)}</div>`;
-          }}
-        />
-      );
+  // ========== GET USER TYPE BADGE ==========
+  const getUserTypeBadge = (userType) => {
+    switch(userType) {
+      case 'landlord':
+        return {
+          icon: <Building className="h-3 w-3" />,
+          text: 'Landlord',
+          color: 'text-purple-600',
+          bg: 'bg-purple-50'
+        };
+      case 'tenant':
+        return {
+          icon: <User className="h-3 w-3" />,
+          text: 'Tenant',
+          color: 'text-blue-600',
+          bg: 'bg-blue-50'
+        };
+      case 'agent':
+        return {
+          icon: <Briefcase className="h-3 w-3" />,
+          text: 'Agent',
+          color: 'text-green-600',
+          bg: 'bg-green-50'
+        };
+      default:
+        return {
+          icon: <User className="h-3 w-3" />,
+          text: 'User',
+          color: 'text-gray-600',
+          bg: 'bg-gray-50'
+        };
     }
-    
-    return (
-      <div 
-        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium"
-        style={{ backgroundColor: colors.primary }}
-      >
-        {getInitials(user?.full_name || 'User')}
-      </div>
-    );
   };
 
   // ========== RENDER MESSAGE CONTENT ==========
@@ -640,7 +711,6 @@ export default function MessagesPage() {
                     }`}
                   >
                     <AtSign className="h-3.5 w-3.5 flex-shrink-0" />
-                    
                     <span className="font-medium text-sm">
                       {part.property?.title 
                         ? part.property.title.length > 25 
@@ -649,7 +719,6 @@ export default function MessagesPage() {
                         : 'Property'
                       }
                     </span>
-                    
                     {part.property?.images?.cover && (
                       <img 
                         src={part.property.images.cover} 
@@ -675,7 +744,7 @@ export default function MessagesPage() {
                     ) : (
                       <span className="flex items-center gap-1">
                         <Copy className="h-3 w-3" />
-                        Copy ID
+                        Copy
                       </span>
                     )}
                   </button>
@@ -808,9 +877,196 @@ export default function MessagesPage() {
     );
   };
 
+  // ========== UTILITIES ==========
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getConversationAvatar = (conversation) => {
+    const user = conversation.other_user;
+    const userTypeBadge = getUserTypeBadge(user?.user_type);
+    
+    if (user?.avatar) {
+      return (
+        <div className="relative">
+          <img 
+            src={user.avatar} 
+            alt={user.full_name}
+            className="w-10 h-10 rounded-full object-cover"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.style.display = 'none';
+              e.target.parentElement.innerHTML = `<div class="w-10 h-10 rounded-full bg-[#BC8BBC] flex items-center justify-center text-white font-medium">${getInitials(user.full_name)}</div>`;
+            }}
+          />
+          <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full ${userTypeBadge.bg} border-2 border-white flex items-center justify-center`}>
+            {userTypeBadge.icon}
+          </span>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="relative">
+        <div 
+          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium"
+          style={{ backgroundColor: colors.primary }}
+        >
+          {getInitials(user?.full_name || 'User')}
+        </div>
+        <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full ${userTypeBadge.bg} border-2 border-white flex items-center justify-center`}>
+          {userTypeBadge.icon}
+        </span>
+      </div>
+    );
+  };
+
+  const fetchConversations = async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
+      
+      const params = new URLSearchParams();
+      if (filter !== 'all') params.append('filter', filter);
+      if (searchTerm) params.append('search', searchTerm);
+      
+      const response = await api.get(`/user/messages/conversations?${params}`);
+      
+      if (response.data.success) {
+        setConversations(response.data.data.conversations || []);
+      }
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
+
+  const fetchMessages = async (conversationId, markAsRead = true) => {
+    try {
+      const response = await api.get(`/user/messages/conversations/${conversationId}`);
+      
+      if (response.data.success) {
+        setMessages(response.data.data.messages || []);
+        
+        if (markAsRead) {
+          await api.put(`/user/messages/conversations/${conversationId}/read`);
+          fetchConversations(true);
+          fetchStats();
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await api.get('/user/messages/stats');
+      if (response.data.success) {
+        setStats(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const handleSelectConversation = (conversation) => {
+    setSelectedConversation(conversation);
+    setMessages([]);
+    fetchMessages(conversation.id);
+    setShowMobileList(false);
+    setShowComposeView(false);
+    setShowSuggestions(false);
+    setNewMessageReceived(false);
+    
+    // Clear URL parameters
+    if (landlordUid || propertyUid || draftMessage) {
+      navigate('/account/messages', { replace: true });
+    }
+  };
+
+  const handleBackToList = () => {
+    setShowMobileList(true);
+    setSelectedConversation(null);
+    setShowComposeView(false);
+    setShowSuggestions(false);
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const toggleUidVisibility = () => {
+    setShowUid(!showUid);
+  };
+
+  const handleManualRefresh = async () => {
+    await checkForNewMessages();
+  };
+
+  const cancelCompose = () => {
+    setShowComposeView(false);
+    setShowMobileList(true);
+    navigate('/account/messages', { replace: true });
+  };
+
+  // Loading state with Skeletons
+  if (loading || initializing) {
+    return (
+      <div className="h-[calc(100vh-8rem)] bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
+        {/* Header Skeleton */}
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-white">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div>
+              <div className="h-6 bg-gray-200 rounded w-32 mb-2 animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+          </div>
+        </div>
+
+        <div className="flex flex-1 overflow-hidden">
+          {/* Conversations List Skeleton */}
+          <div className="w-80 border-r border-gray-200 bg-gray-50">
+            <div className="p-3 border-b border-gray-200 bg-white">
+              <div className="h-9 bg-gray-200 rounded-lg mb-3 animate-pulse"></div>
+              <div className="flex gap-2">
+                <div className="h-6 bg-gray-200 rounded-full w-16 animate-pulse"></div>
+                <div className="h-6 bg-gray-200 rounded-full w-20 animate-pulse"></div>
+                <div className="h-6 bg-gray-200 rounded-full w-20 animate-pulse"></div>
+              </div>
+            </div>
+            <div className="overflow-y-auto">
+              <ConversationSkeleton />
+              <ConversationSkeleton />
+              <ConversationSkeleton />
+              <ConversationSkeleton />
+              <ConversationSkeleton />
+            </div>
+          </div>
+
+          {/* Messages Area Skeleton */}
+          <div className="flex-1 flex flex-col bg-white">
+            <MessagesAreaSkeleton />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-[calc(100vh-12rem)] bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col relative">
-      {/* Header with Professional URL Indicators */}
+    <div className="h-[calc(100vh-8rem)] bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col relative">
+      {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-white">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg" style={{ backgroundColor: colors.primaryLight }}>
@@ -824,6 +1080,12 @@ export default function MessagesPage() {
                   New message
                 </span>
               )}
+              {showComposeView && (
+                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" />
+                  New conversation
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-2 text-sm">
               {stats.unread > 0 ? (
@@ -835,10 +1097,6 @@ export default function MessagesPage() {
               ) : (
                 <span className="text-gray-600">No unread messages</span>
               )}
-              <span className="text-gray-300">•</span>
-              <span className="text-xs text-gray-500">
-                {stats.total} conversations
-              </span>
             </div>
           </div>
         </div>
@@ -868,7 +1126,7 @@ export default function MessagesPage() {
         {/* Conversations List */}
         <div 
           className={`${
-            showMobileList ? 'flex' : 'hidden'
+            showMobileList && !showComposeView ? 'flex' : 'hidden'
           } md:flex w-full md:w-80 lg:w-96 border-r border-gray-200 flex-col bg-gray-50`}
         >
           <div className="p-3 border-b border-gray-200 bg-white">
@@ -930,9 +1188,13 @@ export default function MessagesPage() {
           
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="flex items-center justify-center h-32">
-                <Loader className="animate-spin h-8 w-8" style={{ color: colors.primary }} />
-              </div>
+              <>
+                <ConversationSkeleton />
+                <ConversationSkeleton />
+                <ConversationSkeleton />
+                <ConversationSkeleton />
+                <ConversationSkeleton />
+              </>
             ) : conversations.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 text-center p-6">
                 <MessageSquare className="h-12 w-12 text-gray-300 mb-3" />
@@ -940,16 +1202,14 @@ export default function MessagesPage() {
                 <p className="text-sm text-gray-600">
                   {searchTerm || filter !== 'all' 
                     ? 'Try adjusting your filters' 
-                    : 'When landlords message you, they\'ll appear here'}
+                    : 'Start a conversation with landlords or tenants'}
                 </p>
               </div>
             ) : (
               conversations.map((conv) => {
                 const isSelected = selectedConversation?.id === conv.id;
                 const isUnread = conv.unread_count > 0;
-                const isLandlord = conv.other_user?.user_type === 'landlord';
-                const isHighlighted = urlParams.landlordUid && 
-                  conv.other_user?.user_uid === urlParams.landlordUid;
+                const userTypeBadge = getUserTypeBadge(conv.other_user?.user_type);
                 
                 return (
                   <button
@@ -957,12 +1217,12 @@ export default function MessagesPage() {
                     onClick={() => handleSelectConversation(conv)}
                     className={`w-full p-4 border-b border-gray-200 hover:bg-gray-100 transition-colors text-left relative ${
                       isSelected ? 'bg-gray-100' : ''
-                    } ${isUnread ? 'bg-blue-50/30' : ''} ${
-                      isHighlighted && !isSelected ? 'border-l-4 border-purple-500 bg-purple-50/50' : ''
-                    }`}
+                    } ${isUnread ? 'bg-blue-50/30' : ''}`}
                   >
                     <div className="flex gap-3">
-                      {getConversationAvatar(conv)}
+                      <div className="relative flex-shrink-0">
+                        {getConversationAvatar(conv)}
+                      </div>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
@@ -972,15 +1232,14 @@ export default function MessagesPage() {
                             }`}>
                               {conv.other_user?.full_name || 'User'}
                             </h3>
-                            {isLandlord && (
-                              <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] rounded-full">
-                                Landlord
-                              </span>
-                            )}
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${userTypeBadge.bg} ${userTypeBadge.color} flex items-center gap-0.5`}>
+                              {userTypeBadge.icon}
+                              <span>{userTypeBadge.text}</span>
+                            </span>
                           </div>
                           {conv.last_message && (
                             <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                              {formatMessageTime(conv.last_message.created_at)}
+                              {formatConversationTime(conv.last_message.created_at)}
                             </span>
                           )}
                         </div>
@@ -1018,13 +1277,129 @@ export default function MessagesPage() {
           </div>
         </div>
 
-        {/* Messages Area */}
+        {/* Messages Area / Compose View */}
         <div 
           className={`${
-            !showMobileList ? 'flex' : 'hidden'
+            (!showMobileList || showComposeView) ? 'flex' : 'hidden'
           } md:flex flex-1 flex-col bg-white relative`}
         >
-          {selectedConversation ? (
+          {showComposeView && targetLandlord ? (
+            // Compose View for New Conversation
+            <div className="flex flex-col h-full">
+              <div className="p-4 border-b border-gray-200 flex items-center gap-3 bg-white">
+                <button
+                  onClick={cancelCompose}
+                  className="md:hidden p-1 hover:bg-gray-100 rounded-lg"
+                >
+                  <ChevronLeft className="h-5 w-5 text-gray-600" />
+                </button>
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="relative">
+                    {targetLandlord.avatar ? (
+                      <img 
+                        src={targetLandlord.avatar} 
+                        alt={targetLandlord.full_name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                        <User className="h-6 w-6 text-purple-600" />
+                      </div>
+                    )}
+                    <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-purple-50 border-2 border-white flex items-center justify-center">
+                      <Building className="h-2.5 w-2.5 text-purple-600" />
+                    </span>
+                  </div>
+                  <div>
+                    <h2 className="font-semibold text-gray-900">
+                      {targetLandlord.full_name}
+                    </h2>
+                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                      <Building className="h-3 w-3" />
+                      Landlord
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+                {targetProperty && (
+                  <div className="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <div className="flex items-center gap-3">
+                      {targetProperty.images?.[0]?.image_url ? (
+                        <img 
+                          src={targetProperty.images[0].image_url} 
+                          alt={targetProperty.title}
+                          className="w-16 h-16 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-lg bg-purple-100 flex items-center justify-center">
+                          <Home className="h-8 w-8 text-purple-400" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <h3 className="font-medium text-gray-900">{targetProperty.title}</h3>
+                        <p className="text-xs text-gray-600 mt-1 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {targetProperty.district || targetProperty.sector || 'Rwanda'}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => navigate(`/property/${targetProperty.property_uid}`)}
+                        className="p-2 hover:bg-purple-200 rounded-lg transition-colors"
+                      >
+                        <ExternalLink className="h-4 w-4 text-purple-600" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <MessageSquare className="h-8 w-8 text-purple-300" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">
+                    New Conversation
+                  </h3>
+                  <p className="text-sm text-gray-600 max-w-sm mx-auto">
+                    You're about to start a conversation with {targetLandlord.full_name}. 
+                    Your message has been prepared below.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-gray-200 bg-white">
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <textarea
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Type your message..."
+                      rows="3"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none resize-none"
+                      style={{ focusRingColor: colors.primary }}
+                    />
+                  </div>
+                  <button
+                    onClick={startNewConversation}
+                    disabled={!newMessage.trim() || sending}
+                    className="p-3 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+                    style={{ backgroundColor: colors.primary }}
+                  >
+                    {sending ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    ) : (
+                      <Send className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Press Enter to send, Shift+Enter for new line
+                </p>
+              </div>
+            </div>
+          ) : selectedConversation ? (
+            // Existing Conversation View
             <>
               <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-white">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -1042,24 +1417,23 @@ export default function MessagesPage() {
                       <h2 className="font-semibold text-gray-900 truncate">
                         {selectedConversation.other_user?.full_name || 'User'}
                       </h2>
-                      {selectedConversation.other_user?.user_type === 'landlord' && (
-                        <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
-                          Landlord
+                      {selectedConversation.other_user?.user_type && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                          getUserTypeBadge(selectedConversation.other_user.user_type).bg
+                        } ${
+                          getUserTypeBadge(selectedConversation.other_user.user_type).color
+                        } flex items-center gap-0.5`}>
+                          {getUserTypeBadge(selectedConversation.other_user.user_type).icon}
+                          <span>{getUserTypeBadge(selectedConversation.other_user.user_type).text}</span>
                         </span>
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
-                      {selectedConversation.other_user?.user_type === 'landlord' && (
-                        <span className="flex items-center gap-1">
-                          <Building className="h-3 w-3 flex-shrink-0" />
-                          <span>Property Owner</span>
-                        </span>
-                      )}
                       {selectedConversation.related_booking && (
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3 flex-shrink-0" />
                           <span className="truncate max-w-[100px] sm:max-w-[150px]">
-                            {selectedConversation.related_booking.property?.title || 'Booking'}
+                            Booking #{selectedConversation.related_booking.booking_uid?.slice(0, 8)}
                           </span>
                         </span>
                       )}
@@ -1068,12 +1442,6 @@ export default function MessagesPage() {
                 </div>
                 
                 <div className="flex items-center gap-1 flex-shrink-0">
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Phone className="h-4 w-4 text-gray-600" />
-                  </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Mail className="h-4 w-4 text-gray-600" />
-                  </button>
                   <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                     <MoreVertical className="h-4 w-4 text-gray-600" />
                   </button>
@@ -1090,16 +1458,6 @@ export default function MessagesPage() {
                     <p className="text-sm text-gray-600">
                       Send a message to start the conversation
                     </p>
-                    <div className="mt-4 p-3 bg-gray-100 rounded-lg text-xs text-gray-600">
-                      <p className="flex items-center gap-1 mb-1">
-                        <AtSign className="h-3 w-3" />
-                        Use <span className="font-mono bg-white px-1 py-0.5 rounded">@property-id</span> to mention a property
-                      </p>
-                      <p className="flex items-center gap-1">
-                        <Hash className="h-3 w-3" />
-                        Use <span className="font-mono bg-white px-1 py-0.5 rounded">#tag</span> to add a topic
-                      </p>
-                    </div>
                   </div>
                 ) : (
                   messages.map((message, index) => {
@@ -1153,17 +1511,6 @@ export default function MessagesPage() {
                                   )}
                                 </span>
                               )}
-                              
-                              {message.metadata?.has_mentions && (
-                                <span className="flex items-center gap-1 text-purple-600">
-                                  <AtSign className="h-3 w-3" />
-                                </span>
-                              )}
-                              {message.metadata?.has_tags && (
-                                <span className="flex items-center gap-1 text-blue-600">
-                                  <Hash className="h-3 w-3" />
-                                </span>
-                              )}
                             </div>
                           </div>
                         </div>
@@ -1174,9 +1521,9 @@ export default function MessagesPage() {
                 <div ref={messagesEndRef} />
               </div>
               
-              {/* Message Input with Professional Draft Handling */}
+              {/* Message Input */}
               <div className="p-4 border-t border-gray-200 bg-white relative">
-                {showSuggestions && suggestions.length > 0 && (
+                {showSuggestions && (
                   <div 
                     ref={suggestionsRef}
                     className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-xl shadow-2xl border border-gray-200 max-h-80 overflow-y-auto z-50"
@@ -1186,80 +1533,111 @@ export default function MessagesPage() {
                         {suggestionType === 'property' ? (
                           <>
                             <AtSign className="h-3 w-3" />
-                            Your booked properties
+                            Mention a property
+                            {fetchingSuggestions && (
+                              <Loader className="h-3 w-3 animate-spin ml-2" />
+                            )}
                           </>
                         ) : (
                           <>
                             <Hash className="h-3 w-3" />
-                            Tag suggestions
+                            Add a topic tag
+                            {fetchingSuggestions && (
+                              <Loader className="h-3 w-3 animate-spin ml-2" />
+                            )}
                           </>
                         )}
                       </p>
                     </div>
                     
-                    {suggestions.map((suggestion, index) => (
-                      <button
-                        key={suggestionType === 'property' ? suggestion.id : suggestion.tag}
-                        onClick={() => insertSuggestion(suggestion)}
-                        className={`w-full p-3 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
-                          index === selectedSuggestionIndex ? 'bg-gray-50' : ''
-                        }`}
-                      >
+                    {suggestions.length === 0 && fetchingSuggestions ? (
+                      <div className="p-8 text-center">
+                        <Loader className="h-6 w-6 animate-spin mx-auto mb-2 text-purple-600" />
+                        <p className="text-sm text-gray-600">Finding properties...</p>
+                      </div>
+                    ) : suggestions.length === 0 ? (
+                      <div className="p-8 text-center">
                         {suggestionType === 'property' ? (
                           <>
-                            {suggestion.image ? (
-                              <img 
-                                src={suggestion.image} 
-                                alt={suggestion.name}
-                                className="w-12 h-12 rounded-md object-cover flex-shrink-0"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                <Home className="h-6 w-6 text-gray-400" />
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0 text-left">
-                              <p className="text-sm font-medium text-gray-900 truncate">
-                                {suggestion.name}
-                              </p>
-                              <p className="text-xs text-gray-500 truncate flex items-center gap-1">
-                                <MapPin className="h-3 w-3 flex-shrink-0" />
-                                {suggestion.subtitle}
-                              </p>
-                              {suggestion.displayPrice > 0 && (
-                                <p className="text-xs font-semibold text-purple-700 mt-1">
-                                  {new Intl.NumberFormat('en-RW', {
-                                    style: 'currency',
-                                    currency: 'RWF',
-                                    minimumFractionDigits: 0
-                                  }).format(suggestion.displayPrice)}
-                                  <span className="text-[10px] font-normal text-gray-500 ml-1">/mo</span>
-                                </p>
-                              )}
+                            <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                              <Home className="h-8 w-8 text-purple-300" />
                             </div>
-                            {suggestion.relationship === 'booked' && (
-                              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                                Booked
-                              </span>
-                            )}
+                            <p className="text-sm font-medium text-gray-900 mb-1">
+                              {searchTerm ? `No properties matching "${searchTerm}"` : 'Start typing to search'}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Try typing a property name or location
+                            </p>
                           </>
                         ) : (
                           <>
-                            <div className="w-10 h-10 rounded-md bg-blue-100 flex items-center justify-center flex-shrink-0">
-                              <Hash className="h-5 w-5 text-blue-600" />
+                            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                              <Hash className="h-8 w-8 text-blue-300" />
                             </div>
-                            <div className="flex-1 min-w-0 text-left">
-                              <p className="text-sm font-medium text-gray-900">
-                                #{suggestion.tag}
-                              </p>
-                              <p className="text-xs text-gray-500 truncate">
-                                {suggestion.description}
-                              </p>
-                            </div>
+                            <p className="text-sm font-medium text-gray-900 mb-1">
+                              {searchTerm ? `No tags matching "${searchTerm}"` : 'Start typing to find tags'}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Common tags: #checkin, #payment, #wifi
+                            </p>
                           </>
                         )}
-                      </button>
-                    ))}
+                      </div>
+                    ) : (
+                      suggestions.map((suggestion, index) => (
+                        <button
+                          key={suggestionType === 'property' ? suggestion.id : suggestion.tag}
+                          onClick={() => insertSuggestion(suggestion)}
+                          className={`w-full p-3 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                            index === selectedSuggestionIndex ? 'bg-gray-50' : ''
+                          }`}
+                        >
+                          {suggestionType === 'property' ? (
+                            <>
+                              {suggestion.image ? (
+                                <img 
+                                  src={suggestion.image} 
+                                  alt={suggestion.name}
+                                  className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                  <Home className="h-6 w-6 text-gray-400" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0 text-left">
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  {suggestion.name}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+                                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                                  {suggestion.subtitle}
+                                </p>
+                                {suggestion.sourceDescription && (
+                                  <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded-full mt-1 inline-block">
+                                    {suggestion.sourceDescription}
+                                  </span>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-10 h-10 rounded-md bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                <Hash className="h-5 w-5 text-blue-600" />
+                              </div>
+                              <div className="flex-1 min-w-0 text-left">
+                                <p className="text-sm font-medium text-gray-900">
+                                  #{suggestion.tag}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {suggestion.description}
+                                </p>
+                              </div>
+                            </>
+                          )}
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
                 
@@ -1270,13 +1648,9 @@ export default function MessagesPage() {
                       value={newMessage}
                       onChange={handleTextareaChange}
                       onKeyDown={handleKeyDown}
-                      placeholder="Type a message... Use @ to mention properties you've booked, # for tags"
+                      placeholder="Type a message... Use @ to mention properties, # for tags"
                       rows="2"
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none resize-none pr-20 transition-all ${
-                        urlParams.draftMessage && !selectedConversation
-                          ? 'border-purple-400 ring-1 ring-purple-200 bg-purple-50/30'
-                          : 'border-gray-300'
-                      }`}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none resize-none pr-20"
                       style={{ focusRingColor: colors.primary }}
                     />
                     <div className="absolute right-2 bottom-2 flex gap-1">
@@ -1292,7 +1666,7 @@ export default function MessagesPage() {
                             setTimeout(() => {
                               textarea.focus();
                               textarea.setSelectionRange(pos + 1, pos + 1);
-                              fetchPropertySuggestions('');
+                              fetchPropertySuggestions('', selectedConversation?.id);
                             }, 10);
                           }
                         }}
@@ -1323,12 +1697,12 @@ export default function MessagesPage() {
                   
                   <button
                     onClick={handleSendMessage}
-                    disabled={!newMessage.trim() || sending || !selectedConversation}
+                    disabled={!newMessage.trim() || sending}
                     className="p-3 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 flex-shrink-0"
                     style={{ backgroundColor: colors.primary }}
                   >
                     {sending ? (
-                      <Loader className="animate-spin h-5 w-5" />
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                     ) : (
                       <Send className="h-5 w-5" />
                     )}
@@ -1347,10 +1721,6 @@ export default function MessagesPage() {
                   <span className="flex items-center gap-1">
                     <span className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">↵</span>
                     Send
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">⇧+↵</span>
-                    New line
                   </span>
                   <button
                     onClick={toggleUidVisibility}
@@ -1451,11 +1821,6 @@ export default function MessagesPage() {
                     {hoveredProperty.specs.guests} guests
                   </span>
                 )}
-                {hoveredProperty.relationship === 'booked' && (
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                    Currently booked
-                  </span>
-                )}
               </div>
               
               <div className="flex items-center gap-2 mt-3">
@@ -1467,22 +1832,6 @@ export default function MessagesPage() {
                   className="flex-1 px-3 py-1.5 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-1"
                 >
                   View Property <ExternalLink className="h-3 w-3" />
-                </button>
-                <button
-                  onClick={(e) => copyPropertyUid(hoveredProperty.id, e)}
-                  className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-1"
-                >
-                  {copiedUid === hoveredProperty.id ? (
-                    <>
-                      <CheckCircle className="h-3 w-3 text-green-600" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" />
-                      Copy ID
-                    </>
-                  )}
                 </button>
               </div>
             </div>
@@ -1510,6 +1859,19 @@ export default function MessagesPage() {
         }
         .animate-fadeIn {
           animation: fadeIn 0.2s ease-out;
+        }
+
+        /* Pulse animation for skeletons */
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
+        }
+        .animate-pulse {
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
       `}</style>
     </div>
