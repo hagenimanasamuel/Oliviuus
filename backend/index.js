@@ -81,6 +81,8 @@ const server = createServer(app);
 const allowedOrigins = [
   process.env.CLIENT_ORIGIN,
   "https://oliviuus.com",
+  "https://account.oliviuus.com",
+  "https://www.oliviuus.com",
   "http://localhost:5173",
   "http://localhost:3000",
   "http://localhost:3001",
