@@ -363,7 +363,7 @@ export default function BottomNav() {
                 title: 'Professional Tools',
                 items: [
                     {
-                        label: 'Landlord Dashboard',
+                        label: 'Landlord Center',
                         icon: <HomeIcon size={20} />,
                         path: '/landlord/dashboard',
                         description: 'Manage properties, tenants & earnings',

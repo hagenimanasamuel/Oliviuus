@@ -1931,7 +1931,7 @@ exports.setPropertyCoverImage = async (req, res) => {
   }
 };
 
-// 12. Bulk Update Property Status
+// 12. Bulk Update Property Status (FIXED - Removed property_logs dependency)
 exports.bulkUpdatePropertyStatus = async (req, res) => {
   const connection = await isanzureDb.promise().getConnection();
 
@@ -1939,7 +1939,7 @@ exports.bulkUpdatePropertyStatus = async (req, res) => {
     await connection.beginTransaction();
 
     const { propertyUids, status, reason } = req.body;
-    const { landlordId } = req.query; // Optional landlord filter
+    const { landlordId } = req.query;
 
     if (!propertyUids || !Array.isArray(propertyUids) || propertyUids.length === 0) {
       return res.status(400).json({
@@ -1953,23 +1953,6 @@ exports.bulkUpdatePropertyStatus = async (req, res) => {
         success: false,
         message: 'Valid status is required'
       });
-    }
-
-    // Validate status changes
-    if (status === 'rented') {
-      // Additional validation for renting properties
-      const [existingRented] = await connection.query(
-        `SELECT COUNT(*) as count FROM properties 
-         WHERE property_uid IN (?) AND status = 'rented'`,
-        [propertyUids]
-      );
-
-      if (existingRented[0].count > 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'Some properties are already rented'
-        });
-      }
     }
 
     // Build query
@@ -2004,23 +1987,6 @@ exports.bulkUpdatePropertyStatus = async (req, res) => {
     }
 
     await connection.commit();
-
-    // Log the bulk update
-    if (reason) {
-      const logValues = propertyUids.map(uid => [
-        uid,
-        'status_update',
-        JSON.stringify({ from: 'multiple', to: status, reason }),
-        req.user?.id || 'system'
-      ]);
-
-      await connection.query(
-        `INSERT INTO property_logs 
-         (property_uid, action, details, performed_by) 
-         VALUES ?`,
-        [logValues]
-      );
-    }
 
     res.status(200).json({
       success: true,
@@ -2358,3 +2324,38 @@ exports.duplicateProperty = async (req, res) => {
 };
 
 
+// Update single property status
+exports.updatePropertyStatus = async (req, res) => {
+  try {
+    const { propertyUid } = req.params;
+    const { status } = req.body;
+
+    if (!status || !['active', 'inactive', 'draft', 'under_maintenance', 'rented'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid status is required'
+      });
+    }
+
+    await isanzureQuery(
+      `UPDATE properties 
+       SET status = ?, 
+           updated_at = CURRENT_TIMESTAMP,
+           published_at = CASE WHEN ? = 'active' THEN CURRENT_TIMESTAMP ELSE published_at END
+       WHERE property_uid = ?`,
+      [status, status, propertyUid]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Property status updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Error updating property status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update property status'
+    });
+  }
+};

@@ -188,37 +188,6 @@ const PasswordStep = ({ email, isExistingUser, onSubmit, redirectUrl, loading: p
 
       {/* Main Form */}
       <div className={`space-y-4 sm:space-y-6 md:space-y-8 ${isLoading ? "pointer-events-none opacity-70" : ""}`}>
-        {/* Mobile Header for Password Step */}
-        <div className="lg:hidden">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-semibold mb-2">Welcome back {guestMode ? "(Guest Mode)" : ""}</h1>
-            <p className="text-gray-400 mb-3">Enter your password for</p>
-            <div className="flex justify-center">
-              <div 
-                onClick={handleEditEmailClick}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg cursor-pointer transition-all duration-200 group ${
-                  isDarkMode 
-                    ? 'bg-gray-800/50 border border-gray-700 text-gray-300 hover:border-purple-500 hover:text-white' 
-                    : 'bg-gray-100 border border-gray-300 text-gray-700 hover:border-purple-500 hover:text-gray-900'
-                }`}
-              >
-                <span className="font-medium">{email}</span>
-                <svg 
-                  className={`w-4 h-4 transition-colors duration-200 ${
-                    isDarkMode 
-                      ? 'text-gray-400 group-hover:text-white' 
-                      : 'text-gray-500 group-hover:text-gray-700'
-                  }`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Password Input */}
         <div className="space-y-3 sm:space-y-4">

@@ -176,7 +176,7 @@ export default function AccountMenu({ onClose, user }) {
       authMessage: 'Sign in to become an agent'
     },
     landlordCenter: { 
-      label: 'Landlord Dashboard', 
+      label: 'Landlord Center', 
       icon: <LayoutDashboard size={16} />, 
       path: '/landlord/dashboard',
       requiresAuth: true,
