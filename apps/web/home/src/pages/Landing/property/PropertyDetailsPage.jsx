@@ -18,6 +18,7 @@ import ContactSection from '../../../components/LandingPage/property/ContactSect
 import BookingSummary from '../../../components/LandingPage/property/BookingSummary';
 import ShareModal from '../../../components/LandingPage/property/ShareModal';
 import LandlordProfileCard from '../../../components/LandingPage/property/LandlordProfileCard';
+import ReportModal from '../../../components/LandingPage/property/ReportModal';
 
 // Import skeletons
 import ImageGallerySkeleton from '../../../components/LandingPage/property/skeletons/ImageGallerySkeleton';
@@ -49,7 +50,8 @@ export default function PropertyDetailsPage() {
   const [showFloatingButton, setShowFloatingButton] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
   const [showPeriodSelector, setShowPeriodSelector] = useState(false);
-  
+  const [showReportModal, setShowReportModal] = useState(false);
+
   const bookingSectionRef = useRef(null);
   const floatingButtonRef = useRef(null);
   const periodSelectorRef = useRef(null);
@@ -126,7 +128,7 @@ export default function PropertyDetailsPage() {
     window.addEventListener('scroll', handleScroll);
     // Initial check
     handleScroll();
-    
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -134,13 +136,92 @@ export default function PropertyDetailsPage() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (periodSelectorRef.current && !periodSelectorRef.current.contains(event.target) &&
-          floatingButtonRef.current && !floatingButtonRef.current.contains(event.target)) {
+        floatingButtonRef.current && !floatingButtonRef.current.contains(event.target)) {
         setShowPeriodSelector(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const recordView = async () => {
+      if (!propertyUid) return;
+
+      try {
+        // Get or create session ID from localStorage
+        let sessionId = localStorage.getItem('view_session_id');
+        if (!sessionId) {
+          sessionId = crypto.randomUUID();
+          localStorage.setItem('view_session_id', sessionId);
+        }
+
+        // Record the view
+        const response = await api.post(`/views/property/${propertyUid}/view`, {
+          view_type: 'page_view',
+          session_id: sessionId,
+          referrer: document.referrer || null
+        });
+
+        // Store view UID for later updates
+        if (response.data.success) {
+          localStorage.setItem('current_view_uid', response.data.data.view.view_uid);
+        }
+      } catch (error) {
+        console.log('Failed to record view:', error);
+      }
+    };
+
+    recordView();
+
+    // Track when user leaves
+    return () => {
+      const viewUid = localStorage.getItem('current_view_uid');
+      if (viewUid) {
+        // Send final update when component unmounts
+        navigator.sendBeacon(
+          `/api/views/view/${viewUid}`,
+          JSON.stringify({ left: true })
+        );
+        localStorage.removeItem('current_view_uid');
+      }
+    };
+  }, [propertyUid]);
+
+  // Track scroll depth
+  useEffect(() => {
+    const viewUid = localStorage.getItem('current_view_uid');
+    if (!viewUid) return;
+
+    let maxScroll = 0;
+    const handleScroll = () => {
+      const scrollPercent = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100;
+      const rounded = Math.round(scrollPercent);
+      if (rounded > maxScroll && rounded % 25 === 0) { // Update at 25%, 50%, 75%, 100%
+        maxScroll = rounded;
+        api.patch(`/views/view/${viewUid}`, { scroll_depth: maxScroll })
+          .catch(() => { });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Track time spent
+  useEffect(() => {
+    const viewUid = localStorage.getItem('current_view_uid');
+    if (!viewUid) return;
+
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      const timeSpent = Math.round((Date.now() - startTime) / 1000);
+      api.patch(`/views/view/${viewUid}`, { time_spent: timeSpent })
+        .catch(() => { });
+    }, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleBookNow = () => {
@@ -233,7 +314,7 @@ export default function PropertyDetailsPage() {
   // Get all available periods for the floating selector
   const getAvailablePeriods = () => {
     if (!property) return [];
-    
+
     const periods = [];
     if (property.accept_monthly && property.monthly_price > 0) {
       periods.push({ id: 'monthly', label: 'Monthly', price: property.monthly_price, period: 'month' });
@@ -392,13 +473,13 @@ export default function PropertyDetailsPage() {
           <div className="space-y-3 sm:space-y-4 md:space-y-6 lg:relative">
             {/* Booking Summary - With ref for scroll detection and sticky positioning */}
             <div ref={bookingSectionRef} className="lg:sticky lg:top-24 lg:z-20">
-              <BookingSummary 
-                property={property} 
+              <BookingSummary
+                property={property}
                 onPeriodChange={handlePeriodChange}
                 selectedPeriod={selectedPeriod}
               />
             </div>
-            
+
             {/* Contact Section - For additional contact info */}
             <ContactSection property={property} landlord={landlord} />
           </div>
@@ -415,7 +496,7 @@ export default function PropertyDetailsPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => console.log('Report property:', propertyUid)}
+                    onClick={() => setShowReportModal(true)}
                     className="flex flex-col items-center justify-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     <div className="text-2xl text-gray-600">🚨</div>
@@ -425,25 +506,21 @@ export default function PropertyDetailsPage() {
 
                   <button
                     onClick={handleFavorite}
-                    className={`flex flex-col items-center justify-center gap-2 p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
-                      isFavorite
-                        ? 'border-[#BC8BBC] bg-[#BC8BBC]/5'
-                        : 'border-gray-200 hover:border-[#BC8BBC]/40 hover:bg-[#BC8BBC]/5'
-                    }`}
+                    className={`flex flex-col items-center justify-center gap-2 p-4 border rounded-lg transition-all duration-200 cursor-pointer ${isFavorite
+                      ? 'border-[#BC8BBC] bg-[#BC8BBC]/5'
+                      : 'border-gray-200 hover:border-[#BC8BBC]/40 hover:bg-[#BC8BBC]/5'
+                      }`}
                   >
-                    <div className={`text-2xl transition-colors duration-200 ${
-                      isFavorite ? 'text-[#BC8BBC]' : 'text-gray-600'
-                    }`}>
+                    <div className={`text-2xl transition-colors duration-200 ${isFavorite ? 'text-[#BC8BBC]' : 'text-gray-600'
+                      }`}>
                       {isFavorite ? '❤️' : '🤍'}
                     </div>
-                    <span className={`text-sm font-medium transition-colors duration-200 ${
-                      isFavorite ? 'text-[#BC8BBC]' : 'text-gray-900'
-                    }`}>
+                    <span className={`text-sm font-medium transition-colors duration-200 ${isFavorite ? 'text-[#BC8BBC]' : 'text-gray-900'
+                      }`}>
                       {isFavorite ? 'Saved' : 'Save'}
                     </span>
-                    <span className={`text-xs transition-colors duration-200 ${
-                      isFavorite ? 'text-[#BC8BBC]/70' : 'text-gray-500'
-                    }`}>
+                    <span className={`text-xs transition-colors duration-200 ${isFavorite ? 'text-[#BC8BBC]/70' : 'text-gray-500'
+                      }`}>
                       To wishlist
                     </span>
                   </button>
@@ -526,7 +603,7 @@ export default function PropertyDetailsPage() {
 
       {/* Floating Action Button for Mobile - Shows only when booking section is scrolled out of view */}
       {showFloatingButton && property.status !== 'rented' && selectedPeriodData && (
-        <div 
+        <div
           ref={floatingButtonRef}
           className="fixed bottom-20 left-4 right-4 z-40 md:hidden"
         >
@@ -540,15 +617,15 @@ export default function PropertyDetailsPage() {
                 {/* Dynamic action text based on period */}
                 <span className="text-sm">
                   {selectedPeriodData.id === 'monthly' ? 'Proceed to Rent' :
-                   selectedPeriodData.id === 'weekly' ? 'Reserve Week' :
-                   selectedPeriodData.id === 'daily' ? 'Reserve Day' :
-                   selectedPeriodData.id === 'nightly' ? 'Book Night' : 'Book Now'}
+                    selectedPeriodData.id === 'weekly' ? 'Reserve Week' :
+                      selectedPeriodData.id === 'daily' ? 'Reserve Day' :
+                        selectedPeriodData.id === 'nightly' ? 'Book Night' : 'Book Now'}
                 </span>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 {/* Period Badge - Completely separate click handler */}
-                <div 
+                <div
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
@@ -557,16 +634,16 @@ export default function PropertyDetailsPage() {
                   className="flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors"
                 >
                   <span className="text-xs font-medium">{selectedPeriodData.label}</span>
-                  <svg 
-                    className={`w-3.5 h-3.5 transition-transform duration-300 ${showPeriodSelector ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform duration-300 ${showPeriodSelector ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
-                
+
                 {/* Price */}
                 <span className="text-sm font-bold">
                   {formatPrice(selectedPeriodData.price).replace('RWF', 'RF')}
@@ -576,7 +653,7 @@ export default function PropertyDetailsPage() {
 
             {/* Period Selector Dropdown */}
             {showPeriodSelector && (
-              <div 
+              <div
                 ref={periodSelectorRef}
                 className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden animate-slide-up"
                 onClick={(e) => e.stopPropagation()}
@@ -588,7 +665,7 @@ export default function PropertyDetailsPage() {
                     </svg>
                     <span>Select Rental Period</span>
                   </div>
-                  
+
                   {availablePeriods.map((period) => (
                     <button
                       key={period.id}
@@ -597,29 +674,28 @@ export default function PropertyDetailsPage() {
                         e.preventDefault();
                         handleFloatingPeriodSelect(period.id);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all cursor-pointer ${
-                        selectedPeriod === period.id
-                          ? 'bg-gradient-to-r from-[#BC8BBC]/10 to-[#8A5A8A]/10 border border-[#BC8BBC]/30'
-                          : 'hover:bg-gray-50 border border-transparent'
-                      }`}
+                      className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all cursor-pointer ${selectedPeriod === period.id
+                        ? 'bg-gradient-to-r from-[#BC8BBC]/10 to-[#8A5A8A]/10 border border-[#BC8BBC]/30'
+                        : 'hover:bg-gray-50 border border-transparent'
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         {/* Period icon */}
                         <span className="text-lg">
                           {period.id === 'monthly' ? '📅' :
-                           period.id === 'weekly' ? '📆' :
-                           period.id === 'daily' ? '☀️' : '🌙'}
+                            period.id === 'weekly' ? '📆' :
+                              period.id === 'daily' ? '☀️' : '🌙'}
                         </span>
                         <div className="text-left">
                           <div className="text-sm font-medium text-gray-900">{period.label}</div>
                           <div className="text-xs text-gray-500">
                             {period.id === 'monthly' ? 'Long-term commitment' :
-                             period.id === 'weekly' ? 'Perfect for stays' :
-                             period.id === 'daily' ? 'Flexible booking' : 'Overnight stay'}
+                              period.id === 'weekly' ? 'Perfect for stays' :
+                                period.id === 'daily' ? 'Flexible booking' : 'Overnight stay'}
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <div className="text-right">
                           <div className="text-sm font-bold text-gray-900">
@@ -636,7 +712,7 @@ export default function PropertyDetailsPage() {
                     </button>
                   ))}
                 </div>
-                
+
                 {/* Quick action hint */}
                 <div className="px-3 py-2 bg-gray-50 border-t border-gray-100">
                   <p className="text-[10px] text-gray-500 flex items-center gap-1">
@@ -654,6 +730,14 @@ export default function PropertyDetailsPage() {
 
       {/* Bottom Navigation - Always visible on mobile */}
       <BottomNav />
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        propertyUid={propertyUid}
+        propertyTitle={property?.title}
+      />
 
       {/* Site Footer */}
       <Footer />

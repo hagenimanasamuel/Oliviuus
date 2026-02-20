@@ -1,7 +1,7 @@
-// backend/routes/isanzure/balanceRoutes.js
+// backend/routes/isanzure/landlordBalanceController.js
 const express = require('express');
 const router = express.Router();
-const balanceController = require('../../controllers/isanzure/balanceController');
+const balanceController = require('../../controllers/isanzure/landlordBalanceController');
 const authMiddleware = require('../../middlewares/authMiddleware');
 
 // All routes require authentication

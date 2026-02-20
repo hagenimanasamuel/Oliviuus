@@ -1,46 +1,89 @@
+// src/components/ui/Footer.jsx
+import { 
+  Facebook, 
+  Twitter, 
+  Instagram, 
+  Linkedin, 
+  Youtube,
+  Globe
+} from 'lucide-react';
+import Logo from './Logo';
+import LanguageSelector from './LanguageSelector';
+
 export default function Footer() {
-  const footerLinks = [
-    { label: 'Privacy Policy', href: '#' },
-    { label: 'Terms of Service', href: '#' },
-    { label: 'Contact Us', href: '#' },
+  const currentYear = new Date().getFullYear();
+
+  const footerSections = [
+    {
+      title: 'Support',
+      links: [
+        { label: 'Help Center', href: '#' },
+        { label: 'Safety information', href: '#' },
+        { label: 'Cancellation options', href: '#' },
+        { label: 'Report a concern', href: '#' },
+      ]
+    },
+    {
+      title: 'Hosting',
+      links: [
+        { label: 'List your property', href: '#' },
+        { label: 'Become an agent', href: '#' },
+        { label: 'Hosting resources', href: '#' },
+        { label: 'Community forum', href: '#' },
+      ]
+    },
+    {
+      title: 'iSanzure',
+      links: [
+        { label: 'Newsroom', href: '#' },
+        { label: 'Careers', href: '#' },
+        { label: 'Investors', href: '#' },
+        { label: 'Gift cards', href: '#' },
+      ]
+    },
+  ];
+
+  const legalLinks = [
+    { label: 'Privacy', href: '#' },
+    { label: 'Terms', href: '#' },
+    { label: 'Contact', href: '#' },
     { label: 'About', href: '#' },
   ];
 
-  const footerCategories = [
-    { title: 'Discover', links: ['Kigali', 'Rubavu', 'Musanze', 'Huye', 'Karongi'] },
-    { title: 'Types', links: ['Villas', 'Apartments', 'Houses', 'Huts', 'Studios'] },
-    { title: 'Support', links: ['Help Center', 'Safety Info', 'Cancellation', 'Report Issue'] },
+  const socialLinks = [
+    { icon: <Facebook size={18} />, href: '#', label: 'Facebook' },
+    { icon: <Twitter size={18} />, href: '#', label: 'Twitter' },
+    { icon: <Instagram size={18} />, href: '#', label: 'Instagram' },
+    { icon: <Linkedin size={18} />, href: '#', label: 'LinkedIn' },
+    { icon: <Youtube size={18} />, href: '#', label: 'YouTube' },
   ];
 
   return (
     <footer className="mt-16 border-t border-gray-200 bg-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12">
         
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Brand */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
-              <span className="text-2xl font-bold text-gray-800">iSanzure</span>
-            </div>
-            <p className="text-gray-600 text-sm">
-              Your trusted platform for finding and booking unique homes across Rwanda.
+            <Logo />
+            <p className="text-sm text-gray-500 mt-4">
+              Rwanda's trusted property marketplace.
             </p>
           </div>
 
-          {/* Categories */}
-          {footerCategories.map((category, index) => (
+          {/* Footer Sections */}
+          {footerSections.map((section, index) => (
             <div key={index}>
-              <h3 className="font-semibold text-gray-800 mb-4">{category.title}</h3>
-              <ul className="space-y-2">
-                {category.links.map((link, linkIndex) => (
+              <h3 className="font-semibold text-gray-900 mb-4">{section.title}</h3>
+              <ul className="space-y-3">
+                {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
                     <a 
-                      href="#" 
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors"
+                      href={link.href} 
+                      className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
                     >
-                      {link}
+                      {link.label}
                     </a>
                   </li>
                 ))}
@@ -51,22 +94,49 @@ export default function Footer() {
 
         {/* Bottom Footer */}
         <div className="pt-8 border-t border-gray-200">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <p className="text-gray-500 text-sm">
-                © 2024 iSanzure Rwanda. All rights reserved.
-              </p>
-            </div>
-            <div className="flex space-x-6 text-sm text-gray-600">
-              {footerLinks.map((link, index) => (
-                <a 
-                  key={index}
-                  href={link.href} 
-                  className="hover:text-blue-600 transition-colors"
-                >
-                  {link.label}
-                </a>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            
+            {/* Copyright and Legal Links */}
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <span>© {currentYear} Oliviuus Ltd.</span>
+              <span className="text-gray-300">·</span>
+              {legalLinks.map((link, index) => (
+                <span key={index} className="flex items-center">
+                  <a href={link.href} className="hover:text-gray-900 transition-colors">
+                    {link.label}
+                  </a>
+                  {index < legalLinks.length - 1 && (
+                    <span className="text-gray-300 mx-2">·</span>
+                  )}
+                </span>
               ))}
+            </div>
+
+            {/* Right side - Language and Social */}
+            <div className="flex items-center gap-6">
+              
+              {/* Language Selector - Using your custom component */}
+              <LanguageSelector 
+                variant="compact"
+                position="top"
+                align="end"
+                showLabel={false}
+                size="sm"
+              />
+
+              {/* Social Links */}
+              <div className="flex items-center gap-3">
+                {socialLinks.map((social, index) => (
+                  <a
+                    key={index}
+                    href={social.href}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={social.label}
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </div>

@@ -293,11 +293,6 @@ function TransactionRow({
                       {methodInfo.name}
                     </span>
                   )}
-                  {isWithdrawal && hasFee && (
-                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
-                      Fee: {formatFullAmount(metadata.fee_amount)}
-                    </span>
-                  )}
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
                   {formatDate(transaction.created_at)}

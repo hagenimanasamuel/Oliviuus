@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useIsanzureAuth } from '../../../context/IsanzureAuthContext';
+import api from '../../../api/axios';
 import {
     Home,
     Heart,
@@ -36,6 +37,22 @@ export default function BottomNav() {
     const dragStartY = useRef(0);
     const startHeight = useRef(0);
     
+    // Notification states
+    const [notifications, setNotifications] = useState({
+        messages: { count: 0, hasUnread: false },
+        bookingMessages: { count: 0, hasUnread: false },
+        bookings: { count: 0, hasUnread: false },
+        activeBookings: { count: 0, hasUnread: false },
+        upcomingBookings: { count: 0, hasUnread: false },
+        payments: { count: 0, hasUnread: false },
+        wishlist: { count: 0, hasUnread: false },
+        wishlistActivity: { count: 0, hasUnread: false },
+        settings: { count: 0, hasUnread: false },
+        withdrawalVerification: { count: 0, hasUnread: false },
+        propertyVerifications: { count: 0, hasUnread: false },
+        tenants: { count: 0, hasUnread: false }
+    });
+
     const location = useLocation();
     const navigate = useNavigate();
     
@@ -44,6 +61,52 @@ export default function BottomNav() {
 
     // Get account center URL from environment
     const ACCOUNT_CENTER_URL = import.meta.env.VITE_ACCOUNT_CENTER_URL || 'https://account.oliviuus.com';
+
+    // Fetch notification counts
+    const fetchNotificationCounts = async () => {
+        if (!user) return;
+
+        try {
+            const response = await api.get('/notifications/counts/all').catch(() => null);
+            
+            if (response?.data?.success) {
+                const data = response.data.data.sidebar;
+                setNotifications({
+                    messages: data.messages,
+                    bookingMessages: data.bookingMessages,
+                    bookings: data.bookings,
+                    activeBookings: data.activeBookings,
+                    upcomingBookings: data.upcomingBookings,
+                    payments: data.payments,
+                    wishlist: data.wishlist,
+                    wishlistActivity: data.wishlistActivity,
+                    settings: data.settings,
+                    withdrawalVerification: data.withdrawalVerification,
+                    propertyVerifications: data.propertyVerifications || { count: 0, hasUnread: false },
+                    tenants: data.tenants || { count: 0, hasUnread: false }
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    };
+
+    // Poll for notifications
+    useEffect(() => {
+        fetchNotificationCounts();
+        const interval = setInterval(fetchNotificationCounts, 30000);
+        return () => clearInterval(interval);
+    }, [user]);
+
+    // Helper to get total count for an item
+    const getTotalCount = (types) => {
+        return types.reduce((sum, type) => sum + (notifications[type]?.count || 0), 0);
+    };
+
+    // Check if item has unread notifications
+    const hasUnread = (types) => {
+        return types.some(type => notifications[type]?.hasUnread || false);
+    };
 
     // Handle touch/mouse events for bottom sheet dragging
     useEffect(() => {
@@ -165,7 +228,38 @@ export default function BottomNav() {
         return 'U';
     };
 
-    // Get profile sections based on user type
+    // Mark notifications as read when viewing section
+    const markAsRead = async (type) => {
+        try {
+            await api.put(`/notifications/${type}/mark-all-read`).catch(() => {});
+        } catch (error) {
+            console.error('Error marking as read:', error);
+        }
+    };
+
+    const handleProfileSectionClick = async (item) => {
+        if (item.path) {
+            navigate(item.path);
+            
+            // Mark relevant notifications as read
+            if (item.label === 'Messages') {
+                await markAsRead('messages');
+                await markAsRead('booking_messages');
+            } else if (item.label === 'Bookings') {
+                await markAsRead('bookings');
+            } else if (item.label === 'Wishlist') {
+                await markAsRead('wishlist');
+            } else if (item.label === 'Settings') {
+                await markAsRead('settings');
+                await markAsRead('withdrawal_verification');
+            } else if (item.label === 'Payments') {
+                await markAsRead('payments');
+            }
+        }
+        setIsProfileMenuOpen(false);
+    };
+
+    // Get profile sections based on user type with notifications
     const getProfileSections = () => {
         const sections = [];
 
@@ -186,7 +280,8 @@ export default function BottomNav() {
                     path: '/account/bookings',
                     description: 'Manage your reservations',
                     requiresAuth: true,
-                    badge: '3'
+                    notificationCount: getTotalCount(['bookings', 'activeBookings', 'upcomingBookings']),
+                    hasNotification: hasUnread(['bookings', 'activeBookings', 'upcomingBookings'])
                 },
                 { 
                     label: 'Wishlist', 
@@ -194,7 +289,8 @@ export default function BottomNav() {
                     path: '/account/wishlist',
                     description: 'Your saved properties',
                     requiresAuth: true,
-                    badge: '8'
+                    notificationCount: getTotalCount(['wishlist', 'wishlistActivity']),
+                    hasNotification: hasUnread(['wishlist', 'wishlistActivity'])
                 },
                 { 
                     label: 'Messages', 
@@ -202,14 +298,26 @@ export default function BottomNav() {
                     path: '/account/messages',
                     description: 'Chat with hosts and agents',
                     requiresAuth: true,
-                    badge: '2'
+                    notificationCount: getTotalCount(['messages', 'bookingMessages']),
+                    hasNotification: hasUnread(['messages', 'bookingMessages'])
+                },
+                { 
+                    label: 'Payments', 
+                    icon: <DollarSign size={20} />, 
+                    path: '/account/payments',
+                    description: 'Manage your payments',
+                    requiresAuth: true,
+                    notificationCount: notifications.payments?.count || 0,
+                    hasNotification: notifications.payments?.hasUnread || false
                 },
                 { 
                     label: 'Settings', 
                     icon: <Settings size={20} />, 
                     path: '/account/settings',
                     description: 'Account preferences',
-                    requiresAuth: true 
+                    requiresAuth: true,
+                    notificationCount: getTotalCount(['settings', 'withdrawalVerification']),
+                    hasNotification: hasUnread(['settings', 'withdrawalVerification'])
                 },
             ] : [
                 { 
@@ -260,8 +368,9 @@ export default function BottomNav() {
                         path: '/landlord/dashboard',
                         description: 'Manage properties, tenants & earnings',
                         color: 'text-[#BC8BBC]',
-                        badge: 'Dashboard',
-                        requiresAuth: true
+                        requiresAuth: true,
+                        notificationCount: notifications.propertyVerifications?.count || 0,
+                        hasNotification: notifications.propertyVerifications?.hasUnread || false
                     },
                     {
                         label: 'Analytics',
@@ -272,12 +381,14 @@ export default function BottomNav() {
                         requiresAuth: true
                     },
                     {
-                        label: 'Payments',
-                        icon: <DollarSign size={20} />,
-                        path: '/landlord/dashboard/payments',
-                        description: 'Track your earnings',
-                        color: 'text-green-600',
-                        requiresAuth: true
+                        label: 'Tenants',
+                        icon: <Users size={20} />,
+                        path: '/landlord/dashboard/tenants',
+                        description: 'Manage your tenants',
+                        color: 'text-purple-600',
+                        requiresAuth: true,
+                        notificationCount: notifications.tenants?.count || 0,
+                        hasNotification: notifications.tenants?.hasUnread || false
                     },
                 ]
             });
@@ -294,7 +405,9 @@ export default function BottomNav() {
                         description: 'Manage listings & clients',
                         color: 'text-blue-600',
                         badge: 'Dashboard',
-                        requiresAuth: true
+                        requiresAuth: true,
+                        notificationCount: notifications.propertyVerifications?.count || 0,
+                        hasNotification: notifications.propertyVerifications?.hasUnread || false
                     },
                     {
                         label: 'Commissions',
@@ -367,7 +480,7 @@ export default function BottomNav() {
 
     const profileSections = getProfileSections();
 
-    // Main nav items - 5 items: Explore, Wishlist, Bookings, Messages, Profile
+    // Main nav items with notification badges
     const mainNavItems = [
         {
             label: 'Explore',
@@ -384,7 +497,8 @@ export default function BottomNav() {
             path: '/account/wishlist',
             active: location.pathname.includes('/account/wishlist'),
             requiresAuth: true,
-            badge: '8'
+            notificationCount: getTotalCount(['wishlist', 'wishlistActivity']),
+            hasNotification: hasUnread(['wishlist', 'wishlistActivity'])
         },
         {
             label: 'Bookings',
@@ -393,7 +507,8 @@ export default function BottomNav() {
             path: '/account/bookings',
             active: location.pathname.includes('/account/bookings'),
             requiresAuth: true,
-            badge: '3'
+            notificationCount: getTotalCount(['bookings', 'activeBookings', 'upcomingBookings']),
+            hasNotification: hasUnread(['bookings', 'activeBookings', 'upcomingBookings'])
         },
         {
             label: 'Messages',
@@ -402,20 +517,23 @@ export default function BottomNav() {
             path: '/account/messages',
             active: location.pathname.includes('/account/messages'),
             requiresAuth: true,
-            badge: '2'
+            notificationCount: getTotalCount(['messages', 'bookingMessages']),
+            hasNotification: hasUnread(['messages', 'bookingMessages'])
         },
         {
             label: 'Profile',
             icon: <User size={24} />,
             activeIcon: <User size={24} />,
             isProfile: true,
-            active: isProfileMenuOpen
+            active: isProfileMenuOpen,
+            notificationCount: getTotalCount(['payments', 'settings', 'withdrawalVerification', 'propertyVerifications', 'tenants']),
+            hasNotification: hasUnread(['payments', 'settings', 'withdrawalVerification', 'propertyVerifications', 'tenants'])
         },
     ];
 
     return (
         <>
-            {/* Bottom Navigation Bar - Hidden on desktop, shown on mobile */}
+            {/* Bottom Navigation Bar */}
             <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl py-2 px-2">
                 <div className="flex items-center justify-between max-w-md mx-auto">
                     {mainNavItems.map((item, index) => (
@@ -457,13 +575,24 @@ export default function BottomNav() {
                                             <User size={16} />
                                         </div>
                                     )}
-                                    {!user && (
-                                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#BC8BBC] rounded-full ring-2 ring-white"></div>
-                                    )}
-                                    {user && item.badge && (
-                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full min-w-[18px] text-center ring-2 ring-white">
-                                            {item.badge}
-                                        </span>
+                                    
+                                    {/* Notification dot for profile */}
+                                    {item.hasNotification && item.notificationCount > 0 && (
+                                        <>
+                                            {item.notificationCount <= 2 ? (
+                                                <span 
+                                                    className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-pulse ring-2 ring-white"
+                                                    style={{ backgroundColor: '#BC8BBC' }}
+                                                ></span>
+                                            ) : (
+                                                <span 
+                                                    className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0.5 rounded-full text-white font-bold ring-2 ring-white"
+                                                    style={{ backgroundColor: '#BC8BBC' }}
+                                                >
+                                                    {item.notificationCount > 9 ? '9+' : item.notificationCount}
+                                                </span>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                                 <span className={`
@@ -472,9 +601,6 @@ export default function BottomNav() {
                                 `}>
                                     Profile
                                 </span>
-                                {isProfileMenuOpen && (
-                                    <span className="absolute -top-1.5 w-1 h-1 bg-[#BC8BBC] rounded-full"></span>
-                                )}
                             </button>
                         ) : (
                             <button
@@ -501,13 +627,32 @@ export default function BottomNav() {
                                     `}>
                                         {item.active ? (item.activeIcon || item.icon) : item.icon}
                                     </div>
-                                    {item.badge && user && (
-                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full min-w-[18px] text-center ring-2 ring-white">
-                                            {item.badge}
-                                        </span>
+                                    
+                                    {/* Notification dot/badge */}
+                                    {item.hasNotification && item.notificationCount > 0 && user && (
+                                        <>
+                                            {item.notificationCount <= 2 ? (
+                                                <span 
+                                                    className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-pulse ring-2 ring-white"
+                                                    style={{ backgroundColor: '#BC8BBC' }}
+                                                ></span>
+                                            ) : (
+                                                <span 
+                                                    className="absolute -top-2 -right-2 text-[10px] px-1.5 py-0.5 rounded-full text-white font-bold ring-2 ring-white"
+                                                    style={{ backgroundColor: '#BC8BBC' }}
+                                                >
+                                                    {item.notificationCount > 9 ? '9+' : item.notificationCount}
+                                                </span>
+                                            )}
+                                        </>
                                     )}
+                                    
+                                    {/* Dot for unauthenticated users */}
                                     {item.requiresAuth && !user && (
-                                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#BC8BBC] rounded-full ring-2 ring-white"></div>
+                                        <span 
+                                            className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ring-2 ring-white"
+                                            style={{ backgroundColor: '#BC8BBC' }}
+                                        ></span>
                                     )}
                                 </div>
                                 <span className={`
@@ -516,9 +661,6 @@ export default function BottomNav() {
                                 `}>
                                     {item.label}
                                 </span>
-                                {item.active && (
-                                    <span className="absolute -top-1.5 w-1 h-1 bg-[#BC8BBC] rounded-full"></span>
-                                )}
                             </button>
                         )
                     ))}
@@ -554,7 +696,7 @@ export default function BottomNav() {
                             <div className="w-12 h-1.5 bg-gray-300 rounded-full hover:bg-gray-400 transition-colors"></div>
                         </div>
 
-                        {/* Header */}
+                        {/* Header with Notification Summary */}
                         <div className="px-6 py-4 border-b border-gray-100">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4">
@@ -578,7 +720,18 @@ export default function BottomNav() {
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+                                        
+                                        {/* Total notification badge on avatar */}
+                                        {user && (getTotalCount(['messages', 'bookingMessages', 'payments', 'settings']) > 0) && (
+                                            <span 
+                                                className="absolute -top-1 -right-1 text-xs px-1.5 py-0.5 rounded-full text-white font-bold ring-2 ring-white"
+                                                style={{ backgroundColor: '#BC8BBC' }}
+                                            >
+                                                {getTotalCount(['messages', 'bookingMessages', 'payments', 'settings']) > 9 
+                                                    ? '9+' 
+                                                    : getTotalCount(['messages', 'bookingMessages', 'payments', 'settings'])}
+                                            </span>
+                                        )}
                                     </div>
 
                                     {/* User Info */}
@@ -627,7 +780,7 @@ export default function BottomNav() {
                             </div>
                         </div>
 
-                        {/* Scrollable Content */}
+                        {/* Scrollable Content with Notification Badges */}
                         <div className="h-[calc(100%-120px)] overflow-y-auto pb-20">
                             {profileSections.map((section, sectionIndex) => (
                                 <div key={sectionIndex} className="px-6 py-5 border-b border-gray-100">
@@ -642,21 +795,22 @@ export default function BottomNav() {
                                                     if (item.action) {
                                                         item.action();
                                                     } else {
-                                                        handleMenuItemClick(item.path, item.requiresAuth);
+                                                        handleProfileSectionClick(item);
                                                     }
                                                 }}
                                                 className={`
                                                     w-full flex items-center justify-between p-3.5 rounded-xl
-                                                    transition-all duration-300 group
+                                                    transition-all duration-300 group relative
                                                     ${item.highlight 
                                                         ? 'bg-gradient-to-r from-[#BC8BBC]/10 to-purple-600/10 hover:from-[#BC8BBC]/20 hover:to-purple-600/20' 
                                                         : 'hover:bg-gray-50'
                                                     }
+                                                    ${item.hasNotification ? 'ring-2 ring-[#BC8BBC]/20' : ''}
                                                 `}
                                             >
                                                 <div className="flex items-center space-x-4">
                                                     <div className={`
-                                                        w-10 h-10 rounded-xl flex items-center justify-center
+                                                        w-10 h-10 rounded-xl flex items-center justify-center relative
                                                         ${item.highlight 
                                                             ? 'bg-gradient-to-r from-[#BC8BBC]/20 to-purple-600/20' 
                                                             : 'bg-gray-100 group-hover:bg-gray-200'
@@ -666,6 +820,14 @@ export default function BottomNav() {
                                                         <div className={item.color || 'text-gray-600'}>
                                                             {item.icon}
                                                         </div>
+                                                        
+                                                        {/* Small dot for notification */}
+                                                        {item.hasNotification && item.notificationCount <= 2 && (
+                                                            <span 
+                                                                className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-pulse ring-2 ring-white"
+                                                                style={{ backgroundColor: '#BC8BBC' }}
+                                                            ></span>
+                                                        )}
                                                     </div>
                                                     <div className="text-left">
                                                         <div className="font-medium text-gray-900">
@@ -679,7 +841,24 @@ export default function BottomNav() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-3">
-                                                    {item.badge && (
+                                                    {item.notificationCount > 0 && (
+                                                        <>
+                                                            {item.notificationCount > 2 ? (
+                                                                <span 
+                                                                    className="text-xs px-2 py-1 rounded-full text-white font-bold"
+                                                                    style={{ backgroundColor: '#BC8BBC' }}
+                                                                >
+                                                                    {item.notificationCount > 9 ? '9+' : item.notificationCount}
+                                                                </span>
+                                                            ) : (
+                                                                <span 
+                                                                    className="w-2 h-2 rounded-full animate-pulse"
+                                                                    style={{ backgroundColor: '#BC8BBC' }}
+                                                                ></span>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                    {item.badge && !item.notificationCount && (
                                                         <span className="text-xs px-2.5 py-1 bg-[#BC8BBC]/10 text-[#BC8BBC] rounded-full font-medium">
                                                             {item.badge}
                                                         </span>
@@ -729,6 +908,14 @@ export default function BottomNav() {
                         body {
                             padding-bottom: 80px;
                         }
+                    }
+                    
+                    @keyframes pulse {
+                        0%, 100% { opacity: 1; transform: scale(1); }
+                        50% { opacity: 0.8; transform: scale(1.1); }
+                    }
+                    .animate-pulse {
+                        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
                     }
                 `}
             </style>

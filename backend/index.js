@@ -71,6 +71,8 @@ const wishlistRoutes = require('./routes/isanzure/wishlistRoutes');
 const userBookingRoutes = require('./routes/isanzure/userBookingRoutes');
 const balanceRoutes = require('./routes/isanzure/balanceRoutes');
 const landlordTenantRoutes = require('./routes/isanzure/landlordTenantRoutes');
+const propertyReportRoutes = require('./routes/isanzure/propertyReportRoutes');
+const propertyViewRoutes = require('./routes/isanzure/propertyViewRoutes');
 
 const cookieParser = require("cookie-parser");
 
@@ -82,6 +84,7 @@ const allowedOrigins = [
   process.env.CLIENT_ORIGIN,
   "https://oliviuus.com",
   "https://account.oliviuus.com",
+  "https://isanzure.oliviuus.com",
   "https://www.oliviuus.com",
   "http://localhost:5173",
   "http://localhost:3000",
@@ -479,6 +482,8 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/isanzure/user/bookings', userBookingRoutes);
 app.use('/api/isanzure/balance', balanceRoutes);
 app.use('/api/landlord/tenants', landlordTenantRoutes);
+app.use('/api/reports', propertyReportRoutes);
+app.use('/api/views', propertyViewRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -527,7 +532,7 @@ const startServer = async () => {
     initializeSubscriptionMonitor();
     
     // Step 5: Start the server with Socket.IO
-    const PORT = process.env.PORT || 3123;
+    const PORT = process.env.PORT || 3127;
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT} with Socket.IO support`);
       console.log("✅ Database initialized successfully!");

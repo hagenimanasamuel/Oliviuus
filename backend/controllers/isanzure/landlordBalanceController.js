@@ -1,4 +1,4 @@
-// backend/controllers/isanzure/balanceController.js
+// backend/controllers/isanzure/landlordBalanceController.js
 const { isanzureQuery } = require('../../config/isanzureDbConfig');
 const mysql = require('mysql2');
 

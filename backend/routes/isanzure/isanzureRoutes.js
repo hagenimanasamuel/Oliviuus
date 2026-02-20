@@ -4,7 +4,11 @@ const router = express.Router();
 const { isanzureQuery } = require('../../config/isanzureDbConfig');
 const authMiddleware = require('../../middlewares/authMiddleware');
 const accountSettingsRoutes = require('./accountSettingsRoutes');
+const tenantSettingsRoutes = require('./tenantSettingsRoutes');
+const tenantBalanceRoutes = require('./tenantBalanceRoutes');
 
+router.use('/settings/tenant', tenantSettingsRoutes);
+router.use('/balance/tenant', tenantBalanceRoutes);
 router.use('/settings', accountSettingsRoutes);
 
 // Create iSanzure user with landlord role

@@ -18,17 +18,19 @@ import SettingsPage from './SettingsPage';
 
 export default function LandlordDashboard() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* Header — fixed height, never scrolls */}
       <LandlordHeader />
-      
-      <div className="flex">
-        {/* Sidebar - Hidden on mobile, shown on desktop */}
-        <div className="hidden lg:block">
+
+      {/* Body — fills exact remaining height after header */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', minHeight: 0 }}>
+        {/* Sidebar — hidden on mobile, gets full height from parent on desktop */}
+        <div className="hidden lg:block" style={{ height: '100%' }}>
           <LandlordSidebar />
         </div>
-        
-        {/* Main Content */}
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 80px)' }}>
+
+        {/* Main Content — scrolls independently */}
+        <main style={{ flex: 1, overflowY: 'auto' }} className="bg-gray-50 p-4 lg:p-8">
           <Routes>
             <Route path="/" element={<DashboardOverview />} />
             <Route path="/dashboard" element={<DashboardOverview />} />

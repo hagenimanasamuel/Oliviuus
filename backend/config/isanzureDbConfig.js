@@ -1496,6 +1496,250 @@ const createPendingBalancesTable = async () => {
   }
 };
 
+const createPropertyReportsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS property_reports (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      report_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      
+      -- Who reported (NULL for anonymous reports)
+      reporter_id INT NULL,
+      
+      -- What was reported
+      property_id INT NOT NULL,
+      
+      -- Anonymous reporter info (if not logged in)
+      anonymous_name VARCHAR(100) NULL,
+      anonymous_email VARCHAR(255) NULL,
+      anonymous_phone VARCHAR(20) NULL,
+      
+      -- Report details
+      report_type ENUM(
+        'fake_listing',
+        'wrong_price',
+        'already_rented',
+        'inaccurate_info',
+        'scam_fraud',
+        'inappropriate_content',
+        'duplicate_listing',
+        'landlord_issue',
+        'safety_concern',
+        'other'
+      ) NOT NULL,
+      
+      -- Specific category based on report type
+      fake_listing_reason ENUM(
+        'property_doesnt_exist',
+        'fake_photos',
+        'not_available_for_rent',
+        'different_property'
+      ) NULL,
+      
+      price_issue_type ENUM(
+        'price_too_low',
+        'price_too_high',
+        'hidden_fees',
+        'price_changed'
+      ) NULL,
+      
+      inaccurate_info_field ENUM(
+        'location',
+        'size_area',
+        'amenities',
+        'rooms_count',
+        'property_type',
+        'utilities'
+      ) NULL,
+      
+      scam_type ENUM(
+        'requesting_money_before_viewing',
+        'too_good_to_be_true',
+        'pressure_tactics',
+        'refusal_to_meet',
+        'fake_landlord'
+      ) NULL,
+      
+      landlord_issue_type ENUM(
+        'unresponsive',
+        'rude_behavior',
+        'harassment',
+        'showing_up_unannounced',
+        'broken_promises'
+      ) NULL,
+      
+      safety_issue_type ENUM(
+        'unsafe_neighborhood',
+        'structural_damage',
+        'electrical_hazard',
+        'water_contamination',
+        'security_concern'
+      ) NULL,
+      
+      -- Description (required for 'other' type, optional otherwise)
+      description TEXT NULL,
+      
+      -- Evidence (optional)
+      evidence_images JSON NULL, -- Array of image URLs
+      evidence_public_ids JSON NULL, -- Cloudinary public IDs for deletion
+      
+      -- Contact preference
+      contact_allowed BOOLEAN DEFAULT FALSE,
+      contact_method ENUM('email', 'phone', 'whatsapp', 'none') DEFAULT 'none',
+      
+      -- Reporter IP for anonymous reports (for abuse prevention)
+      reporter_ip VARCHAR(45) NULL,
+      reporter_user_agent TEXT NULL,
+      
+      -- Status tracking
+      status ENUM(
+        'pending',
+        'under_review',
+        'investigating',
+        'resolved',
+        'dismissed',
+        'action_taken'
+      ) DEFAULT 'pending',
+      
+      priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
+      
+      -- Admin handling
+      assigned_to_admin_id INT NULL,
+      admin_notes TEXT NULL,
+      admin_response TEXT NULL,
+      action_taken TEXT NULL,
+      
+      -- Resolution
+      resolved_at TIMESTAMP NULL,
+      resolved_by_admin_id INT NULL,
+      resolution_type ENUM(
+        'no_action',
+        'warning_issued',
+        'listing_removed',
+        'landlord_suspended',
+        'landlord_banned',
+        'property_verified',
+        'content_updated',
+        'other'
+      ) NULL,
+      
+      -- Timestamps
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      
+      -- Indexes for performance
+      INDEX idx_report_uid (report_uid),
+      INDEX idx_reporter_id (reporter_id),
+      INDEX idx_property_id (property_id),
+      INDEX idx_report_type (report_type),
+      INDEX idx_status (status),
+      INDEX idx_priority (priority),
+      INDEX idx_created_at (created_at),
+      INDEX idx_resolved_at (resolved_at),
+      INDEX idx_assigned_to (assigned_to_admin_id),
+      INDEX idx_reporter_ip (reporter_ip),
+      
+      -- Composite indexes for common queries
+      INDEX idx_status_priority (status, priority),
+      INDEX idx_type_status (report_type, status),
+      INDEX idx_reporter_status (reporter_id, status),
+      INDEX idx_property_status (property_id, status),
+      INDEX idx_created_status (created_at, status),
+      
+      -- Foreign keys (reporter_id is now NULLABLE)
+      FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE SET NULL,
+      FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
+      FOREIGN KEY (assigned_to_admin_id) REFERENCES users(id) ON DELETE SET NULL,
+      FOREIGN KEY (resolved_by_admin_id) REFERENCES users(id) ON DELETE SET NULL
+      
+      -- Removed the unique constraint since anonymous reporters could report multiple times
+      -- We'll handle duplicate prevention in the application logic
+      
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ Property reports table is ready");
+  } catch (err) {
+    console.error("❌ Error creating property reports table:", err);
+  }
+};
+
+const createPropertyViewsTable = async () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS property_views (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      view_uid VARCHAR(36) NOT NULL UNIQUE DEFAULT (UUID()),
+      
+      -- What was viewed
+      property_id INT NOT NULL,
+      
+      -- Who viewed (NULL for anonymous)
+      viewer_id INT NULL,
+      
+      -- View details
+      view_type ENUM('page_view', 'quick_view', 'gallery_view', 'contact_view') DEFAULT 'page_view',
+      
+      -- Session tracking
+      session_id VARCHAR(100) NULL,
+      device_type ENUM('mobile', 'tablet', 'desktop', 'bot') DEFAULT 'desktop',
+      browser VARCHAR(50) NULL,
+      os VARCHAR(50) NULL,
+      
+      -- Location data (optional)
+      ip_address VARCHAR(45) NULL,
+      country_code VARCHAR(2) NULL,
+      city VARCHAR(100) NULL,
+      
+      -- Referrer info
+      referrer_url TEXT NULL,
+      referrer_domain VARCHAR(255) NULL,
+      
+      -- Time spent (in seconds, updated when they leave)
+      time_spent INT DEFAULT 0,
+      
+      -- Scroll depth percentage (track engagement)
+      scroll_depth INT DEFAULT 0,
+      
+      -- Actions performed during this view
+      actions JSON NULL, -- Array of actions: ['viewed_images', 'clicked_contact', 'saved', 'shared']
+      
+      -- Timestamps
+      viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      left_at TIMESTAMP NULL,
+      
+      -- Indexes for performance
+      INDEX idx_view_uid (view_uid),
+      INDEX idx_property_id (property_id),
+      INDEX idx_viewer_id (viewer_id),
+      INDEX idx_view_type (view_type),
+      INDEX idx_viewed_at (viewed_at),
+      INDEX idx_session_id (session_id),
+      INDEX idx_device_type (device_type),
+      INDEX idx_country_code (country_code),
+      
+      -- Composite indexes for analytics
+      INDEX idx_property_date (property_id, viewed_at),
+      INDEX idx_property_type_date (property_id, view_type, viewed_at),
+      INDEX idx_viewer_property (viewer_id, property_id),
+      
+      -- Foreign keys
+      FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
+      FOREIGN KEY (viewer_id) REFERENCES users(id) ON DELETE SET NULL
+      
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `;
+
+  try {
+    await isanzureQuery(sql);
+    console.log("✅ Property views table is ready");
+  } catch (err) {
+    console.error("❌ Error creating property views table:", err);
+  }
+};
+
+
 // Initialize iSanzure database 
 const initializeIsanzureDatabase = async () => {
   try {
@@ -1524,6 +1768,8 @@ const initializeIsanzureDatabase = async () => {
     await createWithdrawalsTable(); 
     await createBookingsTable(); 
     await createWishlistTable();
+    await createPropertyReportsTable()
+    await createPropertyViewsTable();
     
     // 3. TABLES THAT REFERENCE ONLY BOOKINGS
     await createBookingExtensionsTable(); 
